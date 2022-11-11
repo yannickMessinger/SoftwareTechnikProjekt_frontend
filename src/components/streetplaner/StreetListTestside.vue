@@ -1,0 +1,129 @@
+<!--
+    author: Sean Dittmann
+    date: 11.11.2022 
+-->
+<script setup lang="ts">
+    /**Imports: */
+    import type { IListElement } from '../../services/streetplaner/IListElement';
+    import type { IToolElement } from '../../services/streetplaner/IToolElement';
+    
+    /**Variables: */
+    var totalToolNumber = 3; /** number of toolslots shown in the toollist*/
+    var toolList: IToolElement[] = Array(totalToolNumber).fill([]); /** List of all Tools */
+    var totalObjectNumber = 3; /** number of objectslots shown in the objectList*/
+    var objectList: IListElement[] = Array(totalObjectNumber).fill([]); /** List of all Objects placable in street Editor*/
+    /** currently selected tool, default value is no tool selected */
+    var activeTool: IToolElement = {
+        id: -1, 
+        name: "no Tool selected",
+        texture:"/img/dummy.png"
+    };
+    /**currently selected object, default value is no object selected */
+    var activeObject: IListElement = { 
+        groupId: -1,
+        group: "no data",
+        id: -1,
+        type:"no data",
+        name:"no Object selected",
+        heading:0,
+        texture: "/img/dummy.png"
+    };
+    
+    /**entrys in toollist */ 
+    toolList[0] = { id: 0, name: "place", texture: "/img/dummy.png"};
+    toolList[1] = { id: 1, name: "destroy", texture: "/img/dummy.png"};
+    toolList[2] = { id: 2, name: "select", texture: "/img/dummy.png"};
+    
+    /**entrys in objectlist */
+    objectList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,texture: "/img/dummy.png"};
+    objectList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: "/img/dummy.png"};
+    objectList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: "/img/dummy.png"};
+    
+</script>
+
+<template>
+    <table class="tableTest">
+        <tr>
+            <td>
+                <div class="list-object">
+                    <h2 class="list-title">Tool List</h2>
+                    <div v-for="row in toolList" class="list-element">
+                        <img v-if="row != null" :src="row.texture" class="grid-img"/>
+                        <h4 v-if="row != null" class="list-text">{{row.name}}</h4>
+                    </div>
+                </div>  
+            </td>
+            <td>
+                <div class="list-object">
+                    <h2 class="list-title">Object List</h2>
+                    <div v-for="row in objectList" class="list-element">
+                        <img v-if="row != null" :src="row.texture" class="list-img"/>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="selected-object">
+                    <h3 class="list-title"> Active Tool:</h3>
+                    <img v-if="activeTool != null" :src="activeTool.texture" class="list-img"/>
+                    <h4 v-if="activeTool != null" class="list-text">{{activeTool.name}}</h4>
+                </div>
+            </td>
+            <td>
+                <div class="selected-object">
+                    <h3 class="list-title"> Active Object:</h3>
+                    <img v-if="activeObject != null" :src="activeObject.texture" class="list-img"/>
+                </div>
+            </td>
+        </tr>
+    </table>
+</template>
+
+<style>
+    .tableTest{
+        width: 100%;
+        height: 100%;
+        display: inline-table;
+    }
+    .list-object{
+        width: 90%;
+        height: 90%;
+        display: table-row;
+        border: solid 1px gray;
+        background-color: gray;
+    }
+    .list-title{
+        margin: 5%;
+        width: 90%;
+        height: 90%;
+        color:black;
+        background-color: white;
+    }
+    .list-element {
+        display: list-item;
+        border: solid 1px gray;
+        background-color:darkgray;
+        margin: 5%;
+    }
+    .list-img {
+        width: 90%;
+        height: 90%;
+        display: block;
+        border: solid 1px gray;
+        margin: 5%;
+        
+    }
+    .list-text{
+        margin: 5%;
+        width: 90%;
+        height: 90%;
+        color:black;
+        border: solid 1px gray;
+        background-color: white;
+    }
+    .selected-object{
+        display: table-row;
+        border: solid 1px gray;
+        background-color:darkgray;
+        margin: 5%;
+    }
+</style>
