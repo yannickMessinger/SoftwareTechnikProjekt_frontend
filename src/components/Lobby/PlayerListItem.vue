@@ -5,7 +5,7 @@
 
 <script setup lang = 'ts'>
 
-import { IPlayerListItem } from '../../services/interfaces/IPlayerListItem';
+import { IPlayerListItem } from '../../typings/IPlayerListItem';
 
 const props = defineProps<{
     player: IPlayerListItem

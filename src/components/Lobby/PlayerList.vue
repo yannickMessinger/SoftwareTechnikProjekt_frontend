@@ -11,9 +11,8 @@
 <script setup lang = 'ts'>
 
 
-import { usePlayerList } from '../../services/usePlayerList';
 import PlayerListItem from './PlayerListItem.vue';
-import { IPlayerListItem } from '../../services/interfaces/IPlayerListItem';
+import { IPlayerListItem } from '../../typings/IPlayerListItem';
 
 
 const props = defineProps<{

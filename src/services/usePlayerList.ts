@@ -1,5 +1,5 @@
 import { reactive, readonly } from "vue";
-import { IPlayerListItem } from "./interfaces/IPlayerListItem";
+import { IPlayerListItem } from "../typings/IPlayerListItem";
 
 export interface IPlayerListState {
     playerlist: IPlayerListItem[]
