@@ -52,8 +52,10 @@
                     <h2 class="list-title">Tool List</h2>
                     <!-- display container for tool list element-->
                     <div v-for="row in toolList" class="list-element">
-                        <img v-if="row != null" :src="row.texture" class="list-img"/>
-                        <h4 v-if="row != null" class="list-text">{{row.name}}</h4>
+                        <button class="list-button">
+                            <img v-if="row != null" :src="row.texture" class="list-img"/>
+                            <h4 v-if="row != null" class="toolList-text">{{row.name}}</h4>
+                        </button>
                     </div>
                 </div>  
             </td>
@@ -63,20 +65,23 @@
                     <h2 class="list-title">Object List</h2>
                     <!-- display container for object list element-->
                     <div v-for="row in objectList" class="list-element">
-                        <table>
-                            <tr>
-                                <td>
-                                    <img v-if="row != null" :src="row.texture" class="list-img"/>
-                                </td>
-                                <td>
-                                    <ul>
-                                        <li class="list-text">{{row.id}}</li>
-                                        <li class="list-text">{{row.name}}</li>
-                                        <li class="list-text">{{row.type}}</li>
-                                    </ul>
-                                </td>
-                            </tr>
-                        </table> 
+                        <button class="list-button">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <img v-if="row != null" :src="row.texture" class="list-img"/>
+                                    </td>
+                                    <td>
+                                        <ul class="list-without">
+                                            <li class="objectList-text"><h4>Details:</h4></li>
+                                            <li class="objectList-text">{{row.id}}</li>
+                                            <li class="objectList-text">{{row.name}}</li>
+                                            <li class="objectList-text">{{row.type}}</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </button> 
                     </div>
                 </div>
             </td>
@@ -85,7 +90,7 @@
                 <div class="selected-object">
                     <h3 class="list-title"> Active Tool:</h3>
                     <img v-if="activeTool != null" :src="activeTool.texture" class="list-img"/>
-                    <h4 v-if="activeTool != null" class="list-text">{{activeTool.name}}</h4>
+                    <h4 v-if="activeTool != null" class="toolList-text">{{activeTool.name}}</h4>
                 </div>
             </td>
             <td>
@@ -98,10 +103,11 @@
                                 <img v-if="activeObject != null" :src="activeObject.texture" class="list-img"/>
                             </td>
                             <td>
-                                <ul>
-                                    <li class="list-text">{{activeObject.id}}</li>
-                                    <li class="list-text">{{activeObject.name}}</li>
-                                    <li class="list-text">{{activeObject.type}}</li>
+                                <ul class="list-without">
+                                    <li class="objectList-text"><h4>Details:</h4></li>
+                                    <li class="objectList-text">{{activeObject.id}}</li>
+                                    <li class="objectList-text">{{activeObject.name}}</li>
+                                    <li class="objectList-text">{{activeObject.type}}</li>
                                 </ul>
                             </td>
                         </tr>
@@ -151,14 +157,18 @@
         margin: 5%;
         
     }
-    /** style for text elements in toollist, active tool and listelements in object list element*/
-    .list-text{
+    /** style for text elements in toollist and active tool*/
+    .toolList-text{
         margin: 5%;
         width: 90%;
         height: 90%;
         color:black;
         border: solid 1px gray;
         background-color: white;
+    }
+    /** style for text in listelements in object lists*/
+    .objectList-text{
+        color:black;
     }
     /** style for active tool and active object container*/
     .selected-object{
@@ -167,4 +177,18 @@
         background-color:darkgray;
         margin: 5%;
     }
+    /** style for buttons (tool list and object list) */
+    .list-button{
+        border: solid 2px black;
+        background-color:darkgray;
+    }
+    /** style for clicked buttons (tool list and object list) */
+    .list-button:active{
+        background-color: orange;
+    }
+    /** list without bullets for object sub list on button*/
+    .list-without {
+        list-style-type: none;
+    }
+
 </style>
