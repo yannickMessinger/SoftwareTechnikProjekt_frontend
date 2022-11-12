@@ -42,11 +42,14 @@
 </script>
 
 <template>
+    <!-- table structure for display test-->
     <table class="tableTest">
         <tr>
             <td>
-                <div class="list-object">
+                <!--display container for toollist-->
+                <div class="list-container">
                     <h2 class="list-title">Tool List</h2>
+                    <!-- display container for tool list element-->
                     <div v-for="row in toolList" class="list-element">
                         <img v-if="row != null" :src="row.texture" class="grid-img"/>
                         <h4 v-if="row != null" class="list-text">{{row.name}}</h4>
@@ -54,14 +57,30 @@
                 </div>  
             </td>
             <td>
-                <div class="list-object">
+                <!--display container for object List-->
+                <div class="list-container">
                     <h2 class="list-title">Object List</h2>
+                    <!-- display container for object list element-->
                     <div v-for="row in objectList" class="list-element">
-                        <img v-if="row != null" :src="row.texture" class="list-img"/>
+                        <table>
+                            <tr>
+                                <td>
+                                    <img v-if="row != null" :src="row.texture" class="list-img"/>
+                                </td>
+                                <td>
+                                    <ul>
+                                        <li class="list-text">{{row.id}}</li>
+                                        <li class="list-text">{{row.name}}</li>
+                                        <li class="list-text">{{row.type}}</li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </table> 
                     </div>
                 </div>
             </td>
             <td>
+                <!--display container for active tool-->
                 <div class="selected-object">
                     <h3 class="list-title"> Active Tool:</h3>
                     <img v-if="activeTool != null" :src="activeTool.texture" class="list-img"/>
@@ -69,9 +88,23 @@
                 </div>
             </td>
             <td>
+                <!--display container for active object-->
                 <div class="selected-object">
                     <h3 class="list-title"> Active Object:</h3>
-                    <img v-if="activeObject != null" :src="activeObject.texture" class="list-img"/>
+                    <table>
+                        <tr>
+                            <td>
+                                <img v-if="activeObject != null" :src="activeObject.texture" class="list-img"/>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li class="list-text">{{activeObject.id}}</li>
+                                    <li class="list-text">{{activeObject.name}}</li>
+                                    <li class="list-text">{{activeObject.type}}</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </table> 
                 </div>
             </td>
         </tr>
@@ -79,18 +112,21 @@
 </template>
 
 <style>
+    /** style for test table*/
     .tableTest{
         width: 100%;
         height: 100%;
         display: inline-table;
     }
-    .list-object{
+    /** style for tool list or object list in general*/
+    .list-container{
         width: 90%;
         height: 90%;
         display: table-row;
         border: solid 1px gray;
         background-color: gray;
     }
+    /** style for list title for toollist and objectlist*/
     .list-title{
         margin: 5%;
         width: 90%;
@@ -98,12 +134,14 @@
         color:black;
         background-color: white;
     }
+    /** style for list element for toollist and objectlist*/
     .list-element {
         display: list-item;
         border: solid 1px gray;
         background-color:darkgray;
         margin: 5%;
     }
+    /** style for images in toollist, objectlist, active tool and active object*/
     .list-img {
         width: 90%;
         height: 90%;
@@ -112,6 +150,7 @@
         margin: 5%;
         
     }
+    /** style for text elements in toollist, active tool and listelements in object list element*/
     .list-text{
         margin: 5%;
         width: 90%;
@@ -120,6 +159,7 @@
         border: solid 1px gray;
         background-color: white;
     }
+    /** style for active tool and active object container*/
     .selected-object{
         display: table-row;
         border: solid 1px gray;
