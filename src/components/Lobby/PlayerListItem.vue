@@ -1,6 +1,6 @@
 <!-- Component that represents a single player in the player list-->
 <template>
-    <li>{{props.player.name}}</li>
+    <tr>{{props.player.name}}</tr>
 </template>
 
 <script setup lang = 'ts'>

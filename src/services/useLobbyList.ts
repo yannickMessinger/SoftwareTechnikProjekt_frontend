@@ -13,8 +13,14 @@ const lobbyState = reactive<ILobbyListState>({
 
 export function useLobbyList(){
 
-    lobbyState.lobbylist.push({name: "test"});
-    lobbyState.lobbylist.push({name:"test2"});
+    lobbyState.lobbylist.push({name: "test", gamemode: "build", player: 4});
+    lobbyState.lobbylist.push({name: "lobby2", gamemode: "play", player: 14});
+
+    lobbyState.lobbylist.push({name: "test", gamemode: "build", player: 4});
+    lobbyState.lobbylist.push({name: "lobby2", gamemode: "play", player: 14});
+
+    lobbyState.lobbylist.push({name: "test", gamemode: "build", player: 4});
+    lobbyState.lobbylist.push({name: "lobby2", gamemode: "play", player: 14});
     
     return {
         lobbyList: readonly(lobbyState) // state vor unkontrollierten Änderungen von außen schützen

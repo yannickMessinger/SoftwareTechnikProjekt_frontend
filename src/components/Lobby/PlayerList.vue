@@ -1,10 +1,29 @@
 <!-- Component that represents a list of active players in a selected lobby-->
 <template>
-    <h3>PlayerListComponent</h3>
-    <table>
-        <ul>
-            <PlayerListItem :player="ele" v-for="ele in liste"></PlayerListItem>
-        </ul>
+    
+    <table cellspacing="0" cellpadding="0" width="325">
+        <h3>Active Players</h3>
+        <tr>
+            <td>
+                <table  cellspacing="0" cellpadding="1" width="325">
+                    <tr style="color:white;background-color:grey">
+                        <th>Player Name</th>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="width:325px; height:100px; overflow:auto">
+                <table cellspacing="0" cellpadding="1" width="300">
+                    <tr>
+                        <PlayerListItem :player="ele" v-for="ele in liste"></PlayerListItem>
+                    </tr>
+                </table>
+                </div>
+            </td>
+        </tr>
+       
     </table>
 </template>
 

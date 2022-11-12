@@ -1,9 +1,11 @@
 <!--List Item that represents single lobby and is embedded in LobbyList-->
 
 <template>
-    
-    <li>{{props.lobby.name}}</li>
-    
+    <tr>
+        <td>{{props.lobby.name}}</td>
+        <td>{{props.lobby.gamemode}}</td>
+        <td>{{props.lobby.player}}</td>
+    </tr>
 </template>
 
 <script setup lang = 'ts'>
