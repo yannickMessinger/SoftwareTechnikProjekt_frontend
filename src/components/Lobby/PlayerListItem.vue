@@ -1,6 +1,13 @@
 <!-- Component that represents a single player in the player list-->
 <template>
-    <h3>PlayerListItemComponent</h3>
+    <li>{{props.player.name}}</li>
 </template>
 
-<script setup lang = 'ts'></script>
+<script setup lang = 'ts'>
+
+import { IPlayerListItem } from '../../services/interfaces/IPlayerListItem';
+
+const props = defineProps<{
+    player: IPlayerListItem
+}>()
+</script>
