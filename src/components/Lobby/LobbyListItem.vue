@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang = 'ts'>
-import { ILobbyListItem } from '../../services/interfaces/ILobbyListItem';
+import { ILobbyListItem } from '../../typings/ILobbyListItem';
 
 
 const props = defineProps<{
@@ -16,3 +16,13 @@ const props = defineProps<{
 
 
 </script>
+
+
+
+<style scoped>
+
+
+
+
+
+</style>

@@ -2,7 +2,7 @@
 <template>
     <h3>LobbyComponent</h3>
     <div class="lobbyList">
-        <LobbyList></LobbyList>
+        <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
     </div>
 
     <div class="playerList">
@@ -15,9 +15,11 @@
 </template>
 
 <script setup lang = 'ts'>
+import { useLobbyList } from '../../services/useLobbyList';
 import LobbyList from './LobbyList.vue';
 import PlayerList from './PlayerList.vue';
 
+const { lobbyList } = useLobbyList()
 
 </script>
 

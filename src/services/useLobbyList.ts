@@ -1,5 +1,5 @@
 import { reactive, readonly } from "vue";
-import { ILobbyListItem } from "./interfaces/ILobbyListItem";
+import { ILobbyListItem } from "../typings/ILobbyListItem";
 
 export interface ILobbyListState {
     lobbylist: ILobbyListItem[]

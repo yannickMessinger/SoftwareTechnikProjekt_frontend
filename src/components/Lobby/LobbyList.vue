@@ -5,11 +5,11 @@
     <table>
        
     
-       
+       <div class="list">
           <ul>
            <LobbyListItem :lobby="ele" v-for="ele in liste"></LobbyListItem>
           </ul>
-           
+       </div>    
        
    
    </table>
@@ -18,9 +18,9 @@
 
 <script setup lang = 'ts'>
 
-import { useLobbyList } from '../../services/useLobbyList';
+
 import LobbyListItem from './LobbyListItem.vue';
-import { ILobbyListItem } from '../../services/interfaces/ILobbyListItem'
+import { ILobbyListItem } from '../../typings/ILobbyListItem'
 
    const props = defineProps<{
       liste: Readonly<ILobbyListItem[]>,
@@ -30,5 +30,17 @@ import { ILobbyListItem } from '../../services/interfaces/ILobbyListItem'
    
 
 </script>
+
+
+<style scoped>
+
+.list{
+   color:blue
+
+}
+
+
+
+</style>
 
 

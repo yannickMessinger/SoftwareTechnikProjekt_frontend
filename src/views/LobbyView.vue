@@ -2,14 +2,13 @@
     <div>
         <h2>Lobbyliste</h2>
         <div>
-            <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
+            <Lobby></Lobby>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import LobbyList from '../components/Lobby/LobbyList.vue';
-    import { useLobbyList } from '../services/useLobbyList';
+import Lobby from '../components/Lobby/Lobby.vue';
 
-    const { lobbyList } = useLobbyList()
+    
 </script>
