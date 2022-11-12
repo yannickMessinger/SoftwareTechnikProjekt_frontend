@@ -8,6 +8,7 @@
     import type { IToolElement } from '../../services/streetplaner/IToolElement';
     
     /**Variables: */
+    const pathToPictures = "/img/streetplaner/";
     var totalToolNumber = 3; /** number of toolslots shown in the toollist*/
     var toolList: IToolElement[] = Array(totalToolNumber).fill([]); /** List of all Tools */
     var totalObjectNumber = 3; /** number of objectslots shown in the objectList*/
@@ -16,7 +17,7 @@
     var activeTool: IToolElement = {
         id: -1, 
         name: "no Tool selected",
-        texture:"/img/dummy.png"
+        texture: (pathToPictures+"no-data.png")
     };
     /**currently selected object, default value is no object selected */
     var activeObject: IListElement = { 
@@ -26,18 +27,18 @@
         type:"no data",
         name:"no Object selected",
         heading:0,
-        texture: "/img/dummy.png"
+        texture: (pathToPictures+"no-data.png")
     };
     
     /**entrys in toollist */ 
-    toolList[0] = { id: 0, name: "place", texture: "/img/dummy.png"};
-    toolList[1] = { id: 1, name: "destroy", texture: "/img/dummy.png"};
-    toolList[2] = { id: 2, name: "select", texture: "/img/dummy.png"};
+    toolList[0] = { id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
+    toolList[1] = { id: 1, name: "delete", texture: (pathToPictures+"tool-icons/delete.png")};
+    toolList[2] = { id: 2, name: "edit", texture: (pathToPictures+"tool-icons/edit.png")};
     
     /**entrys in objectlist */
-    objectList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,texture: "/img/dummy.png"};
-    objectList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: "/img/dummy.png"};
-    objectList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: "/img/dummy.png"};
+    objectList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,texture: (pathToPictures+"object-icons/straight.png")};
+    objectList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: (pathToPictures+"object-icons/curve.png")};
+    objectList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: (pathToPictures+"object-icons/cross.png")};
     
 </script>
 
