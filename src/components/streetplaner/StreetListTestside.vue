@@ -51,7 +51,7 @@
                     <h2 class="list-title">Tool List</h2>
                     <!-- display container for tool list element-->
                     <div v-for="row in toolList" class="list-element">
-                        <img v-if="row != null" :src="row.texture" class="grid-img"/>
+                        <img v-if="row != null" :src="row.texture" class="list-img"/>
                         <h4 v-if="row != null" class="list-text">{{row.name}}</h4>
                     </div>
                 </div>  
