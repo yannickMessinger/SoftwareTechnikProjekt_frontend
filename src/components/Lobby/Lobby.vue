@@ -6,7 +6,7 @@
     </div>
 
     <div class="playerList">
-        <PlayerList></PlayerList>
+        <PlayerList :liste="playerList.playerlist"></PlayerList>
     </div>
 
     <button>Play</button>
@@ -16,10 +16,12 @@
 
 <script setup lang = 'ts'>
 import { useLobbyList } from '../../services/useLobbyList';
+import { usePlayerList } from '../../services/usePlayerList';
 import LobbyList from './LobbyList.vue';
 import PlayerList from './PlayerList.vue';
 
-const { lobbyList } = useLobbyList()
+const { lobbyList } = useLobbyList();
+const { playerList } = usePlayerList();
 
 </script>
 
