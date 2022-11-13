@@ -1,6 +1,6 @@
 <script lang="ts">
-import { PointLight, Box, Camera, Renderer, Scene, LambertMaterial} from 'troisjs';
-import { defineComponent, onMounted, ref } from 'vue';
+import { PointLight, Box, Camera, Renderer, Scene, LambertMaterial } from 'troisjs';
+import { defineComponent, onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
 
 export default defineComponent({
   components: { Box, Camera, Renderer, Scene, PointLight, LambertMaterial },
@@ -10,12 +10,37 @@ export default defineComponent({
     const box = ref();
     const camera = ref();
 
-    
+    onBeforeMount(() => {
+      window.addEventListener("keypress", movementKeyboard)
+    }),
+
+    onBeforeUnmount(() => {
+      window.removeEventListener("keypress", movementKeyboard)
+    }),
+
     onMounted(() => {
         renderer.value?.onBeforeRender(() => {
-            box.value.mesh.rotation.x += 0.01;
         });
     })
+
+    function movementKeyboard(e: KeyboardEvent) {
+      if (e.key == "w") {
+          camera.value.camera.position.z -= 0.1
+          box.value.mesh.position.z -= 0.1;
+        }
+        if (e.key == "a") {
+          camera.value.camera.position.x += 0.01
+          box.value.mesh.position.x += 0.01;
+        }
+        if (e.key == "s") {
+          camera.value.camera.position.z += 0.1
+          box.value.mesh.position.z += 0.1;
+        }
+        if (e.key == "d") {
+          camera.value.camera.position.x -= 0.01
+          box.value.mesh.position.x -= 0.01;
+        }
+    }
 
     return {
       renderer,
