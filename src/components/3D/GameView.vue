@@ -1,6 +1,7 @@
 <script lang="ts">
 import { PointLight, Box, Camera, Renderer, Scene, LambertMaterial } from 'troisjs';
 import { defineComponent, onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
+import { InputController } from '../../models/InputController'
 
 export default defineComponent({
   components: { Box, Camera, Renderer, Scene, PointLight, LambertMaterial },
@@ -9,55 +10,32 @@ export default defineComponent({
     const renderer = ref();
     const box = ref();
     const camera = ref();
-
-    onBeforeMount(() => {
-      window.addEventListener("keypress", movementKeyboard)
-    }),
-
-    onBeforeUnmount(() => {
-      window.removeEventListener("keypress", movementKeyboard)
-    }),
+    const controller = new InputController(camera);
 
     onMounted(() => {
-        renderer.value?.onBeforeRender(() => {
-        });
+      renderer.value.onBeforeRender(() => {
+        controller.updateRotation();
+        controller.updateTranslation();
+      });
     })
-
-    function movementKeyboard(e: KeyboardEvent) {
-      if (e.key == "w") {
-          camera.value.camera.position.z -= 0.1
-          box.value.mesh.position.z -= 0.1;
-        }
-        if (e.key == "a") {
-          camera.value.camera.position.x += 0.01
-          box.value.mesh.position.x += 0.01;
-        }
-        if (e.key == "s") {
-          camera.value.camera.position.z += 0.1
-          box.value.mesh.position.z += 0.1;
-        }
-        if (e.key == "d") {
-          camera.value.camera.position.x -= 0.01
-          box.value.mesh.position.x -= 0.01;
-        }
-    }
 
     return {
       renderer,
       camera,
-      box
+      box,
+      controller,
     }
   }
 });
 </script>
 
 <template>
-  <Renderer width="1280" height="720" ref="renderer">
-    <Camera ref="camera" :position="{ z: 10 }">
+  <Renderer resize="window" ref="renderer">
+    <Camera ref="camera" :position="{ x:0, y:0, z: 0 }" :look-at="{x: 0, y:0, z:-1}">
     </Camera>
     <Scene background="#4DBA87">
       <PointLight :position="{ y: 50, z: 50 }" />
-      <Box ref="box">
+      <Box ref="box" :position="{x: 0, y:0, z:-5}">
         <LambertMaterial />
       </Box>
     </Scene>
