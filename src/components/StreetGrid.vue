@@ -4,35 +4,44 @@
     import type { IGridElement } from '../services/IGridElement';
     var gridSizeX = 20;
     var gridSizeY = 30;
-    var streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
+
+    // create and initialize streetGrid
+    const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
+    // fill streetGrid with empty IGridElements
     for (let row=0; row < gridSizeX; row++) {
         for (let col=0; col < gridSizeY; col++) {
             streetGrid[row][col] = { posX: row, posY: col, texture: ""};
         }
     }
+
+    // initialize gridSize
     const gridSize = ref(40);
+    // initialize gridSizePx used in css
     const gridSizePx = computed(() => gridSize.value.toString() + "px");
     var mouseDown = false;
 
+    // onClick handles click on specific cell
     function onClick(cell: any) {
+        // set texture of clicked cell to dummy
         streetGrid[cell.posX][cell.posY].texture = "/img/dummy.png";
     }
-    function onMouseDown(cell: any) {
-        mouseDown = true;
-    }
-    function onMouseMove(cell: any) {
-        if (mouseDown) {  
+
+    // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
+    function onMouseMove(cell: any, event: any) {
+        if (event.buttons === 1) {  
             streetGrid[cell.posX][cell.posY].texture = "/img/dummy.png";
         }
     }
-    function onMouseUp(cell: any) {
-        mouseDown = false;
-    }
+    
+    // disable right click context menu
+    window.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    }, false);
 </script>
 
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
-        <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousedown="onMouseDown(ele)" @mousemove="onMouseMove(ele)" @mouseup="onMouseUp(ele)">
+        <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
             <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img"/>
         </div>
     </div>
