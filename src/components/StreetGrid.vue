@@ -31,9 +31,9 @@
 </script>
 
 <template>
-    <div v-for="row in streetGrid" class="row">
-        <div v-for="ele in row" class="grid-item grid-size col" @click="onClick(ele)" @mousedown="onMouseDown(ele)" @mousemove="onMouseMove(ele)" @mouseup="onMouseUp(ele)">
-            <img v-if="ele.texture != ''" :src="ele.texture" class="grid-img" draggable="false"/>
+    <div v-for="row in streetGrid" class="row no-drag">
+        <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousedown="onMouseDown(ele)" @mousemove="onMouseMove(ele)" @mouseup="onMouseUp(ele)">
+            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img"/>
         </div>
     </div>
 </template>
@@ -62,7 +62,11 @@
         height: 100%;
         display: block;
     }
-    img {  
+    .no-drag {  
         user-select: none;
+        -webkit-user-drag: none; 
+        -khtml-user-drag: none; 
+        -moz-user-drag: none; 
+        -o-user-drag: none; 
     }
 </style>
