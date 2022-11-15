@@ -2,29 +2,11 @@
 <template>
     
 
-    <table cellspacing="0" cellpadding="0" width="325">
-      <h3>LobbyListComponent</h3>
-      <tr>
-         <td>
-            <table  cellspacing="0" cellpadding="1" width="325">
-               <tr style="color:white;background-color:grey">
-                  <th>Lobby Name</th>
-                  <th>Gamemode</th>
-                  <th>Active Players</th>
-               </tr>
-            </table>
-         </td>
-      </tr>
-      <tr>
-         <td>
-            <div style="width:325px; height:100px; overflow:auto">
-               <table cellspacing="0" cellpadding="1" width="300">
+    
+                  <div class="flex-container">
                   <LobbyListItem :lobby="ele" v-for="ele in liste"></LobbyListItem>
-               </table>
-            </div>
-         </td>
-      </tr>
-   </table>
+                  </div>
+          
 
 </template>
 
@@ -46,11 +28,17 @@ import { ILobbyListItem } from '../../typings/ILobbyListItem'
 
 <style scoped>
 
-.list{
-   color:blue
 
+
+.flex-container{
+   height: 800px;
+   width: 100%;
+   display: flex;
+   flex-direction: column;
+   align-items: start;
+   justify-content: start;
+   overflow: auto;
 }
-
 
 
 </style>

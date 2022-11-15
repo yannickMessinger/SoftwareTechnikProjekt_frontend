@@ -1,13 +1,16 @@
 <!-- Component that represents overview of lobbys-->
 <template>
     <h3>LobbyComponent</h3>
-    <div class="lobbyList">
-        <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
-    </div>
 
-    <div class="playerList">
-        <PlayerList :liste="playerList.playerlist"></PlayerList>
-    </div>
+    
+        
+        <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
+    
+
+    
+     <!--<PlayerList :liste="playerList.playerlist"></PlayerList>-->
+        
+   
 
     <button>Play</button>
 
@@ -24,4 +27,13 @@ const { lobbyList } = useLobbyList();
 const { playerList } = usePlayerList();
 
 </script>
+
+
+<style scoped>
+
+
+
+
+
+</style>
 
