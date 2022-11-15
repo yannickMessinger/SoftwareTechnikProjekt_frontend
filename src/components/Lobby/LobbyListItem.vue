@@ -54,26 +54,25 @@ const props = defineProps<{
 
     width: 600px;
     height: 100px;
+    background: #F6F6F6;
     color: #fff;
     margin: 2px;
     padding: 10px;
     border: 1px solid white;
-    background: rgb(198,198,198);
-background: linear-gradient(90deg, rgba(198,198,198,0.09287464985994398) 0%, rgba(246,246,246,1) 100%);
 
-    /*
+    
     clip-path: 
     polygon(
-      0% 0%,     top left 
-      0% 0%,     top left 
-      100% 0%,     top right 
-      100% 5%,    top right
-      100% 75%,  bottom right 
-      95% 100%,   bottom right 
-      0% 100%,   bottom left 
-      0 95%      bottom left 
+      0% 0%,     /* top left */
+      0% 0%,     /* top left */
+      100% 0%,    /* top right */
+      100% 5%,   /* top right */
+      100% 75%,  /* bottom right */
+      95% 100%,  /* bottom right */
+      0% 100%,   /* bottom left */
+      0 95%      /* bottom left */
     );
-    */
+    
 
     
     
@@ -91,7 +90,7 @@ background: linear-gradient(90deg, rgba(198,198,198,0.09287464985994398) 0%, rgb
 }
 
 .item:hover{
-   background-color:#00ABFF;
+    background-color: #c6c6c6;
 }
 
 

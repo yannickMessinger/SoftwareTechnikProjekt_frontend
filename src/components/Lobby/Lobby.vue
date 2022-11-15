@@ -1,15 +1,12 @@
 <!-- Component that represents overview of lobbys-->
 <template>
-    <h3>LobbyComponent</h3>
+    <h3>Lobby Component</h3>
 
     
-        
-        <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
-    
-
-    
-     <!--<PlayerList :liste="playerList.playerlist"></PlayerList>-->
-        
+        <div class="flex-container">
+            <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
+            <PlayerList :liste="playerList.playerlist"></PlayerList>
+        </div>
    
 
     <button>Play</button>
@@ -31,7 +28,14 @@ const { playerList } = usePlayerList();
 
 <style scoped>
 
+.flex-container{
+    display: flex;
+    align-items:flex-start;
+}
 
+h3{
+    text-align: center;
+}
 
 
 

@@ -4,6 +4,7 @@
 
     
                   <div class="flex-container">
+                  <h3>List of available lobbys:</h3>
                   <LobbyListItem :lobby="ele" v-for="ele in liste"></LobbyListItem>
                   </div>
           
@@ -32,12 +33,13 @@ import { ILobbyListItem } from '../../typings/ILobbyListItem'
 
 .flex-container{
    height: 800px;
-   width: 100%;
+   width: 50%;
    display: flex;
    flex-direction: column;
    align-items: start;
    justify-content: start;
    overflow: auto;
+   /*background-color: blue;*/
 }
 
 
