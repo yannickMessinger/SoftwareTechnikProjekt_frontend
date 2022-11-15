@@ -12,6 +12,7 @@ export class InputController {
   public phi: any;
   public theta: any;
   public timesCalled: any;
+  public firstClick: boolean;
 
   constructor(camera: any) {
     this.target = document;
@@ -22,6 +23,7 @@ export class InputController {
     this.previousKeys = {}
     this.phi = 0;
     this.theta = 0;
+    this.firstClick = false;
     console.log(this.camera);
     this.initialize_();    
   }
@@ -37,26 +39,34 @@ export class InputController {
     };
     this.previous = null;
     this.target.addEventListener('mousedown', (e: MouseEvent) => this.onMouseDown(e), false);
-    this.target.addEventListener('mouseup', (e: MouseEvent) => this.onMouseUp(e), false);
+    //this.target.addEventListener('mouseup', (e: MouseEvent) => this.onMouseUp(e), false);
     this.target.addEventListener('mousemove', (e: MouseEvent) => this.onMouseMove(e), false);
     this.target.addEventListener('keydown', (e: KeyboardEvent) => this.onKeyDown(e), false);
     this.target.addEventListener('keyup', (e: KeyboardEvent) => this.onKeyUp(e), false);
   }
 
   onMouseMove(e: MouseEvent) {
-    this.current.mouseX = e.pageX - window.innerWidth / 2;
-    this.current.mouseY = e.pageY - window.innerHeight / 2;
-
-    if (this.previous === null) {
-      this.previous = {...this.current};
+    if(e.buttons === 1) {
+      this.current.mouseX = e.pageX - window.innerWidth / 2;
+      this.current.mouseY = e.pageY - window.innerHeight / 2;
+      if (this.firstClick) {
+        this.previous = {...this.current};
+        this.firstClick = false;
+      }
+      //console.log("current: " + this.current.mouseX + ", " + this.current.mouseY);
+      //console.log("previous: " + this.previous.mouseX + ", " + this.previous.mouseY);
+      this.current.mouseXDelta = this.current.mouseX - this.previous.mouseX;
+      this.current.mouseYDelta = this.current.mouseY - this.previous.mouseY;
+      this.previous.mouseX = this.current.mouseX;
+      this.previous.mouseY = this.current.mouseY;
     }
-
-    this.current.mouseXDelta = this.current.mouseX - this.previous.mouseX;
-    this.current.mouseYDelta = this.current.mouseY - this.previous.mouseY;
   }
 
   onMouseDown(e: MouseEvent) {
-    this.onMouseMove(e);
+    if(e.buttons === 1) {
+      this.firstClick = true;
+    }
+    /*this.onMouseMove(e);
     switch (e.button) {
       case 0: {
         this.current.leftButton = true;
@@ -66,10 +76,10 @@ export class InputController {
         this.current.rightButton = true;
         break;
       }
-    }
+    }*/
   }
 
-  onMouseUp(e: MouseEvent) {
+  /*onMouseUp(e: MouseEvent) {
     this.onMouseMove(e);
     switch (e.button) {
       case 0: {
@@ -81,7 +91,7 @@ export class InputController {
         break;
       }
     }
-  }
+  }*/
 
   onKeyDown(e: KeyboardEvent) {
     this.keys[e.key] = true;
@@ -100,12 +110,14 @@ export class InputController {
   updateRotation() {
     const xh = this.current.mouseXDelta / window.innerWidth;
     const yh = this.current.mouseYDelta / window.innerHeight;
-    this.phi += -xh * 0.08;
-    this.theta = this.clamp(this.theta + -yh * 0.08, -Math.PI / 3, Math.PI / 3);
+    this.current.mouseXDelta = this.current.mouseXDelta / 2;
+    this.current.mouseYDelta = this.current.mouseYDelta / 2;
+    this.phi += -xh * 2;
+    this.theta = this.clamp(this.theta + -yh * 2, -Math.PI / 3, Math.PI / 3);
     const qx = new THREE.Quaternion();
-    qx.setFromAxisAngle(new THREE.Vector3(0,1,0), this.phi);
+    qx.setFromAxisAngle(new THREE.Vector3(0,-1,0), this.phi);
     const qz = new THREE.Quaternion();
-    qz.setFromAxisAngle(new THREE.Vector3(1,0,0), this.theta);
+    qz.setFromAxisAngle(new THREE.Vector3(-1,0,0), this.theta);
     const q = new THREE.Quaternion();
     q.multiply(qx);
     q.multiply(qz);
