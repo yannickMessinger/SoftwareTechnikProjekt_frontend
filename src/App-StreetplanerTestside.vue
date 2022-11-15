@@ -16,11 +16,23 @@ import StreetListTestside from './components/streetplaner/StreetListTestside.vue
 <style scoped>
 .title {
   color:black;
+  user-select: none;
+        -webkit-user-drag: none; 
+        -khtml-user-drag: none; 
+        -moz-user-drag: none; 
+        -o-user-drag: none;
 }
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
+}
+.streetList{
+  user-select: none;
+        -webkit-user-drag: none; 
+        -khtml-user-drag: none; 
+        -moz-user-drag: none; 
+        -o-user-drag: none;
 }
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
