@@ -23,8 +23,7 @@ const props = defineProps<{
 
 <style scoped>
 
-
-
-
-
+td {
+    text-align: left;
+}
 </style>
