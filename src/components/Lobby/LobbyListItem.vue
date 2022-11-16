@@ -1,4 +1,4 @@
-<!--List Item that represents single lobby and is embedded in LobbyList-->
+<!--List Item that represents single lobby and is embedded in LobbyList, displays Lobby Dta Name, the current gaming mode the lobby is set to and the number of active players-->
 
 <template>
 <div  @click="selectLobby()">
@@ -11,8 +11,8 @@
 
     <div class="lobby_data">
       <div>
-        <b>Name: </b>{{ props.lobby.name }}   
-        <b>mode:</b>{{ props.lobby.gamemode }} 
+        <b>Name: </b>{{ props.lobby.name }}<br/>   
+        <b>mode: </b>{{ props.lobby.gamemode }} <br/>
         <b>active players: </b>{{ props.lobby.player }}
       </div>
     </div>
@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { ILobbyListItem } from "../../typings/ILobbyListItem";
+
 
 const props = defineProps<{
   lobby: ILobbyListItem;

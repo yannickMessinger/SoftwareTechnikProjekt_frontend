@@ -1,4 +1,4 @@
-<!-- Component that represents overview of lobbys-->
+<!-- Component that displays overview of existing lobbys and active players-->
 <template>
   <h3>Lobby Component</h3>
 
@@ -11,7 +11,7 @@
   <div v-else>
     <p>Leider keine Lobbys vorhanden:(</p>
   </div>
-
+  <!--Button to manually refresh Lobbylist-->
   <button @click="updateLobbyList()">Refresh</button>
 
   <button>Play</button>
@@ -26,7 +26,7 @@ import PlayerList from "./PlayerList.vue";
 
 onMounted(async () => {
   //await  updateLobbyList()
-  console.log("hier update von backend");
+  //Todo: coinnect to backend
 });
 
 const { lobbyList } = useLobbyList();

@@ -2,6 +2,7 @@
 <template>
   <div class="flex-container">
     <h3>List of available lobbys:</h3>
+    <!--Renders List of Lobbylistitems-->
     <LobbyListItem :lobby="ele" v-for="ele in liste"></LobbyListItem>
   </div>
 </template>
@@ -10,6 +11,7 @@
 import LobbyListItem from "./LobbyListItem.vue";
 import { ILobbyListItem } from "../../typings/ILobbyListItem";
 
+//Lobbylist passed from backend
 const props = defineProps<{
   liste: Readonly<ILobbyListItem[]>;
 }>();
@@ -24,6 +26,6 @@ const props = defineProps<{
   align-items: start;
   justify-content: start;
   overflow: auto;
-  /*background-color: blue;*/
+  
 }
 </style>

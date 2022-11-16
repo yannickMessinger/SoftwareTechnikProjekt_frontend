@@ -1,3 +1,7 @@
+/**
+ *Data class to fetch and update the List of existing Lobbys 
+ */
+
 import { reactive, readonly } from "vue";
 import { ILobbyListItem } from "../typings/ILobbyListItem";
 
@@ -15,6 +19,7 @@ const lobbyState = reactive<ILobbyListState>({
 
 export function useLobbyList(){
 
+    //Test objects of lobbys to be displayed, once backend is connected not neccessary anymore 
     lobbyState.lobbylist.push({name: "lobby1", gamemode: "build", player: 4});
     lobbyState.lobbylist.push({name: "lobby2", gamemode: "play", player: 7});
     lobbyState.lobbylist.push({name: "lobby3", gamemode: "build", player: 10});
@@ -30,6 +35,7 @@ export function useLobbyList(){
 
 }
 
+//functions to fetch and update LobbyState item
 export async function updateLobbyList():Promise<void> {
     
 
