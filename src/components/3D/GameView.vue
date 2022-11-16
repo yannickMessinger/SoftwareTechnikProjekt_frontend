@@ -1,7 +1,7 @@
 <script lang="ts">
 import { PointLight, Box, Camera, Renderer, Scene, LambertMaterial } from 'troisjs';
 import { defineComponent, onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue';
-import { InputController } from '../../models/InputController'
+import { FirstPersonCamera } from '../../models/FirstPersonCamera'
 
 export default defineComponent({
   components: { Box, Camera, Renderer, Scene, PointLight, LambertMaterial },
@@ -10,12 +10,11 @@ export default defineComponent({
     const renderer = ref();
     const box = ref();
     const camera = ref();
-    const controller = new InputController(camera);
+    const fpsCamera = new FirstPersonCamera(camera, box)
 
     onMounted(() => {
       renderer.value.onBeforeRender(() => {
-        controller.updateRotation();
-        controller.updateTranslation();
+        fpsCamera.update();
       });
     })
 
@@ -23,7 +22,7 @@ export default defineComponent({
       renderer,
       camera,
       box,
-      controller,
+      fpsCamera,
     }
   }
 });

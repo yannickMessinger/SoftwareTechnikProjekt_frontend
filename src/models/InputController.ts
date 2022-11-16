@@ -2,33 +2,17 @@ import * as THREE from 'https://cdn.skypack.dev/three@0.136';
 
 export class InputController {
 	public target: any;
-	public current: any;
-	public previous: any;
-  public camera: any;
+  public current: any;
+  public previous: any;
   public keys: any;
   public previousKeys: any;
-  public rotation: any;
-  public translation: any;
-  public phi: any;
-  public theta: any;
-  public timesCalled: any;
-  public firstClick: boolean;
 
-  constructor(camera: any) {
+  constructor() {
     this.target = document;
-    this.camera = camera;
-    this.rotation = new THREE.Quaternion();
-    this.translation = new THREE.Vector3(0, 0, 0);
-    this.keys = {}
-    this.previousKeys = {}
-    this.phi = 0;
-    this.theta = 0;
-    this.firstClick = false;
-    console.log(this.camera);
-    this.initialize_();    
+    this.initialize();    
   }
 
-  initialize_() {
+  initialize() {
     this.current = {
       leftButton: false,
       rightButton: false,
@@ -38,48 +22,40 @@ export class InputController {
       mouseY: 0,
     };
     this.previous = null;
+    this.keys = {};
+    this.previousKeys = {};
     this.target.addEventListener('mousedown', (e: MouseEvent) => this.onMouseDown(e), false);
-    //this.target.addEventListener('mouseup', (e: MouseEvent) => this.onMouseUp(e), false);
     this.target.addEventListener('mousemove', (e: MouseEvent) => this.onMouseMove(e), false);
+    this.target.addEventListener('mouseup', (e: MouseEvent) => this.onMouseUp(e), false);
     this.target.addEventListener('keydown', (e: KeyboardEvent) => this.onKeyDown(e), false);
     this.target.addEventListener('keyup', (e: KeyboardEvent) => this.onKeyUp(e), false);
   }
 
   onMouseMove(e: MouseEvent) {
-    if(e.buttons === 1) {
-      this.current.mouseX = e.pageX - window.innerWidth / 2;
-      this.current.mouseY = e.pageY - window.innerHeight / 2;
-      if (this.firstClick) {
-        this.previous = {...this.current};
-        this.firstClick = false;
-      }
-      //console.log("current: " + this.current.mouseX + ", " + this.current.mouseY);
-      //console.log("previous: " + this.previous.mouseX + ", " + this.previous.mouseY);
-      this.current.mouseXDelta = this.current.mouseX - this.previous.mouseX;
-      this.current.mouseYDelta = this.current.mouseY - this.previous.mouseY;
-      this.previous.mouseX = this.current.mouseX;
-      this.previous.mouseY = this.current.mouseY;
+    this.current.mouseX = e.pageX - window.innerWidth / 2;
+    this.current.mouseY = e.pageY - window.innerHeight / 2;
+
+    if (this.previous === null ){
+      this.previous = {...this.current}
     }
+    this.current.mouseXDelta = this.current.mouseX - this.previous.mouseX;
+    this.current.mouseYDelta = this.current.mouseY - this.previous.mouseY;
   }
 
   onMouseDown(e: MouseEvent) {
-    if(e.buttons === 1) {
-      this.firstClick = true;
-    }
-    /*this.onMouseMove(e);
+    this.onMouseMove(e);
+
     switch (e.button) {
       case 0: {
         this.current.leftButton = true;
-        break;
       }
       case 2: {
         this.current.rightButton = true;
-        break;
       }
-    }*/
+    }
   }
 
-  /*onMouseUp(e: MouseEvent) {
+  onMouseUp(e: MouseEvent) {
     this.onMouseMove(e);
     switch (e.button) {
       case 0: {
@@ -91,59 +67,31 @@ export class InputController {
         break;
       }
     }
-  }*/
+  }
 
   onKeyDown(e: KeyboardEvent) {
-    this.keys[e.key] = true;
-    this.updateTranslation();
+    this.keys[e.keyCode] = true;
   }
 
   onKeyUp(e: KeyboardEvent) {
-    this.keys[e.key] = false;
-    this.updateTranslation();
+    this.keys[e.keyCode] = false;
   }
 
-  key(key: any) {
-    return !!this.keys[key];
+  key(keyCode: any) {
+    return !!this.keys[keyCode];
   }
 
-  updateRotation() {
-    const xh = this.current.mouseXDelta / window.innerWidth;
-    const yh = this.current.mouseYDelta / window.innerHeight;
-    this.current.mouseXDelta = this.current.mouseXDelta / 2;
-    this.current.mouseYDelta = this.current.mouseYDelta / 2;
-    this.phi += -xh * 2;
-    this.theta = this.clamp(this.theta + -yh * 2, -Math.PI / 3, Math.PI / 3);
-    const qx = new THREE.Quaternion();
-    qx.setFromAxisAngle(new THREE.Vector3(0,-1,0), this.phi);
-    const qz = new THREE.Quaternion();
-    qz.setFromAxisAngle(new THREE.Vector3(-1,0,0), this.theta);
-    const q = new THREE.Quaternion();
-    q.multiply(qx);
-    q.multiply(qz);
-    this.rotation.copy(q);
-    this.camera.value.camera.quaternion.copy(this.rotation);
+  isReady(){
+    return this.previous !== null;
   }
 
-  updateTranslation() {
-    const forwardVelocity = (this.key("w") ? 1 : 0) + (this.key("s") ? -1 : 0);
-    const strafeVelocity = (this.key("a") ? 1 : 0) + (this.key("d") ? -1 : 0);
+  update(){
+    if (this.previous !== null) {
+      this.current.mouseXDelta = this.current.mouseX - this.previous.mouseX;
+      this.current.mouseYDelta = this.current.mouseY - this.previous.mouseY;
 
-    const qx = new THREE.Quaternion();
-    qx.setFromAxisAngle(new THREE.Vector3(0, 1, 0), this.phi);
-
-    const forward = new THREE.Vector3(0,0,-1)
-    forward.applyQuaternion(qx);
-    forward.multiplyScalar(forwardVelocity * 0.01 * 2);
-
-    const left = new THREE.Vector3(-1,0,0)
-    left.applyQuaternion(qx);
-    left.multiplyScalar(strafeVelocity * 0.01 * 2);
-
-    this.translation.add(forward);
-    this.translation.add(left);
-
-    this.camera.value.camera.position.copy(this.translation);
+      this.previous = {...this.current};
+    }
   }
 
   clamp(x:any, a:any, b:any) {
