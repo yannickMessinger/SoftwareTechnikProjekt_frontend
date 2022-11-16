@@ -4,6 +4,7 @@
 -->
 <script setup lang="ts">
     /**Imports: */
+    import { reactive } from 'vue';
     import type { IListElement } from '../../services/streetplaner/IListElement';
     import type { IToolElement } from '../../services/streetplaner/IToolElement';
     
@@ -29,8 +30,8 @@
         heading:0,
         texture: (pathToPictures+"no-data.png")
     };
-    var activeTool = defaultTool;
-    var activeObject = defaultObject;
+    const activeTool = reactive({tool: defaultTool});
+    const activeObject = reactive({obj: defaultObject});
     
     /**entrys in toollist */ 
     toolList[0] = { id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
@@ -51,15 +52,15 @@
             case 2:
                 editLogic();
         }
-        activeTool = activateThis(row,activeTool,defaultTool);
+        activeTool.tool = activateThis(row,activeTool.tool,defaultTool);
         
     }
 
     function onCreateObjectClick(row:any){
-        activeObject = activateThis(row,activeObject,defaultObject);
+        activeObject.obj = activateThis(row,activeObject.obj,defaultObject);
     }
 
-    function activateThis(row:any,active:any, defaultThing:any){
+    function activateThis(row:any, active:any, defaultThing:any){
         console.log(active.name);
         if(active!=row){
             active = row;
@@ -92,14 +93,18 @@
                     <h2 class="list-title">Tool List</h2>
                     <!-- display container for tool list element-->
                     <li v-for="element in toolList" :key="element.id" class="list-element">
-                        <button v-if="element== activeTool" id="test" class="listButtonActive" @click="onToolClick(element)">
+                        <button id="test" :class="element.name === activeTool.tool.name ? 'listButtonActive' : 'listButton'" @click="onToolClick(element)">
+                            <img v-if="element != null" :src="element.texture" class="list-img"/>
+                            <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
+                        </button>
+                        <!--<button v-if="element== activeTool" id="test" class="listButtonActive" @click="onToolClick(element)">
                             <img v-if="element != null" :src="element.texture" class="list-img"/>
                             <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
                         </button>
                         <button v-else id="test" class="listButton" @click="onToolClick(element)">
                             <img v-if="element != null" :src="element.texture" class="list-img"/>
                             <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
-                        </button>
+                        </button>-->
                     </li>
                 </ul>  
             </td>
@@ -133,8 +138,8 @@
                 <!--display container for active tool-->
                 <div class="selected-object">
                     <h3 class="list-title"> Active Tool:</h3>
-                    <img v-if="activeTool != null" :src="activeTool.texture" class="list-img"/>
-                    <h4 v-if="activeTool != null" class="toolList-text">{{activeTool.name}}</h4>
+                    <img v-if="activeTool != null" :src="activeTool.tool.texture" class="list-img"/>
+                    <h4 v-if="activeTool != null" class="toolList-text">{{activeTool.tool.name}}</h4>
                 </div>
             </td>
             <td>
@@ -144,14 +149,14 @@
                     <table>
                         <tr>
                             <td>
-                                <img v-if="activeObject != null" :src="activeObject.texture" class="list-img"/>
+                                <img v-if="activeObject != null" :src="activeObject.obj.texture" class="list-img"/>
                             </td>
                             <td>
                                 <ul class="list-without">
                                     <li class="objectList-text"><h4>Details:</h4></li>
-                                    <li class="objectList-text">{{activeObject.id}}</li>
-                                    <li class="objectList-text">{{activeObject.name}}</li>
-                                    <li class="objectList-text">{{activeObject.type}}</li>
+                                    <li class="objectList-text">{{activeObject.obj.id}}</li>
+                                    <li class="objectList-text">{{activeObject.obj.name}}</li>
+                                    <li class="objectList-text">{{activeObject.obj.type}}</li>
                                 </ul>
                             </td>
                         </tr>
