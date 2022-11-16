@@ -3,11 +3,12 @@ import { ref } from "vue";
 import useUser from "../service/UserStore";
 
 let username = ref("");
-const { name, setName } = useUser();
+const { name, setName, sendName } = useUser();
 
 function sendUsername() {
   setName(username.value);
   // Methode, wenn auf Button geklickt wird hier hin...
+  sendName();
 }
 </script>
 
