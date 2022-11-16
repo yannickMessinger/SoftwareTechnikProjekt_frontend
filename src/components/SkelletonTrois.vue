@@ -3,14 +3,16 @@
     <Camera :position="{ z: 10 }" />
     <Scene>
       <PointLight :position="{ y: 50, z: 50 }" />
-      <Box :size="1" ref="meshC" :rotation="{ y: Math.PI / 4, z: Math.PI / 4 }">
+      <Box :size="1" :position="{x:0,y:1,z:0}" ref="meshC" :rotation="{ y: Math.PI / 4, z: Math.PI / 4 }">
         <LambertMaterial />
       </Box>
+      <GroundPlane></GroundPlane>
     </Scene>
   </Renderer>
 </template>
 
 <script setup lang="ts">
+import GroundPlane from "./Plane.vue"
 import { ref, onMounted } from 'vue'
 import { Box, Camera, LambertMaterial, MeshPublicInterface, PointLight, Renderer, RendererPublicInterface, Scene } from 'troisjs'
 
