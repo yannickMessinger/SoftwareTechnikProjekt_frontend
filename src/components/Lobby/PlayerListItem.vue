@@ -1,6 +1,9 @@
 <!-- Component that represents a single player in the player list-->
 <template>
-    <tr>{{props.player.name}}</tr>
+    <tr>
+        <td>{{props.player.name}}</td>
+    </tr>
+
 </template>
 
 <script setup lang = 'ts'>

@@ -10,15 +10,9 @@ const playerState = reactive<IPlayerListState>({
 })
 
 export function usePlayerList(){
-    playerState.playerlist.push({name: "player1"});
-    playerState.playerlist.push({name: "player2"});
-    playerState.playerlist.push({name: "player3"});
-    playerState.playerlist.push({name: "player4"});
-    playerState.playerlist.push({name: "player5"});
-    playerState.playerlist.push({name: "player6"});
-    playerState.playerlist.push({name: "player7"});
-    playerState.playerlist.push({name: "player8"});
-    playerState.playerlist.push({name: "player9"});
+    for(let i = 0; i < 20; i++){
+        playerState.playerlist.push({name: "player" + i});
+    }
 
     return {
         playerList: readonly(playerState)

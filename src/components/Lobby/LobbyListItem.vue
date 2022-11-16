@@ -68,7 +68,7 @@ function selectLobby(){
   height: 100px;
   width: 400px;
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   color: black;
 }

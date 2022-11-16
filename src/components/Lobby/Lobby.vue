@@ -12,7 +12,7 @@
     <p>Leider keine Lobbys vorhanden:(</p>
   </div>
 
-  <button @click="updateLobbyList()">REFRESH</button>
+  <button @click="updateLobbyList()">Refresh</button>
 
   <button>Play</button>
 </template>
@@ -41,5 +41,24 @@ const { playerList } = usePlayerList();
 
 h3 {
   text-align: center;
+}
+
+button {
+  background-color: rgb(255, 200, 0);
+  color: rgb(63, 63, 63);
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 15px 32px;
+  font-size: 14px;
+  font-weight: bold;
+  margin: 4px 2px;
+  margin-left: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  border: none;
+
+}
+
+button:hover {
+  background-color: rgb(219, 172, 0);
 }
 </style>
