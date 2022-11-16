@@ -14,13 +14,13 @@
     var totalObjectNumber = 3; /** number of objectslots shown in the objectList*/
     var objectList: IListElement[] = Array(totalObjectNumber).fill([]); /** List of all Objects placable in street Editor*/
     /** currently selected tool, default value is no tool selected */
-    var activeTool: IToolElement = {
+    var defaultTool: IToolElement = {
         id: -1, 
         name: "no Tool selected",
         texture: (pathToPictures+"no-data.png")
     };
     /**currently selected object, default value is no object selected */
-    var activeObject: IListElement = { 
+    var defaultObject: IListElement = { 
         groupId: -1,
         group: "no data",
         id: -1,
@@ -29,6 +29,8 @@
         heading:0,
         texture: (pathToPictures+"no-data.png")
     };
+    var activeTool = defaultTool;
+    var activeObject = defaultObject;
     
     /**entrys in toollist */ 
     toolList[0] = { id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
@@ -40,21 +42,44 @@
     objectList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: (pathToPictures+"object-icons/curve.png")};
     objectList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: (pathToPictures+"object-icons/cross.png")};
     
-    function onClick(row:any){
-        console.log(activeTool.name);
-        if(activeTool!=row){
-            activeTool = row;
-        }else{
-            activeTool = {
-                id: -1, 
-                name: "no Tool selected",
-                texture: (pathToPictures+"no-data.png")
-            };
+    function onToolClick(row:any){
+        switch(row.id){
+            case 0:
+                createLogic();
+            case 1:
+                deleteLogic();
+            case 2:
+                editLogic();
         }
-        console.log(row.id);
-        console.log(activeTool.name);
+        activeTool = activateThis(row,activeTool,defaultTool);
+        
     }
 
+    function onCreateObjectClick(row:any){
+        activeObject = activateThis(row,activeObject,defaultObject);
+    }
+
+    function activateThis(row:any,active:any, defaultThing:any){
+        console.log(active.name);
+        if(active!=row){
+            active = row;
+        }else{
+            active = defaultThing;
+        }
+        console.log(active.name);
+        return active;
+        
+    }
+
+    function createLogic(){
+        /**add create logic here */
+    }
+    function deleteLogic(){
+        /**add delete logic here */
+    }
+    function editLogic(){
+        /**add edit logic here */
+    }
 </script>
 
 <template>
@@ -67,7 +92,11 @@
                     <h2 class="list-title">Tool List</h2>
                     <!-- display container for tool list element-->
                     <li v-for="element in toolList" :key="element.id" class="list-element">
-                        <button id="test" class="list-button" @click="onClick(element)">
+                        <button v-if="element== activeTool" id="test" class="listButtonActive" @click="onToolClick(element)">
+                            <img v-if="element != null" :src="element.texture" class="list-img"/>
+                            <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
+                        </button>
+                        <button v-else id="test" class="listButton" @click="onToolClick(element)">
                             <img v-if="element != null" :src="element.texture" class="list-img"/>
                             <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
                         </button>
@@ -80,7 +109,7 @@
                     <h2 class="list-title">Object List</h2>
                     <!-- display container for object list element-->
                     <div v-for="element in objectList" class="list-element">
-                        <button class="list-button">
+                        <button class="listButton" @click="onCreateObjectClick(element)">
                             <table>
                                 <tr>
                                     <td>
@@ -233,7 +262,7 @@
         -o-user-drag: none;
     }
     /** style for buttons (tool list and object list) */
-    .list-button{
+    .listButton{
         border: solid 2px black;
         background-color:darkgray;
         user-select: none;
@@ -242,19 +271,21 @@
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-    .list-button{
+    
+    .listButtonActive{
         border: solid 2px black;
-        background-color:darkgray;
+        background-color:red;
         user-select: none;
         -webkit-user-drag: none; 
         -khtml-user-drag: none; 
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-    /** style for clicked buttons (tool list and object list) */
+    /** style for clicked buttons (tool list and object list) *//** 
     .list-button:focus{
         background-color: orange;
     }
+    */
     /** list without bullets for object sub list on button*/
     .list-without {
         list-style-type: none;
