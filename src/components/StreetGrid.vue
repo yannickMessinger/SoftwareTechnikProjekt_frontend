@@ -42,7 +42,7 @@
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
         <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
-            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img"/>
+            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false"/>
         </div>
     </div>
 </template>
