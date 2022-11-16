@@ -2,7 +2,7 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import StreetListTestside from './components/streetplaner/StreetListTestside.vue'
-
+import StreetPlanerListComponent from './components/streetplaner/StreetPlanerListComponent.vue'
 </script>
 
 <template>
@@ -10,6 +10,7 @@ import StreetListTestside from './components/streetplaner/StreetListTestside.vue
   <br/>
   <div class="streetList">
     <StreetListTestside></StreetListTestside>
+    <StreetPlanerListComponent></StreetPlanerListComponent>
   </div>
 </template>
 
