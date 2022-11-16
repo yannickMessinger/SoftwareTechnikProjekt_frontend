@@ -52,24 +52,23 @@
             case 2:
                 editLogic();
         }
-        activeTool.tool = activateThis(row,activeTool.tool,defaultTool);
-        
+        console.log(activeTool.tool.name);
+        if(activeTool.tool.id==row.id){
+            activeTool.tool = defaultTool;
+        }else{
+            activeTool.tool = row;
+        }
+        console.log(activeTool.tool.name);
     }
 
     function onCreateObjectClick(row:any){
-        activeObject.obj = activateThis(row,activeObject.obj,defaultObject);
-    }
-
-    function activateThis(row:any, active:any, defaultThing:any){
-        console.log(active.name);
-        if(active!=row){
-            active = row;
+        console.log(activeObject.obj.name);
+        if(activeObject.obj.id==row.id){
+            activeObject.obj = defaultObject;
         }else{
-            active = defaultThing;
+            activeObject.obj = row;
         }
-        console.log(active.name);
-        return active;
-        
+        console.log(activeObject.obj.name);
     }
 
     function createLogic(){
@@ -93,18 +92,10 @@
                     <h2 class="list-title">Tool List</h2>
                     <!-- display container for tool list element-->
                     <li v-for="element in toolList" :key="element.id" class="list-element">
-                        <button id="test" :class="element.name === activeTool.tool.name ? 'listButtonActive' : 'listButton'" @click="onToolClick(element)">
+                        <button :class="element.name === activeTool.tool.name ? 'listButtonActive' : 'listButton'" @click="onToolClick(element)">
                             <img v-if="element != null" :src="element.texture" class="list-img"/>
                             <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
                         </button>
-                        <!--<button v-if="element== activeTool" id="test" class="listButtonActive" @click="onToolClick(element)">
-                            <img v-if="element != null" :src="element.texture" class="list-img"/>
-                            <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
-                        </button>
-                        <button v-else id="test" class="listButton" @click="onToolClick(element)">
-                            <img v-if="element != null" :src="element.texture" class="list-img"/>
-                            <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
-                        </button>-->
                     </li>
                 </ul>  
             </td>
@@ -114,7 +105,8 @@
                     <h2 class="list-title">Object List</h2>
                     <!-- display container for object list element-->
                     <div v-for="element in objectList" class="list-element">
-                        <button class="listButton" @click="onCreateObjectClick(element)">
+                        <button :class="element.name === activeObject.obj.name ? 'listButtonActive' : 'listButton'" @click="onCreateObjectClick(element)">
+                            
                             <table>
                                 <tr>
                                     <td>
@@ -276,7 +268,7 @@
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-    
+    /** style for clicked buttons (tool list and object list) */
     .listButtonActive{
         border: solid 2px black;
         background-color:red;
@@ -286,11 +278,6 @@
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-    /** style for clicked buttons (tool list and object list) *//** 
-    .list-button:focus{
-        background-color: orange;
-    }
-    */
     /** list without bullets for object sub list on button*/
     .list-without {
         list-style-type: none;
@@ -300,6 +287,4 @@
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-
-
 </style>
