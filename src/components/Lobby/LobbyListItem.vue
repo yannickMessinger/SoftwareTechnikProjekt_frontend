@@ -4,14 +4,17 @@
 <div  @click="selectLobby()">
   <div class="item">
     <img
-      src="https://images.unsplash.com/photo-1526920929362-5b26677c148c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1476&q=80"
+      src="https://images.unsplash.com/photo-1553481187-be93c21490a9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
       width="100"
       height="100"
     />
 
     <div class="lobby_data">
-      <b>Name</b>: {{ props.lobby.name }} <b>mode</b>:
-      {{ props.lobby.gamemode }} <b>active players: </b>{{ props.lobby.player }}
+      <div>
+        <b>Name: </b>{{ props.lobby.name }}   
+        <b>mode:</b>{{ props.lobby.gamemode }} 
+        <b>active players: </b>{{ props.lobby.player }}
+      </div>
     </div>
   </div>
 </div>
@@ -46,11 +49,13 @@ function selectLobby(){
 
   width: 600px;
   height: 100px;
-  background: #f6f6f6;
+  background: rgb(255,255,255);
+  background: rgb(255,255,255);
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(175,175,175,1) 100%, rgba(0,0,0,0.5242471988795518) 100%);
   color: #fff;
   margin: 2px;
   padding: 10px;
-  border: 1px solid white;
+  border: 2px solid;
 
   clip-path: polygon(
     0% 0%,
@@ -68,12 +73,14 @@ function selectLobby(){
   height: 100px;
   width: 400px;
   display: flex;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-evenly;
   align-items: center;
   color: black;
+  
 }
 
 .item:hover {
-  background-color: #c6c6c6;
+  border-color: #1fc8f5;
 }
 </style>
