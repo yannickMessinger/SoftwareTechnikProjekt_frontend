@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { computed } from '@vue/reactivity';
     import { ref, reactive } from 'vue';
-    import type { IGridElement } from '../services/IGridElement';
+    import type { IGridElement } from '../../services/streetplaner/IGridElement';
     var gridSizeX = 20;
     var gridSizeY = 30;
 
