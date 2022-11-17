@@ -1,23 +1,48 @@
 <script setup lang="ts">
     import { computed } from '@vue/reactivity';
-    import { ref } from 'vue';
+    import { ref, reactive } from 'vue';
     import type { IGridElement } from '../services/IGridElement';
     var gridSizeX = 20;
     var gridSizeY = 30;
-    var streetGrid: IGridElement[][] = Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null));
-    for (let i = 0; i < 5; i++) {
-        var x = Math.floor(Math.random() * gridSizeX);
-        var y = Math.floor(Math.random() * gridSizeY);
-        streetGrid[x][y] = { posX: x, posY: y, texture: "/img/dummy.png"};
+
+    // create and initialize streetGrid
+    const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
+    // fill streetGrid with empty IGridElements
+    for (let row=0; row < gridSizeX; row++) {
+        for (let col=0; col < gridSizeY; col++) {
+            streetGrid[row][col] = { posX: row, posY: col, texture: ""};
+        }
     }
+
+    // initialize gridSize
     const gridSize = ref(40);
+    // initialize gridSizePx used in css
     const gridSizePx = computed(() => gridSize.value.toString() + "px");
+    var mouseDown = false;
+
+    // onClick handles click on specific cell
+    function onClick(cell: any) {
+        // set texture of clicked cell to dummy
+        streetGrid[cell.posX][cell.posY].texture = "/img/dummy.png";
+    }
+
+    // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
+    function onMouseMove(cell: any, event: any) {
+        if (event.buttons === 1) {  
+            streetGrid[cell.posX][cell.posY].texture = "/img/dummy.png";
+        }
+    }
+    
+    // disable right click context menu
+    window.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    }, false);
 </script>
 
 <template>
-    <div v-for="row in streetGrid" class="row">
-        <div v-for="ele in row" class="grid-item grid-size col">
-            <img v-if="ele != null" :src="ele.texture" class="grid-img"/>
+    <div v-for="row in streetGrid" class="row no-drag">
+        <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
+            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false"/>
         </div>
     </div>
 </template>
@@ -45,5 +70,12 @@
         width: 100%;
         height: 100%;
         display: block;
+    }
+    .no-drag {  
+        user-select: none;
+        -webkit-user-drag: none; 
+        -khtml-user-drag: none; 
+        -moz-user-drag: none; 
+        -o-user-drag: none; 
     }
 </style>
