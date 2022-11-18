@@ -1,16 +1,28 @@
 <script setup lang="ts">
     import { computed } from '@vue/reactivity';
-    import { ref, reactive } from 'vue';
+    import { ref, reactive, watch } from 'vue';
     import type { IGridElement } from '../../services/streetplaner/IGridElement';
+    import useEventBus from '../../services/eventBus';
+    import ToolEnum from '../../services/streetplaner/ToolEnum';
+    const { bus } = useEventBus();
+
     var gridSizeX = 20;
     var gridSizeY = 30;
+    const toolState = reactive({ tool: ToolEnum.EMPTY, block: ""});
+
+    watch(() => bus.value.get('tool-select-event'), (val) => {
+        toolState.tool = val;
+    });
+    watch(() => bus.value.get('block-select-event'), (val) => {
+        toolState.block = val;
+    });
 
     // create and initialize streetGrid
     const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
     // fill streetGrid with empty IGridElements
     for (let row=0; row < gridSizeX; row++) {
         for (let col=0; col < gridSizeY; col++) {
-            streetGrid[row][col] = { posX: row, posY: col, texture: ""};
+            streetGrid[row][col] = { id: -1, posX: row, posY: col, texture: ""};
         }
     }
 
@@ -23,13 +35,13 @@
     // onClick handles click on specific cell
     function onClick(cell: any) {
         // set texture of clicked cell to dummy
-        streetGrid[cell.posX][cell.posY].texture = "/img/dummy.png";
+        streetGrid[cell.posX][cell.posY].texture = "/img/streetplaner/dummy.png";
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
     function onMouseMove(cell: any, event: any) {
         if (event.buttons === 1) {  
-            streetGrid[cell.posX][cell.posY].texture = "/img/dummy.png";
+            streetGrid[cell.posX][cell.posY].texture = "/img/streetplaner/dummy.png";
         }
     }
     
