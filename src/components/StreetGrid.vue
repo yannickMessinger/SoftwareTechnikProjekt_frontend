@@ -2,6 +2,8 @@
     import { computed } from '@vue/reactivity';
     import { ref, reactive } from 'vue';
     import type { IGridElement } from '../services/IGridElement';
+    import {useStreetGrid} from '../services/useStreetGrid';
+    const {setGridState, showGridState} = useStreetGrid();
     var gridSizeX = 20;
     var gridSizeY = 30;
 
@@ -37,6 +39,18 @@
     window.addEventListener('contextmenu', function (e) {
         e.preventDefault();
     }, false);
+
+
+    function saveGrid(){
+        setGridState(streetGrid);
+        showGridState();
+
+    }
+
+    function parseGrid(parseGrid:any){
+
+    }
+    
 </script>
 
 <template>
@@ -45,6 +59,8 @@
             <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false"/>
         </div>
     </div>
+
+    <button @click="saveGrid()">show grid</button>
 </template>
 
 <style>
