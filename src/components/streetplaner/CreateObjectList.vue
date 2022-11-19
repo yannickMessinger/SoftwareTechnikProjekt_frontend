@@ -7,6 +7,8 @@
     import { reactive } from 'vue';
     import type { IListElement } from '../../services/streetplaner/IListElement';
     
+    import useEventBus from './../../services/eventBus';
+
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
     var totalObjectNumber = 3; /** number of objectslots shown in the objectList*/
@@ -28,6 +30,9 @@
     objectList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: (pathToPictures+"object-icons/curve.png")};
     objectList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: (pathToPictures+"object-icons/cross.png")};
 
+    
+    const {emit}=useEventBus();
+
     function onCreateObjectClick(row:any){
         console.log(activeObject.obj.name);
         if(activeObject.obj.id==row.id){
@@ -35,6 +40,7 @@
         }else{
             activeObject.obj = row;
         }
+        emit("object-event", activeObject.obj);
         console.log(activeObject.obj.name);
     }
 </script>
