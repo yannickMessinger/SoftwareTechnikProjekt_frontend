@@ -4,8 +4,8 @@
 -->
 <script setup lang="ts">
     /**Imports: */
-    import CreateObjectList from './CreateObjectList.vue'
-    import ToolList from './ToolList.vue'
+    import ListBlocksComponent from './ListBlocksComponent.vue'
+    import ListToolsComponent from './ListToolsComponent.vue'
     import SelectedBlockComponent from './SelectedBlockComponent.vue'
     import SelectedToolComponent from './SelectedToolComponent.vue';    
 </script>
@@ -16,11 +16,11 @@
         <tr>
             <td>
                 <!--display tool List-->
-                <ToolList></ToolList>  
+                <ListToolsComponent></ListToolsComponent>  
             </td>
             <td>
                 <!--display object List-->
-                <CreateObjectList></CreateObjectList>
+                <ListBlocksComponent></ListBlocksComponent>
             </td>
             <td>
                <SelectedToolComponent></SelectedToolComponent> 
