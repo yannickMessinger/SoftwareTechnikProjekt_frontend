@@ -6,6 +6,8 @@
     /**Imports: */
     import { reactive } from 'vue';
     import type { IToolElement } from '../../services/streetplaner/IToolElement';
+    import useEventBus from './../../services/eventBus';
+    
     
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
@@ -18,6 +20,8 @@
         texture: (pathToPictures+"no-data.png")
     };
     const activeTool = reactive({tool: defaultTool});
+    const {emit}=useEventBus();
+    
     
     /**entrys in toollist */ 
     toolList[0] = { id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
@@ -39,6 +43,7 @@
         }else{
             activeTool.tool = row;
         }
+        emit('tool-select-event', activeTool.tool);
         console.log(activeTool.tool.name);
     }
 
