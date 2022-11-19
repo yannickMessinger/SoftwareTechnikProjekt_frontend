@@ -9,11 +9,11 @@
     </div>
   </div>
   <div v-else>
-    <p>Leider keine Lobbys vorhanden:(</p>
+    <p>No lobbys available:(</p>
   </div>
   <!--Button to manually refresh Lobbylist-->
   <button @click="updateLobbyList()">Refresh</button>
-
+  <button>Add new Lobby</button>
   <button>Play</button>
 </template>
 

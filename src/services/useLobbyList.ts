@@ -3,6 +3,7 @@
  */
 
 import { reactive, readonly } from "vue";
+import { AddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO";
 import { ILobbyListItem } from "../typings/ILobbyListItem";
 
 export interface ILobbyListState {
@@ -80,6 +81,32 @@ export async function updateLobbyList():Promise<void> {
         console.log(" error in updateLobbyList");
     }
        
+
+}
+
+
+export async function createNewLobby(){
+
+    const url = '/api/lobby';
+
+    const testname = 'testname'
+    const numOfPlayers = 17;
+
+    const testLobby:AddLobbyRequestDTO = ({name: testname,numplayer:numOfPlayers,gamemode: "play"})
+    
+    try{
+
+        const res = await fetch(url,{
+            method:'POST'
+            
+        })
+
+
+
+    }catch (error){
+        console.log(error)
+    }
+
 
 }
 
