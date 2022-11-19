@@ -13,6 +13,8 @@ export function useStreetGrid( ) {
         //lobby noch?? 
     }
 
+
+
     const gridState = reactive<IGridState>({playerGrid: Array(1).fill([]).map(() => Array(1).fill(null)), errorMsg:''});
 
 

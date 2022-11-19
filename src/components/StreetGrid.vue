@@ -3,7 +3,7 @@
     import { ref, reactive } from 'vue';
     import type { IGridElement } from '../services/IGridElement';
     import {useStreetGrid} from '../services/useStreetGrid';
-    const {setGridState, showGridState} = useStreetGrid();
+    const {setGridState, showGridState,saveStreetGrid} = useStreetGrid();
     var gridSizeX = 20;
     var gridSizeY = 30;
 
@@ -44,6 +44,7 @@
     function saveGrid(){
         setGridState(streetGrid);
         showGridState();
+        saveStreetGrid();
 
     }
 
