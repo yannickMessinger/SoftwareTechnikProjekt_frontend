@@ -6,7 +6,7 @@
     /**Imports: */
     import { reactive } from 'vue';
     import type { IToolElement } from '../../services/streetplaner/IToolElement';
-    import useEventBus from './../../services/eventBus';
+    import useEventBus from '../../services/eventBus';
     
     
     /**Variables: */

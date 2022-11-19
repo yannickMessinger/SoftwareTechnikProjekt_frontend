@@ -7,7 +7,7 @@
     import { reactive } from 'vue';
     import type { IListElement } from '../../services/streetplaner/IListElement';
     
-    import useEventBus from './../../services/eventBus';
+    import useEventBus from '../../services/eventBus';
 
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
