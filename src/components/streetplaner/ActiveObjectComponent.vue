@@ -6,7 +6,7 @@
     /**Imports: */
     import { reactive } from 'vue';
     import type { IListElement } from '../../services/streetplaner/IListElement';
-    import { ref, watch } from 'vue';
+    import { watch } from 'vue';
     import useEventBus from '../../services/eventBus';
       
     /**Variables: */
@@ -22,9 +22,8 @@
         texture: (pathToPictures+"no-data.png")
     };
     const { bus } = useEventBus();
-    const x = ref(0);
     const activeObject = reactive({obj: defaultObject});
-    watch(() =>  bus.value.get('object-event'), (val) => {
+    watch(() =>  bus.value.get('block-select-event'), (val) => {
         activeObject.obj = val[0];
     });
 

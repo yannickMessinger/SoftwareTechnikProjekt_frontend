@@ -40,7 +40,7 @@
         }else{
             activeObject.obj = row;
         }
-        emit("object-event", activeObject.obj);
+        emit("block-select-event", activeObject.obj);
         console.log(activeObject.obj.name);
     }
 </script>
