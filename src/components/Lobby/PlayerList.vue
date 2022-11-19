@@ -27,6 +27,7 @@
     </table>
 -->
 
+<!--Display List of Active Users in selected Lobby-->
         <table>
             <thead>
                 <tr>
@@ -68,7 +69,7 @@
 import PlayerListItem from './PlayerListItem.vue';
 import { IPlayerListItem } from '../../typings/IPlayerListItem';
 
-
+//PlayerList passed from backend
 const props = defineProps<{
     liste: Readonly<IPlayerListItem[]>,
 }>()
