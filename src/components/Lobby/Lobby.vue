@@ -13,19 +13,19 @@
   </div>
   <!--Button to manually refresh Lobbylist-->
   <button @click="updateLobbyList()">Refresh</button>
-  <button>Add new Lobby</button>
+  <button @click="createNewLobby">Add new Lobby</button>
   <button>Play</button>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useLobbyList, updateLobbyList } from "../../services/useLobbyList";
+import { useLobbyList, updateLobbyList,createNewLobby } from "../../services/useLobbyList";
 import { usePlayerList } from "../../services/usePlayerList";
 import LobbyList from "./LobbyList.vue";
 import PlayerList from "./PlayerList.vue";
 
 onMounted(async () => {
-  //await  updateLobbyList()
+  await  updateLobbyList()
   //Todo: coinnect to backend
 });
 

@@ -3,8 +3,9 @@
  */
 
 import { reactive, readonly } from "vue";
-import { AddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO";
+import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO";
 import { ILobbyListItem } from "../typings/ILobbyListItem";
+import {E_LobbyMode} from "../typings/E_LobbyMode";
 
 export interface ILobbyListState {
     lobbylist: ILobbyListItem[]
@@ -21,10 +22,10 @@ const lobbyState = reactive<ILobbyListState>({
 export function useLobbyList(){
 
     //Test objects of lobbys to be displayed, once backend is connected not neccessary anymore 
-    lobbyState.lobbylist.push({name: "lobby1", gamemode: "build", player: 4});
-    lobbyState.lobbylist.push({name: "lobby2", gamemode: "play", player: 7});
-    lobbyState.lobbylist.push({name: "lobby3", gamemode: "build", player: 10});
-    lobbyState.lobbylist.push({name: "lobby4", gamemode: "build", player: 4});
+    //lobbyState.lobbylist.push({name: "lobby1", gamemode: "build", player: 4});
+    //lobbyState.lobbylist.push({name: "lobby2", gamemode: "play", player: 7});
+    //lobbyState.lobbylist.push({name: "lobby3", gamemode: "build", player: 10});
+    //lobbyState.lobbylist.push({name: "lobby4", gamemode: "build", player: 4});
     
     
     
@@ -42,7 +43,7 @@ export async function updateLobbyList():Promise<void> {
 
     
 
-    const url = '/zugriffauf/backendrestpoint';
+    const url = '/api/lobby';
     
 
     try{
@@ -68,6 +69,9 @@ export async function updateLobbyList():Promise<void> {
 
         
         const jsondata : ILobbyListItem[] = await response.json();
+        console.log("JSONDATA");
+        console.log(jsondata)
+
         lobbyState.lobbylist = jsondata;
         lobbyState.errormsg = '';
            
@@ -89,19 +93,21 @@ export async function createNewLobby(){
 
     const url = '/api/lobby';
 
-    const testname = 'testname'
+    const testname = 'testname';
     const numOfPlayers = 17;
 
-    const testLobby:AddLobbyRequestDTO = ({name: testname,numplayer:numOfPlayers,gamemode: "play"})
+    const testLobby: IAddLobbyRequestDTO = ({lobbyName:testname, numOfPlayers:numOfPlayers, lobbyMode:E_LobbyMode.BUILD_MODE})
     
     try{
 
         const res = await fetch(url,{
-            method:'POST'
-            
-        })
+            method:'POST',
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify(testLobby)
+        });
 
-
+        console.log("added new Lobby");
+       
 
     }catch (error){
         console.log(error)
