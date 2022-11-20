@@ -7,6 +7,7 @@
     import { reactive } from 'vue';
     import type { IListElement } from '../../services/streetplaner/IListElement';
     import type { IToolElement } from '../../services/streetplaner/IToolElement';
+    import ToolEnum from '../../services/streetplaner/ToolEnum';
     
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
@@ -16,6 +17,7 @@
     var objectList: IListElement[] = Array(totalObjectNumber).fill([]); /** List of all Objects placable in street Editor*/
     /** currently selected tool, default value is no tool selected */
     var defaultTool: IToolElement = {
+        tool: ToolEnum.EMPTY,
         id: -1, 
         name: "no Tool selected",
         texture: (pathToPictures+"no-data.png")
@@ -34,9 +36,9 @@
     const activeObject = reactive({obj: defaultObject});
     
     /**entrys in toollist */ 
-    toolList[0] = { id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
-    toolList[1] = { id: 1, name: "delete", texture: (pathToPictures+"tool-icons/delete.png")};
-    toolList[2] = { id: 2, name: "edit", texture: (pathToPictures+"tool-icons/edit.png")};
+    toolList[0] = { tool: ToolEnum.CREATE, id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
+    toolList[1] = { tool: ToolEnum.DELETE, id: 1, name: "delete", texture: (pathToPictures+"tool-icons/delete.png")};
+    toolList[2] = { tool: ToolEnum.EDIT, id: 2, name: "edit", texture: (pathToPictures+"tool-icons/edit.png")};
     
     /**entrys in objectlist */
     objectList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,texture: (pathToPictures+"object-icons/straight.png")};
