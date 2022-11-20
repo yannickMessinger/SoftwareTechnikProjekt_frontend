@@ -12,37 +12,37 @@
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
     /**currently selected object, default value is no object selected */
-    var defaultObject: IBlockElement = { 
+    var defaultBlock: IBlockElement = { 
         groupId: -1,
         group: "no data",
         id: -1,
         type:"no data",
-        name:"no Object selected",
+        name:"no Block selected",
         heading:0,
         texture: (pathToPictures+"no-data.png")
     };
     const { bus } = useEventBus();
-    const activeObject = reactive({obj: defaultObject});
+    const selectedBlock = reactive({obj: defaultBlock});
     watch(() =>  bus.value.get('block-select-event'), (val) => {
-        activeObject.obj = val[0];
+        selectedBlock.obj = val[0];
     });
 
 </script>
 
 <template>
     <div class="selected-object">
-        <h3 class="list-title"> Active Object:</h3>
+        <h3 class="list-title"> Selected Block:</h3>
         <table>
             <tr>
                 <td>
-                    <img v-if="activeObject != null" :src="activeObject.obj.texture" class="list-img"/>
+                    <img v-if="selectedBlock != null" :src="selectedBlock.obj.texture" class="list-img"/>
                 </td>
                 <td>
                     <ul class="list-without">
                         <li class="objectList-text"><h4>Details:</h4></li>
-                        <li class="objectList-text">{{activeObject.obj.id}}</li>
-                        <li class="objectList-text">{{activeObject.obj.name}}</li>
-                        <li class="objectList-text">{{activeObject.obj.type}}</li>
+                        <li class="objectList-text">{{selectedBlock.obj.id}}</li>
+                        <li class="objectList-text">{{selectedBlock.obj.name}}</li>
+                        <li class="objectList-text">{{selectedBlock.obj.type}}</li>
                     </ul>
                 </td>
             </tr>
@@ -51,7 +51,7 @@
 </template>
 
 <style>
-    /** style for images in toollist, objectlist, active tool and active object*/
+    /** style for images in selected block */
     .list-img {
         width: 90%;
         height: 90%;
@@ -64,7 +64,7 @@
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-    /** style for text in listelements in object lists*/
+    /** style for text in list elements in block list*/
     .objectList-text{
         color:black;
         user-select: none;
@@ -73,7 +73,7 @@
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-    /** style for active tool and active object container*/
+    /** style for selected block container*/
     .selected-object{
         display: table-row;
         border: solid 1px gray;
