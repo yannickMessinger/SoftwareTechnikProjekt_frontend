@@ -8,13 +8,15 @@
 
     var gridSizeX = 20;
     var gridSizeY = 30;
-    const toolState = reactive({ tool: ToolEnum.EMPTY, block: ""});
+    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { texture: "" }});
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
-        toolState.tool = val;
+        toolState.tool = val[0].name;
+        console.log(toolState);
     });
     watch(() => bus.value.get('block-select-event'), (val) => {
-        toolState.block = val;
+        toolState.block = val[0];
+        console.log(toolState);
     });
 
     // create and initialize streetGrid
@@ -35,13 +37,15 @@
     // onClick handles click on specific cell
     function onClick(cell: any) {
         // set texture of clicked cell to dummy
-        streetGrid[cell.posX][cell.posY].texture = "/img/streetplaner/dummy.png";
+        if (toolState.tool == "create") {
+            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+        }
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
     function onMouseMove(cell: any, event: any) {
-        if (event.buttons === 1) {  
-            streetGrid[cell.posX][cell.posY].texture = "/img/streetplaner/dummy.png";
+        if (event.buttons === 1 && toolState.tool == "create") {  
+            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
         }
     }
     
