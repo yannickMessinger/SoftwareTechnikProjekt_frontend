@@ -7,7 +7,7 @@
     import { reactive } from 'vue';
     import type { IToolElement } from '../../services/streetplaner/IToolElement';
     import useEventBus from '../../services/eventBus';
-    
+    import ToolEnum from '../../services/streetplaner/ToolEnum'
     
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
@@ -15,6 +15,7 @@
     var toolList: IToolElement[] = Array(totalToolNumber).fill([]); /** List of all Tools */
     /** currently selected tool, default value is no tool selected */
     var defaultTool: IToolElement = {
+        tool: ToolEnum.EMPTY,
         id: -1, 
         name: "no Tool selected",
         texture: (pathToPictures+"no-data.png")
@@ -24,9 +25,9 @@
     
     
     /**entrys in toollist */ 
-    toolList[0] = { id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
-    toolList[1] = { id: 1, name: "delete", texture: (pathToPictures+"tool-icons/delete.png")};
-    toolList[2] = { id: 2, name: "edit", texture: (pathToPictures+"tool-icons/edit.png")};
+    toolList[0] = { tool: ToolEnum.CREATE, id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
+    toolList[1] = { tool: ToolEnum.DELETE, id: 1, name: "delete", texture: (pathToPictures+"tool-icons/delete.png")};
+    toolList[2] = { tool: ToolEnum.EDIT, id: 2, name: "edit", texture: (pathToPictures+"tool-icons/edit.png")};
         
     function onToolClick(row:any){
         switch(row.id){
@@ -43,7 +44,8 @@
         }else{
             activeTool.tool = row;
         }
-        emit('tool-select-event', activeTool.tool);
+        emit('tool-select-event', activeTool.tool.tool);
+        emit('tool-select-component-event', activeTool.tool);
         console.log(activeTool.tool.name);
     }
 
@@ -94,22 +96,12 @@
         height: 90%;
         color:black;
         background-color: white;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
     }
     /** style for list element for toollist and objectlist*/
     .list-element {
         display: list-item;
         border: solid 1px gray;
         margin: 5%;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
     }
     /** style for images in toollist, objectlist, active tool and active object*/
     .list-img {
@@ -118,11 +110,6 @@
         display: block;
         border: solid 1px gray;
         margin: 5%;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none; 
     }
     /** style for text elements in toollist and active tool*/
     .toolList-text{
@@ -132,30 +119,15 @@
         color:black;
         border: solid 1px gray;
         background-color: white;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
     }
     /** style for buttons (tool list and object list) */
     .listButton{
         border: solid 2px black;
         background-color:darkgray;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
     }
     /** style for clicked buttons (tool list and object list) */
     .listButtonActive{
         border: solid 2px black;
-        background-color:red;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
+        background-color:orange;
     }
 </style>
