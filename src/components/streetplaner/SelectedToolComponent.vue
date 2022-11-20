@@ -8,6 +8,7 @@
     import type { IToolElement } from '../../services/streetplaner/IToolElement';
     import { watch } from 'vue';
     import useEventBus from '../../services/eventBus';
+    import ToolEnum from '../../services/streetplaner/ToolEnum';
     
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
@@ -15,12 +16,13 @@
     
     /** currently selected tool, default value is no tool selected */
     var defaultTool: IToolElement = {
+        tool: ToolEnum.EMPTY,
         id: -1, 
         name: "no Tool selected",
         texture: (pathToPictures+"no-data.png")
     };
     const activeTool = reactive({tool: defaultTool});
-    watch(() =>  bus.value.get('tool-select-event'), (val) => {
+    watch(() =>  bus.value.get('tool-select-component-event'), (val) => {
         activeTool.tool = val[0];
     });
     

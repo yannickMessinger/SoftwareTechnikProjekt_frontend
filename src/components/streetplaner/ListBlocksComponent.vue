@@ -147,7 +147,7 @@
     /** style for clicked buttons (tool list and object list) */
     .listButtonActive{
         border: solid 2px black;
-        background-color:red;
+        background-color:orange;
         user-select: none;
         -webkit-user-drag: none; 
         -khtml-user-drag: none; 

@@ -8,7 +8,10 @@
  * texture - path for the displayed picture
  */
 
+import { TypesConfig } from "vue-router"
+import ToolEnum from "./ToolEnum"
 export interface IToolElement {
+    tool:string,
     id: number,
     name: string,
     texture: string
