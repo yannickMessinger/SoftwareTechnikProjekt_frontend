@@ -11,9 +11,9 @@
 
     <div class="lobby_data">
       <div>
-        <b>Name: </b>{{ props.lobby.name }}<br/>   
-        <b>mode: </b>{{ props.lobby.gamemode }} <br/>
-        <b>active players: </b>{{ props.lobby.player }}
+        <b>Name: </b>{{ props.lobby.lobbyName }}<br/>   
+        <b>mode: </b>{{ props.lobby.lobbyMode }} <br/>
+        <b>active players: </b>{{ props.lobby.numOfPlayers }}
       </div>
     </div>
   </div>
@@ -30,7 +30,7 @@ const props = defineProps<{
 }>();
 
 function selectLobby(){
-    console.log(props.lobby.name);
+    console.log(props.lobby.lobbyName);
 }
 
 

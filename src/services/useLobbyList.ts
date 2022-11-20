@@ -21,11 +21,7 @@ const lobbyState = reactive<ILobbyListState>({
 
 export function useLobbyList(){
 
-    //Test objects of lobbys to be displayed, once backend is connected not neccessary anymore 
-    //lobbyState.lobbylist.push({name: "lobby1", gamemode: "build", player: 4});
-    //lobbyState.lobbylist.push({name: "lobby2", gamemode: "play", player: 7});
-    //lobbyState.lobbylist.push({name: "lobby3", gamemode: "build", player: 10});
-    //lobbyState.lobbylist.push({name: "lobby4", gamemode: "build", player: 4});
+    
     
     
     
@@ -40,12 +36,12 @@ export function useLobbyList(){
 //functions to fetch and update LobbyState item
 export async function updateLobbyList():Promise<void> {
     
-
     
-
+    
+    
     const url = '/api/lobby';
     
-
+    
     try{
     
 
@@ -72,6 +68,8 @@ export async function updateLobbyList():Promise<void> {
         console.log("JSONDATA");
         console.log(jsondata)
 
+    
+
         lobbyState.lobbylist = jsondata;
         lobbyState.errormsg = '';
            
@@ -84,7 +82,8 @@ export async function updateLobbyList():Promise<void> {
     } catch(error){
         console.log(" error in updateLobbyList");
     }
-       
+    
+    
 
 }
 

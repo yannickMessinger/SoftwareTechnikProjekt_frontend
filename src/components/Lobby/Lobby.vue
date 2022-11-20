@@ -12,7 +12,7 @@
     <p>No lobbys available:(</p>
   </div>
   <!--Button to manually refresh Lobbylist-->
-  <button @click="updateLobbyList()">Refresh</button>
+  <button @click="updateLobbys()">Refresh</button>
   <button @click="createNewLobby">Add new Lobby</button>
   <button>Play</button>
 </template>
@@ -31,6 +31,10 @@ onMounted(async () => {
 
 const { lobbyList } = useLobbyList();
 const { playerList } = usePlayerList();
+
+async function updateLobbys(){
+  await updateLobbyList();
+}
 </script>
 
 <style scoped>
