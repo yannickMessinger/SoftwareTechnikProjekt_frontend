@@ -5,7 +5,7 @@
 <script setup lang="ts">
     /**Imports: */
     import { reactive } from 'vue';
-    import type { IListElement } from '../../services/streetplaner/IListElement';
+    import type { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import type { IToolElement } from '../../services/streetplaner/IToolElement';
     import ToolEnum from '../../services/streetplaner/ToolEnum';
     
@@ -14,7 +14,7 @@
     var totalToolNumber = 3; /** number of toolslots shown in the toollist*/
     var toolList: IToolElement[] = Array(totalToolNumber).fill([]); /** List of all Tools */
     var totalObjectNumber = 3; /** number of objectslots shown in the objectList*/
-    var objectList: IListElement[] = Array(totalObjectNumber).fill([]); /** List of all Objects placable in street Editor*/
+    var objectList: IBlockElement[] = Array(totalObjectNumber).fill([]); /** List of all Objects placable in street Editor*/
     /** currently selected tool, default value is no tool selected */
     var defaultTool: IToolElement = {
         tool: ToolEnum.EMPTY,
@@ -23,7 +23,7 @@
         texture: (pathToPictures+"no-data.png")
     };
     /**currently selected object, default value is no object selected */
-    var defaultObject: IListElement = { 
+    var defaultObject: IBlockElement = { 
         groupId: -1,
         group: "no data",
         id: -1,

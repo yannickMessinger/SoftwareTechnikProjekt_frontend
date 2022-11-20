@@ -5,14 +5,14 @@
 <script setup lang="ts">
     /**Imports: */
     import { reactive } from 'vue';
-    import type { IListElement } from '../../services/streetplaner/IListElement';
+    import type { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import { watch } from 'vue';
     import useEventBus from '../../services/eventBus';
       
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
     /**currently selected object, default value is no object selected */
-    var defaultObject: IListElement = { 
+    var defaultObject: IBlockElement = { 
         groupId: -1,
         group: "no data",
         id: -1,

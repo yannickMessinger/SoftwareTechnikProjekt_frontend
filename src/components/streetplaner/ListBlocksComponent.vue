@@ -5,16 +5,16 @@
 <script setup lang="ts">
     /**Imports: */
     import { reactive } from 'vue';
-    import type { IListElement } from '../../services/streetplaner/IListElement';
+    import type { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import useEventBus from '../../services/eventBus';
 
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
     var totalBlockNumber = 3; /** number of blocks in blocklist*/
-    var blockList: IListElement[] = Array(totalBlockNumber).fill([]); /** List of all blocks placable in street editor*/
+    var blockList: IBlockElement[] = Array(totalBlockNumber).fill([]); /** List of all blocks placable in street editor*/
     
     /*default block element*/
-    var defaultBlock: IListElement = { 
+    var defaultBlock: IBlockElement = { 
         groupId: -1,
         group: "no data",
         id: -1,
