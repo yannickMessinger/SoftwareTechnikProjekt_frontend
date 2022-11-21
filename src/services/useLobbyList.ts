@@ -10,11 +10,13 @@ import {E_LobbyMode} from "../typings/E_LobbyMode";
 export interface ILobbyListState {
     lobbylist: ILobbyListItem[]
     errormsg : string
+    
 }
 
 const lobbyState = reactive<ILobbyListState>({
     lobbylist: Array<ILobbyListItem>(),
     errormsg:""
+   
 })
 
 
@@ -88,21 +90,23 @@ export async function updateLobbyList():Promise<void> {
 }
 
 
-export async function createNewLobby(){
+export async function createNewLobby(addLobbyName:string, addNumOfPlayers: number, addLobbyMode: E_LobbyMode){
 
     const url = '/api/lobby';
 
     const testname = 'testname';
     const numOfPlayers = 17;
 
-    const testLobby: IAddLobbyRequestDTO = ({lobbyName:testname, numOfPlayers:numOfPlayers, lobbyMode:E_LobbyMode.BUILD_MODE})
+    const addLobby: IAddLobbyRequestDTO = ({lobbyName:addLobbyName, numOfPlayers:addNumOfPlayers, lobbyMode:addLobbyMode})
+    //console.log(addLobby);
+    
     
     try{
 
         const res = await fetch(url,{
             method:'POST',
             headers: { "Content-Type": "application/json"},
-            body: JSON.stringify(testLobby)
+            body: JSON.stringify(addLobby)
         });
 
         console.log("added new Lobby");

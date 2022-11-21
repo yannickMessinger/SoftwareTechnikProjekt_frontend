@@ -1,26 +1,38 @@
 <!-- Component that displays overview of existing lobbys and active players-->
 <template>
   <h3>Lobby Component</h3>
-
-  <div v-if="lobbyList.lobbylist.length > 0">
-    <div class="flex-container">
-      <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
-      <PlayerList :liste="playerList.playerlist"></PlayerList>
+    <div v-if="showAddLobby">
+      <input type ="text"  v-model=lobbyNameInput placeholder="enter lobbyname" />
+      <input type = "number" v-model="playerNumberInput" placeholder="amount of players"/>
+      <input type = "radio" value ="build" @click="setBuildMode()"/>
+      <input type = "radio" value ="play" @click="setPlayMode()"/>
+      
+      
+      <button @click="createNewLobby(lobbyNameInput,playerNumberInput,lobbyModeInput)">create new lobby</button>
     </div>
-  </div>
-  <div v-else>
+  
+    <div class="flex-container">
+      <div v-if="lobbyList.lobbylist.length > 0">
+      <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
+    </div>
+    <div v-else>
     <p>No lobbys available:(</p>
   </div>
+      <PlayerList :liste="playerList.playerlist"></PlayerList>
+    </div>
+  
+  
   <!--Button to manually refresh Lobbylist-->
   <button @click="updateLobbys()">Refresh</button>
-  <button @click="createNewLobby">Add new Lobby</button>
+  <button @click="setShowLobby()">Add new Lobby</button>
   <button>Play</button>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useLobbyList, updateLobbyList,createNewLobby } from "../../services/useLobbyList";
 import { usePlayerList } from "../../services/usePlayerList";
+import { E_LobbyMode } from "../../typings/E_LobbyMode";
 import LobbyList from "./LobbyList.vue";
 import PlayerList from "./PlayerList.vue";
 
@@ -31,10 +43,32 @@ onMounted(async () => {
 
 const { lobbyList } = useLobbyList();
 const { playerList } = usePlayerList();
+const showAddLobby = ref(false);
+const lobbyNameInput = ref("");
+const playerNumberInput = ref(0);
+const lobbyModeInput = ref(E_LobbyMode.BUILD_MODE);
 
 async function updateLobbys(){
   await updateLobbyList();
 }
+
+function setShowLobby(){
+  showAddLobby.value = !showAddLobby.value
+}
+
+function setPlayMode(){
+  lobbyModeInput.value = E_LobbyMode.PLAY_MODE
+  
+}
+
+function setBuildMode(){
+  lobbyModeInput.value = E_LobbyMode.BUILD_MODE;
+  
+}
+
+
+
+
 </script>
 
 <style scoped>
