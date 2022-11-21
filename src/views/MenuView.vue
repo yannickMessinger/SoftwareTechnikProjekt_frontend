@@ -3,7 +3,7 @@
   <PrimButton display="Editor Mode" :btn_click="switchEditor"></PrimButton>
 </template>
 
-<script setup lang = "ts">
+<script setup lang="ts">
   import PrimButton from '../components/PrimButton.vue';
   import router from '../router/router';
 
