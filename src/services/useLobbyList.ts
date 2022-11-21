@@ -111,6 +111,7 @@ export async function createNewLobby(addLobbyName:string, addNumOfPlayers: numbe
 
         console.log("added new Lobby");
        
+        await updateLobbyList();
 
     }catch (error){
         console.log(error)
