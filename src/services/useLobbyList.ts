@@ -4,17 +4,17 @@
 
 import { reactive, readonly } from "vue";
 import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO";
-import { ILobbyListItem } from "../typings/ILobbyListItem";
+import { ILobby } from "../typings/ILobby";
 import {E_LobbyMode} from "../typings/E_LobbyMode";
 
 export interface ILobbyListState {
-    lobbylist: ILobbyListItem[]
+    lobbylist: ILobby[]
     errormsg : string
     
 }
 
 const lobbyState = reactive<ILobbyListState>({
-    lobbylist: Array<ILobbyListItem>(),
+    lobbylist: Array<ILobby>(),
     errormsg:""
    
 })
@@ -66,7 +66,7 @@ export async function updateLobbyList():Promise<void> {
         
 
         
-        const jsondata : ILobbyListItem[] = await response.json();
+        const jsondata : ILobby[] = await response.json();
         console.log("JSONDATA");
         console.log(jsondata)
 

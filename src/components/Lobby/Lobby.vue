@@ -1,69 +1,36 @@
-<!-- Component that displays overview of existing lobbys and active players-->
+<!--List Item that represents single lobby and is embedded in LobbyList, displays Lobby Dta Name, the current gaming mode the lobby is set to and the number of active players-->
+
 <template>
-  <h3>Lobby Component</h3>
-    <div v-if="showAddLobby">
-      <input type ="text"  v-model=lobbyNameInput placeholder="enter lobbyname" />
-      <input type = "number" v-model="playerNumberInput" placeholder="amount of players"/>
-      <input type = "radio" value ="build" @click="setBuildMode()"/>
-      <input type = "radio" value ="play" @click="setPlayMode()"/>
-      
-      
-      <button @click="createNewLobby(lobbyNameInput,playerNumberInput,lobbyModeInput)">create new lobby</button>
+<div  @click="selectLobby()">
+  <div class="item">
+    <img
+      src="https://images.unsplash.com/photo-1628947733273-cdae71c9bfd3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+      width="100"
+      height="100"
+    />
+
+    <div class="lobby_data">
+      <div>
+        <b>Name: </b>{{ props.lobby.lobbyName }}<br/>   
+        <b>mode: </b>{{ props.lobby.lobbyMode }} <br/>
+        <b>active players: </b>{{ props.lobby.numOfPlayers }}
+      </div>
     </div>
-  
-    <div class="flex-container">
-      <div v-if="lobbyList.lobbylist.length > 0">
-      <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
-    </div>
-    <div v-else>
-    <p>No lobbys available:(</p>
   </div>
-      <PlayerList :liste="playerList.playerlist"></PlayerList>
-    </div>
-  
-  
-  <!--Button to manually refresh Lobbylist-->
-  <button @click="updateLobbys()">Refresh</button>
-  <button @click="setShowLobby()">Add new Lobby</button>
-  <button>Play</button>
+</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useLobbyList, updateLobbyList,createNewLobby } from "../../services/useLobbyList";
-import { usePlayerList } from "../../services/usePlayerList";
-import { E_LobbyMode } from "../../typings/E_LobbyMode";
-import LobbyList from "./LobbyList.vue";
-import PlayerList from "./PlayerList.vue";
+import { computed, ref } from "vue";
+import { ILobby } from "../../typings/ILobby";
 
-onMounted(async () => {
-  await  updateLobbyList()
-  //Todo: coinnect to backend
-});
 
-const { lobbyList } = useLobbyList();
-const { playerList } = usePlayerList();
-const showAddLobby = ref(false);
-const lobbyNameInput = ref("");
-const playerNumberInput = ref(0);
-const lobbyModeInput = ref(E_LobbyMode.BUILD_MODE);
+const props = defineProps<{
+  lobby: ILobby;
+}>();
 
-async function updateLobbys(){
-  await updateLobbyList();
-}
-
-function setShowLobby(){
-  showAddLobby.value = !showAddLobby.value
-}
-
-function setPlayMode(){
-  lobbyModeInput.value = E_LobbyMode.PLAY_MODE
-  
-}
-
-function setBuildMode(){
-  lobbyModeInput.value = E_LobbyMode.BUILD_MODE;
-  
+function selectLobby(){
+    console.log(props.lobby.lobbyName);
 }
 
 
@@ -72,31 +39,47 @@ function setBuildMode(){
 </script>
 
 <style scoped>
-.flex-container {
+.item {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+
   display: flex;
-  align-items: flex-start;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  width: 600px;
+  height: 100px;
+  background: rgb(63, 63, 63); 
+  color: #fff;
+  margin: 2px;
+  padding: 10px;
+  border: 2px solid;
+
+  clip-path: polygon(
+    0% 0%,
+    /* top left */ 0% 0%,
+    /* top left */ 100% 0%,
+    /* top right */ 100% 5%,
+    /* top right */ 100% 75%,
+    /* bottom right */ 95% 100%,
+    /* bottom right */ 0% 100%,
+    /* bottom left */ 0 95% /* bottom left */
+  );
 }
 
-h3 {
-  text-align: center;
+.lobby_data {
+  height: 100px;
+  width: 400px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  color: lightgray;
+  
 }
 
-button {
-  background-color: rgb(255, 200, 0);
-  color: rgb(63, 63, 63);
-  font-family: Arial, Helvetica, sans-serif;
-  padding: 15px 32px;
-  font-size: 14px;
-  font-weight: bold;
-  margin: 4px 2px;
-  margin-left: 10px;
-  margin-right: 10px;
-  cursor: pointer;
-  border: none;
-
-}
-
-button:hover {
-  background-color: rgb(219, 172, 0);
+.item:hover {
+  border-color:  rgb(255, 200, 0);;
 }
 </style>

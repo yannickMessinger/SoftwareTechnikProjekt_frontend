@@ -2,14 +2,15 @@
     <div>
         <h2>Game Lobby</h2>
         <div>
-            <Lobby></Lobby>
+            <LobbyOverview></LobbyOverview>
         </div>
     </div>
 
 </template>
 
 <script setup lang="ts">
-    import Lobby from '../components/Lobby/Lobby.vue';
+    import LobbyOverview from '../components/Lobby/LobbyOverview.vue';
+import Lobby from '../components/Lobby/LobbyOverview.vue';
     
 
     

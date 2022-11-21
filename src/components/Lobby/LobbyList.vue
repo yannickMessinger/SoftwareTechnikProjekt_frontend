@@ -3,17 +3,17 @@
   <div class="flex-container">
     <h3>List of available lobbys:</h3>
     <!--Renders List of Lobbylistitems-->
-    <LobbyListItem :lobby="ele" v-for="ele in liste"></LobbyListItem>
+    <Lobby :lobby="ele" v-for="ele in liste"></Lobby>
   </div>
 </template>
 
 <script setup lang="ts">
-import LobbyListItem from "./LobbyListItem.vue";
-import { ILobbyListItem } from "../../typings/ILobbyListItem";
+import Lobby from "./Lobby.vue";
+import { ILobby } from "../../typings/ILobby";
 
 //Lobbylist passed from backend
 const props = defineProps<{
-  liste: Readonly<ILobbyListItem[]>;
+  liste: Readonly<ILobby[]>;
 }>();
 </script>
 
