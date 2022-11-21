@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import './style.css'
-/** import App from './App.vue'*/ /**original */
-import App from './App-StreetplanerTestside.vue' /**modified for testing */
+import App from './App.vue'
+import router from "./router/router";
 
-createApp(App).mount('#app')
+const app = createApp(App)
+app.use(router).mount('#app')
