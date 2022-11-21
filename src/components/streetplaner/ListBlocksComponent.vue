@@ -4,9 +4,10 @@
 -->
 <script setup lang="ts">
     /**Imports: */
-    import { reactive } from 'vue';
+    import { reactive, ref, watch } from 'vue';
     import type { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import useEventBus from '../../services/eventBus';
+    import ToolEnum from '../../services/streetplaner/ToolEnum';
 
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
@@ -26,8 +27,7 @@
     /**  currently selected block */
     const activeBlock = reactive({block: defaultBlock});
     /** bus event */
-    const {emit}=useEventBus();
-
+    const {emit, bus} =useEventBus();
     /**entrys in blocklist */
     blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,texture: (pathToPictures+"object-icons/straight.png")};
     blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: (pathToPictures+"object-icons/curve.png")};
@@ -43,6 +43,14 @@
         emit("block-select-event", activeBlock.block);
         console.log(activeBlock.block.name);
     }
+    const isCreateTool = ref(false);
+    watch(() =>  bus.value.get('tool-select-event'), (val) => {
+        if(val == ToolEnum.CREATE){
+            isCreateTool.value = true;
+        }else{
+            isCreateTool.value = false;
+        }
+    });
 </script>
 
 <template>
@@ -51,7 +59,7 @@
         <h2 class="list-title">Block List</h2>
         <!-- display container for block list element-->
         <div v-for="element in blockList" class="list-element">
-            <button :class="element.name === activeBlock.block.name ? 'listButtonActive' : 'listButton'" @click="onBlockClicked(element)">      
+            <button :disabled ="!isCreateTool" :class="element.name === activeBlock.block.name ? 'listButtonActive' : 'listButton'" @click="onBlockClicked(element)">      
                 <img v-if="element != null" :src="element.texture" class="list-img"/>
             </button> 
         </div>
