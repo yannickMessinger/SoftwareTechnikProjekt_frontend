@@ -6,51 +6,17 @@
         <div class="left">
             <div class="left_top">
                 <p>Tools</p>
-                <EditorItem></EditorItem>
-                <EditorItem></EditorItem>
-                <EditorItem></EditorItem>
-                <EditorItem></EditorItem>
-                <EditorItem></EditorItem> 
+                <ListToolsComponent></ListToolsComponent>
                 <p>Elements</p> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem>
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem>
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
-                <EditorItem></EditorItem> 
+                <ListBlocksComponent></ListBlocksComponent>
             </div> 
             <div class="left_bottom">
                 <p>Explanation</p>
-                <EditorItem></EditorItem>
+                <SelectedBlockComponent></SelectedBlockComponent>
             </div>          
         </div>
         <div class="right">
-            <p>"GRID"</p>
-            <img scr="https://picsum.photos/300" width="1200" height="1200">
+            <StreetGrid></StreetGrid>
         </div>
     </div>
     
@@ -59,8 +25,11 @@
 <script setup lang="ts">
     import { computed,ref } from 'vue'
     import PrimButton from '../components/PrimButton.vue'
-    import EditorItem from '../components/EditorItem.vue'
     import router from '../router/router'
+    import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
+    import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
+    import SelectedBlockComponent from '../components/streetplaner/SelectedBlockComponent.vue'
+    import StreetGrid from '../components/streetplaner/StreetGrid.vue'
 
     function backToMenu(){
         router.push('/')
