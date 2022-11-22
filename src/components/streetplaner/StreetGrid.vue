@@ -18,6 +18,9 @@
         toolState.block = val[0];
         console.log(toolState);
     });
+    watch(() => bus.value.get('grid-reset-event'), (val) => {
+        if (val) { resetGrid(); }
+    });
 
     // create and initialize streetGrid
     const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
