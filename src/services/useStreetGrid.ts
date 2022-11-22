@@ -18,20 +18,55 @@ export function useStreetGrid() {
         errorMsg: ''
     });
 
+    
+    function extractElements(){
+        let test: IGridElement[] = [];
+
+        gridState.playerGrid.forEach((zeile) => {
+            zeile.forEach((spalte) => {
+                if (spalte.texture !== ""){
+                    test.push(spalte);
+                }
+            })
+        })
+
+        console.log(JSON.stringify({"filledArray":test, "width" : gridState.playerGrid[0].length, "height": gridState.playerGrid.length}));
+        
+      let test2 : IGridElement[][] = gridState.playerGrid.map((ele) => {
+            return ele.filter((ele) =>{
+                return ele.texture !== ""
+            })
+      })
+
+      
+
+    }
+
 
     function setGridState(setGrid: IGridElement[][]) {
-        console.log("setGridState");
+        //console.log("setGridState");
         gridState.playerGrid = setGrid;
+      
     }
 
     async function saveStreetGrid(): Promise<void> {
         const url = '/api/streetgrid';
 
+        const filledGridCells: IGridElement[] = [];
+
+        gridState.playerGrid.forEach((zeile) => {
+            zeile.forEach((spalte) => {
+                if (spalte.texture !== ""){
+                    filledGridCells.push(spalte);
+                }
+            })
+        })
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(gridState)
+                body: JSON.stringify({"filledArray":filledGridCells, "width" : gridState.playerGrid[0].length, "height": gridState.playerGrid.length})
             })
 
             if (!response.ok) {
@@ -47,20 +82,14 @@ export function useStreetGrid() {
         }
     }
 
-    function showGridState() {
-        console.log("showGridState");
-        console.log(JSON.stringify(gridState));
-    }
 
-    function parseStreetGrid() {
-
-    }
 
 
     return {
         gridState: readonly(gridState),
         saveStreetGrid,
         setGridState,
-        showGridState
+        extractElements
+        
     }
 }
