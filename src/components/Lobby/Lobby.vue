@@ -1,4 +1,4 @@
-<!--List Item that represents single lobby and is embedded in LobbyList, displays Lobby Dta Name, the current gaming mode the lobby is set to and the number of active players-->
+<!--List Item that represents single lobby and is embedded in LobbyList, displays Lobby Data Name, the current gaming mode the lobby is set to and the number of active players-->
 
 <template>
 <div  @click="selectLobby()">
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+
 import { ILobby } from "../../typings/ILobby";
 
 
@@ -29,6 +29,7 @@ const props = defineProps<{
   lobby: ILobby;
 }>();
 
+//for later purposes to link to selected lobby via Vue Router
 function selectLobby(){
     console.log(props.lobby.lobbyName);
 }

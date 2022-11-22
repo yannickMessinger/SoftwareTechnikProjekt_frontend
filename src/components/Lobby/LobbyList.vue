@@ -3,7 +3,7 @@
   <div class="flex-container">
     <h3>List of available lobbys:</h3>
     <!--Renders List of Lobbylistitems-->
-    <Lobby :lobby="ele" v-for="ele in liste"></Lobby>
+    <Lobby :lobby="ele" v-for="ele in props.liste"></Lobby>
   </div>
 </template>
 

@@ -1,27 +1,36 @@
-<!-- Component that displays overview of existing lobbys and active players-->
+<!-- Component that displays overview of existing lobbys and active players, also possible to add new Lobbys. Style not complete!-->
 <template>
   <h3>Lobby Component</h3>
-    <div v-if="showAddLobby">
-      <input type ="text"  v-model=lobbyNameInput placeholder="enter lobbyname" />
-      <input type = "number" v-model="playerNumberInput" placeholder="amount of players"/>
-      <input type = "radio" value ="build" @click="setBuildMode()"/>
-      <input type = "radio" value ="play" @click="setPlayMode()"/>
-      
-      
-      <button @click="createNewLobby(lobbyNameInput,playerNumberInput,lobbyModeInput)">create new lobby</button>
-    </div>
-  
-    <div class="flex-container">
-      <div v-if="lobbyList.lobbylist.length > 0">
+  <div v-if="showAddLobby">
+    <input type="text" v-model="lobbyNameInput" placeholder="enter lobbyname" />
+    <input
+      type="number"
+      v-model="playerNumberInput"
+      placeholder="amount of players"
+    />
+    <select v-model="selected" @change="switchSelect($event)">
+      <option disabled value="">Please select LobbyMode</option>
+      <option value="build">BuildMode</option>
+      <option value="play">PlayMode</option>
+    </select>
+
+    <button
+      @click="createNewLobby(lobbyNameInput, playerNumberInput, lobbyModeInput)"
+    >
+      create new lobby
+    </button>
+  </div>
+
+  <div class="flex-container">
+    <div v-if="lobbyList.lobbylist.length > 0">
       <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
     </div>
     <div v-else>
-    <p>No lobbys available:(</p>
-  </div>
-      <PlayerList :liste="playerList.playerlist"></PlayerList>
+      <p>No lobbys available:(</p>
     </div>
-  
-  
+    <PlayerList :liste="playerList.playerlist"></PlayerList>
+  </div>
+
   <!--Button to manually refresh Lobbylist-->
   <button @click="updateLobbys()">Refresh</button>
   <button @click="setShowLobby()">Add new Lobby</button>
@@ -30,15 +39,18 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useLobbyList, updateLobbyList,createNewLobby } from "../../services/useLobbyList";
+import {
+  useLobbyList,
+  updateLobbyList,
+  createNewLobby,
+} from "../../services/useLobbyList";
 import { usePlayerList } from "../../services/usePlayerList";
 import { E_LobbyMode } from "../../typings/E_LobbyMode";
 import LobbyList from "./LobbyList.vue";
 import PlayerList from "./PlayerList.vue";
 
 onMounted(async () => {
-  await  updateLobbyList()
-  //Todo: coinnect to backend
+  await updateLobbyList();
 });
 
 const { lobbyList } = useLobbyList();
@@ -47,28 +59,32 @@ const showAddLobby = ref(false);
 const lobbyNameInput = ref("");
 const playerNumberInput = ref(0);
 const lobbyModeInput = ref(E_LobbyMode.BUILD_MODE);
+const selected = ref("");
 
-async function updateLobbys(){
+async function updateLobbys() {
   await updateLobbyList();
 }
 
-function setShowLobby(){
-  showAddLobby.value = !showAddLobby.value
+function setShowLobby() {
+  showAddLobby.value = !showAddLobby.value;
 }
 
-function setPlayMode(){
-  lobbyModeInput.value = E_LobbyMode.PLAY_MODE
-  
+function setPlayMode() {
+  lobbyModeInput.value = E_LobbyMode.PLAY_MODE;
 }
 
-function setBuildMode(){
+function setBuildMode() {
   lobbyModeInput.value = E_LobbyMode.BUILD_MODE;
-  
 }
 
-
-
-
+function switchSelect(event: any) {
+  selected.value = event.target.value;
+  if (selected.value === "play") {
+    setPlayMode();
+  } else if (selected.value === "build") {
+    setBuildMode();
+  }
+}
 </script>
 
 <style scoped>
@@ -93,7 +109,6 @@ button {
   margin-right: 10px;
   cursor: pointer;
   border: none;
-
 }
 
 button:hover {
