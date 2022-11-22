@@ -11,7 +11,7 @@
 
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
-    var totalBlockNumber = 3; /** number of blocks in blocklist*/
+    var totalBlockNumber = 6; /** number of blocks in blocklist*/
     var blockList: IBlockElement[] = Array(totalBlockNumber).fill([]); /** List of all blocks placable in street editor*/
     
     /*default block element*/
@@ -25,7 +25,7 @@
         texture: (pathToPictures+"no-data.png")
     };
     /**  currently selected block */
-    const activeBlock = reactive({block: defaultBlock});
+    const selectedBlock = reactive({block: defaultBlock});
     /** bus event */
     const {emit, bus} =useEventBus();
     /**entrys in blocklist */
@@ -34,14 +34,14 @@
     blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: (pathToPictures+"object-icons/cross.png")};
 
     function onBlockClicked(clickedBlock:any){
-        console.log(activeBlock.block.name);
-        if(activeBlock.block.id==clickedBlock.id){
-            activeBlock.block = defaultBlock;
+        console.log(selectedBlock.block.name);
+        if(selectedBlock.block.id==clickedBlock.id){
+            selectedBlock.block = defaultBlock;
         }else{
-            activeBlock.block = clickedBlock;
+            selectedBlock.block = clickedBlock;
         }
-        emit("block-select-event", activeBlock.block);
-        console.log(activeBlock.block.name);
+        emit("block-select-event", selectedBlock.block);
+        console.log(selectedBlock.block.name);
     }
     const isCreateTool = ref(false);
     watch(() =>  bus.value.get('tool-select-event'), (val) => {
@@ -55,25 +55,37 @@
 
 <template>
     <!--display container for block list-->
-    <div class="list-container">
-        <h2 class="list-title">Block List</h2>
+    <h2 class="blockListTitle">Block List</h2>
+    <div class="blockListContainer">
         <!-- display container for block list element-->
-        <div v-for="element in blockList" class="list-element">
-            <button :disabled ="!isCreateTool" :class="element.name === activeBlock.block.name ? 'listButtonActive' : 'listButton'" @click="onBlockClicked(element)">      
-                <img v-if="element != null" :src="element.texture" class="list-img"/>
+        <div v-for="element in blockList" class="blockListElement">
+            <button :disabled ="!isCreateTool" :class="element.name === selectedBlock.block.name ? 'blockListButtonActive' : 'blockListButton'" @click="onBlockClicked(element)">      
+                <img v-if="element != null" :src="element.texture" class="blockListImg"/>
             </button> 
         </div>
     </div>
 </template>
 
 <style>
+    /** style for list title in blocklist*/
+    .blockListTitle{
+        color:black;
+        background-color: white;
+        text-align: center;
+        margin:5%;
+        user-select: none;
+        -webkit-user-drag: none; 
+        -khtml-user-drag: none; 
+        -moz-user-drag: none; 
+        -o-user-drag: none;
+    }
     /** style for block list in general*/
-    .list-container{
+    .blockListContainer{
+        margin: 5%;
         list-style-type: none;
-        width: 90%;
-        height: 90%;
-        display: table-row;
-        border: solid 1px gray;
+        overflow-y:scroll;
+        overflow-x: hidden;
+        max-block-size: 19vh;
         background-color: gray;
         user-select: none;
             -webkit-user-drag: none; 
@@ -81,39 +93,25 @@
             -moz-user-drag: none; 
             -o-user-drag: none;
     }
-    /** style for list title in blocklist*/
-    .list-title{
-        margin: 5%;
-        width: 90%;
-        height: 90%;
-        color:black;
-        background-color: white;
-    }
     /** style for list element in block list*/
-    .list-element {
-        display: list-item;
-        border: solid 1px gray;
-        margin: 5%;
+    .blockListElement{
+        margin:1%;
+        display:inline-flex;
+        max-height: 45%;
+        max-width: 45%;
     }
     /** style for images in list element*/
-    .list-img {
-        width: 90%;
-        height: 90%;
-        display: block;
-        border: solid 1px gray;
-        margin: 5%;
-    }
-    /** style for text in list lement*/
-    .objectList-text{
-        color:black;
+    .blockListImg {
+        width: 100%;
+        height: 100%;
     }
     /** style for buttons in list element */
-    .listButton{
+    .blockListButton{
         border: solid 2px black;
         background-color:darkgray;
     }
     /** style for clicked buttons in list element */
-    .listButtonActive{
+    .blockListButtonActive{
         border: solid 2px black;
         background-color:orange;
     }

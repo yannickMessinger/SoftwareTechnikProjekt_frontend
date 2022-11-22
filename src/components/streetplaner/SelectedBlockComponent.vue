@@ -30,19 +30,19 @@
 </script>
 
 <template>
-    <div class="selected-object">
-        <h3 class="list-title"> Selected Block:</h3>
+    <div class="selectedBlock">
+        <h3 class="selectedBlockTitle"> Selected Block:</h3>
         <table>
             <tr>
                 <td>
-                    <img v-if="selectedBlock != null" :src="selectedBlock.obj.texture" class="list-img"/>
+                    <img v-if="selectedBlock != null" :src="selectedBlock.obj.texture" class="selectedBlockImg"/>
                 </td>
                 <td>
-                    <ul class="list-without">
-                        <li class="objectList-text"><h4>Details:</h4></li>
-                        <li class="objectList-text">{{selectedBlock.obj.id}}</li>
-                        <li class="objectList-text">{{selectedBlock.obj.name}}</li>
-                        <li class="objectList-text">{{selectedBlock.obj.type}}</li>
+                    <ul class="selectedBlockDetails">
+                        <li class="selectedBlockDetailText"><h4>Details:</h4></li>
+                        <li class="selectedBlockDetailText">{{selectedBlock.obj.id}}</li>
+                        <li class="selectedBlockDetailText">{{selectedBlock.obj.name}}</li>
+                        <li class="selectedBlockDetailText">{{selectedBlock.obj.type}}</li>
                     </ul>
                 </td>
             </tr>
@@ -51,34 +51,30 @@
 </template>
 
 <style>
+    .selectedBlockTitle{
+        color:black;
+        background-color: white;
+        text-align: center;
+        margin:5%;
+    }
     /** style for images in selected block */
-    .list-img {
-        width: 90%;
-        height: 90%;
+    .selectedBlockImg{
+        width: 100%;
+        height: 100%;
         display: block;
         border: solid 1px gray;
-        margin: 5%;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
+
     }
     /** style for text in list elements in block list*/
-    .objectList-text{
+    .selectedBlockDetailText{
         color:black;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
     }
     /** style for selected block container*/
-    .selected-object{
+    .selectedBlock{
         display: table-row;
         border: solid 1px gray;
         background-color:darkgray;
-        margin: 5%;
+        padding: 5px;
         user-select: none;
         -webkit-user-drag: none; 
         -khtml-user-drag: none; 

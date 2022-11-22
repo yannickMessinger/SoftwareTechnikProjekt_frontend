@@ -63,71 +63,66 @@
 
 <template>
     <!--display container for toollist-->
-    <ul class="list-container">
-        <h2 class="list-title">Tool List</h2>
+    <h2 class="toolListTitle">Tool List</h2>
+    <div class="toolListContainer">
         <!-- display container for tool list element-->
-        <li v-for="element in toolList" :key="element.id" class="list-element">
-            <button :class="element.name === selectedTool.tool.name ? 'listButtonActive' : 'listButton'" @click="onToolClick(element)">
-                <img v-if="element != null" :src="element.texture" class="list-img"/>
-                <h4 v-if="element != null" class="toolList-text">{{element.name}}</h4>
+        <div v-for="element in toolList" :key="element.id" class="toolListElement">
+            <button :class="element.name === selectedTool.tool.name ? 'toolListButtonActive' : 'toolListButton'" @click="onToolClick(element)">
+               <div class="toolListButtonContainer">
+                    <img v-if="element != null" :src="element.texture" class="toolListImg"/>
+                    <p v-if="element != null" class="toolListText">{{element.name}}</p>
+               </div>
             </button>
-        </li>
-    </ul>  
+        </div>
+    </div>  
 </template>
 
 <style>
-    /** style for tool list in general*/
-    .list-container{
-        list-style-type: none;
-        width: 90%;
-        height: 90%;
-        display: table-row;
-        border: solid 1px gray;
-        background-color: gray;
+    /** style for list title in tool list */
+    .toolListTitle{
+        color:black;
+        background-color: white;
+        text-align: center;
+        margin:5%;
         user-select: none;
         -webkit-user-drag: none; 
         -khtml-user-drag: none; 
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-    /** style for list title in tool list */
-    .list-title{
-        margin: 5%;
-        width: 90%;
-        height: 90%;
-        color:black;
-        background-color: white;
+    /** style for tool list in general*/
+    .toolListContainer{
+        margin-left: 5%;
+        margin-right: 5%;
+        list-style-type: none;
+        display: inline-flex;
+        user-select: none;
+        -webkit-user-drag: none; 
+        -khtml-user-drag: none; 
+        -moz-user-drag: none; 
+        -o-user-drag: none;
     }
     /** style for list element in tool list*/
-    .list-element {
-        display: list-item;
-        border: solid 1px gray;
-        margin: 5%;
+    .toolListElement {
+        margin:0.5%;
     }
     /** style for images in tool list */
-    .list-img {
-        width: 90%;
-        height: 90%;
-        display: block;
-        border: solid 1px gray;
-        margin: 5%;
+    .toolListImg {
+        max-width: 5vh;
+        max-height: 5vh;
     }
     /** style for text elements in tool list */
-    .toolList-text{
-        margin: 5%;
-        width: 90%;
-        height: 90%;
-        color:black;
-        border: solid 1px gray;
-        background-color: white;
+    .toolListText{
+        color:white;
+        margin-top: auto;
     }
     /** style for buttons in tool list */
-    .listButton{
+    .toolListButton{
         border: solid 2px black;
-        background-color:darkgray;
+        background-color:gray;
     }
     /** style for selected button in tool list */
-    .listButtonActive{
+    .toolListButtonActive{
         border: solid 2px black;
         background-color:orange;
     }

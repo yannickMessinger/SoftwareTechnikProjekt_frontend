@@ -1,17 +1,16 @@
 <template>
-    <h1>Editor Mode</h1>
+    <h1 class="title">Editor Mode</h1>
     <PrimButton display="Back to menu" :btn_click="backToMenu"></PrimButton>
 
     <div class="flex">
         <div class="left">
-            <div class="left_top">
-                <p>Tools</p>
+            <div class="left_top1">
                 <ListToolsComponent></ListToolsComponent>
-                <p>Elements</p> 
-                <ListBlocksComponent></ListBlocksComponent>
-            </div> 
+            </div>
+            <div class="left_top2">
+                <ListBlocksComponent></ListBlocksComponent> 
+            </div>
             <div class="left_bottom">
-                <p>Explanation</p>
                 <SelectedBlockComponent></SelectedBlockComponent>
             </div>          
         </div>
@@ -37,25 +36,29 @@
 </script>
 
 <style>
+    .title{
+        color:black;
+    }
     .flex {
         display: flex;
-        max-height: 70vh;
+        max-height: 75vh;
     }
     .left {
-        flex: 1 1 20%;
+        flex: 1 1 15%;
         display: flex;
         flex-direction: column;
         background-color:bisque;
-        
     }
     .left_bottom {
         margin-top: auto;
-        background-color:darkkhaki;
-        
+        background-color:darkkhaki;   
     }
-    .left_top {
+    .left_top1 {
         background-color:darkgrey;
-        overflow: auto;
+    }
+    .left_top2 {
+        background-color:darkgrey;
+        max-height: 25vh;
     }
     .right {
         flex: 1 1 80%;
