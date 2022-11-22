@@ -4,6 +4,7 @@
 <template>
   <ul>
     <li><router-link class="link" to="/game">Game</router-link></li>
+    <li><router-link class="link" to="/editor">Editor</router-link></li>
   </ul>
 </template>
 
