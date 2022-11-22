@@ -44,7 +44,7 @@
         max-height: 75vh;
     }
     .left {
-        flex: 1 1 15%;
+        flex: 1 1 20%;
         display: flex;
         flex-direction: column;
         background-color:bisque;

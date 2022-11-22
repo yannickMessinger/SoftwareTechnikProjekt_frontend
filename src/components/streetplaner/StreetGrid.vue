@@ -54,9 +54,9 @@
     }
 
     // disable right click context menu
-    window.addEventListener('contextmenu', function (e) {
-        e.preventDefault();
-    }, false);
+    // window.addEventListener('contextmenu', function (e) {
+    //     e.preventDefault();
+    // }, false);
 </script>
 
 <template>
@@ -84,7 +84,7 @@
         height: v-bind(gridSizePx);
     }
     .grid-item {
-        border: solid 1px gray;
+        border: solid 1px white;
     }
     .grid-img {
         width: 100%;

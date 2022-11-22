@@ -11,7 +11,7 @@
 
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
-    var totalBlockNumber = 6; /** number of blocks in blocklist*/
+    var totalBlockNumber = 3; /** number of blocks in blocklist*/
     var blockList: IBlockElement[] = Array(totalBlockNumber).fill([]); /** List of all blocks placable in street editor*/
     
     /*default block element*/
@@ -91,7 +91,7 @@
     .blockListContainer{
         margin: 5%;
         list-style-type: none;
-        overflow-y:scroll;
+        overflow-y: scroll;
         overflow-x: hidden;
         max-block-size: 19vh;
         background-color: gray;
