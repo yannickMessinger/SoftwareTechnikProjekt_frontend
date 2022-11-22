@@ -1,7 +1,7 @@
 <template>
     <h1 class="title">Editor Mode</h1>
     <PrimButton display="Back to menu" :btn_click="backToMenu"></PrimButton>
-
+    <DialogsWrapper />
     <div class="flex">
         <div class="left">
             <div class="left_top1">
@@ -10,7 +10,7 @@
             <div class="left_top2">
                 <ListBlocksComponent></ListBlocksComponent> 
             </div>
-            <button class="button" @click="emit('grid-reset-event', true)">Reset Grid</button>
+            <button class="button" @click="reveal">Reset Grid</button>
             <div class="left_bottom">
                 <SelectedBlockComponent></SelectedBlockComponent>
             </div>          
@@ -23,6 +23,7 @@
 </template>
 
 <script setup lang="ts">
+    import { ref } from 'vue'
     import useEventBus from '../services/eventBus'
     import PrimButton from '../components/PrimButton.vue'
     import router from '../router/router'
@@ -30,12 +31,19 @@
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
     import SelectedBlockComponent from '../components/streetplaner/SelectedBlockComponent.vue'
     import StreetGrid from '../components/streetplaner/StreetGrid.vue'
+    import { createConfirmDialog } from 'vuejs-confirm-dialog'
+    import SimpleDialog from '../components/SimpleDialog.vue'
+
+    const { reveal, onConfirm } = createConfirmDialog(SimpleDialog, { question: "Do really want to reset the grid? This will be irreversible."});
 
     const {emit} = useEventBus();
 
     function backToMenu(){
-        router.push('/')
+        router.push('/');
     }
+    onConfirm(() => {
+        emit('grid-reset-event', true);
+    })
 </script>
 
 <style>
