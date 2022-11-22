@@ -31,33 +31,20 @@
     toolList[2] = { tool: ToolEnum.EDIT, id: 2, name: "edit", texture: (pathToPictures+"tool-icons/edit.png")};
         
     function onToolClick(clickedTool:any){
-        switch(clickedTool.id){
-            case 0:
-                createLogic();
-            case 1:
-                deleteLogic();
-            case 2:
-                editLogic();
-        }
+        /** if the selected tool is the clicked tool, it gets deselected by restoring the default tool
+         * otherwhise the clicked tool is now the selected tool.
+        */
         console.log(selectedTool.tool.name);
         if(selectedTool.tool.id==clickedTool.id){
             selectedTool.tool = defaultTool;
         }else{
             selectedTool.tool = clickedTool;
         }
+        /** fire a tool select event to mark a tool change. Sends out the enum value of the selected tool*/
         emit('tool-select-event', selectedTool.tool.tool);
+        /** fire a tool select event to mark a tool change for selectedToolComponent. Sends out the complete tool of the selected tool*/
         emit('tool-select-component-event', selectedTool.tool);
         console.log(selectedTool.tool.name);
-    }
-
-    function createLogic(){
-        /** add create logic here */
-    }
-    function deleteLogic(){
-        /** add delete logic here */
-    }
-    function editLogic(){
-        /** add edit logic here */
     }
 </script>
 

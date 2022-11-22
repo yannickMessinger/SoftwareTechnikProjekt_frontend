@@ -21,12 +21,14 @@
         heading:0,
         texture: (pathToPictures+"no-data.png")
     };
+    /** bus event */
     const { bus } = useEventBus();
+    /**  currently selected block */
     const selectedBlock = reactive({obj: defaultBlock});
+    /** watch for selected block events to display selected block*/
     watch(() =>  bus.value.get('block-select-event'), (val) => {
         selectedBlock.obj = val[0];
     });
-
 </script>
 
 <template>
@@ -51,6 +53,7 @@
 </template>
 
 <style>
+    /**style for the title in selected block */
     .selectedBlockTitle{
         color:black;
         background-color: white;
@@ -65,7 +68,7 @@
         border: solid 1px gray;
 
     }
-    /** style for text in list elements in block list*/
+    /** style for text in details list in selected block*/
     .selectedBlockDetailText{
         color:black;
     }
