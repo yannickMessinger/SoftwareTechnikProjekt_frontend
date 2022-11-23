@@ -15,16 +15,16 @@ export default defineComponent({
 
 <template>
     <div class="menu">
-        <ul>
-            <li><router-link class="link" to="/">Melden</router-link></li>
-            <li><router-link class="link" to="/">Chat</router-link></li>
-            <li><router-link class="link" to="/">Schließen</router-link></li>
+        <ul class="ul-class">
+            <li class="ul-li-class"><router-link class="link" to="/">Melden</router-link></li>
+            <li class="ul-li-class"><router-link class="link" to="/">Chat</router-link></li>
+            <li class="ul-li-class"><router-link class="link" to="/">Schließen</router-link></li>
         </ul>
     </div>
 </template>
 
 <style>
-    ul {
+    .ul-class {
         list-style-type: none;
         display: flex;
         justify-content: center;
@@ -33,7 +33,7 @@ export default defineComponent({
         overflow: hidden;
         background-color: #242424;
     }
-    ul li {
+    .ul-li-class {
         display: list-item;
         background: #333;
         padding: 15px 30px;
