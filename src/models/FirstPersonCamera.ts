@@ -1,4 +1,4 @@
-import * as THREE from 'https://cdn.skypack.dev/three@0.136';
+import * as THREE from 'three';
 import { InputController } from './InputController';
 
 export class FirstPersonCamera {
@@ -32,7 +32,7 @@ export class FirstPersonCamera {
     }
 
     update(){
-        const velocity = 0.005 // random velocity
+        const velocity = 0.002 // random velocity
         this.updateRotation(velocity);
         this.updateCamera();
         this.updateTranslation(velocity);
