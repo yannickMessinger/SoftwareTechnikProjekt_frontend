@@ -13,17 +13,21 @@
 
 <script setup lang="ts">
 import GroundPlane from "./Plane.vue"
+import { MovmentInputController } from "../models/movmentInputController";
 import { ref, onMounted } from 'vue'
-import { Box, Camera, LambertMaterial, MeshPublicInterface, PointLight, Renderer, RendererPublicInterface, Scene } from 'troisjs'
+import { Box, Group, Camera, LambertMaterial, MeshPublicInterface, PointLight, Renderer, RendererPublicInterface, Scene } from 'troisjs'
 
 const rendererC = ref()
 const meshC = ref()
+const box = ref()
+
+const moveableObject = new MovmentInputController(meshC)
 
 onMounted(() => {
   const renderer = rendererC.value as RendererPublicInterface
   const mesh = (meshC.value as MeshPublicInterface).mesh
   renderer.onBeforeRender(() => {
-    mesh!.rotation.x += 0.01
+    moveableObject.update();
   })
 })
 </script>
