@@ -11,7 +11,7 @@
     
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
-    var totalToolNumber = 3; /** number of toolslots shown in the toollist */
+    var totalToolNumber = 4; /** number of toolslots shown in the toollist */
     var toolList: IToolElement[] = Array(totalToolNumber).fill([]); /** List of all Tools */
     /** default values for selected tool when no tool is selected */
     var defaultTool: IToolElement = {
@@ -29,6 +29,7 @@
     toolList[0] = { tool: ToolEnum.CREATE, id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
     toolList[1] = { tool: ToolEnum.DELETE, id: 1, name: "delete", texture: (pathToPictures+"tool-icons/delete.png")};
     toolList[2] = { tool: ToolEnum.EDIT, id: 2, name: "edit", texture: (pathToPictures+"tool-icons/edit.png")};
+    toolList[3] = { tool: ToolEnum.ROTATE, id: 3, name: "rotate", texture: (pathToPictures+"tool-icons/rotate.png")};
         
     function onToolClick(clickedTool:any){
         /** if the selected tool is the clicked tool, it gets deselected by restoring the default tool

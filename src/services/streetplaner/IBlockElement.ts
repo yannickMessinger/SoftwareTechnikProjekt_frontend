@@ -19,5 +19,6 @@ export interface IBlockElement {
     type: string,
     name: string,
     heading: number,
+    rotation: number,
     texture: string
 }

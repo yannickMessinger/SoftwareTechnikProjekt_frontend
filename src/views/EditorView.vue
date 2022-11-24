@@ -34,7 +34,7 @@
     import { createConfirmDialog } from 'vuejs-confirm-dialog'
     import SimpleDialog from '../components/SimpleDialog.vue'
 
-    const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, { question: "Do really want to reset the grid? This will be irreversible."});
+    const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, { question: "Do you want to reset the grid? This will be irreversible."});
 
     const {emit} = useEventBus();
     const disableResetButton = ref(false);

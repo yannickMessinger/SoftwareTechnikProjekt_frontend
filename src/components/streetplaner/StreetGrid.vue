@@ -8,7 +8,7 @@
 
     var gridSizeX = 20;
     var gridSizeY = 30;
-    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, texture: "" } });
+    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" } });
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -36,13 +36,20 @@
     function onClick(cell: any) {
         // set texture of clicked cell to dummy
         if (toolState.tool == ToolEnum.CREATE && toolState.block.id !== -1) {
+            streetGrid[cell.posX][cell.posY].id = toolState.block.id;
+            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+        }
+        if (toolState.tool == ToolEnum.ROTATE) {
+            streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4;
         }
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
     function onMouseMove(cell: any, event: any) {
         if (event.buttons === 1 && toolState.tool == ToolEnum.CREATE && toolState.block.id !== -1) {  
+            streetGrid[cell.posX][cell.posY].id = toolState.block.id;
+            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
         }
     }
@@ -51,21 +58,21 @@
         // fill streetGrid with empty IGridElements
         for(let row=0; row<streetGrid.length; row++) {
             for(let col=0; col<streetGrid[0].length; col++) {
-                streetGrid[row][col] = { id: -1, posX: row, posY: col, texture: ""};
+                streetGrid[row][col] = { id: -1, posX: row, posY: col, rotation: 0, texture: ""};
             }
         }
     }
 
     // disable right click context menu
-    // window.addEventListener('contextmenu', function (e) {
-    //     e.preventDefault();
-    // }, false);
+    window.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+    }, false);
 </script>
 
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
         <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
-            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false"/>
+            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false" :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"/>
         </div>
     </div>
 </template>
