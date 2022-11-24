@@ -10,7 +10,7 @@
             <div class="left_top2">
                 <ListBlocksComponent></ListBlocksComponent> 
             </div>
-            <button class="button" @click="reveal">Reset Grid</button>
+            <button :disabled="disableResetButton" class="reset-button" @click="reveal(); disableResetButton = true;">Reset Grid</button>
             <div class="left_bottom">
                 <SelectedBlockComponent></SelectedBlockComponent>
             </div>          
@@ -34,16 +34,21 @@
     import { createConfirmDialog } from 'vuejs-confirm-dialog'
     import SimpleDialog from '../components/SimpleDialog.vue'
 
-    const { reveal, onConfirm } = createConfirmDialog(SimpleDialog, { question: "Do really want to reset the grid? This will be irreversible."});
+    const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, { question: "Do really want to reset the grid? This will be irreversible."});
 
     const {emit} = useEventBus();
+    const disableResetButton = ref(false);
 
     function backToMenu(){
         router.push('/');
     }
     onConfirm(() => {
         emit('grid-reset-event', true);
-    })
+        disableResetButton.value = false;
+    });
+    onCancel(() => {
+        disableResetButton.value = false;
+    });
 </script>
 
 <style>
@@ -76,49 +81,14 @@
         background-color: grey;
         overflow: auto;
     }
-    .button {
-        background-color: #FFFFFF;
-        border: 1px solid #222222;
-        border-radius: 8px;
-        box-sizing: border-box;
-        color: #222222;
+    .reset-button {
         cursor: pointer;
-        display: inline-block;
-        font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
-        font-size: 16px;
-        font-weight: 600;
-        line-height: 20px;
-        margin: 0;
-        outline: none;
-        padding: 13px 23px;
-        position: relative;
-        text-align: center;
-        text-decoration: none;
-        touch-action: manipulation;
-        transition: box-shadow .2s,-ms-transform .1s,-webkit-transform .1s,transform .1s;
-        user-select: none;
-        -webkit-user-select: none;
-        width: auto;
-    }
-
-    .button:focus-visible {
-        box-shadow: #222222 0 0 0 2px, rgba(255, 255, 255, 0.8) 0 0 0 4px;
-        transition: box-shadow .2s;
-    }
-
-    .button:active {
-        background: #F6F9FE;
-        border-color: #000000;
-        transform: scale(.96);
-    }
-
-    .button:disabled {
-        border-color: #DDDDDD;
-        color: #DDDDDD;
-        cursor: not-allowed;
-        opacity: 1;
-    }
-    .button:hover {
-        background: #F6F9FE;
+        height: 30px;
+        padding: 5px 25px;
+        border: 2px solid black;
+        border-radius: 5px;
+        background-color: white;
+        font-weight: bold;
+        color: black;
     }
 </style>
