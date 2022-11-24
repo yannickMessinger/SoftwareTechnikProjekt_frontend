@@ -28,7 +28,10 @@
     <div v-else>
       <p>No lobbys available:(</p>
     </div>
-    <PlayerList :liste="playerList.playerlist"></PlayerList>
+    <div v-if="lobbyList.lobbylist.length > 0">
+      <PlayerList :liste="playerList.playerlist"></PlayerList>
+    </div>
+    
   </div>
 
   <!--Button to manually refresh Lobbylist-->
