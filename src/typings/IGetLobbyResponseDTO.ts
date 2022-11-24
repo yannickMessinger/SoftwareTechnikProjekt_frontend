@@ -1,3 +1,5 @@
+//interface for DTO's to receive messages from backend
+
 import { E_LobbyMode } from "./E_LobbyMode"
 
 export interface IGetLobbyResponseDTO {
