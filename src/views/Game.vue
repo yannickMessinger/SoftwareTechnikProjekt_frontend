@@ -2,14 +2,14 @@
     <div id="game-menu">
         <GameMenu></GameMenu>
     </div>
-    <div class="container" id="game-view">
-        <div class="box">
-            <SkelletonTrois></SkelletonTrois>
+        <div class="container" id="game-view">
+            <div class="box">
+                <SkelletonTrois></SkelletonTrois>
+            </div>
+            <div class="box overlay">
+                <HUD></HUD>
+            </div>
         </div>
-        <div class="box overlay">
-            <HUD></HUD>
-        </div>
-    </div>
 </template>
 
 <script lang='ts'>
@@ -31,14 +31,14 @@ export default defineComponent({
 <style>
 
 .container {
-  width: 1280px;
-  height: 720px;
+  width: 100%;
+  height: 100%;
   position: relative;
 }
 
 .box {
-  width: 1280px;
-  height: 720px;
+  width: 100%;
+  height: 100%;
   position: absolute;
   top: 0;
   left: 0;

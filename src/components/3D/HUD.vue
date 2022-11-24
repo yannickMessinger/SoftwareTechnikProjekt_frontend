@@ -5,7 +5,6 @@ export default defineComponent({
   components: {},
 
   setup() {
-    // initialize 
     const gametime = ref(0)
     const points = ref(0)
     const updateCurrentTime = () => { gametime.value += 1; };
