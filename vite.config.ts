@@ -3,14 +3,5 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue()],
-  server:{
-    proxy:{
-      '/api':'http://localhost:8080',
-      '/websock': {
-        target:'ws://localhost:8080',
-        ws:true
-      }
-    }
-  }
+  plugins: [vue()]
 },)
