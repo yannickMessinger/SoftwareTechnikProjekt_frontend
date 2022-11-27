@@ -15,6 +15,7 @@ import LobbyView from './views/LobbyView.vue';
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" />
+  <LobbyView></LobbyView>
 </template>
 
 <style scoped>

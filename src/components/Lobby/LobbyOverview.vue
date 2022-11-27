@@ -28,7 +28,7 @@
     <div v-else>
       <p>No lobbys available:(</p>
     </div>
-    <div v-if="lobbyList.lobbylist.length > 0">
+    <div> <!--v-if="lobbyList.lobbylist.length > 0"-->
       <PlayerList :liste="playerList.playerlist"></PlayerList>
     </div>
     
@@ -91,10 +91,11 @@ function switchSelect(event: any) {
 </script>
 
 <style scoped>
-.flex-container {
+/*.flex-container {
   display: flex;
   align-items: flex-start;
 }
+*/
 
 h3 {
   text-align: center;

@@ -1,33 +1,8 @@
 <!-- Component that represents a list of active players in a selected lobby-->
 <template>
-<!--    
-    <table cellspacing="0" cellpadding="0" width="325">
-        <h3>Active Players</h3>
-        <tr>
-            <td>
-                <table  cellspacing="0" cellpadding="1" width="325">
-                    <tr style="color:white;background-color:grey">
-                        <th>Player Name</th>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div style="width:325px; height:100px; overflow:auto">
-                <table cellspacing="0" cellpadding="1" width="300">
-                    <tr>
-                        <PlayerListItem :player="ele" v-for="ele in liste"></PlayerListItem>
-                    </tr>
-                </table>
-                </div>
-            </td>
-        </tr>
-       
-    </table>
--->
 
-<!--Display List of Active Users in selected Lobby-->
+
+<!--Display List of Active Users in selected Lobby
         <table>
             <thead>
                 <tr>
@@ -43,21 +18,23 @@
             </tbody>
         </table>
 
-
+-->
         
 
-<!--
-    <table>
-        <tr>
-            <th>Player Name</th>
-        </tr>
-        <tbody>
-            <PlayerListItem :player="ele" v-for="ele in liste"></PlayerListItem>
-        </tbody>
+    <div class="playerList">
+        <table >
+            <tr>
+                <th>Player</th>
+            
+            </tr>
+        </table>
+        <table>
+            <tbody>
+                <PlayerListItem :player="ele" v-for="ele in liste"></PlayerListItem>
+            </tbody>
+        </table>
 
-
-    </table>
--->
+    </div>
 
 
 </template>
@@ -78,35 +55,40 @@ const props = defineProps<{
 
 <style scoped>
 th, td {
-  padding: 10px;
+  padding: 1px;
   text-align: left;
 
 }
 
 table {
     /*border: 4px solid black;*/
-    width: 20%;
+    width: 100%;
     font-family: Arial, Helvetica, sans-serif;
-    color:rgb(63, 63, 63);
-    background-color: rgb(63, 63, 63);
-    border: none;
+    color:black;
 
-    height: 100px;
-
-
+    border: 1px solid #707070;
+    height: 80px;
+    
 
 }
 
 th {
     height: 20px;
-    text-align: center;
-    background-color: rgb(255, 200, 0);
-   
-    
+    text-align: left;
+    background-color: white;
+    display: fixed;
 }
 
 td {
    background-color: rgb(63, 63, 63); 
    color: white;  
 }
+
+.playerList {
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
 </style>
