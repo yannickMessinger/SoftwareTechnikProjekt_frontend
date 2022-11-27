@@ -1,24 +1,16 @@
-<script lang="ts">
+<script setup lang="ts">
 import { defineComponent } from 'vue';
+import PrimButton from '../Buttons/PrimButton.vue';
+import router from '../../router/router';
 
-export default defineComponent({
-  components: {},
-
-  setup() {
-    return {
-
-    }
-  }
-
-});
 </script>
 
 <template>
     <div class="menu">
         <ul class="ul-class">
-            <li class="ul-li-class"><router-link class="link" to="/">Melden</router-link></li>
-            <li class="ul-li-class"><router-link class="link" to="/">Chat</router-link></li>
-            <li class="ul-li-class"><router-link class="link" to="/">Schließen</router-link></li>
+            <li class="ul-li-class">
+                <PrimButton display="Startseite" :btn_click="() => {router.push('/')}"></PrimButton>
+            </li>
         </ul>
     </div>
 </template>
