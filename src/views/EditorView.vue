@@ -1,4 +1,5 @@
 <template>
+    <Header></Header>
     <h1 class="title">Editor Mode</h1>
     <PrimButton display="Back to menu" :btn_click="backToMenu"></PrimButton>
 
@@ -29,6 +30,7 @@
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
     import SelectedBlockComponent from '../components/streetplaner/SelectedBlockComponent.vue'
     import StreetGrid from '../components/streetplaner/StreetGrid.vue'
+    import Header from '../components/Header.vue'
 
     function backToMenu(){
         router.push('/')
