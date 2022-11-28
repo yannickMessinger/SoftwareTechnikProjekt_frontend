@@ -3,6 +3,7 @@ import { ref } from "vue";
 import useUser from "../service/UserStore";
 import router from "../router/router"
 import PrimButton from "../components/Buttons/PrimButton.vue";
+import Header from '../components/Header.vue'
 
 let username = ref("")
 let password = ref("")
@@ -17,6 +18,7 @@ function sendUsername() {
 
 
 <template>
+  <Header text="World of eMobility" :displayHomebutton="false"></Header>
   <h1>Login</h1>
   <label>Benutzer</label>
   <input v-model="username" type="text" required />

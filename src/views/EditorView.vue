@@ -1,8 +1,5 @@
 <template>
-    <Header></Header>
-    <h1 class="title">Editor Mode</h1>
-    <PrimButton display="Zurück zur Startseite" :btn_click="() => {router.push('/')}"></PrimButton>
-
+    <Header text="World of eMobility" :displayHomebutton="true"></Header>
     <div class="flex">
         <div class="left">
             <div class="left_top1">
