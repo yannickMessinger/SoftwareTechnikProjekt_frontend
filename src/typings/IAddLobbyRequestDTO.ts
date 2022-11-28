@@ -6,4 +6,5 @@ export interface IAddLobbyRequestDTO{
     lobbyName:string
     numOfPlayers: number
     lobbyMode: E_LobbyMode
+    host?:string
 }
