@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-    import PrimButton from './PrimButton.vue';
+    import PrimButton from '../components/Buttons/PrimButton.vue';
     import router from '../router/router';
 
 </script>
