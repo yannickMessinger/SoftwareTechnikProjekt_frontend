@@ -1,7 +1,7 @@
 <template>
     <Header></Header>
     <h1 class="title">Editor Mode</h1>
-    <PrimButton display="Back to menu" :btn_click="backToMenu"></PrimButton>
+    <PrimButton display="Zurück zur Startseite" :btn_click="() => {router.push('/')}"></PrimButton>
 
     <div class="flex">
         <div class="left">
@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
     import { computed,ref } from 'vue'
-    import PrimButton from '../components/PrimButton.vue'
+    import PrimButton from '../components/Buttons/PrimButton.vue'
     import router from '../router/router'
     import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
@@ -32,9 +32,6 @@
     import StreetGrid from '../components/streetplaner/StreetGrid.vue'
     import Header from '../components/Header.vue'
 
-    function backToMenu(){
-        router.push('/')
-    }
 </script>
 
 <style>
