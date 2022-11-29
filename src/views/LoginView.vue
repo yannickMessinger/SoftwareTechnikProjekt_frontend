@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import useUser from "../service/UserStore";
-import router from "../router/router"
+import router from "../router/router";
 import PrimButton from "../components/Buttons/PrimButton.vue";
 
-let username = ref("")
+let username = ref("");
 let password = ref("")
-const { name, setName } = useUser();
+const { name, setName, sendName } = useUser();
 
 function sendUsername() {
   setName(username.value);
@@ -40,5 +40,17 @@ input {
   border: 1px double #777;
   border-radius: 4px;
   padding: 10px;
+}
+
+button {
+  font-size: 16px;
+  color: #000;
+  background: #fff;
+  padding: 0.4rem 1.3rem;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 10px;
 }
 </style>
