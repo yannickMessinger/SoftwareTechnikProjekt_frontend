@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import useUser from "../service/UserStore";
+import router from "../router/router";
+import PrimButton from "../components/Buttons/PrimButton.vue";
 
 let username = ref("");
 let password = ref("")
