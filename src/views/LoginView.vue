@@ -3,22 +3,27 @@ import { ref } from "vue";
 import useUser from "../service/UserStore";
 
 let username = ref("");
+let password = ref("")
 const { name, setName, sendName } = useUser();
 
 function sendUsername() {
   setName(username.value);
   // Methode, wenn auf Button geklickt wird hier hin...
-  sendName();
+  router.push('/');
 }
 </script>
 
 
 <template>
-  <h1>Welcome to eMobility</h1>
-  <label>Username</label>
+  <h1>Login</h1>
+  <label>Benutzer</label>
   <input v-model="username" type="text" required />
-  <br />
-  <button @click="sendUsername">OK</button>
+  <label>Passwort</label>
+  <input v-model="password" type="text" required />
+  <br>
+  <PrimButton display="Anmelden" :btn_click="sendUsername"></PrimButton>
+  <PrimButton display="Registrieren" :btn_click="() => {}"></PrimButton>
+
 </template>
 
 
