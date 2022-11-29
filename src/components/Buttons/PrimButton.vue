@@ -1,5 +1,5 @@
 <template>
-    <button class="button" @click="btn_click">{{display}}</button>
+    <button class="button" v-on="btn_click ? {click: btn_click} : {}">{{display}}</button>
 </template>
 
 <script setup lang="ts">
