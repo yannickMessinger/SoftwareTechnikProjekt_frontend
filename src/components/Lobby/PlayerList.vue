@@ -25,6 +25,9 @@
         <table >
             <tr>
                 <th>Player</th>
+                <!--if getting the playerList failes, error Message is displayed here-->
+                <th class="alignRight" v-if="playerList.errormsg">{{playerList.errormsg}}</th>
+                <th class="alignRight" v-else>{{props.liste.length}}/anzMaxSpielerEinfügen</th>
             
             </tr>
         </table>
@@ -45,12 +48,14 @@
 
 import PlayerListItem from './PlayerListItem.vue';
 import { IPlayerListItem } from '../../typings/IPlayerListItem';
+import { usePlayerList } from '../../services/usePlayerList';
 
 //PlayerList passed from backend
 const props = defineProps<{
     liste: Readonly<IPlayerListItem[]>,
 }>()
 
+const { playerList} = usePlayerList()
 </script>
 
 <style scoped>
@@ -89,6 +94,11 @@ td {
     display: flex;
     flex-direction: column;
     overflow: auto;
+}
+
+.alignRight {
+    text-align: right;
+    font-weight: normal;
 }
 
 </style>
