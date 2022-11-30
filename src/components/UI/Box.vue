@@ -29,7 +29,7 @@
     let password = ref("")
     let passwordRepeat = ref("")
     let registrationMode = ref(false)
-    const { name, setName } = useUser();
+    const { name, setName, sendName } = useUser();
 
     function sendUsername() {
         setName(username.value);

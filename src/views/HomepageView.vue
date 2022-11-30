@@ -6,7 +6,6 @@
   <BasicButton class="sec btn blue" display="Lobby erstellen" :btn_click="() => {router.push('/create')}"/>
   <BasicButton class="ter btn grey" display="Lobby verlassen"/>
   <BasicButton class="cncl btn red" display="Lobby schließen"/>
-  <BasicButton display="Basic"/>
  
 
 
