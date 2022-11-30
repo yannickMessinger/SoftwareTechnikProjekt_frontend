@@ -4,7 +4,7 @@
             <tr>
                 <td>{{props.map.name}}</td>
                 <td>{{props.map.datum}}</td>
-                <td><button>Lobby Beitreten</button></td>
+                <td><button>Lobby erstellen</button></td>
             </tr>
         </table>
     </div>

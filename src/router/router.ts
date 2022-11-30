@@ -5,7 +5,7 @@ import Game from "../views/Game.vue"
 import HomepageView from "../views/HomepageView.vue"
 import LoginView from "../views/LoginView.vue"
 import CreateLobbyView from "../views/CreateLobbyView.vue"
-import LobbyView from "../views/LobbyView.vue"
+import LobbySelect from "../views/LobbySelect.vue"
 
 
 
@@ -23,7 +23,7 @@ const router = createRouter({
         },
         {
             path: '/lobby',
-            component: LobbyView
+            component: LobbySelect
         },
         {
             path: '/editor',

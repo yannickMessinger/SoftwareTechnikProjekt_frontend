@@ -73,6 +73,7 @@
     --woe-violet-80: #29005a;
     --woe-violet-90: #1a0033;
 
+
     --btn-primary: var(--woe-green-60);
     --btn-primary-hover: var(--woe-green-70);
     --btn-secondary: var(--woe-blue-60);
@@ -140,6 +141,8 @@
     /*place-items: center;*/
     min-width: 320px;
     min-height: 100vh;
+    background: var(--woe-white);
+    color: var(--woe-black);
   }
 
   @media (prefers-color-scheme: light) {
