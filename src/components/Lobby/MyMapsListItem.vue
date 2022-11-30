@@ -2,8 +2,8 @@
     <div class="cell">
         <table>
             <tr>
-                <td>Wiesbaden</td>
-                <td>16.11.2022</td>
+                <td>{{props.map.name}}</td>
+                <td>{{props.map.datum}}</td>
                 <td><button>Lobby Beitreten</button></td>
             </tr>
         </table>

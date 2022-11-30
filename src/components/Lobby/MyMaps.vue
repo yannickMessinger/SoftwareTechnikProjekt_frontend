@@ -17,12 +17,15 @@
 
 import MyMapsListItem from './MyMapsListItem.vue';
 import { IMyMapsListItem } from '../../typings/IMyMapsListitem';
+import { useMyMaps } from '../../services/useMyMaps';
 
 
 
 const props = defineProps<{
     liste: Readonly<IMyMapsListItem[]>,
 }>()
+
+const { mapsList } = useMyMaps()
 
 </script>
 

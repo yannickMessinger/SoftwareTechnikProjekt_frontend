@@ -7,12 +7,14 @@ const mapsState = reactive<IMyMapsState>({
     errormsg: ""
 })
 
+//temporary function to test MyMapsList
 export function useMyMaps(){
-    let date: Date = new Date("2019-01-16");
+    //let date: Date = new Date(500000);
     for(let i = 0; i < 4; i++){
-        mapsState.mapslist.push({name: "Karte " + i, datum: date})
+        mapsState.mapslist.push({name: "Karte " + i, datum: "hallo"});
     }
+    
     return {
-        mapslist: mapsState
+        mapsList: mapsState
     }
 }
