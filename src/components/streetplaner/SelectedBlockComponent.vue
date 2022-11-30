@@ -11,6 +11,7 @@
       
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
+    const pathRotateButton = (pathToPictures+"tool-icons/rotate.png");
     /**currently selected object, default value is no object selected */
     var defaultBlock: IBlockElement = { 
         groupId: -1,
@@ -40,16 +41,15 @@
                     <img v-if="selectedBlock != null" :src="selectedBlock.obj.texture" class="selectedBlockImg"/>
                 </td>
                 <td>
+                    <h4 class="selectedBlockDetailText">Details:</h4>
                     <ul class="selectedBlockDetails">
-                        <li class="selectedBlockDetailText"><h4>Details:</h4></li>
                         <li class="selectedBlockDetailText">{{selectedBlock.obj.id}}</li>
                         <li class="selectedBlockDetailText">{{selectedBlock.obj.name}}</li>
                         <li class="selectedBlockDetailText">{{selectedBlock.obj.type}}</li>
                     </ul>
-                    <ul id="rotateList">
-                        <li><button></button></li>
-                        <li><button></button></li>
-                    </ul>  
+                    <button id="ListRotateButton" class="rotateButtonInDetails">
+                            <img v-if="selectedBlock != null" :src="pathRotateButton" id="ListRotateButtonImg" class="selectedBlockRotateImg"/>
+                    </button>
                 </td>
             </tr>
         </table> 
@@ -70,7 +70,6 @@
         height: 100%;
         display: block;
         border: solid 1px gray;
-
     }
     /** style for text in details list in selected block*/
     .selectedBlockDetailText{
@@ -88,7 +87,14 @@
         -moz-user-drag: none; 
         -o-user-drag: none;
     }
-    #rotateList > li {
-        display: inline;
+    .selectedBlockRotateImg{
+        width: 25%;
+        height: 25%;
+        border: solid 1px gray;
+    }
+    .rotateButtonInDetails{
+        display:inline;
+        border: solid 2px black;
+        background-color: grey;
     }
 </style>
