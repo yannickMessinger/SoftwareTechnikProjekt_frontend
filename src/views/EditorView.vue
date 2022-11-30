@@ -1,6 +1,6 @@
 <template>
     <h1 class="title">Editor Mode</h1>
-    <PrimButton display="Back to menu" :btn_click="backToMenu"></PrimButton>
+    <PrimButton display="Zurück zur Startseite" :btn_click="() => {router.push('/')}"></PrimButton>
     <DialogsWrapper />
     <div class="flex">
         <div class="left">
@@ -25,7 +25,7 @@
 <script setup lang="ts">
     import { ref } from 'vue'
     import useEventBus from '../services/eventBus'
-    import PrimButton from '../components/PrimButton.vue'
+    import PrimButton from '../components/Buttons/PrimButton.vue'
     import router from '../router/router'
     import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
@@ -39,9 +39,6 @@
     const {emit} = useEventBus();
     const disableResetButton = ref(false);
 
-    function backToMenu(){
-        router.push('/');
-    }
     onConfirm(() => {
         emit('grid-reset-event', true);
         disableResetButton.value = false;
@@ -58,6 +55,10 @@
     .flex {
         display: flex;
         max-height: 75vh;
+	    font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
+	    font-size: 16px;
+	    font-weight: 600;
+
     }
     .left {
         flex: 1 1 20%;
