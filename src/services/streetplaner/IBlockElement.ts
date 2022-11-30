@@ -8,7 +8,7 @@
  * id - Id of this block (useful Id system needs to be invented later)
  * type - fill text, maybe useful later or should be deleted later
  * name - name of this block which is displayed in the list
- * heading - preperation for rotation task, shows the heading 0(default) - 90 - 180 - 270 - 0
+ * rotation - rotates clockwise 0(default) - 1 (90 degrees) - 2 (180 degrees) - 3 (270 degrees) - 0
  * texture - path for the displayed picture
  */
 
@@ -18,7 +18,6 @@ export interface IBlockElement {
     id: number,
     type: string,
     name: string,
-    heading: number,
     rotation: number,
     texture: string
 }

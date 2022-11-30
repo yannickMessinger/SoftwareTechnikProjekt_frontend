@@ -21,7 +21,6 @@
         id: -1,
         type:"no data",
         name:"no Object selected",
-        heading:0,
         rotation:0,
         texture: (pathToPictures+"no-data.png")
     };
@@ -32,9 +31,9 @@
     /** boolean value that controls weather blocks are clicable or not */
     const isCreateTool = ref(false);
     /**entrys in blocklist */
-    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,rotation: 0,texture: (pathToPictures+"object-icons/straight.png")};
-    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,rotation: 0,texture: (pathToPictures+"object-icons/curve.png")};
-    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,rotation: 0,texture: (pathToPictures+"object-icons/cross.png")};
+    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",rotation: 0,texture: (pathToPictures+"object-icons/straight.png")};
+    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",rotation: 0,texture: (pathToPictures+"object-icons/curve.png")};
+    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",rotation: 0,texture: (pathToPictures+"object-icons/cross.png")};
 
     /**function activated by clicking on an block */
     function onBlockClicked(clickedBlock:any){

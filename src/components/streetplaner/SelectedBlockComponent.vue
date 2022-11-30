@@ -18,7 +18,7 @@
         id: -1,
         type:"no data",
         name:"no Block selected",
-        heading:0,
+        rotation:0,
         texture: (pathToPictures+"no-data.png")
     };
     /** bus event */
@@ -46,6 +46,10 @@
                         <li class="selectedBlockDetailText">{{selectedBlock.obj.name}}</li>
                         <li class="selectedBlockDetailText">{{selectedBlock.obj.type}}</li>
                     </ul>
+                    <ul id="rotateList">
+                        <li><button></button></li>
+                        <li><button></button></li>
+                    </ul>  
                 </td>
             </tr>
         </table> 
@@ -83,5 +87,8 @@
         -khtml-user-drag: none; 
         -moz-user-drag: none; 
         -o-user-drag: none;
+    }
+    #rotateList > li {
+        display: inline;
     }
 </style>
