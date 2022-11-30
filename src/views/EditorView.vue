@@ -37,7 +37,7 @@
 
     const {emit} = useEventBus();
     const disableResetButton = ref(false);
-    
+    import Header from '../components/Header.vue'
 
     onConfirm(() => {
         emit('grid-reset-event', true);
