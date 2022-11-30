@@ -96,7 +96,10 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+
+
   }
+
 
   .prim.btn.green {
     background-color: var(--btn-primary);
@@ -140,6 +143,8 @@
     /*place-items: center;*/
     min-width: 320px;
     min-height: 100vh;
+    background: var(--woe-white);
+    color: var(--woe-black);
   }
 
   @media (prefers-color-scheme: light) {
