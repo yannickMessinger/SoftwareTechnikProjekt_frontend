@@ -8,7 +8,7 @@
 
     var gridSizeX = 20;
     var gridSizeY = 30;
-    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, texture: "" }});
+    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, texture: "" } });
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -17,6 +17,9 @@
     watch(() => bus.value.get('block-select-event'), (val) => {
         toolState.block = val[0];
         console.log(toolState);
+    });
+    watch(() => bus.value.get('grid-reset-event'), (val) => {
+        if (val) { resetGrid(); }
     });
 
     // create and initialize streetGrid
