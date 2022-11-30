@@ -1,8 +1,7 @@
 <template>
-    <h1 class="title">Editor Mode</h1>
-    <PrimButton display="Zurück zur Startseite" :btn_click="() => {router.push('/')}"></PrimButton>
+    <Header text="World of eMobility" :displayHomebutton="true"></Header>
     <DialogsWrapper />
-    <div class="flex">
+   <div class="flex">
         <div class="left">
             <div class="left_top1">
                 <ListToolsComponent></ListToolsComponent>
@@ -25,7 +24,6 @@
 <script setup lang="ts">
     import { ref } from 'vue'
     import useEventBus from '../services/eventBus'
-    import PrimButton from '../components/Buttons/PrimButton.vue'
     import router from '../router/router'
     import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
@@ -33,11 +31,13 @@
     import StreetGrid from '../components/streetplaner/StreetGrid.vue'
     import { createConfirmDialog } from 'vuejs-confirm-dialog'
     import SimpleDialog from '../components/SimpleDialog.vue'
+    import Header from '../components/Header.vue'
 
     const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, { question: "Do you want to reset the grid? This will be irreversible."});
 
     const {emit} = useEventBus();
     const disableResetButton = ref(false);
+    
 
     onConfirm(() => {
         emit('grid-reset-event', true);
@@ -49,9 +49,6 @@
 </script>
 
 <style>
-    .title{
-        color:black;
-    }
     .flex {
         display: flex;
         max-height: 75vh;
