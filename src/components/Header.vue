@@ -1,13 +1,13 @@
 <template>
     <div class="header">
         <span>{{text}}</span>
-        <PrimButton v-if=displayHomebutton id="home" display="" :btn_click="() => {router.push('/')}"></PrimButton>
+        <BasicButton v-if=displayHomebutton id="home" display="" :btn_click="() => {router.push('/')}"/>
     </div>
 </template>
 
 <script setup lang="ts">
-    import PrimButton from '../components/Buttons/PrimButton.vue';
     import router from '../router/router';
+    import BasicButton from './Buttons/BasicButton.vue';
 
     const props = defineProps({
         text: {
@@ -26,14 +26,14 @@
 <style>
     .header {
         display: flex;
-        background-color: #03006A;
+        background-color: var(--woe-blue-80);
         justify-content: space-between;
         align-items: center;
         height: 5em;
         
     }
     span{
-        color: white;
+        color: var(--woe-white-almost);
         font-size: 1.5em;
         margin: 2em;
     }
@@ -42,7 +42,7 @@
         border-radius: 50%;
         width: 4em;
         height: 4em;
-        background-color: white;
+        background-color: var(--woe-white-almost);
         background-size: cover;
         background-position: center;
         background-image: url("../assets/Icons/Home.svg");

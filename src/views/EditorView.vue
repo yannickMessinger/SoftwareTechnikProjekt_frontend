@@ -21,7 +21,6 @@
 
 <script setup lang="ts">
     import { computed,ref } from 'vue'
-    import PrimButton from '../components/Buttons/PrimButton.vue'
     import router from '../router/router'
     import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
@@ -32,9 +31,6 @@
 </script>
 
 <style>
-    .title{
-        color:black;
-    }
     .flex {
         display: flex;
         max-height: 75vh;
