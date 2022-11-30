@@ -6,7 +6,6 @@
 
 <template>
   <router-view />
-
 </template>
 
 <style>
@@ -68,5 +67,86 @@
     --woe-violet-60: #4500a4;
     --woe-violet-80: #29005a;
     --woe-violet-90: #1a0033;
-}
+
+    --btn-primary: var(--woe-green-50);
+    --btn-primary-hover: var(--woe-green-60);
+    --btn-secondary: var(--woe-blue-50);
+    --btn-secondary-hover: var(--woe-blue-60);
+    --btn-tertiary: var(--woe-gray-50);
+    --btn-teriary-hover: var(--woe-gray-60);
+    --btn-cancle: var(--woe-red-50);
+    --btn-cancle-hover: var(--woe-red-60);
+
+    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #242424;
+
+
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .prim.btn.green {
+    background-color: var(--btn-primary);
+    color: var(--woe-white);
+  }
+
+  .prim.btn.green:hover {
+    background: var(--btn-primary-hover);
+  }
+
+  .sec.btn.blue {
+    background-color: var(--btn-secondary);
+    color: var(--woe-white);
+  }
+
+  .sec.btn.blue:hover {
+    background: var(--btn-secondary-hover);
+  }
+
+  .ter.btn.grey {
+    background-color: var(--btn-tertiary);
+    color: var(--woe-white);
+  }
+
+  .ter.btn.grey:hover {
+    background: var(--btn-teriary-hover);
+  }
+
+  .cncl.btn.red {
+    background-color: var(--btn-cancle);
+    color: var(--woe-white);
+  }
+
+  .cncl.btn.red:hover {
+    background: var(--btn-cancle-hover);
+  }
+
+  body {
+    margin: 0;
+    /*display: flex;**/
+    /*place-items: center;*/
+    min-width: 320px;
+    min-height: 100vh;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      color: #213547;
+      background-color: #ffffff;
+    }
+    a:hover {
+      color: #747bff;
+    }
+    button {
+      background-color: #f9f9f9;
+    }
+  }
 </style>
