@@ -1,36 +1,12 @@
 <!-- Component that represents a list of active players in a selected lobby-->
 <template>
-
-
-<!--Display List of Active Users in selected Lobby
-        <table>
-            <thead>
-                <tr>
-                    <th>Active Players</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template v-for="player in liste">
-                    <tr>
-                        <td>{{player.name}}</td>
-                    </tr>
-                </template>
-            </tbody>
-        </table>
-
--->
         
-
-    <div class="playerList">
-        <table >
-            <tr>
-                <th>Player</th>
-                <!--if getting the playerList failes, error Message is displayed here-->
-                <th class="alignRight" v-if="playerList.errormsg">{{playerList.errormsg}}</th>
-                <th class="alignRight" v-else>{{props.liste.length}}/anzMaxSpielerEinfügen</th>
-            
-            </tr>
-        </table>
+    <div class="head">
+        <h3>Player</h3>
+        <h3 v-if="playerList.errormsg">{{playerList.errormsg}}</h3>
+        <h3 v-else>{{props.liste.length}}/anzMaxSpielerEinfügen</h3>
+    </div>
+    <div class="playerList">      
         <table>
             <tbody>
                 <PlayerListItem :player="ele" v-for="ele in liste"></PlayerListItem>
@@ -90,7 +66,7 @@ td {
 }
 
 .playerList {
-    height: 600px;
+    height: 300px;
     display: flex;
     flex-direction: column;
     overflow: auto;
@@ -99,6 +75,12 @@ td {
 .alignRight {
     text-align: right;
     font-weight: normal;
+}
+
+.head{
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
 }
 
 </style>

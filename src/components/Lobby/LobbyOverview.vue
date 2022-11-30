@@ -31,6 +31,9 @@
     <div> <!--v-if="lobbyList.lobbylist.length > 0"-->
       <PlayerList :liste="playerList.playerlist"></PlayerList>
     </div>
+    <div>
+      <MyMaps></MyMaps>
+    </div>
     
   </div>
 
@@ -50,6 +53,7 @@ import {
 import { usePlayerList } from "../../services/usePlayerList";
 import { E_LobbyMode } from "../../typings/E_LobbyMode";
 import LobbyList from "./LobbyList.vue";
+import MyMaps from "./MyMaps.vue";
 import PlayerList from "./PlayerList.vue";
 
 onMounted(async () => {
