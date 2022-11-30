@@ -5,6 +5,9 @@ import Game from "../views/Game.vue"
 import HomepageView from "../views/HomepageView.vue"
 import LoginView from "../views/LoginView.vue"
 import CreateLobbyView from "../views/CreateLobbyView.vue"
+import LobbyView from "../views/LobbyView.vue"
+
+
 
 const history = createWebHistory()
 const router = createRouter({
@@ -19,8 +22,12 @@ const router = createRouter({
             component: LoginView
         },
         {
-            path: '/create',
-            component: CreateLobbyView
+            path: '/lobby',
+            component: LobbyView
+        },
+        {
+            path: '/editor',
+            component: EditorView
         },
         {
             path: '/game/:gameId',
