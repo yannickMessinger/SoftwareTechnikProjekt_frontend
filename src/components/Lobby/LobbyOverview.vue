@@ -32,7 +32,7 @@
       <PlayerList :liste="playerList.playerlist"></PlayerList>
     </div>
     <div>
-      <MyMaps></MyMaps>
+      <MyMaps :liste="mapsList.mapslist"></MyMaps>
     </div>
     
   </div>
@@ -50,6 +50,7 @@ import {
   updateLobbyList,
   createNewLobby,
 } from "../../services/useLobbyList";
+import { useMyMaps } from "../../services/useMyMaps";
 import { usePlayerList } from "../../services/usePlayerList";
 import { E_LobbyMode } from "../../typings/E_LobbyMode";
 import LobbyList from "./LobbyList.vue";
@@ -62,6 +63,7 @@ onMounted(async () => {
 
 const { lobbyList } = useLobbyList();
 const { playerList } = usePlayerList();
+const { mapsList } = useMyMaps();
 const showAddLobby = ref(false);
 const lobbyNameInput = ref("");
 const playerNumberInput = ref(0);

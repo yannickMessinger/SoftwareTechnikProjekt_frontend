@@ -3,7 +3,7 @@
     <div class="head">
         <h3>Meine Karten</h3>
     </div>
-    <div class="playerList">
+    <div class="mapsList">
         <table>
             <tbody>
                 <MyMapsListItem :map="ele" v-for="ele in liste"></MyMapsListItem>
@@ -66,5 +66,12 @@ td {
     display: flex;
     justify-content: space-between;
     border: 1px solid black;
+}
+
+.mapsList {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
 }
 </style>
