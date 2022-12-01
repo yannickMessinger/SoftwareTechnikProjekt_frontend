@@ -9,41 +9,7 @@
       <BasicButton class="ter btn grey" display="Lobby verlassen"/>
       <BasicButton class="cncl btn red" display="Lobby schließen"/>
       <Chat/>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
-      <h1>Bla</h1>
+
     </div>
     
   </div>

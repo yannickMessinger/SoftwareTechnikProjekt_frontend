@@ -2,20 +2,15 @@
     <footer>
         <header class="msg-header">
             Chat
+            <BasicButton class="msg-close-btn" display="X" :btn_click="hideChat"/>
         </header>
-        <main class="msg-chat">
-            <div class="msg-message" v-for="(item, index) in chatHistory" :key="index">
-                <div class="msg-info">
-                    {{item.name}}
-                </div>
-                <div class="msg-text">
-                    {{item.text}}
-                </div>
+        <div id="msg-chat" v-bind="chat" v-if="visible">
+            <div id="msg-message" v-for="(item, index) in chatHistory" :key="index">
+                <p class=""><strong>{{item.name}}</strong>{{item.text}}</p>
             </div>
-            <div id="anchor"></div>
-        </main>
+        </div>
         
-        <div class="msg-inputarea">
+        <div id="msg-inputarea" v-if="visible" @keyup.enter="appendMessage">
             <input class="msg-input" type="text" placeholder="Gebe deine Nachricht ein..." v-model="input">
             <BasicButton class="msg-send-btn" display="Senden" :btn_click="appendMessage"/>
         </div>
@@ -30,21 +25,23 @@
         name: string,
         text: string
     }
-
+    const chatHistory = ref<Message[]>([])
+    const chatLength = 20
     let input = ref("")
-    
-    const chatHistory = ref([
-        {name: "hans001", text: "Wer will eine Lobby aufmachen?"},
-        {name: "peter001", text: "Ich machs! Kommt schnell rein, sonst wird sind die Plätze weg"},
-        {name: "werner001", text: "Alles klar"}
-    ])
+    let chat = ref()
+    let visible = ref(false)
     
     function appendMessage(){
-        if(input.value){
-            chatHistory.value.push({name: "norbert", text: input.value})
-            input.value = ""
+        let a = document.getElementById('msg-chat')
+        if(input.value && a){
+            chatHistory.value.push({name: "norbert: ", text: input.value})
+            chatHistory.value.length > chatLength ? chatHistory.value.shift() : undefined
+            input.value = ""   
+            a.scrollTop = a.scrollHeight
         }
-        
+    }
+    function hideChat(){
+       visible.value = !visible.value   
     }
 </script>
 
@@ -53,73 +50,57 @@
         box-sizing: border-box;
         position: fixed;
         bottom: 0px;
-        background-color: var(--woe-gray-40);
-        
+        overflow: hidden;
         display: flex;
-        flex-flow: column wrap;
+        flex-direction: column;
         justify-content: space-between;
         width: 100%;
         max-width: 500px;
-        height: 100%;
         max-height: 300px;
-        border: 0.5px solid var(--woe-gray-90);
-        border-radius: 5px;
+        border-radius: 16px;
+        border: 1px solid var(--woe-gray-90);
+        
+    }
+
+    p{
+        margin: 0;
     }
 
     .msg-header{
         display: flex;
+        align-items: center;
         justify-content: space-between;
-        padding: 5px;
+        padding: 10px;
         border-bottom: var(--woe-gray-90);
         background: var(--woe-gray-30);
         color: var(--woe-black);
     }
 
-    .msg-chat {
-        display: flex;
-        flex-direction: column;
-        scroll-behavior: auto;
+    #msg-chat {
         flex: 1;
+        scroll-behavior: auto;
         overflow-y: auto;
-        padding: 10px;
+        padding: 0 0 0 20px ;
     }
 
-    .msg-chat::-webkit-scrollbar {
-        width: 6px;
+    #msg-chat::-webkit-scrollbar {
+        width: 10px;
     }
 
-    .msg-chat::-webkit-scrollbar-track {
+    #msg-chat::-webkit-scrollbar-track {
         background: #ddd;
     }
     
-    .msg-chat::-webkit-scrollbar-thumb {
+    #msg-chat::-webkit-scrollbar-thumb {
         background: #bdbdbd;
     }
 
-    .msg-message{
+    #msg-inputarea {
         display: flex;
-        align-items: flex-end;
-        margin-bottom: 10px;
-    }
-    .msg-message:last-of-type {
-        margin: 0;
+        margin: 10px;
     }
 
-    .msg-info{
-        margin-right: 10px;
-        font-weight: bold;
-    }
-
-    .msg-info-time {
-        font-size: 0.7em;
-    }
-
-    .msg-inputarea {
-        display: flex;
-        margin: 10px 10px 10px 10px;
-    }
-
-    .msg-inputarea * {
+    #msg-inputarea * {
         padding: 10px;
         border-radius: 8px;
         border: none;
@@ -128,7 +109,7 @@
 
     .msg-input {
         flex: 1;
-        background: #eee;
+        background: var(--woe-gray-20);
     }
 
     .msg-send-btn {
@@ -144,7 +125,9 @@
         background: var(--woe-green-70);
     }
 
-    #anchor{
-        overflow-anchor: auto;
+    .msg-close-btn{
+        background: none;
+        color: var(--woe-black);
+        padding: 5px;
     }
 </style>
