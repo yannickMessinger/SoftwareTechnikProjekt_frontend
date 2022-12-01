@@ -34,6 +34,7 @@ import Header from '../components/Header.vue'
   top: 0;
   left: 0;
   opacity: 1;
+  cursor: none;
 }
 
 .overlay {
