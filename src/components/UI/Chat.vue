@@ -1,8 +1,9 @@
 <template>
     <footer>
         <header class="msg-header">
-            Chat
-            <BasicButton class="msg-close-btn" display="X" :btn_click="hideChat"/>
+            <p>Chat</p>
+            <BasicButton class="msg-close-btn" id="msg-close-btn-not-visible" v-if="visible" display=" " :btn_click="hideChat"/>
+            <BasicButton class="msg-close-btn" id="msg-close-btn-visible" v-if="!visible" display=" " :btn_click="hideChat"/>
         </header>
         <div id="msg-chat" v-bind="chat" v-if="visible">
             <div id="msg-message" v-for="(item, index) in chatHistory" :key="index">
@@ -18,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-    import {reactive, ref} from 'vue'
+    import {ref} from 'vue'
     import BasicButton from '../Buttons/BasicButton.vue';
 
     interface Message{
@@ -34,7 +35,7 @@
     function appendMessage(){
         let a = document.getElementById('msg-chat')
         if(input.value && a){
-            chatHistory.value.push({name: "norbert: ", text: input.value})
+            chatHistory.value.push({name: "user001: ", text: input.value}) // TODO: Username hier setzen
             chatHistory.value.length > chatLength ? chatHistory.value.shift() : undefined
             input.value = ""   
             a.scrollTop = a.scrollHeight
@@ -126,8 +127,19 @@
     }
 
     .msg-close-btn{
-        background: none;
-        color: var(--woe-black);
         padding: 5px;
+        width: 2em;
+        height: 2em;
+        background: none;
+        background-size: cover;
+        background-position: center;
+    }
+    
+    #msg-close-btn-visible{
+        background-image: url("../../assets/Icons/Chat_closed.svg");
+    }
+
+    #msg-close-btn-not-visible{
+        background-image: url("../../assets/Icons/Chat_open.svg");
     }
 </style>
