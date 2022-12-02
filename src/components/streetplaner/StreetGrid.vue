@@ -8,15 +8,18 @@
 
     var gridSizeX = 20;
     var gridSizeY = 30;
-    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, texture: "" } });
+    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" }});
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
-        console.log(toolState);
+        // console.log(toolState.tool);
     });
     watch(() => bus.value.get('block-select-event'), (val) => {
         toolState.block = val[0];
-        console.log(toolState);
+        // console.log(toolState.block);
+    });
+    watch(() => bus.value.get('grid-reset-event'), (val) => {
+        if (val) { resetGrid(); }
     });
     watch(() => bus.value.get('grid-reset-event'), (val) => {
         if (val) { resetGrid(); }
@@ -35,15 +38,29 @@
     // onClick handles click on specific cell
     function onClick(cell: any) {
         // set texture of clicked cell to dummy
-        if (toolState.tool == ToolEnum.CREATE && toolState.block.id !== -1) {
+        if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
+            streetGrid[cell.posX][cell.posY].id = toolState.block.id;
+            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+        }
+        if (toolState.tool === ToolEnum.DELETE) {
+            streetGrid[cell.posX][cell.posY].id = -1;
+            streetGrid[cell.posX][cell.posY].rotation = 0;
+            streetGrid[cell.posX][cell.posY].texture = "";
         }
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
     function onMouseMove(cell: any, event: any) {
-        if (event.buttons === 1 && toolState.tool == ToolEnum.CREATE && toolState.block.id !== -1) {  
+        if (event.buttons === 1 && toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
+            streetGrid[cell.posX][cell.posY].id = toolState.block.id;
+            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+        }
+        if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
+            streetGrid[cell.posX][cell.posY].id = -1;
+            streetGrid[cell.posX][cell.posY].rotation = 0;
+            streetGrid[cell.posX][cell.posY].texture = "";
         }
     }
     
@@ -51,7 +68,7 @@
         // fill streetGrid with empty IGridElements
         for(let row=0; row<streetGrid.length; row++) {
             for(let col=0; col<streetGrid[0].length; col++) {
-                streetGrid[row][col] = { id: -1, posX: row, posY: col, texture: ""};
+                streetGrid[row][col] = { id: -1, posX: row, posY: col, rotation: 0, texture: ""};
             }
         }
     }
