@@ -9,20 +9,33 @@
       </div>
 
       <div class="formWrapper">
-      <form action="" method="" class>
+      <div class="lobbyInput">
         <div class="field-wrap">
-        <label for="first_name"> <b>Lobby-Name</b></label>
-          <input type="text" name="first_name" value="" />
+        <label for="lobby_name"> <b>Lobby-Name</b></label>
+          <input type="text" name="lobby_name" v-model="lobbyNameInput" placeholder="enter lobbyname"/>
         </div>
 
+        <div class = "field-wrap">
+          <label for="lobby_mode"> <b>Lobby-Mode</b></label>
+        <select v-model="selected" @change="switchSelect($event)">
+      <option disabled value="">Please select LobbyMode</option>
+      <option value="build">BuildMode</option>
+      <option value="play">PlayMode</option>
+    </select>
+    </div>
+
         <div class="field-wrap">
-          <label for="last_name"><b>Karte</b></label>
-          <input type="text" name="last_name" value="" />
+          <label for="map"><b>Karte</b></label>
+      <select>
+      <option disabled value="Please select Map">Please select Map</option>
+      <option value="testmap1">testmap1</option>
+      <option value="testmap2">testmap2</option>
+    </select>
         </div>
 
         <div class="field-wrap">
           <label for="last_name"><b>Passwort</b></label>
-          <input type="text" name="last_name" value="" />
+          <input type="password" name="password"  v-model="passwordInput" placeholder="enter password"/>
         </div>
 
 
@@ -32,7 +45,11 @@
         <BasicButton
           class="sec btn blue"
           display="erstellen"
-          :btn_click="createLobby"
+          :btn_click="
+          () => {
+            createNewLobby(lobbyNameInput, 0, lobbyModeInput);
+          }
+          "
         />
       </div>
 
@@ -49,7 +66,7 @@
       </div>
       </div>
        
-      </form>
+    </div>
 
     </div>
 
@@ -60,12 +77,36 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import BasicButton from "../components/Buttons/BasicButton.vue";
 import Header from "../components/Header.vue";
 import router from "../router/router";
+import { E_LobbyMode } from "../typings/E_LobbyMode";
+import {createNewLobby} from "../services/useLobbyList";
+
+const lobbyNameInput = ref("");
+const passwordInput = ref("");
+const lobbyModeInput = ref(E_LobbyMode.BUILD_MODE);
+const selected = ref("");
+
+function setPlayMode() {
+  lobbyModeInput.value = E_LobbyMode.PLAY_MODE;
+}
+
+function setBuildMode() {
+  lobbyModeInput.value = E_LobbyMode.BUILD_MODE;
+}
+
+function switchSelect(event: any) {
+  selected.value = event.target.value;
+  if (selected.value === "play") {
+    setPlayMode();
+  } else if (selected.value === "build") {
+    setBuildMode();
+  }
+}
 
 function createLobby() {
-  //Lobby ertellen hier hin
   router.push("/");
 }
 </script>
@@ -93,7 +134,7 @@ function createLobby() {
     "Header Header"
     "Form Form"
     ". Button";
-  height: 70%;
+  height: 80%;
   width:29em;
 }
 
@@ -109,7 +150,7 @@ function createLobby() {
   height: 3em;
 }
 
-form {
+.lobbyInput{
  
   width: 100%;
   padding-left: 20px;
@@ -118,8 +159,11 @@ form {
   height: 50%;
 }
 
-input{
-  background-color: white;
+
+select{
+color: white;
+width:70%;
+border-color: white;
 }
 
 .field-wrap {
@@ -166,7 +210,7 @@ label {
 
 .formWrapper{
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   flex-direction: row;
   width: 400px;
  
