@@ -48,6 +48,7 @@
           :btn_click="
           () => {
             createNewLobby(lobbyNameInput, 0, lobbyModeInput);
+            router.push('/')
           }
           "
         />
@@ -106,9 +107,6 @@ function switchSelect(event: any) {
   }
 }
 
-function createLobby() {
-  router.push("/");
-}
 </script>
 
 <style scoped>
