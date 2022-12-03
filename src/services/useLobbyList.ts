@@ -59,8 +59,11 @@ export async function createNewLobby(
   const addLobby: IAddLobbyRequestDTO = {
     lobbyName: addLobbyName,
     numOfPlayers: addNumOfPlayers,
-    lobbyMode: addLobbyMode,
+    lobbyModeEnum: addLobbyMode,
+    hostID:"1"
   };
+
+  console.log(addLobby)
 
   try {
     const res = await fetch(url, {
