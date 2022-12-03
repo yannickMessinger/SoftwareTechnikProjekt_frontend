@@ -1,9 +1,13 @@
 <script setup lang="ts">
     import { computed } from '@vue/reactivity';
-    import { ref, reactive, watch } from 'vue';
+    import { ref, reactive, watch, onMounted } from 'vue';
     import type { IGridElement } from '../../services/streetplaner/IGridElement';
     import useEventBus from '../../services/eventBus';
     import ToolEnum from '../../services/streetplaner/ToolEnum';
+    import { useBlockList, updateBlockList } from '../../services/streetplaner/useBlockList';
+    import { useStreetGridList, updateStreetGridList } from '../../services/streetplaner/useStreetGridList';
+    import { IBlockElement } from '../../services/streetplaner/IBlockElement';
+    import { IStreetElement } from '../../services/streetplaner/IStreetElement';
     const { bus } = useEventBus();
 
     var gridSizeX = 20;
@@ -21,9 +25,6 @@
     watch(() => bus.value.get('grid-reset-event'), (val) => {
         if (val) { resetGrid(); }
     });
-    watch(() => bus.value.get('grid-reset-event'), (val) => {
-        if (val) { resetGrid(); }
-    });
 
     // create and initialize streetGrid
     const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
@@ -33,7 +34,19 @@
     const gridSize = ref(40);
     // initialize gridSizePx used in css
     const gridSizePx = computed(() => gridSize.value.toString() + "px");
-    var mouseDown = false;
+    // declare blockList
+    var blockList: Array<IBlockElement>;
+    var streetGridList: Array<IStreetElement>;
+
+    onMounted(() => {
+        blockList = useBlockList().blockList;
+        streetGridList = useStreetGridList().streetGridList;
+        updateBlockList();
+        updateStreetGridList().then(() => {
+            loadStreetGrid(streetGridList);
+        });
+
+    });
 
     // onClick handles click on specific cell
     function onClick(cell: any) {
@@ -64,6 +77,19 @@
         }
     }
     
+    
+    function loadStreetGrid(list: Array<IStreetElement>) {
+        resetGrid();
+        for(let ele of list) {
+            streetGrid[ele.X][ele.Y] = { 
+                id: ele.Objekt_ID, 
+                posX: ele.X, 
+                posY: ele.Y, 
+                rotation: ele.Rotation, 
+                texture: blockList[ele.Objekt_ID].texture};
+        }
+    }
+
     function resetGrid() {
         // fill streetGrid with empty IGridElements
         for(let row=0; row<streetGrid.length; row++) {
