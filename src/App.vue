@@ -150,13 +150,36 @@
   @media (prefers-color-scheme: light) {
     :root {
       color: #213547;
-      background-color: #ffffff;
+      background-color: var(--woe-white-almost);
     }
     a:hover {
       color: #747bff;
     }
     button {
-      background-color: #f9f9f9;
+      background-color: var(--woe-white-almost);
+    }
+
+    input{
+      background-color: var(--woe-white-almost);
+      color: var(--woe-black)
     }
   }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color: #213547;
+      background-color: var(--woe-white-almost);
+    }
+    a:hover {
+      color: #747bff;
+    }
+    button {
+      background-color: var(--woe-white-almost);
+    }
+
+    input{
+      background-color: var(--woe-white-almost);
+      color: var(--woe-black)
+    }
+}
 </style>
