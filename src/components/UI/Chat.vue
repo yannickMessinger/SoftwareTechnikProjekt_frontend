@@ -58,7 +58,7 @@
         width: 100%;
         max-width: 500px;
         max-height: 300px;
-        border-radius: 16px;
+        border-top-right-radius: 16px;
         border: 1px solid var(--woe-gray-90);
         
     }
@@ -73,7 +73,6 @@
         justify-content: space-between;
         padding: 10px;
         border-bottom: var(--woe-gray-90);
-        background: var(--woe-gray-30);
         color: var(--woe-black);
     }
 
