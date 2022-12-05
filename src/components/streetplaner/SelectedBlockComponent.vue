@@ -32,8 +32,7 @@
 </script>
 
 <template>
-    <div class="selectedBlock">
-        <h3 class="selectedBlockTitle"> Selected Block:</h3>
+    <!--
         <table>
             <tr>
                 <td>
@@ -49,39 +48,50 @@
                 </td>
             </tr>
         </table> 
-    </div>
+        -->
+    <p>
+        <span id="header">Zelle</span>
+    </p>
+    <img v-if="selectedBlock != null" :src="selectedBlock.obj.texture" class="selectedBlockImg"/>
+    <p>
+        <span>ID</span>
+        <span>{{selectedBlock.obj.id}}</span>
+    </p>
+    <p>
+        <span>Name</span>
+        <span>{{selectedBlock.obj.name}}</span>
+    </p>
+    <p>
+        <span>Type</span>
+        <span>{{selectedBlock.obj.type}}</span>
+    </p>
 </template>
 
-<style>
-    /**style for the title in selected block */
-    .selectedBlockTitle{
-        color:black;
-        background-color: white;
-        text-align: center;
-        margin:5%;
+<style scoped>
+    *{
+        --margin-bottom: 12px;
+        
+        font-size: 1em;
+        margin: 0;
+        color: var(--woe-black);
     }
-    /** style for images in selected block */
-    .selectedBlockImg{
-        width: 100%;
-        height: 100%;
-        display: block;
-        border: solid 1px gray;
 
+    .selectedBlockImg{
+        width: auto;
+        height: auto;
+        display: block;
+        border: solid 2px var(--woe-blue-50);
+        margin-bottom: var(--margin-bottom);
     }
-    /** style for text in details list in selected block*/
-    .selectedBlockDetailText{
-        color:black;
+
+    p{
+        display: flex;
+        justify-content: space-between;
+        
     }
-    /** style for selected block container*/
-    .selectedBlock{
-        display: table-row;
-        border: solid 1px gray;
-        background-color:darkgray;
-        padding: 5px;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
+
+    #header{
+        font-weight: bold;
+        margin-bottom: var(--margin-bottom);
     }
 </style>
