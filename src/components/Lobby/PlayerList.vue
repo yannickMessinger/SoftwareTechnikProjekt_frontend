@@ -1,10 +1,10 @@
 <!-- Component that represents a list of active players in a selected lobby-->
 <template>
         
-    <div class="head">
-        <h3>Player</h3>
+    <div class="headline">
+        <h2>Spieler</h2>
         <h3 v-if="playerList.errormsg">{{playerList.errormsg}}</h3>
-        <h3 v-else>{{props.liste.length}}/anzMaxSpielerEinfügen</h3>
+        <h4 v-else>{{props.liste.length}}/anzMaxSpielerEinfügen</h4>
     </div>
     <div class="playerList">      
         <table>
@@ -42,28 +42,11 @@ th, td {
 }
 
 table {
-    /*border: 4px solid black;*/
     width: 100%;
-    font-family: Arial, Helvetica, sans-serif;
-    color:black;
-
-    border: 1px solid #707070;
-    height: 80px;
-    
-
 }
 
-th {
-    height: 20px;
-    text-align: left;
-    background-color: white;
-    display: fixed;
-}
 
-td {
-   background-color: rgb(63, 63, 63); 
-   color: white;  
-}
+
 
 .playerList {
     height: 300px;
@@ -81,6 +64,14 @@ td {
     display: flex;
     justify-content: space-between;
     border: 1px solid black;
+}
+
+.headline{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-left: 30px;
+    margin-bottom: 10px;
 }
 
 </style>

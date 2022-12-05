@@ -1,7 +1,7 @@
 <template>
 
-    <div class="head">
-        <h3>Meine Karten</h3>
+    <div class="headline">
+        <h2>Meine Karten</h2>
     </div>
     <div class="mapsList">
         <table>
@@ -32,20 +32,13 @@ const { mapsList } = useMyMaps()
 
 <style scoped>
 
-th, td {
-  padding: 1px;
-  text-align: left;
 
-}
 
 table {
     /*border: 4px solid black;*/
     width: 100%;
-    font-family: Arial, Helvetica, sans-serif;
     color:black;
 
-    border: 1px solid #707070;
-    height: 80px;
     
 
 }
@@ -57,15 +50,13 @@ th {
     display: fixed;
 }
 
-td {
-   background-color: rgb(63, 63, 63); 
-   color: white;  
-}
 
-.head{
+.headline{
     display: flex;
     justify-content: space-between;
-    border: 1px solid black;
+    margin-top: 10px;
+    margin-left: 30px;
+    margin-bottom: 10px;
 }
 
 .mapsList {

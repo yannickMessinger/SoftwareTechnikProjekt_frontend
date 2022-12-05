@@ -6,6 +6,7 @@ import HomepageView from "../views/HomepageView.vue"
 import LoginView from "../views/LoginView.vue"
 import CreateLobbyView from "../views/CreateLobbyView.vue"
 import LobbySelect from "../views/LobbySelect.vue"
+import LobbyView from "../views/LobbyView.vue"
 
 
 
@@ -24,6 +25,10 @@ const router = createRouter({
         {
             path: '/lobby',
             component: LobbySelect
+        },
+        {
+            path: '/lobbyview',
+            component: LobbyView
         },
         {
             path: '/editor',

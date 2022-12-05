@@ -5,12 +5,10 @@
             <MyMaps :liste="mapsList.mapslist"></MyMaps>
         </div>
         <div class="content">
-            <div v-if="lobbyList.lobbylist.length > 0">
+            <div>
                 <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
             </div>
-            <div v-else>
-                <p>No lobbys available:(</p>
-            </div>
+            
         </div>
         
     </div>
@@ -41,7 +39,9 @@ const { mapsList } = useMyMaps();
 
 .content{
     width: 35%;
-    border: 2px solid var(--woe-black);
-    border-radius: 6px;
+    /*border: 2px solid var(--woe-black);*/
+    border-radius: 8px;
+    background-color: var(--woe-gray-30);
+    
 }
 </style>
