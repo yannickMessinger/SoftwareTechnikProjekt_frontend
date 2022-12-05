@@ -1,32 +1,29 @@
 import { reactive, readonly } from "vue";
 import { IPlayerListItem } from "../typings/IPlayerListItem";
 import { IPlayerListState } from "../typings/IPlayerListState";
+import useUser from "./UserStore";
 
-
+const { activeLobby } = useUser();
 const playerState = reactive<IPlayerListState>({
     playerlist: Array<IPlayerListItem>(),
     errormsg: ""
 })
 
 //temporary function to test the PlayerList
-export function usePlayerList(){
-    for(let i = 0; i < 20; i++){
-        playerState.playerlist.push({name: "player" + i});
+export async function fetchPlayerList(): Promise<void> {
+    const response = await fetch(`/api/lobby/get_players/${activeLobby.value.lobbyId}`, {
+        method: 'GET'
+    })
+    const result = await response.json();
+    console.log("fetch playerlist response", result);
+    for(let i of result) {
+        playerState.playerlist.push({
+            userId: i.userId,
+            userName: i.userName
+        })
     }
-
-    return {
-        playerList: playerState
-    }
+    console.log(playerState);
 }
-
-/*
-export function usePlayerList(){
-    return {
-        playerList: readonly(playerState),
-        updatePlayerList,
-    }
-}
-*/
 
 export async function updatePlayerList() {
     console.log("Update PlayerList");
@@ -48,4 +45,13 @@ export async function updatePlayerList() {
         playerState.errormsg = 'FEHLER: ${reason}'
     })
     
+}
+
+
+export function usePlayerList(){
+    return {
+        playerListState: readonly(playerState),
+        fetchPlayerList,
+        updatePlayerList,
+    }
 }

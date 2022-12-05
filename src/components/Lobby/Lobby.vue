@@ -1,7 +1,8 @@
 <!--List Item that represents single lobby and is embedded in LobbyList, displays Lobby Data Name, the current gaming mode the lobby is set to and the number of active players-->
 
 <template>
-<div  @click="selectLobby()">
+<RouterLink to="/lobbyview">
+  <div  @click="selectLobby()">
   <div class="item">
     <img
       src="https://images.unsplash.com/photo-1628947733273-cdae71c9bfd3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
@@ -12,26 +13,32 @@
     <div class="lobby_data">
       <div>
         <b>Name: </b>{{ props.lobby.lobbyName }}<br/>   
-        <b>mode: </b>{{ props.lobby.lobbyMode }} <br/>
+        <b>mode: </b>{{ props.lobby.lobbyModeEnum }} <br/>
         <b>active players: </b>{{ props.lobby.numOfPlayers }}
+      </div>
       </div>
     </div>
   </div>
-</div>
+</RouterLink>
 </template>
 
 <script setup lang="ts">
 
 import { ILobby } from "../../typings/ILobby";
-
+import BasicButton from "../Buttons/BasicButton.vue";
+import useUser from "../../services/UserStore";
 
 const props = defineProps<{
   lobby: ILobby;
 }>();
 
+const {setActiveLobby} = useUser();
+
 //for later purposes to link to selected lobby via Vue Router
 function selectLobby(){
-    console.log(props.lobby.lobbyName);
+    console.log(props.lobby.lobbyId, props.lobby.lobbyName);
+    setActiveLobby(props.lobby);
+    console.log("user has active lobby");
 }
 
 

@@ -29,7 +29,7 @@
       <p>No lobbys available:(</p>
     </div>
     <div> <!--v-if="lobbyList.lobbylist.length > 0"-->
-      <PlayerList :liste="playerList.playerlist"></PlayerList>
+      <PlayerList :liste="playerListState.playerlist"></PlayerList>
     </div>
     <div>
       <MyMaps :liste="mapsList.mapslist"></MyMaps>
@@ -62,7 +62,7 @@ onMounted(async () => {
 });
 
 const { lobbyList } = useLobbyList();
-const { playerList } = usePlayerList();
+const { playerListState } = usePlayerList();
 const { mapsList } = useMyMaps();
 const showAddLobby = ref(false);
 const lobbyNameInput = ref("");

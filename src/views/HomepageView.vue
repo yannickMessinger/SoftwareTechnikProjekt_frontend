@@ -4,6 +4,7 @@
   <BasicButton class="prim btn green" display="Fahren" :btn_click="() => {router.push({name: 'Game', params: {gameId: gameId}})}"/>
   <BasicButton class="sec btn blue" display="Planungs-Modus" :btn_click="() => {router.push({name: 'Edit', params: {gameId: gameId}})}"/>
   <BasicButton class="sec btn blue" display="Lobby erstellen" :btn_click="() => {router.push('/create')}"/>
+    <BasicButton class="sec btn blue" display="Lobbys anzeigen" :btn_click="() => {router.push('/lobby')}" />
   <BasicButton class="ter btn grey" display="Lobby verlassen"/>
   <BasicButton class="cncl btn red" display="Lobby schließen"/>
  

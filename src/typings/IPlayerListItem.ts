@@ -1,3 +1,4 @@
 export interface IPlayerListItem {
-    name: string
+    userId: number,
+    userName: string
 }
