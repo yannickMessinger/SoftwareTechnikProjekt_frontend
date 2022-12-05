@@ -43,6 +43,12 @@ const router = createRouter({
             path: '/edit/:gameId',
             component: EditorView,
             name: 'Edit'
+        },
+        {
+            path:'/create',
+            component: CreateLobbyView,
+            name: 'CreateLobby'
+
         }
     ]
 })

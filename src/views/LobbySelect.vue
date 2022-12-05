@@ -22,9 +22,14 @@ import { useMyMaps } from "../services/useMyMaps";
 
 import LobbyList from "../components/Lobby/LobbyList.vue";
 import MyMaps from "../components/Lobby/MyMaps.vue";
+import { onMounted } from 'vue';
 
-const { lobbyList } = useLobbyList();
+const { lobbyList, updateLobbyList } = useLobbyList();
 const { mapsList } = useMyMaps();
+
+onMounted(async () => {
+  await updateLobbyList();
+});
 </script>
 
 <style scoped>

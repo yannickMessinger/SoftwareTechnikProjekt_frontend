@@ -6,4 +6,5 @@ export interface IGetLobbyResponseDTO {
     lobbyName:string
     numOfPlayers: number
     lobbyMode: E_LobbyMode
+    hostID?:number
 }
