@@ -65,8 +65,9 @@
                 isHost.value = true;
                 isLobbyOpen.value = true;
             }else{
-                //TODO (#201 change card in active lobby)
+                selectedCard.card = clickedCard;
             }
+            //TODO control if watcher can handle the change at all time, otherwise prevent the player from changing
             emit("card-load-event",selectedCard.card);
             //TODO inform backend that active map changed (#229 connect backend)
         }
