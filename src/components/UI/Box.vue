@@ -12,7 +12,7 @@
                 <label v-if="registrationMode">Passwort erneut eingeben</label>
                 <input v-if="registrationMode" v-model="passwordRepeat" type="password" placeholder="Passwort" required />
                 <hr>
-                <BasicButton class="sec btn blue" :display="registrationMode ? 'Registrieren' : 'Login'" :btn_click="sendUsername"/>
+                <BasicButton class="sec btn blue" :display="registrationMode ? 'Registrieren' : 'Login'" :btn_click="login"/>
                 <BasicButton class="ter btn grey" :display="registrationMode ? 'Zurück zum Login' : 'Registrieren'" :btn_click="registration"/>
             </div>
         </div>
@@ -24,21 +24,29 @@
     import useUser from "../../services/UserStore";
     import router from "../../router/router"
     import BasicButton from '../Buttons/BasicButton.vue';
+    import { LoginService } from "../../services/Login/LoginService";	
 
     let username = ref("")
     let password = ref("")
     let passwordRepeat = ref("")
     let registrationMode = ref(false)
-    const { name, setName, sendName } = useUser();
-
-    function sendUsername() {
-        setName(username.value);
-        // Methode, wenn auf Button geklickt wird hier hin...
+    let loginService = new LoginService();
+    
+    function login() {
+        if (registrationMode.value) {
+            loginService.register(username.value, password.value)
+        }else{
+            loginService.login(username.value, password.value)
+        }
+        
         router.push('/');
+        
     }
+
     function registration() {
         registrationMode.value = !registrationMode.value
     }
+
 </script>
 
 <style scoped>
