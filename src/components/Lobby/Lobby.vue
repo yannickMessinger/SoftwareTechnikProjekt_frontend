@@ -12,7 +12,7 @@
     <div class="lobby_data">
       <div>
         <b>Name: </b>{{ props.lobby.lobbyName }}<br/>   
-        <b>mode: </b>{{ props.lobby.lobbyMode }} <br/>
+        <b>mode: </b>{{ props.lobby.lobbyModeEnum }} <br/>
         <b>active players: </b>{{ props.lobby.numOfPlayers }}
       </div>
     </div>
