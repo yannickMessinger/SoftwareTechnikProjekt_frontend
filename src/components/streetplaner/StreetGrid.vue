@@ -5,14 +5,15 @@
     import useEventBus from '../../services/eventBus';
     import ToolEnum from '../../services/streetplaner/ToolEnum';
     import { useBlockList, updateBlockList } from '../../services/streetplaner/useBlockList';
-    import { useStreetGridList, updateStreetGridList } from '../../services/streetplaner/useStreetGridList';
+    import { useStreetGridList, updateStreetGridList, postStreetGrid } from '../../services/streetplaner/useStreetGridList';
     import { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import { IStreetElement } from '../../services/streetplaner/IStreetElement';
+    import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
     const { bus } = useEventBus();
 
     var gridSizeX = 20;
     var gridSizeY = 30;
-    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" }});
+    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" } });
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -25,6 +26,7 @@
     watch(() => bus.value.get('grid-reset-event'), (val) => {
         if (val) { resetGrid(); }
     });
+    watch(() => bus.value.get('grid-save-event'), (val) => { saveStreetGrid(); });
 
     // create and initialize streetGrid
     const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
@@ -36,14 +38,14 @@
     const gridSizePx = computed(() => gridSize.value.toString() + "px");
     // declare blockList
     var blockList: Array<IBlockElement>;
-    var streetGridList: Array<IStreetElement>;
+    var streetGridDTO: StreetGridDTO;
 
     onMounted(() => {
         blockList = useBlockList().blockList;
-        streetGridList = useStreetGridList().streetGridList;
+        streetGridDTO = useStreetGridList().streetGridDTO;
         updateBlockList();
         updateStreetGridList().then(() => {
-            loadStreetGrid(streetGridList);
+            loadStreetGrid(streetGridDTO);
         });
 
     });
@@ -77,10 +79,26 @@
         }
     }
     
+    function saveStreetGrid() {
+        let dto: StreetGridDTO = { Strassenobjekte: Array<IStreetElement>() };
+        for(let row=0; row<streetGrid.length; row++) {
+            for(let col=0; col<streetGrid[0].length; col++) {
+                let ele = streetGrid[row][col];
+                if(ele.id !== -1) {
+                    dto.Strassenobjekte.push( { Objekt_ID: ele.id, 
+                                                X: ele.posX,
+                                                Y: ele.posY,
+                                                Rotation: ele.rotation
+                                            } );
+                }
+            }
+        }
+        postStreetGrid(dto);
+    }
     
-    function loadStreetGrid(list: Array<IStreetElement>) {
+    function loadStreetGrid(dto: StreetGridDTO) {
         resetGrid();
-        for(let ele of list) {
+        for(let ele of dto.Strassenobjekte) {
             streetGrid[ele.X][ele.Y] = { 
                 id: ele.Objekt_ID, 
                 posX: ele.X, 

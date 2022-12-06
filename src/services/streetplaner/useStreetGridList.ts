@@ -1,17 +1,18 @@
 import { reactive } from "vue";
 import { IStreetElement } from "./IStreetElement";
+import { StreetGridDTO } from "./StreetGridDTO";
 
-const streetGridList = reactive(Array<IStreetElement>());
+const streetGridDTO = reactive({ Strassenobjekte: Array<IStreetElement>() });
 
 export function useStreetGridList() {
     return {
-        streetGridList: streetGridList,
+        streetGridDTO: streetGridDTO,
         updateStreetGridList
     }
 }
 
 export async function updateStreetGridList() {
-    const url = "api/map/12";
+    const url = "api/mapobject";
 
     try {
         // Todo, get map from backend
@@ -22,17 +23,32 @@ export async function updateStreetGridList() {
         }
     }
     catch {
-        // Todo, load from json format
-        streetGridList.splice(0, streetGridList.length);
-        streetGridList.push(...[
-            { Objekt_ID: 1, X: 0, Y: 0, Rotation: 0 },
-            { Objekt_ID: 0, X: 1, Y: 0, Rotation: 0 },
-            { Objekt_ID: 0, X: 0, Y: 1, Rotation: 0 },
-            { Objekt_ID: 2, X: 0, Y: 2, Rotation: 0 },
-            { Objekt_ID: 2, X: 2, Y: 3, Rotation: 0 },
-            { Objekt_ID: 1, X: 3, Y: 5, Rotation: 0 },
-            { Objekt_ID: 0, X: 6, Y: 3, Rotation: 0 },
-            { Objekt_ID: 0, X: 7, Y: 7, Rotation: 0 }
-        ]);
+        let json = '{"Strassenobjekte":[]}';
+        streetGridDTO.Strassenobjekte = JSON.parse(json).Strassenobjekte;
+    }
+}
+
+export async function postStreetGrid(dto: StreetGridDTO) {
+    const url = "/api/mapobject";
+    try {
+        let response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        let data = await response.json();
+        let id = data.length;
+        console.log(dto);
+        response = await fetch(url + '/1', { 
+            method: 'POST',
+            body: JSON.stringify(dto),
+            headers: {'Content-Type': 'application/json; charset=UTF-8' }
+        });
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        console.log(response.body);
+    } 
+    catch (error) {
+        console.log(error);
     }
 }

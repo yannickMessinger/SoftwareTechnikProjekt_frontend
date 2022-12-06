@@ -26,9 +26,9 @@ export async function updateBlockList(): Promise<void> {
         // Todo, load from json format
         blockList.splice(0, blockList.length);
         blockList.push(...[
-            { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,texture: (pathToPictures+"object-icons/straight.png")},
-            { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: (pathToPictures+"object-icons/curve.png")},
-            { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: (pathToPictures+"object-icons/cross.png")}
+            { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,texture: (pathToPictures.concat("object-icons/straight.png"))},
+            { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: (pathToPictures.concat("object-icons/curve.png"))},
+            { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: (pathToPictures.concat("object-icons/cross.png"))}
         ]);
     }
 }

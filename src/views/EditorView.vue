@@ -1,5 +1,6 @@
 <template>
     <Header text="World of eMobility" :displayHomebutton="true"></Header>
+    <button class="reset-button" @click="emit('grid-save-event', true)">Save</button> <!-- Remove before merge with dev -->
     <DialogsWrapper />
    <div class="flex">
         <div class="left">
@@ -24,7 +25,6 @@
 <script setup lang="ts">
     import { ref } from 'vue'
     import useEventBus from '../services/eventBus'
-    import router from '../router/router'
     import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
     import SelectedBlockComponent from '../components/streetplaner/SelectedBlockComponent.vue'
