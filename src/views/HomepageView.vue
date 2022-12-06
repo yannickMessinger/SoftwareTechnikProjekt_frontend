@@ -6,6 +6,7 @@
   <BasicButton class="sec btn blue" display="Lobby erstellen" :btn_click="() => {router.push('/create')}"/>
   <BasicButton class="ter btn grey" display="Lobby verlassen"/>
   <BasicButton class="cncl btn red" display="Lobby schließen"/>
+  <OwnCardComponent></OwnCardComponent>
  
 
 
@@ -16,6 +17,7 @@
   import BasicButton from '../components/Buttons/BasicButton.vue';
   import Header from '../components/Header.vue'
   import router from '../router/router';
+  import OwnCardComponent from '../components/mainpage/OwnCards/OwnCardsComponent.vue';
 
   let gameId = ref(20); //TODO: gameId must refers to the id in the backend
 </script>
