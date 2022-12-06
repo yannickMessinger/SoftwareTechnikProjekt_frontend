@@ -21,7 +21,7 @@
         id: -1,
         type:"no data",
         name:"no Object selected",
-        heading:0,
+        rotation:0,
         texture: (pathToPictures+"no-data.png")
     };
     /**  currently selected block */
@@ -31,13 +31,13 @@
     /** boolean value that controls weather blocks are clicable or not */
     const isCreateTool = ref(false);
     /**entrys in blocklist */
-    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"Gerade",heading:0,texture: (pathToPictures+"object-icons/Road_straight.svg")};
-    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"Kurve",heading:0,texture: (pathToPictures+"object-icons/Road_curve.svg")};
-    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"Kreuzung",heading:0,texture: (pathToPictures+"object-icons/Road_cross.svg")};
+    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",rotation: 0,texture: (pathToPictures+"object-icons/straight.png")};
+    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",rotation: 0,texture: (pathToPictures+"object-icons/curve.png")};
+    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",rotation: 0,texture: (pathToPictures+"object-icons/cross.png")};
 
     /**function activated by clicking on an block */
-    function onBlockClicked(clickedBlock:any){
-        console.log(selectedBlock.block.name);
+    function onBlockClicked(clickedBlock: any){
+        // console.log(selectedBlock.block.name);
         /** if the selected block is the clicked block, it gets deselected by restoring the default block
          * otherwhise the clicked block is now the selected block.
         */
@@ -48,7 +48,7 @@
         }
         /** fires a block select event to mark a selected block change. Sends out this blocks name*/
         emit("block-select-event", selectedBlock.block);
-        console.log(selectedBlock.block.name);
+        // console.log(selectedBlock.block.name);
     }
 
     /** sets buttons to clickable if create tool is selected, or not clickable if its not */

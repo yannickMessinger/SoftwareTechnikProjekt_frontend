@@ -11,7 +11,7 @@
     
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
-    var totalToolNumber = 3; /** number of toolslots shown in the toollist */
+    var totalToolNumber = 4; /** number of toolslots shown in the toollist */
     var toolList: IToolElement[] = Array(totalToolNumber).fill([]); /** List of all Tools */
     /** default values for selected tool when no tool is selected */
     var defaultTool: IToolElement = {
@@ -51,8 +51,7 @@
         emit('tool-select-event', selectedTool.tool.tool);
         /** fire a tool select event to mark a tool change for selectedToolComponent. Sends out the complete tool of the selected tool*/
         emit('tool-select-component-event', selectedTool.tool);
-        console.log(selectedTool.tool.name);
-
+        // console.log(selectedTool.tool.name);
     }
 </script>
 
