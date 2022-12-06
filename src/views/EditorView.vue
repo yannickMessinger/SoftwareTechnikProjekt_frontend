@@ -100,6 +100,7 @@
         height: 100%;
         width: 100%;
         overflow: scroll;
+        
     }
     .selected-block{
         display: flex;
@@ -114,19 +115,18 @@
         border-top: none;
         overflow: hidden;
         position: fixed;
-        z-index: 2;
         background-color: var(--woe-white);
     }
 
 
     .container{
         display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        flex-direction: column;
+        flex-flow: row-reverse;
+        /*
+        margin-left: auto;
         min-height: 75vh;
-        z-index: 2;
         position: fixed;
+        */
     }
 
     .tools{
@@ -141,9 +141,11 @@
         border-radius: var(--border-radius) 0 0 var(--border-radius);
         overflow: hidden;
         width: 8%;
-        max-height: 75vh;
+        max-height: 50vh;
+        margin-top: 10%;
         overflow-y: scroll;
         background-color: var(--woe-white);
+        position: fixed;
     }
 
     .tools-back-btn{

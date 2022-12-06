@@ -21,7 +21,7 @@ import Chat from '../components/UI/Chat.vue'
 
 </script>
 
-<style>
+<style scoped>
 
 .container {
   width: 100%;
