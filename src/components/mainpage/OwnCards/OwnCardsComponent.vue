@@ -18,26 +18,23 @@
     const isEmpty = ref(true);
     const isLobbyOpen = ref(false);
     const numberOfOwnedCards = ref(0);
-    var numberOfMaxCards = 15;
     const cardList: ICardElement[] = reactive(Array(numberOfOwnedCards.value).fill(null));
+    
+    /**Card List Data Import from Backend or load default list */
     console.log("Cards:");
-    console.log(cardList.length);
     if(backendOfflineDebugMode){ /**TODO Remove Debug Components */
-        cardList[0] = {id:0, name:"abcd", date:new Date('2000-12-12')}
-        cardList[1] = {id:1, name:"ergh", date:new Date('2000-12-12')} 
-        cardList[2] = {id:2, name:"ijkl", date:new Date('2000-12-12')}
-        numberOfOwnedCards.value = 1;
-        console.log(cardList.length);
-        //var removed = cardList.splice(1,1);
-        console.log(cardList.length);
-        //console.log(removed);
-
+        cardList[0] = {id:0, name:"abcd", date:new Date('2000-12-12')};
+        cardList[1] = {id:1, name:"ergh", date:new Date('2000-12-12')}; 
+        cardList[2] = {id:2, name:"ijkl", date:new Date('2000-12-12')};
+        isEmpty.value = false;
     }else{
-        // import list data from backend here
+        //TODO import list data from backend here (#229 connect backend)
     }
+    //TODO Compile imported data into card Elements (#229 connect backend)
+    console.log(cardList.length);
 
     function addNewCardClickAction(){
-        //Feature Request? 
+        //Feature Request (#227 add new map button)
     }
 
     function cardClickedLobbyAction(clickedCard:any){
@@ -47,9 +44,8 @@
     }
 
     function cardClickedDeleteAction(clickedCard:any){
-        // What if deleted card is active card?
         if(clickedCard.id==selectedCard.card.id){
-            //TODO
+            /*TODO What if deleted card is active card? (#228) */ 
         }else{
             console.log("Delete Action");
             console.log("List-old:");
@@ -71,8 +67,11 @@
             }
             console.log("List-new:");
             console.log(cardList.length);
+            if(cardList.length==0){
+                isEmpty.value = true;
+            }
             if(!backendOfflineDebugMode){
-                // TODO Add Backend delete here!
+                // TODO call delete option in Backend (#229 connect backend)
             }
         }
     }
@@ -100,7 +99,7 @@
                         <h6>Karte loeschen</h6>
                     </th>
                 </tr>
-                <tr v-for="card in cardList" track-by="id" id = "cardListItem">
+                <tr v-for="card in cardList" track-by="id" v-if="!isEmpty" id = "cardListItem">
                     <td v-if="card !== null">
                         <p id ="CardNameTag">{{card.name}}</p> <!-- laenge beschränken?-->
                     </td>
@@ -112,6 +111,11 @@
                     </td>
                     <td v-if="card !== null">
                         <button id="deleteCardButton" @click="cardClickedDeleteAction(card)"> X </button>
+                    </td>
+                </tr>
+                <tr v-if="isEmpty" id = "emptyListRow">
+                    <td>
+                        <p>keine Karten vorhanden</p>
                     </td>
                 </tr>
             </table>
