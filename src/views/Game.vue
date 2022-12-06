@@ -7,6 +7,7 @@
     <div class="box overlay">
       <HUD></HUD>
     </div>
+    <Chat/>
   </div>
 </template>
 
@@ -15,6 +16,7 @@ import { defineComponent } from 'vue'
 import SkelletonTrois from "../components/3D/GameView.vue"
 import HUD from "../components/3D/HUD.vue"
 import Header from '../components/Header.vue'
+import Chat from '../components/UI/Chat.vue'
 
 
 </script>

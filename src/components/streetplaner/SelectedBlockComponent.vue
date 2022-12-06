@@ -32,23 +32,6 @@
 </script>
 
 <template>
-    <!--
-        <table>
-            <tr>
-                <td>
-                    <img v-if="selectedBlock != null" :src="selectedBlock.obj.texture" class="selectedBlockImg"/>
-                </td>
-                <td>
-                    <ul class="selectedBlockDetails">
-                        <li class="selectedBlockDetailText"><h4>Details:</h4></li>
-                        <li class="selectedBlockDetailText">{{selectedBlock.obj.id}}</li>
-                        <li class="selectedBlockDetailText">{{selectedBlock.obj.name}}</li>
-                        <li class="selectedBlockDetailText">{{selectedBlock.obj.type}}</li>
-                    </ul>
-                </td>
-            </tr>
-        </table> 
-        -->
     <p>
         <span id="header">Zelle</span>
     </p>

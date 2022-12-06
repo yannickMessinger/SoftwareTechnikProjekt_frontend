@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Box from "../components/UI/Box.vue";
+import Login from "../components/UI/Login.vue";
 import Header from '../components/Header.vue'
 
 /** */
@@ -8,7 +8,7 @@ import Header from '../components/Header.vue'
 
 <template>
   <Header text="World of eMobility" :displayHomebutton="false"></Header>
-  <Box/>
+  <Login/>
 </template>
 
 

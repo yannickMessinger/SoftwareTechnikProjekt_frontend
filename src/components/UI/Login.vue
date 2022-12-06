@@ -47,6 +47,11 @@
         
     }
 
+    h2{
+        margin-top: 0.83em;
+        margin-bottom: 0.83em;
+    }
+
     .container{
         display: flex;
         flex-direction: column;

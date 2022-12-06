@@ -5,16 +5,19 @@
             <BasicButton class="msg-close-btn" id="msg-close-btn-not-visible" v-if="visible" display=" " :btn_click="hideChat"/>
             <BasicButton class="msg-close-btn" id="msg-close-btn-visible" v-if="!visible" display=" " :btn_click="hideChat"/>
         </header>
-        <div id="msg-chat" v-bind="chat" v-if="visible">
-            <div id="msg-message" v-for="(item, index) in chatHistory" :key="index">
-                <p class=""><strong>{{item.name}}</strong>{{item.text}}</p>
+        <transition name="slide">
+            <div id="msg-chat" v-bind="chat" v-if="visible">
+                <div id="msg-message" v-for="(item, index) in chatHistory" :key="index">
+                    <p class=""><strong>{{item.name}}</strong>{{item.text}}</p>
+                </div>
             </div>
-        </div>
-        
-        <div id="msg-inputarea" v-if="visible" @keyup.enter="appendMessage">
-            <input class="msg-input" type="text" placeholder="Gebe deine Nachricht ein..." v-model="input">
-            <BasicButton class="msg-send-btn" display="Senden" :btn_click="appendMessage"/>
-        </div>
+        </transition>
+        <transition name="slide">
+            <div id="msg-inputarea" v-if="visible" @keyup.enter="appendMessage">
+                <input class="msg-input" type="text" placeholder="Gebe deine Nachricht ein..." v-model="input">
+                <BasicButton class="msg-send-btn" display="Senden" :btn_click="appendMessage"/>
+            </div>
+        </transition>
     </footer>
 </template>
 
@@ -60,20 +63,17 @@
         max-height: 300px;
         border-top-right-radius: 16px;
         border: 1px solid var(--woe-gray-90);
-        
+        border-left: none;
+        border-bottom: none;
+        background-color: var(--woe-white);
     }
 
-    p{
-        margin: 0;
-    }
 
     .msg-header{
         display: flex;
         align-items: center;
         justify-content: space-between;
         padding: 10px;
-        border-bottom: var(--woe-gray-90);
-        color: var(--woe-black);
     }
 
     #msg-chat {
@@ -118,7 +118,6 @@
         color: #fff;
         font-weight: bold;
         cursor: pointer;
-        transition: background 0.23s;
     }
 
     .msg-send-btn:hover {

@@ -88,7 +88,7 @@
     font-weight: 400;
 
     color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
+    color: var(--woe-black);
     background-color: #242424;
 
 
@@ -100,6 +100,9 @@
 
   }
 
+  *{
+    margin: 0;
+  }
 
   .prim.btn.green {
     background-color: var(--btn-primary);
@@ -137,10 +140,35 @@
     background: var(--btn-cancle-hover);
   }
 
+  #editor-tool{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 6em;
+    height: 6em;
+    border: 1px solid var(--woe-black);
+  }
+
+  .editor-tool-not-active{
+    background-color: transparent;
+  }
+
+  .editor-tool-active{
+    background-color: var(--woe-orange-30);
+  }
+    
+  .editor-tool-btn{
+    background-size: cover;
+    background-position: center;
+    width: 4em;
+    height: 4em;
+    border: none;
+    background-color: transparent;
+  }
+
   body {
     margin: 0;
-    /*display: flex;**/
-    /*place-items: center;*/
     min-width: 320px;
     min-height: 100vh;
     background: var(--woe-white);

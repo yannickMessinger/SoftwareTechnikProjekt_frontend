@@ -31,9 +31,9 @@
     /** boolean value that controls weather blocks are clicable or not */
     const isCreateTool = ref(false);
     /**entrys in blocklist */
-    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",heading:0,texture: (pathToPictures+"object-icons/straight.png")};
-    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",heading:0,texture: (pathToPictures+"object-icons/curve.png")};
-    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",heading:0,texture: (pathToPictures+"object-icons/cross.png")};
+    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"Gerade",heading:0,texture: (pathToPictures+"object-icons/Road_straight.svg")};
+    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"Kurve",heading:0,texture: (pathToPictures+"object-icons/Road_curve.svg")};
+    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"Kreuzung",heading:0,texture: (pathToPictures+"object-icons/Road_cross.svg")};
 
     /**function activated by clicking on an block */
     function onBlockClicked(clickedBlock:any){
@@ -62,65 +62,15 @@
 </script>
 
 <template>
-    <!--display container for block list-->
-    <h2 class="blockListTitle">Block List</h2>
-    <div class="blockListContainer">
-        <!-- display container for block list element-->
-        <div v-for="element in blockList" class="blockListElement">
-            <button :disabled ="!isCreateTool" :class="element.name === selectedBlock.block.name ? 'blockListButtonActive' : 'blockListButton'" @click="onBlockClicked(element)">      
-                <img v-if="element != null" :src="element.texture" class="blockListImg"/>
-            </button> 
-        </div>
+    <div v-for="element in blockList" :key="element.id" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClicked(element)">
+        <button class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
+        <p v-if="element != null">{{element.name}}</p>
     </div>
 </template>
 
-<style>
-    /** style for list title in blocklist*/
-    .blockListTitle{
-        color:black;
-        background-color: white;
-        text-align: center;
-        margin:5%;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
-    }
-    /** style for block list in general*/
-    .blockListContainer{
-        margin: 5%;
-        list-style-type: none;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        max-block-size: 19vh;
-        background-color: gray;
-        user-select: none;
-            -webkit-user-drag: none; 
-            -khtml-user-drag: none; 
-            -moz-user-drag: none; 
-            -o-user-drag: none;
-    }
-    /** style for list element in block list*/
-    .blockListElement{
-        margin:1%;
-        display:inline-flex;
-        max-height: 45%;
-        max-width: 45%;
-    }
-    /** style for images in list element*/
-    .blockListImg {
-        width: 100%;
-        height: 100%;
-    }
-    /** style for buttons in list element */
-    .blockListButton{
-        border: solid 2px black;
-        background-color:darkgray;
-    }
-    /** style for clicked buttons in list element */
-    .blockListButtonActive{
-        border: solid 2px black;
-        background-color:orange;
+<style scoped>
+    *{
+        color: var(--woe-black);
+        font-size: 1em;
     }
 </style>
