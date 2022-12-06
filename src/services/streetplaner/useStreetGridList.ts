@@ -23,7 +23,7 @@ export async function updateStreetGridList() {
         }
     }
     catch {
-        let json = '{"Strassenobjekte":[]}';
+        let json = '{"Strassenobjekte":[{"Objekt_ID":1,"X":0,"Y":0,"Rotation":0},{"Objekt_ID":0,"X":0,"Y":1,"Rotation":1},{"Objekt_ID":0,"X":0,"Y":2,"Rotation":1},{"Objekt_ID":1,"X":0,"Y":3,"Rotation":1},{"Objekt_ID":0,"X":1,"Y":0,"Rotation":2},{"Objekt_ID":0,"X":1,"Y":3,"Rotation":2},{"Objekt_ID":1,"X":1,"Y":6,"Rotation":0},{"Objekt_ID":0,"X":1,"Y":7,"Rotation":3},{"Objekt_ID":1,"X":1,"Y":8,"Rotation":1},{"Objekt_ID":0,"X":2,"Y":0,"Rotation":2},{"Objekt_ID":1,"X":2,"Y":2,"Rotation":0},{"Objekt_ID":2,"X":2,"Y":3,"Rotation":0},{"Objekt_ID":0,"X":2,"Y":4,"Rotation":3},{"Objekt_ID":0,"X":2,"Y":5,"Rotation":3},{"Objekt_ID":1,"X":2,"Y":6,"Rotation":2},{"Objekt_ID":0,"X":2,"Y":8,"Rotation":0},{"Objekt_ID":0,"X":3,"Y":0,"Rotation":0},{"Objekt_ID":0,"X":3,"Y":2,"Rotation":0},{"Objekt_ID":0,"X":3,"Y":3,"Rotation":2},{"Objekt_ID":0,"X":3,"Y":8,"Rotation":0},{"Objekt_ID":0,"X":4,"Y":0,"Rotation":0},{"Objekt_ID":0,"X":4,"Y":2,"Rotation":0},{"Objekt_ID":0,"X":4,"Y":3,"Rotation":2},{"Objekt_ID":0,"X":4,"Y":8,"Rotation":0},{"Objekt_ID":1,"X":5,"Y":0,"Rotation":3},{"Objekt_ID":0,"X":5,"Y":1,"Rotation":1},{"Objekt_ID":1,"X":5,"Y":2,"Rotation":2},{"Objekt_ID":0,"X":5,"Y":3,"Rotation":2},{"Objekt_ID":1,"X":5,"Y":7,"Rotation":0},{"Objekt_ID":1,"X":5,"Y":8,"Rotation":2},{"Objekt_ID":1,"X":6,"Y":3,"Rotation":3},{"Objekt_ID":0,"X":6,"Y":4,"Rotation":3},{"Objekt_ID":0,"X":6,"Y":5,"Rotation":3},{"Objekt_ID":0,"X":6,"Y":6,"Rotation":3},{"Objekt_ID":1,"X":6,"Y":7,"Rotation":2}]}';
         streetGridDTO.Strassenobjekte = JSON.parse(json).Strassenobjekte;
     }
 }
