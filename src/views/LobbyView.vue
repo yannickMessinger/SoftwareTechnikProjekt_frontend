@@ -3,7 +3,8 @@
     <div class="container">
 
             <div class="content">
-                <PlayerList :liste="playerList.playerlist"></PlayerList>
+                <!--<PlayerList :liste="playerList.playerlist"></PlayerList>-->
+                <ActiveLobby2></ActiveLobby2>
             </div>
             <div class="content">
                 <PlayerList :liste="playerList.playerlist"></PlayerList>
@@ -24,6 +25,7 @@ import LobbyOverview from '../components/Lobby/LobbyOverview.vue';
 import Lobby from '../components/Lobby/LobbyOverview.vue';
 import PlayerList from '../components/Lobby/PlayerList.vue';
 import { usePlayerList } from "../services/usePlayerList";
+import ActiveLobby2 from '../components/Lobby/ActiveLobby2.vue';
     
 const { playerList } = usePlayerList();
 </script>

@@ -4,21 +4,22 @@
   
 
   <div class="headline">
-        <h2>Lobbys</h2>
-        <button>Lobby erstellen</button>
-    </div>
-    <div class="lobbyList">
-        <table>
-            <tbody>
-              <Lobby :lobby="ele" v-for="ele in props.liste"></Lobby>
-            </tbody>
-        </table>
-    </div>
+    <h2>Lobbys</h2>
+
+    <BasicButton class="sec btn blue" display="Lobby erstellen" :btn_click="() => {router.push('/create')}"/>
+  </div>
+
+  <div class="content">
+    <!--Renders List of Lobbylistitems-->
+    <Lobby :lobby="ele" v-for="ele in props.liste"></Lobby>
+  </div>
 </template>
 
 <script setup lang="ts">
 import Lobby from "./Lobby.vue";
 import { ILobby } from "../../typings/ILobby";
+import BasicButton from "../Buttons/BasicButton.vue";
+import router from "../../router/router";
 
 //Lobbylist passed from backend
 const props = defineProps<{
