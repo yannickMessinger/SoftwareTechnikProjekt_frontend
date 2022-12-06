@@ -87,7 +87,7 @@
         height: v-bind(gridSizePx);
     }
     .grid-item {
-        border: solid 1px white;
+        border: solid 1px black;
     }
     .grid-img {
         width: 100%;

@@ -66,6 +66,7 @@
         border-left: none;
         border-bottom: none;
         background-color: var(--woe-white);
+        z-index: 2;
     }
 
 

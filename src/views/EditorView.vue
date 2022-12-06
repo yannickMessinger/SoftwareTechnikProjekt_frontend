@@ -1,12 +1,12 @@
 <template>
     <Header text="World of eMobility" :displayHomebutton="true"></Header>
     <!--
-    <DialogsWrapper />
     <ListToolsComponent></ListToolsComponent>
     <ListBlocksComponent></ListBlocksComponent> 
     <button :disabled="disableResetButton" class="reset-button" @click="reveal(); disableResetButton = true;">Reset Grid</button>
      <StreetGrid></StreetGrid>
     -->
+    <DialogsWrapper />
     <div class="selected-block">
         <SelectedBlockComponent/>
     </div>
@@ -20,7 +20,9 @@
             <ListBlocksComponent v-if="elementBarVisible"/>
         </div>
     </div>
-    
+    <div class="grid">
+        <StreetGrid/>
+    </div>
 
     <Chat/>
 </template>
@@ -83,11 +85,22 @@
         margin-bottom: 8px;
         
     }
+
     #header{
         font-weight: bold;
         align-self: flex-start;
     }
 
+
+    .grid{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        width: 100%;
+        overflow: scroll;
+    }
     .selected-block{
         display: flex;
         flex-direction: column;
@@ -101,6 +114,8 @@
         border-top: none;
         overflow: hidden;
         position: fixed;
+        z-index: 2;
+        background-color: var(--woe-white);
     }
 
 
@@ -110,6 +125,8 @@
         justify-content: center;
         flex-direction: column;
         min-height: 75vh;
+        z-index: 2;
+        position: fixed;
     }
 
     .tools{
@@ -126,6 +143,7 @@
         width: 8%;
         max-height: 75vh;
         overflow-y: scroll;
+        background-color: var(--woe-white);
     }
 
     .tools-back-btn{
