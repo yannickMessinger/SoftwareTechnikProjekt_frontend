@@ -43,6 +43,9 @@
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
         }
+        if (toolState.tool == ToolEnum.ROTATE) {
+            streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4;
+        }
         if (toolState.tool === ToolEnum.DELETE) {
             streetGrid[cell.posX][cell.posY].id = -1;
             streetGrid[cell.posX][cell.posY].rotation = 0;
@@ -82,7 +85,7 @@
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
         <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
-            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false"/>
+            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false" :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"/>
         </div>
     </div>
 </template>
