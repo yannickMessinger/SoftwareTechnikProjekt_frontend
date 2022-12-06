@@ -1,6 +1,8 @@
 <!-- Component that represents list of lobby's to choose from-->
 <template>
 
+  
+
   <div class="headline">
     <h2>Lobbys</h2>
 
@@ -26,40 +28,51 @@ const props = defineProps<{
 </script>
 
 <style scoped>
-.content {
-  height: 300px;
-  /*width: 50%;*/
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: start;
-  overflow: auto;
-  
+
+
+
+table {
+    /*border: 4px solid black;*/
+    width: 100%;
+    color:black;
 }
+
+th {
+    height: 20px;
+    text-align: left;
+    background-color: white;
+    display: fixed;
+}
+
 
 .headline{
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
     margin-left: 30px;
-    margin-right: 30px;
     margin-bottom: 10px;
 
+    
+
+    
+}
+
+.lobbyList {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
 }
 
 button {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
-    font-size: 16px;
     font-weight: 600;
-    padding:18px;
+    padding: 10px 20px;
+    margin-right: 34px;
     background-color: var(--woe-blue-60);
     color: white;
 }
 
-button:hover {
-    background-color: var(--woe-blue-70);
-}
 </style>
