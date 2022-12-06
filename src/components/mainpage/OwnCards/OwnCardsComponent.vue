@@ -17,32 +17,62 @@
     const selectedCard = reactive({card: defaultCard})
     const isEmpty = ref(true);
     const isLobbyOpen = ref(false);
+    const isHost = ref(false);
     const numberOfOwnedCards = ref(0);
     const cardList: ICardElement[] = reactive(Array(numberOfOwnedCards.value).fill(null));
     
     /**Card List Data Import from Backend or load default list */
     console.log("Cards:");
     if(backendOfflineDebugMode){ /**TODO Remove Debug Components */
-        cardList[0] = {id:0, name:"abcd", date:new Date('2000-12-12')};
-        cardList[1] = {id:1, name:"ergh", date:new Date('2000-12-12')}; 
-        cardList[2] = {id:2, name:"ijkl", date:new Date('2000-12-12')};
+        cardList[0] = {id:0, name:"Testmap 1", date:new Date('1997-06-07')};
+        cardList[1] = {id:1, name:"Testmap 2", date:new Date('1997-06-07')}; 
+        cardList[2] = {id:2, name:"Testmap 3", date:new Date('1997-06-07')};
         isEmpty.value = false;
     }else{
         //TODO import list data from backend here (#229 connect backend)
     }
-    //TODO Compile imported data into card Elements (#229 connect backend)
+    //TODO Compile imported data into card Elements (#229 connect backend, #42 need card informations)
     console.log(cardList.length);
 
-    function addNewCardClickAction(){
-        //Feature Request (#227 add new map button)
-    }
+    watch(() => bus.value.get('lobby-closed-event'), (val)=>{
+        if(isLobbyOpen.value){
+            isLobbyOpen.value = false;
+        }
+        if(isHost.value){
+            isHost.value = false;
+        }
+        selectedCard.card = defaultCard;
+        /** backend communication from event emit?*/ 
+    })
 
+    watch(() => bus.value.get('card-saved-event'), (val)=>{
+        selectedCard.card = val;
+        var changedIndex = cardList.findIndex(cardElement => cardElement.id==val.id);
+        cardList[changedIndex] = val;
+        /** backend communication from event emit?*/      
+    })
+
+    /** button functions: */
+    /** Lobby action button*/
     function cardClickedLobbyAction(clickedCard:any){
-        if(!isLobbyOpen){
-            selectedCard.card = clickedCard
+        if(clickedCard.id==selectedCard.card.id){
+            selectedCard.card = defaultCard;
+            isHost.value = false;
+            isLobbyOpen.value = false;
+        }else{
+            if(!isLobbyOpen.value){
+                selectedCard.card = clickedCard;
+                isHost.value = true;
+                isLobbyOpen.value = true;
+            }else{
+                //TODO (#201 change card in active lobby)
+            }
+            emit("card-load-event",selectedCard.card);
+            //TODO inform backend that active map changed (#229 connect backend)
         }
     }
 
+    /** delete button*/
     function cardClickedDeleteAction(clickedCard:any){
         if(clickedCard.id==selectedCard.card.id){
             /*TODO What if deleted card is active card? (#228) */ 
@@ -71,9 +101,16 @@
                 isEmpty.value = true;
             }
             if(!backendOfflineDebugMode){
-                // TODO call delete option in Backend (#229 connect backend)
+                if(removedCard!=null){
+                    console.log("Removed Item: "+clickedCard.id);
+                    // TODO call delete option in Backend (#229 connect backend)
+                }
             }
         }
+    }
+
+    function addNewCardClickAction(){
+        //Feature Request (#227 add new map button)
     }
 
 </script>
@@ -107,7 +144,9 @@
                         <p id ="CardDateTag">{{card.date.getDate()}}/{{(card.date.getMonth()+1)}}/{{card.date.getFullYear()}}</p>    
                     </td>
                     <td v-if="card !== null">
-                        <button id="startLobbyButton">Lobby erstellen</button>    
+                        <button v-if="!isLobbyOpen" id="startLobbyButton" @click="cardClickedLobbyAction(card)">Lobby erstellen</button>
+                        <button :disabled="!isHost" v-if="((isLobbyOpen)&&!(card.id==selectedCard.card.id))" id="startLobbyButton" @click="cardClickedLobbyAction(card)">Karte wechseln</button>
+                        <button :disabled="!isHost" v-if="((isLobbyOpen)&&(card.id==selectedCard.card.id))" id="startLobbyButton" @click="cardClickedLobbyAction(card)">Lobby schließen</button>    
                     </td>
                     <td v-if="card !== null">
                         <button id="deleteCardButton" @click="cardClickedDeleteAction(card)"> X </button>
