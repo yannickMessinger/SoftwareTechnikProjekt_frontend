@@ -51,18 +51,18 @@
     <p>
         <span id="header">Zelle</span>
     </p>
-    <img v-if="selectedBlock != null" :src="selectedBlock.obj.texture" class="selectedBlockImg"/>
+    <img v-if="selectedBlock != null" :src="selectedBlock.block.texture" class="selectedBlockImg"/>
     <p>
         <span>ID</span>
-        <span>{{selectedBlock.obj.id}}</span>
+        <span>{{selectedBlock.block.id}}</span>
     </p>
     <p>
         <span>Name</span>
-        <span>{{selectedBlock.obj.name}}</span>
+        <span>{{selectedBlock.block.name}}</span>
     </p>
     <p>
         <span>Type</span>
-        <span>{{selectedBlock.obj.type}}</span>
+        <span>{{selectedBlock.block.type}}</span>
     </p>
 </template>
 
