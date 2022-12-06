@@ -3,7 +3,8 @@
 
   <div class="headline">
     <h2>Lobbys</h2>
-    <button>Lobby erstellen</button>
+
+    <BasicButton class="sec btn blue" display="Lobby erstellen" :btn_click="() => {router.push('/create')}"/>
   </div>
 
   <div class="content">
@@ -15,6 +16,8 @@
 <script setup lang="ts">
 import Lobby from "./Lobby.vue";
 import { ILobby } from "../../typings/ILobby";
+import BasicButton from "../Buttons/BasicButton.vue";
+import router from "../../router/router";
 
 //Lobbylist passed from backend
 const props = defineProps<{
