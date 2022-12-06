@@ -167,7 +167,7 @@ function switchMapSelect() {
     "Header Header"
     "Form Form"
     ". Button";
-  height: 100%;
+  height: 90%;
   width: 29em;
 }
 
