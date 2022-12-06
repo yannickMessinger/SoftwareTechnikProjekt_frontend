@@ -19,16 +19,19 @@ export class MovmentInput{
 
     onKeyDown(e: KeyboardEvent) {
         
-        this.keys[e.key] = this.target.key;
-        console.log(e.key);
+        this.keys[e.key] = true;
+        //console.log(e.key);
+        //console.log(this.keys[e.key]);
     }
 
     onKeyUp(e: KeyboardEvent) {
         this.keys[e.key] = false;
+        //console.log(this.keys[e.key]);
     }
 
     key(key: any){
-        return this.keys[key];
+        //console.log(key); 
+        return !!this.keys[key];
     }
 
 }

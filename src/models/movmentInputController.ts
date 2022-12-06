@@ -9,6 +9,8 @@ export class MovmentInputController{
     public box: any;
     public target: any;
     public translation: any;
+    public pressedKey: any;
+    public clock: any;
     public inputMovement: MovmentInput;
 
 
@@ -22,28 +24,60 @@ export class MovmentInputController{
 
     constructor(objects: any){
         
-        this.objects = objects;
-        
+        this.objects = objects;  
         this.target = document;
+        this.clock = new THREE.Clock();
         this.inputMovement = new MovmentInput;
         this.translation = new THREE.Vector3(0,1,0);
-        this.KEYS = {"a": 65, "s": 83, "w": 87, "d": 68};
+        this.KEYS = {"a": 65, "s": 83, "w": 'w', "d": 68};
+        this.initialize();
     }
 
-    
+    initialize() {
+        this.target.addEventListener('keydown',(e: KeyboardEvent) => this.onKeyDown(e),false);
+        this.target.addEventListener('keyup',(e: KeyboardEvent) => this.onKeyUp(e),false);  
+    }
 
     public update(){
         const velocity = 0.05;
         this.updateTranslation();
     }
 
-    updateTranslation(){     
-        if(this.inputMovement.key(this.KEYS.W) == this.KEYS.W){
-            this.objects.value.position.z +=1;
+    updateTranslation(){   
+        const delta = this.clock.getDelta(); // seconds
+        const movespeed = 200*delta; //speed
+        const rotateAngle = Math.PI / 2 * delta; //rotation Angle
+
+        if(this.pressedKey == "w"){
+            this.objects.value.position.z += 1;
             console.log(this.objects.value.position);
+        }
+        if(this.pressedKey == "s"){
+            this.objects.value.position.z -=1;
+            console.log(this.objects.value.position);
+        }
+        if(this.pressedKey == "d"){
+            this.objects.value.rotation.y += rotateAngle;
+            console.log(this.objects.value.position);
+            console.log(this.objects.value.rotation)
+        }
+        if(this.pressedKey == "a"){
+            this.objects.value.rotation.y -= rotateAngle;
+            console.log(this.objects.value.position);
+            console.log(this.objects.value.rotation)
         }
         
         
+    }
+
+    onKeyDown(e: KeyboardEvent) {
+        console.log(e.key);
+        this.pressedKey = e.key;
+    }
+
+    onKeyUp(e: KeyboardEvent) {
+        console.log(e.key + "lifted");
+        this.pressedKey = null;
     }
 
     private directionOffset(keysPressed: any) {
