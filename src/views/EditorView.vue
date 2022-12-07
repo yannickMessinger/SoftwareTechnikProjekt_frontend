@@ -1,16 +1,11 @@
 <template>
     <Header text="World of eMobility" :displayHomebutton="true"></Header>
-    <!--
-    <ListToolsComponent></ListToolsComponent>
-    <ListBlocksComponent></ListBlocksComponent> 
-    <button :disabled="disableResetButton" class="reset-button" @click="reveal(); disableResetButton = true;">Reset Grid</button>
-     <StreetGrid></StreetGrid>
-    -->
     <DialogsWrapper />
     <div class="selected-block">
         <SelectedBlockComponent/>
     </div>
     <div class="container">
+        <BasicButton class="reset-btn" display="Grid zurücksetzen" :btn_click="() => {reveal(); disableResetButton = true;}"></BasicButton>
         <div class="tools">
             <p id="header">
                 <BasicButton v-if="elementBarVisible" class="tools-back-btn" display=" " :btn_click="switchMode"/>
@@ -23,7 +18,6 @@
     <div class="grid">
         <StreetGrid/>
     </div>
-
     <Chat/>
 </template>
 
@@ -118,15 +112,13 @@
         background-color: var(--woe-white);
     }
 
+    .reset-btn{
+        position: fixed;
+    }
 
     .container{
         display: flex;
         flex-flow: row-reverse;
-        /*
-        margin-left: auto;
-        min-height: 75vh;
-        position: fixed;
-        */
     }
 
     .tools{
@@ -157,4 +149,23 @@
         background-position: center;
         background-image: url(../assets/Icons/back.svg);
     }
+    /* Style angefangen für den Slider
+    .container-slider{
+        display: flex;
+        flex-flow: row-reverse;
+        bottom: 0px;
+        background-color: gray;
+    }
+    .slider{
+        width: 25%;
+        outline: none;
+        opacity: 0.7;
+        transition: opacity .2s;
+        position: fixed;
+    }
+
+    .slider:hover {
+        opacity: 1;
+    }
+    */
 </style>

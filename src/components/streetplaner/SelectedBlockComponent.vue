@@ -1,12 +1,10 @@
-<!--
-    author: Sean Dittmann
-    date: 11.11.2022 
--->
 <script setup lang="ts">
     /**Imports: */
     import { reactive, watch, ref } from 'vue';
     import type { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import useEventBus from '../../services/eventBus';
+    import BasicButton from '../Buttons/BasicButton.vue';
+
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
     const pathRotateButton = (pathToPictures+"tool-icons/rotate.png");
@@ -50,8 +48,9 @@
 <template>
     <p>
         <span id="header">Zelle</span>
+        <BasicButton display="Drehen" :btn_click="onRotateClick"/>
     </p>
-    <img v-if="selectedBlock != null" :src="selectedBlock.block.texture" class="selectedBlockImg"/>
+        <img v-if="selectedBlock != null" :src="selectedBlock.block.texture" class="selectedBlockImg" :style="{ transform: 'rotate(' + selectedBlock.block.rotation * 90 + 'deg)' }"/>
     <p>
         <span>ID</span>
         <span>{{selectedBlock.block.id}}</span>
@@ -86,7 +85,7 @@
     p{
         display: flex;
         justify-content: space-between;
-        
+        align-items: baseline;
     }
 
     #header{
