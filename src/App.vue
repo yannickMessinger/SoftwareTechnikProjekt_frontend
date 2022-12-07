@@ -177,6 +177,11 @@
     color: var(--woe-black);
   }
 
+  h2{
+    margin-top: 0.83em;
+    margin-bottom: 0.83em;
+  }
+  
   @media (prefers-color-scheme: light) {
     :root {
       color: #213547;
