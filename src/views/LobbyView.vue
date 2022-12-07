@@ -7,7 +7,7 @@
                 <ActiveLobby2></ActiveLobby2>
             </div>
             <div class="content">
-                <PlayerList :liste="playerListState.playerlist"></PlayerList>
+                <PlayerList :liste="playerList"></PlayerList>
             </div>
     </div>
 </template>
@@ -20,7 +20,7 @@ import PlayerList from '../components/Lobby/PlayerList.vue';
 import { usePlayerList } from "../services/usePlayerList";
 import ActiveLobby2 from '../components/Lobby/ActiveLobby2.vue';
     
-const { playerListState, fetchPlayerList } = usePlayerList();
+const { playerListState, playerList, fetchPlayerList } = usePlayerList();
 
 onMounted(async () => {
   await fetchPlayerList();

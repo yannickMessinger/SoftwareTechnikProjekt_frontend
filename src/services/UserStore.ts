@@ -36,15 +36,19 @@ async function sendName():Promise<void> {
   console.log("sendName():", response);
   const jsondata = await response.json();
   setId(Number(jsondata));
-  console.log("state.id", state.userId);
+  console.log("state.userId", state.userId);
 }
 
 async function setActiveLobby(lobby: ILobby):Promise<void> {
   state.activeLobby = lobby;
+  await postActiveLobby(lobby);
+}
+
+async function postActiveLobby(lobby:ILobby) {
   const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
     method: 'POST',
   });
-  console.log(response);
+  console.log("setActiveLobby() -> post player to lobby - response", response);
 }
 
 export default function useUser() {

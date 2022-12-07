@@ -1,4 +1,4 @@
-import { reactive, readonly } from "vue";
+import { computed, reactive, readonly } from "vue";
 import { IPlayerListState } from "../typings/IPlayerListState";
 import IUser from "../typings/IUser";
 import useUser from "./UserStore";
@@ -53,6 +53,7 @@ export async function updatePlayerList() {
 export function usePlayerList(){
     return {
         playerListState: readonly(playerState),
+        playerList: computed(() => playerState.playerlist),
         fetchPlayerList,
         updatePlayerList,
     }

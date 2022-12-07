@@ -32,7 +32,11 @@ const props = defineProps<{
     liste: Readonly<IUser[]>,
 }>()
 
-const { playerListState } = usePlayerList()
+const { playerListState, fetchPlayerList } = usePlayerList()
+
+onMounted(async () => {
+    await fetchPlayerList;
+})
 
 </script>
 
