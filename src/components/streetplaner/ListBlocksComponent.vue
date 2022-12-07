@@ -37,7 +37,6 @@
 
     /**function activated by clicking on an block */
     function onBlockClicked(clickedBlock: any){
-        // console.log(selectedBlock.block.name);
         /** if the selected block is the clicked block, it gets deselected by restoring the default block
          * otherwhise the clicked block is now the selected block.
         */
@@ -48,7 +47,6 @@
         }
         /** fires a block select event to mark a selected block change. Sends out this blocks name*/
         emit("block-select-event", selectedBlock.block);
-        // console.log(selectedBlock.block.name);
     }
 
     /** sets buttons to clickable if create tool is selected, or not clickable if its not */

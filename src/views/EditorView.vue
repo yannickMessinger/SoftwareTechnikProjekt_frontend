@@ -27,6 +27,7 @@
     import router from '../router/router'
     import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
+    import SelectViewTypeForList from '../components/streetplaner/SelectViewTypeForList.vue'
     import SelectedBlockComponent from '../components/streetplaner/SelectedBlockComponent.vue'
     import StreetGrid from '../components/streetplaner/StreetGrid.vue'
     import { createConfirmDialog } from 'vuejs-confirm-dialog'
