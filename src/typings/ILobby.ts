@@ -5,7 +5,7 @@ import { IPlayerListItem } from "./IPlayerListItem"
 export interface ILobby {
     lobbyName:string
     numOfPlayers: number
-    lobbyMode: E_LobbyMode
-    host?:string
+    lobbyModeEnum: E_LobbyMode
+    hostID?:string
     playerList?: IPlayerListItem[]
 }

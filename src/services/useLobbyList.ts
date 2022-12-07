@@ -7,6 +7,10 @@ import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO";
 import { ILobby } from "../typings/ILobby";
 import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobbyListState } from "../typings/ILobbyListState";
+import useUser from "./UserStore";
+
+const {userID} = useUser();
+
 
 const lobbyState = reactive<ILobbyListState>({
   lobbylist: Array<ILobby>(),
@@ -53,14 +57,18 @@ export async function createNewLobby(
   addNumOfPlayers: number,
   addLobbyMode: E_LobbyMode
 ) {
+  console.log(`User ID from useLobbyList  ${userID.value}`);
   const url = "/api/lobby";
 
 
   const addLobby: IAddLobbyRequestDTO = {
     lobbyName: addLobbyName,
     numOfPlayers: addNumOfPlayers,
-    lobbyMode: addLobbyMode,
+    lobbyModeEnum: addLobbyMode,
+    hostID: userID.value
   };
+
+  console.log(addLobby)
 
   try {
     const res = await fetch(url, {

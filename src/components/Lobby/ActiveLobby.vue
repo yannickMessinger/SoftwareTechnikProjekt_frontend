@@ -1,5 +1,6 @@
 <!-- Component that displays overview of existing lobbys and active players, also possible to add new Lobbys. Style not complete!-->
 <template>
+  <h3>Lobby Component</h3>
   <div v-if="showAddLobby">
     <input type="text" v-model="lobbyNameInput" placeholder="enter lobbyname" />
     <input
@@ -20,22 +21,26 @@
     </button>
   </div>
 
-    <div>
-      <MyMaps :liste="mapsList.mapslist"></MyMaps>
-    </div>
+  <div class="flex-container">
     <div v-if="lobbyList.lobbylist.length > 0">
       <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
     </div>
     <div v-else>
       <p>No lobbys available:(</p>
     </div>
+    <div> <!--v-if="lobbyList.lobbylist.length > 0"-->
+      <PlayerList :liste="playerList.playerlist"></PlayerList>
+    </div>
+    <div>
+      <MyMaps :liste="mapsList.mapslist"></MyMaps>
+    </div>
     
-    
+  </div>
 
-  <!--Button to manually refresh Lobbylist
+  <!--Button to manually refresh Lobbylist-->
   <button @click="updateLobbys()">Refresh</button>
   <button @click="setShowLobby()">Add new Lobby</button>
-  <button>Play</button>-->
+  <button>Play</button>
 </template>
 
 <script setup lang="ts">

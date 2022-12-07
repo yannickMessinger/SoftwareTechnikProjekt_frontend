@@ -33,6 +33,7 @@
 
     function sendUsername() {
         setName(username.value);
+        sendName()
         // Methode, wenn auf Button geklickt wird hier hin...
         router.push('/');
     }
