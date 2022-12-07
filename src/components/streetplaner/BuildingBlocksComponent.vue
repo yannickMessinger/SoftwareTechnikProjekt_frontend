@@ -11,9 +11,10 @@ import ToolEnum from "../../services/streetplaner/ToolEnum";
 import BigBuilding from "../../assets/2D_Models/Buildings/BigBuilding.png";
 import Building from "../../assets/2D_Models/Buildings/Building.png";
 import Supermarkt from "../../assets/2D_Models/Buildings/Supermarkt.png";
+import Stadium from "../../assets/2D_Models/Buildings/Stadium.png";
 /**Variables: */
 const pathToPictures = "/img/streetplaner/";
-var totalBlockNumber = 3; /** number of blocks in blocklist*/
+var totalBlockNumber = 4; /** number of blocks in blocklist*/
 var blockList: IBlockElement[] = Array(totalBlockNumber).fill(
   []
 ); /** List of all blocks placable in street editor*/
@@ -39,7 +40,7 @@ blockList[0] = {
   groupId: 0,
   group: "Testobject1",
   id: 0,
-  type: "???",
+  type: "Building",
   name: "Big Building",
   rotation: 0,
   texture: BigBuilding,
@@ -48,7 +49,7 @@ blockList[1] = {
   groupId: 1,
   group: "Testobject2",
   id: 1,
-  type: "???",
+  type: "Building",
   name: "Building",
   rotation: 0,
   texture: Building,
@@ -57,12 +58,20 @@ blockList[2] = {
   groupId: 2,
   group: "Testobject3",
   id: 2,
-  type: "???",
+  type: "Building",
   name: "Markt",
   rotation: 0,
   texture: Supermarkt,
 };
-
+blockList[3] = {
+  groupId: 0,
+  group: "Testobject4",
+  id: 0,
+  type: "Building",
+  name: "Stadium",
+  rotation: 0,
+  texture: Stadium,
+};
 /**function activated by clicking on an block */
 function onBlockClicked(clickedBlock: any) {
   /** if the selected block is the clicked block, it gets deselected by restoring the default block
@@ -133,7 +142,6 @@ watch(
   list-style-type: none;
   overflow-y: scroll;
   overflow-x: hidden;
-  max-block-size: 19vh;
   background-color: gray;
   user-select: none;
   -webkit-user-drag: none;

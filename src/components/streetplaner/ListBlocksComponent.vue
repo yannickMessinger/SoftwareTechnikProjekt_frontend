@@ -31,9 +31,9 @@
     /** boolean value that controls weather blocks are clicable or not */
     const isCreateTool = ref(false);
     /**entrys in blocklist */
-    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"straight",rotation: 0,texture: (pathToPictures+"object-icons/straight.png")};
-    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"curve",rotation: 0,texture: (pathToPictures+"object-icons/curve.png")};
-    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"cross",rotation: 0,texture: (pathToPictures+"object-icons/cross.png")};
+    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"Street",name:"straight",rotation: 0,texture: (pathToPictures+"object-icons/straight.png")};
+    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"Street",name:"curve",rotation: 0,texture: (pathToPictures+"object-icons/curve.png")};
+    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"Street",name:"cross",rotation: 0,texture: (pathToPictures+"object-icons/cross.png")};
 
     /**function activated by clicking on an block */
     function onBlockClicked(clickedBlock: any){
@@ -90,7 +90,6 @@
         list-style-type: none;
         overflow-y: scroll;
         overflow-x: hidden;
-        max-block-size: 19vh;
         background-color: gray;
         user-select: none;
             -webkit-user-drag: none; 

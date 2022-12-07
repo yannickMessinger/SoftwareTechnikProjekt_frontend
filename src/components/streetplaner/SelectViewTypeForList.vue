@@ -25,8 +25,8 @@ export default {
   <h2 class="blockListTitle">Block List</h2>
   <div class="selectView">
     Select View <br />
-    <button @click="handleClick('street')">STREET</button>
-    <button @click="handleClick('building')">BUILDINGS</button>
+    <button style="margin-right:3px" @click="handleClick('street')">STREET</button>
+    <button @click="handleClick('building')">BUILDING</button>
   </div>
   <div v-if="viewType === 'street'">
     <ListBlocksComponent />
@@ -51,6 +51,7 @@ export default {
 
 .selectView {
   padding-left: 13px;
+  padding-bottom: 13px;
 }
 /** style for list element in block list*/
 .blockListElement {
