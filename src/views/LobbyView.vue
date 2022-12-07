@@ -7,26 +7,24 @@
                 <ActiveLobby></ActiveLobby>
             </div>
             <div class="content">
-                <PlayerList :liste="playerList.playerlist"></PlayerList>
+                <PlayerList :liste="playerList"></PlayerList>
             </div>
-
-
     </div>
-
-    
-
 </template>
 
 <script setup lang="ts">
 
+import { onMounted } from 'vue';
 import Header from '../components/Header.vue';
-import ActiveLobby from '../components/Lobby/ActiveLobby.vue';
-import LobbyOverview from '../components/Lobby/LobbyOverview.vue';
-import Lobby from '../components/Lobby/LobbyOverview.vue';
 import PlayerList from '../components/Lobby/PlayerList.vue';
 import { usePlayerList } from "../services/usePlayerList";
     
-const { playerList } = usePlayerList();
+const { playerListState, playerList, fetchPlayerList } = usePlayerList();
+
+onMounted(async () => {
+  await fetchPlayerList();
+});
+
 </script>
 
 <style scoped>

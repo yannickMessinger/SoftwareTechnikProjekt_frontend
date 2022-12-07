@@ -7,7 +7,11 @@
             <tr>
                 <td style="width:25%">{{props.lobby.lobbyName}}</td>
                 <td style="width:15%">{{props.lobby.lobbyModeEnum}}</td>
-                <td style="width:30%"><button @click="selectLobby()">Beitreten</button></td>
+                <td style="width:30%">
+                    <button @click="selectLobby()">
+                        Beitreten
+                    </button>    
+                </td>
             </tr>
         </table>
     </div>
@@ -17,16 +21,24 @@
 <script setup lang="ts">
 
 import { ILobby } from "../../typings/ILobby";
-
+import BasicButton from "../Buttons/BasicButton.vue";
+import useUser from "../../services/UserStore";
+import router from "../../router/router";
 
 const props = defineProps<{
   lobby: ILobby;
 }>();
 
+const {setActiveLobby} = useUser();
+
 //for later purposes to link to selected lobby via Vue Router
-function selectLobby(){
-    console.log(props.lobby.lobbyName);
-    console.log(props.lobby.hostID);
+async function selectLobby(){
+    console.log(props.lobby.lobbyId, props.lobby.lobbyName);
+    await setActiveLobby(props.lobby);
+    console.log("user has active lobby");
+    router.push({
+        path: '/lobbyview'
+    })
 }
 
 

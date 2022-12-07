@@ -1,7 +1,7 @@
-import { IPlayerListItem } from "./IPlayerListItem"
+import IUser from "./IUser"
 
 
 export interface IPlayerListState {
-    playerlist: IPlayerListItem[]
+    playerlist: IUser[]
     errormsg : string
 }
