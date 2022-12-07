@@ -51,7 +51,7 @@ th {
     margin-top: 10px;
     margin-left: 30px;
     margin-bottom: 10px;
-
+    
     
 
     
@@ -73,6 +73,8 @@ button {
     margin-right: 34px;
     background-color: var(--woe-blue-60);
     color: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 </style>
