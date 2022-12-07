@@ -214,7 +214,12 @@
 
     input{
       background-color: var(--woe-white-almost);
-      color: var(--woe-black)
+      color: var(--woe-black);
+    }
+
+    select{
+      background-color: var(--woe-white-almost);
+      color: var(--woe-black);
     }
 }
 </style>

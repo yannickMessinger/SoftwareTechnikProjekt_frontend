@@ -16,7 +16,7 @@
               type="text"
               name="lobby_name"
               v-model="lobbyNameInput"
-              placeholder="enter lobbyname"
+              placeholder="Lobbyname eingeben"
             />
           </div>
 
@@ -61,7 +61,7 @@
               type="password"
               name="password"
               v-model="passwordInput"
-              placeholder="enter password"
+              placeholder="Passwort eingeben"
             />
           </div>
 
@@ -69,7 +69,7 @@
             <div class="button1">
               <BasicButton
                 class="sec btn blue"
-                display="erstellen"
+                display="Erstellen"
                 :btn_click="
                   () => {
                     createNewLobby(lobbyNameInput, 0, lobbyModeInput);
@@ -203,9 +203,8 @@ function switchMapSelect() {
 }
 
 select {
-  color: white;
+  
   width: 70%;
-  border-color: white;
 }
 
 .field-wrap {
