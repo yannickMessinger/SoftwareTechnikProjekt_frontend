@@ -25,10 +25,10 @@
 
 <script setup lang = 'ts'>
 
-import { IPlayerListItem } from '../../typings/IPlayerListItem';
+import IUser from '../../typings/IUser';
 
 const props = defineProps<{
-    player: IPlayerListItem
+    player: IUser
 }>()
 </script>
 

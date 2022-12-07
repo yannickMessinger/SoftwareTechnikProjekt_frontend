@@ -23,13 +23,13 @@
 
 
 import PlayerListItem from './PlayerListItem.vue';
-import { IPlayerListItem } from '../../typings/IPlayerListItem';
+import IUser from '../../typings/IUser';
 import { usePlayerList } from '../../services/usePlayerList';
 import { onMounted } from 'vue';
 
 //PlayerList passed from backend
 const props = defineProps<{
-    liste: Readonly<IPlayerListItem[]>,
+    liste: Readonly<IUser[]>,
 }>()
 
 const { playerListState } = usePlayerList()

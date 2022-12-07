@@ -1,17 +1,19 @@
 import { reactive, readonly } from "vue";
-import { IPlayerListItem } from "../typings/IPlayerListItem";
 import { IPlayerListState } from "../typings/IPlayerListState";
+import IUser from "../typings/IUser";
 import useUser from "./UserStore";
 
 const { activeLobby } = useUser();
 const playerState = reactive<IPlayerListState>({
-    playerlist: Array<IPlayerListItem>(),
+    playerlist: Array<IUser>(),
     errormsg: ""
 })
 
-//temporary function to test the PlayerList
+/**
+ * fetches the playerlist of the active lobby which is saved in the UserStore under activeLobby
+ */
 export async function fetchPlayerList(): Promise<void> {
-    const response = await fetch(`/api/lobby/get_players/${activeLobby.value.lobbyId}`, {
+    const response = await fetch(`/api/lobby/get_players/${activeLobby.value?.lobbyId}`, {
         method: 'GET'
     })
     const result = await response.json();
@@ -22,7 +24,7 @@ export async function fetchPlayerList(): Promise<void> {
             userName: i.userName
         })
     }
-    console.log(playerState);
+    console.log("playerState", playerState);
 }
 
 export async function updatePlayerList() {
@@ -36,7 +38,7 @@ export async function updatePlayerList() {
         }
         return resp.json();
     })
-    .then((jsondata: IPlayerListItem[]) => {
+    .then((jsondata: IUser[]) => {
         playerState.playerlist = jsondata
         playerState.errormsg = ""
     })
