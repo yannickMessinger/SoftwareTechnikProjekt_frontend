@@ -26,6 +26,7 @@ const props = defineProps<{
 //for later purposes to link to selected lobby via Vue Router
 function selectLobby(){
     console.log(props.lobby.lobbyName);
+    console.log(props.lobby.hostID);
 }
 
 
