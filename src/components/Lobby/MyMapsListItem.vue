@@ -4,7 +4,8 @@
             <tr>
                 <td style="width:25%">{{props.map.name}}</td>
                 <td style="width:15%">{{props.map.datum}}</td>
-                <td style="width:30%"><button>Lobby erstellen</button></td>
+                <!--<td style="width:30%"><button>Lobby erstellen</button></td>-->
+                <td style="width:30%"><BasicButton class="sec btn blue" display="Lobby öffnen" :btn_click="() => {router.push('/lobbyview')}"/></td>
                 <td style="width:1%"><button class="deleteButton">X</button></td>
             </tr>
         </table>
@@ -14,6 +15,8 @@
 <script setup lang = 'ts'>
 
 import { IMyMapsListItem } from '../../typings/IMyMapsListitem';
+import BasicButton from '../Buttons/BasicButton.vue';
+import router from '../../router/router';
 
 const props = defineProps<{
     map: IMyMapsListItem

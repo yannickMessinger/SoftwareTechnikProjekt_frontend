@@ -3,7 +3,8 @@
     <div class="container">
 
             <div class="content">
-                <PlayerList :liste="playerListState.playerlist"></PlayerList>
+                <!--<PlayerList :liste="playerList.playerlist"></PlayerList>-->
+                <ActiveLobby2></ActiveLobby2>
             </div>
             <div class="content">
                 <PlayerList :liste="playerListState.playerlist"></PlayerList>
@@ -17,6 +18,7 @@ import { onMounted } from 'vue';
 import Header from '../components/Header.vue';
 import PlayerList from '../components/Lobby/PlayerList.vue';
 import { usePlayerList } from "../services/usePlayerList";
+import ActiveLobby2 from '../components/Lobby/ActiveLobby2.vue';
     
 const { playerListState, fetchPlayerList } = usePlayerList();
 

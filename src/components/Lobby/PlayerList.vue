@@ -46,15 +46,12 @@ th, td {
 table {
     width: 100%;
 }
-
-
-
-
 .playerList {
     height: 300px;
     display: flex;
     flex-direction: column;
     overflow: auto;
+    padding-right: 30px;
 }
 
 .alignRight {
@@ -73,6 +70,7 @@ table {
     justify-content: space-between;
     margin-top: 10px;
     margin-left: 30px;
+    margin-right: 30px;
     margin-bottom: 10px;
 }
 

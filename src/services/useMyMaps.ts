@@ -15,6 +15,7 @@ export function useMyMaps(){
     }
     
     return {
-        mapsList: mapsState
+        mapsList: mapsState,
+        test_list: mapsState.mapslist
     }
 }
