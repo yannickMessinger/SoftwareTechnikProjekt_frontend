@@ -30,6 +30,7 @@ async function sendName():Promise<void> {
 export default function useUser() {
   return {
     name: computed(() => state.username),
+    userID: computed(() =>state.id ),
     setName,
     sendName
   };

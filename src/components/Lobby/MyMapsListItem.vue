@@ -1,40 +1,31 @@
-<!--List Item that represents single lobby and is embedded in LobbyList, displays Lobby Data Name, the current gaming mode the lobby is set to and the number of active players-->
-
 <template>
-
-<div class="cell">
+    <div class="cell">
         <table>
             <tr>
-                <td style="width:25%">{{props.lobby.lobbyName}}</td>
-                <td style="width:15%">{{props.lobby.lobbyModeEnum}}</td>
-                <td style="width:30%"><button @click="selectLobby()">Beitreten</button></td>
+                <td style="width:25%">{{props.map.name}}</td>
+                <td style="width:15%">{{props.map.datum}}</td>
+                <!--<td style="width:30%"><button>Lobby erstellen</button></td>-->
+                <td style="width:30%"><BasicButton class="sec btn blue" display="Lobby öffnen" :btn_click="() => {router.push('/lobbyview')}"/></td>
+                <td style="width:1%"><button class="deleteButton">X</button></td>
             </tr>
         </table>
     </div>
-  
 </template>
 
-<script setup lang="ts">
+<script setup lang = 'ts'>
 
-import { ILobby } from "../../typings/ILobby";
-
+import { IMyMapsListItem } from '../../typings/IMyMapsListitem';
+import BasicButton from '../Buttons/BasicButton.vue';
+import router from '../../router/router';
 
 const props = defineProps<{
-  lobby: ILobby;
-}>();
-
-//for later purposes to link to selected lobby via Vue Router
-function selectLobby(){
-    console.log(props.lobby.lobbyName);
-    console.log(props.lobby.hostID);
-}
-
-
-
+    map: IMyMapsListItem
+}>()
 
 </script>
 
 <style scoped>
+
 * {
     font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
     font-size: 16px;
@@ -46,11 +37,10 @@ button {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-weight: 300;
+    font-weight: 600;
     padding: 13px 23px;
     background-color: var(--woe-blue-60);
     color: white;
-   
 }
 
 button:hover {
@@ -72,4 +62,7 @@ td {
     padding-bottom: 20px;
     padding-left: 30px;
 }
+
+
+
 </style>
