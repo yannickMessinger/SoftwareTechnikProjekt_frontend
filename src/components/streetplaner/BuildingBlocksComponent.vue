@@ -1,7 +1,3 @@
-<!--
-    author: Sean Dittmann
-    date: 11.11.2022 
--->
 <script setup lang="ts">
 /**Imports: */
 import { reactive, ref, watch } from "vue";
@@ -73,7 +69,7 @@ blockList[3] = {
   texture: Stadium,
 };
 /**function activated by clicking on an block */
-function onBlockClicked(clickedBlock: any) {
+function onBlockClick(clickedBlock: any) {
   /** if the selected block is the clicked block, it gets deselected by restoring the default block
    * otherwhise the clicked block is now the selected block.
    */
@@ -100,9 +96,13 @@ watch(
 </script>
 
 <template>
-  <!--display container for block list-->
+  
+  <div v-for="element in blockList" :key="element.id" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClick(element)">
+        <button v-if="element != null" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
+        <p v-if="element != null">{{element.name}}</p>
+  </div>
+  <!--
   <div class="blockListContainer">
-    <!-- display container for block list element-->
     <div v-for="element in blockList" class="blockListElement">
       <button
         :disabled="!isCreateTool"
@@ -121,54 +121,12 @@ watch(
       </button>
     </div>
   </div>
+  -->
 </template>
 
 <style>
-/** style for list title in blocklist*/
-.blockListTitle {
-  color: black;
-  background-color: white;
-  text-align: center;
-  margin: 5%;
-  user-select: none;
-  -webkit-user-drag: none;
-  -khtml-user-drag: none;
-  -moz-user-drag: none;
-  -o-user-drag: none;
-}
-/** style for block list in general*/
-.blockListContainer {
-  margin: 5%;
-  list-style-type: none;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  background-color: gray;
-  user-select: none;
-  -webkit-user-drag: none;
-  -khtml-user-drag: none;
-  -moz-user-drag: none;
-  -o-user-drag: none;
-}
-/** style for list element in block list*/
-.blockListElement {
-  margin: 1%;
-  display: inline-flex;
-  max-height: 45%;
-  max-width: 45%;
-}
-/** style for images in list element*/
-.blockListImg {
-  width: 100%;
-  height: 100%;
-}
-/** style for buttons in list element */
-.blockListButton {
-  border: solid 2px black;
-  background-color: darkgray;
-}
-/** style for clicked buttons in list element */
-.blockListButtonActive {
-  border: solid 2px black;
-  background-color: orange;
-}
+  *{
+    color: var(--woe-black);
+    font-size: 1em;
+  }
 </style>

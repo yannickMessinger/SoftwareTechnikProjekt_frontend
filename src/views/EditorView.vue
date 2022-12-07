@@ -13,6 +13,8 @@
             <span>{{header}}</span>
             <ListToolsComponent v-if="!elementBarVisible" />
             <ListBlocksComponent v-if="elementBarVisible"/>
+            <span v-if="elementBarVisible">Gebäude</span>
+            <BuildingBlocksComponent v-if="elementBarVisible"/>
         </div>
     </div>
     <div class="grid">
@@ -25,9 +27,9 @@
     import { ref, watch} from 'vue'
     import useEventBus from '../services/eventBus'
     import router from '../router/router'
+    import BuildingBlocksComponent from '../components/streetplaner/BuildingBlocksComponent.vue'
     import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
     import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
-    import SelectViewTypeForList from '../components/streetplaner/SelectViewTypeForList.vue'
     import SelectedBlockComponent from '../components/streetplaner/SelectedBlockComponent.vue'
     import StreetGrid from '../components/streetplaner/StreetGrid.vue'
     import { createConfirmDialog } from 'vuejs-confirm-dialog'
@@ -72,6 +74,7 @@
         --padding: 1em;
 
     }
+
     span{
         margin: 0;
         font-size: 1em;

@@ -1,7 +1,3 @@
-<!--
-    author: Sean Dittmann, Norbert Balaz
-    date: 11.11.2022, 05.12.2022 
--->
 <script setup lang="ts">
     /**Imports: */
     import { reactive } from 'vue';
@@ -36,8 +32,6 @@
          * otherwhise the clicked tool is now the selected tool.
         */
         
-        
-        console.log(selectedTool.tool.name);
         if(selectedTool.tool.id==clickedTool.id){
             selectedTool.tool = defaultTool;
         }else{
@@ -51,7 +45,6 @@
         emit('tool-select-event', selectedTool.tool.tool);
         /** fire a tool select event to mark a tool change for selectedToolComponent. Sends out the complete tool of the selected tool*/
         emit('tool-select-component-event', selectedTool.tool);
-        // console.log(selectedTool.tool.name);
     }
 </script>
 
