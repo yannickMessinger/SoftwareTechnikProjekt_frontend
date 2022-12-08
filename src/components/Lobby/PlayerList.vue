@@ -3,7 +3,7 @@
         
     <div class="headline">
         <h2>Spieler</h2>
-        <h3 v-if="playerList.errormsg">{{playerList.errormsg}}</h3>
+        <h3 v-if="playerListState.errormsg">{{playerListState.errormsg}}</h3>
         <h4 v-else>{{props.liste.length}}/anzMaxSpielerEinfügen</h4>
     </div>
     <div class="playerList">      
@@ -23,15 +23,21 @@
 
 
 import PlayerListItem from './PlayerListItem.vue';
-import { IPlayerListItem } from '../../typings/IPlayerListItem';
+import IUser from '../../typings/IUser';
 import { usePlayerList } from '../../services/usePlayerList';
+import { onMounted } from 'vue';
 
 //PlayerList passed from backend
 const props = defineProps<{
-    liste: Readonly<IPlayerListItem[]>,
+    liste: Readonly<IUser[]>,
 }>()
 
-const { playerList} = usePlayerList()
+const { playerListState, fetchPlayerList } = usePlayerList()
+
+onMounted(async () => {
+    await fetchPlayerList;
+})
+
 </script>
 
 <style scoped>

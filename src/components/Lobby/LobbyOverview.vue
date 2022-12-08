@@ -57,7 +57,6 @@ onMounted(async () => {
 });
 
 const { lobbyList } = useLobbyList();
-const { playerList } = usePlayerList();
 const { mapsList } = useMyMaps();
 const showAddLobby = ref(false);
 const lobbyNameInput = ref("");

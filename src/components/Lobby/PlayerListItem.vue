@@ -14,7 +14,7 @@
         <table>
             <tr>
                 <div class="cellone">
-                    <td style="width:100%">{{props.player.name}}</td>
+                    <td style="width:100%">{{props.player.userName}}</td>
                 </div>
                 <td style="width:10%"><button>Nachricht</button></td>
                 <td style="width:10%"><button class="deleteButton">X</button></td>
@@ -25,10 +25,10 @@
 
 <script setup lang = 'ts'>
 
-import { IPlayerListItem } from '../../typings/IPlayerListItem';
+import IUser from '../../typings/IUser';
 
 const props = defineProps<{
-    player: IPlayerListItem
+    player: IUser
 }>()
 </script>
 

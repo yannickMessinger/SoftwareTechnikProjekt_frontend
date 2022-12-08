@@ -1,7 +1,3 @@
-<!--
-    author: Sean Dittmann
-    date: 11.11.2022 
--->
 <script setup lang="ts">
     /**Imports: */
     import { reactive } from 'vue';
@@ -26,92 +22,42 @@
     
     
     /**entrys in toollist */ 
-    toolList[0] = { tool: ToolEnum.CREATE, id: 0, name: "create", texture: (pathToPictures+"tool-icons/create.png")};
-    toolList[1] = { tool: ToolEnum.DELETE, id: 1, name: "delete", texture: (pathToPictures+"tool-icons/delete.png")};
-    toolList[2] = { tool: ToolEnum.EDIT, id: 2, name: "edit", texture: (pathToPictures+"tool-icons/edit.png")};
-    toolList[3] = { tool: ToolEnum.ROTATE, id: 3, name: "rotate", texture: (pathToPictures+"tool-icons/rotate.png")};
-        
-    function onToolClick(clickedTool: any){
+    toolList[0] = { tool: ToolEnum.CREATE, id: 0, name: "Erstellen", texture: (pathToPictures+"tool-icons/create.svg")};
+    toolList[1] = { tool: ToolEnum.DELETE, id: 1, name: "Löschen", texture: (pathToPictures+"tool-icons/delete.svg")};
+    toolList[2] = { tool: ToolEnum.EDIT, id: 2, name: "Bearbeiten", texture: (pathToPictures+"tool-icons/edit.svg")};
+    toolList[3] = { tool: ToolEnum.ROTATE, id: 3, name: "Drehen", texture: (pathToPictures+"tool-icons/rotate.svg")};
+
+    function onToolClick(clickedTool:any){
         /** if the selected tool is the clicked tool, it gets deselected by restoring the default tool
          * otherwhise the clicked tool is now the selected tool.
         */
-        // console.log(selectedTool.tool.name);
+        
         if(selectedTool.tool.id==clickedTool.id){
             selectedTool.tool = defaultTool;
         }else{
             selectedTool.tool = clickedTool;
         }
+
+        if(selectedTool.tool.tool == ToolEnum.CREATE){
+            emit('create-toggle-view', undefined)
+        }
         /** fire a tool select event to mark a tool change. Sends out the enum value of the selected tool*/
         emit('tool-select-event', selectedTool.tool.tool);
         /** fire a tool select event to mark a tool change for selectedToolComponent. Sends out the complete tool of the selected tool*/
         emit('tool-select-component-event', selectedTool.tool);
-        // console.log(selectedTool.tool.name);
     }
 </script>
 
 <template>
-    <!--display container for toollist-->
-    <h2 class="toolListTitle">Tool List</h2>
-    <div class="toolListContainer">
-        <!-- display container for tool list element-->
-        <div v-for="element in toolList" :key="element.id" class="toolListElement">
-            <button :class="element.name === selectedTool.tool.name ? 'toolListButtonActive' : 'toolListButton'" @click="onToolClick(element)">
-               <div class="toolListButtonContainer">
-                    <img v-if="element != null" :src="element.texture" class="toolListImg"/>
-                    <p v-if="element != null" class="toolListText">{{element.name}}</p>
-               </div>
-            </button>
-        </div>
-    </div>  
+    <div v-for="element in toolList" :key="element.id" id="editor-tool" :class="element.name === selectedTool.tool.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onToolClick(element)">
+        <button v-if="element != null" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
+        <p v-if="element != null">{{element.name}}</p>
+    </div>
 </template>
 
-<style>
-    /** style for list title in tool list */
-    .toolListTitle{
-        color:black;
-        background-color: white;
-        text-align: center;
-        margin:5%;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
-    }
-    /** style for tool list in general*/
-    .toolListContainer{
-        margin-left: 5%;
-        margin-right: 5%;
-        list-style-type: none;
-        display: inline-flex;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
-    }
-    /** style for list element in tool list*/
-    .toolListElement {
-        margin:0.5%;
-    }
-    /** style for images in tool list */
-    .toolListImg {
-        max-width: 5vh;
-        max-height: 5vh;
-    }
-    /** style for text elements in tool list */
-    .toolListText{
-        color:white;
-        margin-top: auto;
-    }
-    /** style for buttons in tool list */
-    .toolListButton{
-        border: solid 2px black;
-        background-color:gray;
-    }
-    /** style for selected button in tool list */
-    .toolListButtonActive{
-        border: solid 2px black;
-        background-color:orange;
+<style scoped>
+    *{
+        color: var(--woe-black);
+        font-size: 1em;
     }
 </style>

@@ -7,6 +7,7 @@
     <div class="box overlay">
       <HUD></HUD>
     </div>
+    <Chat/>
   </div>
 </template>
 
@@ -15,11 +16,12 @@ import { defineComponent } from 'vue'
 import SkelletonTrois from "../components/3D/GameView.vue"
 import HUD from "../components/3D/HUD.vue"
 import Header from '../components/Header.vue'
+import Chat from '../components/UI/Chat.vue'
 
 
 </script>
 
-<style>
+<style scoped>
 
 .container {
   width: 100%;
@@ -34,6 +36,7 @@ import Header from '../components/Header.vue'
   top: 0;
   left: 0;
   opacity: 1;
+  cursor: none;
 }
 
 .overlay {
