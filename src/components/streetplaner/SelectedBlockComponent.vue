@@ -1,12 +1,10 @@
-<!--
-    author: Sean Dittmann
-    date: 11.11.2022 
--->
 <script setup lang="ts">
     /**Imports: */
     import { reactive, watch, ref } from 'vue';
     import type { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import useEventBus from '../../services/eventBus';
+    import BasicButton from '../Buttons/BasicButton.vue';
+
     /**Variables: */
     const pathToPictures = "/img/streetplaner/";
     const pathRotateButton = (pathToPictures+"tool-icons/rotate.png");
@@ -48,59 +46,51 @@
 </script>
 
 <template>
-    <div class="selectedBlock">
-        <h3 class="selectedBlockTitle"> Selected Block:</h3>
-        <table>
-            <tr>
-                <td>
-                    <img v-if="selectedBlock != null" :src="selectedBlock.block.texture" class="selectedBlockImg" :style="{ transform: 'rotate(' + selectedBlock.block.rotation * 90 + 'deg)' }"/>
-                </td>
-                <td>
-                    <h4 class="selectedBlockDetailText">Details:</h4>
-                    <ul class="selectedBlockDetails">
-                        <li class="selectedBlockDetailText">{{selectedBlock.block.id}}</li>
-                        <li class="selectedBlockDetailText">{{selectedBlock.block.name}}</li>
-                        <li class="selectedBlockDetailText">{{selectedBlock.block.type}}</li>
-                    </ul>
-                    <button :disabled="isDefault" id="ListRotateButton" class="rotateButtonInDetails" @click="onRotateClick()">
-                            <img v-if="selectedBlock != null" :src="pathRotateButton" id="ListRotateButtonImg" class="selectedBlockRotateImg" />
-                    </button>
-                </td>
-            </tr>
-        </table> 
-    </div>
+    <p>
+        <span id="header">Zelle</span>
+        <BasicButton display="Drehen" :btn_click="onRotateClick"/>
+    </p>
+        <img v-if="selectedBlock != null" :src="selectedBlock.block.texture" class="selectedBlockImg" :style="{ transform: 'rotate(' + selectedBlock.block.rotation * 90 + 'deg)' }"/>
+    <p>
+        <span>ID</span>
+        <span>{{selectedBlock.block.id}}</span>
+    </p>
+    <p>
+        <span>Name</span>
+        <span>{{selectedBlock.block.name}}</span>
+    </p>
+    <p>
+        <span>Type</span>
+        <span>{{selectedBlock.block.type}}</span>
+    </p>
 </template>
 
-<style>
-    /**style for the title in selected block */
-    .selectedBlockTitle{
-        color:black;
-        background-color: white;
-        text-align: center;
-        margin:5%;
+<style scoped>
+    *{
+        --margin-bottom: 12px;
+        
+        font-size: 1em;
+        margin: 0;
+        color: var(--woe-black);
     }
-    /** style for images in selected block */
+
     .selectedBlockImg{
-        width: 100%;
-        height: 100%;
+        width: auto;
+        height: auto;
         display: block;
-        border: solid 1px gray;
+        border: solid 2px var(--woe-blue-50);
+        margin-bottom: var(--margin-bottom);
     }
-    /** style for text in details list in selected block*/
-    .selectedBlockDetailText{
-        color:black;
+
+    p{
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
     }
-    /** style for selected block container*/
-    .selectedBlock{
-        display: table-row;
-        border: solid 1px gray;
-        background-color:darkgray;
-        padding: 5px;
-        user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none;
+
+    #header{
+        font-weight: bold;
+        margin-bottom: var(--margin-bottom);
     }
     .selectedBlockRotateImg{
         width: 25%;

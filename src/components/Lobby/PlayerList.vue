@@ -1,36 +1,12 @@
 <!-- Component that represents a list of active players in a selected lobby-->
 <template>
-
-
-<!--Display List of Active Users in selected Lobby
-        <table>
-            <thead>
-                <tr>
-                    <th>Active Players</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template v-for="player in liste">
-                    <tr>
-                        <td>{{player.name}}</td>
-                    </tr>
-                </template>
-            </tbody>
-        </table>
-
--->
         
-
-    <div class="playerList">
-        <table >
-            <tr>
-                <th>Player</th>
-                <!--if getting the playerList failes, error Message is displayed here-->
-                <th class="alignRight" v-if="playerList.errormsg">{{playerList.errormsg}}</th>
-                <th class="alignRight" v-else>{{props.liste.length}}/anzMaxSpielerEinfügen</th>
-            
-            </tr>
-        </table>
+    <div class="headline">
+        <h2>Spieler</h2>
+        <h3 v-if="playerListState.errormsg">{{playerListState.errormsg}}</h3>
+        <h4 v-else>{{props.liste.length}}/anzMaxSpielerEinfügen</h4>
+    </div>
+    <div class="playerList">      
         <table>
             <tbody>
                 <PlayerListItem :player="ele" v-for="ele in liste"></PlayerListItem>
@@ -47,15 +23,21 @@
 
 
 import PlayerListItem from './PlayerListItem.vue';
-import { IPlayerListItem } from '../../typings/IPlayerListItem';
+import IUser from '../../typings/IUser';
 import { usePlayerList } from '../../services/usePlayerList';
+import { onMounted } from 'vue';
 
 //PlayerList passed from backend
 const props = defineProps<{
-    liste: Readonly<IPlayerListItem[]>,
+    liste: Readonly<IUser[]>,
 }>()
 
-const { playerList} = usePlayerList()
+const { playerListState, fetchPlayerList } = usePlayerList()
+
+onMounted(async () => {
+    await fetchPlayerList;
+})
+
 </script>
 
 <style scoped>
@@ -66,39 +48,34 @@ th, td {
 }
 
 table {
-    /*border: 4px solid black;*/
     width: 100%;
-    font-family: Arial, Helvetica, sans-serif;
-    color:black;
-
-    border: 1px solid #707070;
-    height: 80px;
-    
-
 }
-
-th {
-    height: 20px;
-    text-align: left;
-    background-color: white;
-    display: fixed;
-}
-
-td {
-   background-color: rgb(63, 63, 63); 
-   color: white;  
-}
-
 .playerList {
-    height: 600px;
+    height: 300px;
     display: flex;
     flex-direction: column;
     overflow: auto;
+    padding-right: 30px;
 }
 
 .alignRight {
     text-align: right;
     font-weight: normal;
+}
+
+.head{
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+}
+
+.headline{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom: 10px;
 }
 
 </style>

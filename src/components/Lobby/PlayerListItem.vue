@@ -13,7 +13,9 @@
     <div class="cell">
         <table>
             <tr>
-                <td style="width:100%">{{props.player.name}}</td>
+                <div class="cellone">
+                    <td style="width:100%">{{props.player.userName}}</td>
+                </div>
                 <td style="width:10%"><button>Nachricht</button></td>
                 <td style="width:10%"><button class="deleteButton">X</button></td>
             </tr>
@@ -23,43 +25,52 @@
 
 <script setup lang = 'ts'>
 
-import { IPlayerListItem } from '../../typings/IPlayerListItem';
+import IUser from '../../typings/IUser';
 
 const props = defineProps<{
-    player: IPlayerListItem
+    player: IUser
 }>()
 </script>
 
 <style scoped>
 
+* {
+    font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 20px;
+}
 button {
-  background-color: #0012af;
-  color: white;
-  font-family: Arial, Helvetica, sans-serif;
-  padding: 8px 25px;
-  font-size: 14px;
-  font-weight: bold;
-  margin: 4px 2px;
-  margin-left: 10px;
-  margin-right: 10px;
-  cursor: pointer;
-  border: 1px solid #707070;
-  border-radius: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 13px 23px;
+    background-color: var(--woe-blue-60);
+    color: white;
 }
 
 button:hover {
-    background-color: #000d80;
+    background-color: var(--woe-blue-70);
 }
 
 .deleteButton {
-    background: #B50000 0% 0% no-repeat padding-box;
-    border: 1px solid #707070;
-    border-radius: 10px;
+    background: var(--woe-gray-50);
+    border: none;
+    border-radius: 8px;
     opacity: 1;
 }
 
-
 .deleteButton:hover {
-    background: #900000;
+    background-color: var(--woe-red-70);
+}
+
+td {
+    padding-bottom: 20px;
+   
+}
+
+.cellone {
+    padding-left: 30px;
 }
 </style>

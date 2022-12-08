@@ -33,6 +33,7 @@
 
     function sendUsername() {
         setName(username.value);
+        sendName()
         // Methode, wenn auf Button geklickt wird hier hin...
         router.push('/');
     }
@@ -45,6 +46,11 @@
     *{
         box-sizing: border-box;
         
+    }
+
+    h2{
+        margin-top: 0.83em;
+        margin-bottom: 0.83em;
     }
 
     .container{

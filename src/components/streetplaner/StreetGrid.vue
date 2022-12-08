@@ -17,11 +17,9 @@
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
-        // console.log(toolState.tool);
     });
     watch(() => bus.value.get('block-select-event'), (val) => {
         toolState.block = val[0];
-        // console.log(toolState.block);
     });
     watch(() => bus.value.get('grid-reset-event'), (val) => {
         if (val) { resetGrid(); }
@@ -151,7 +149,7 @@
         height: v-bind(gridSizePx);
     }
     .grid-item {
-        border: solid 1px white;
+        border: solid 1px black;
     }
     .grid-img {
         width: 100%;
