@@ -4,7 +4,7 @@ import { IPlayerListItem } from "./IPlayerListItem"
 export interface ILobbyDTO {
     lobbyID?:number
     hostID?:number
-    mapID?:number
+    mapID:number
     lobbyName:string
     numOfPlayers: number
     lobbyModeEnum: E_LobbyMode

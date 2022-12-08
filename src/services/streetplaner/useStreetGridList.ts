@@ -2,7 +2,7 @@ import { reactive } from "vue";
 import { IStreetElement } from "./IStreetElement";
 import { StreetGridDTO } from "./StreetGridDTO";
 
-const streetGridDTO = reactive({ Strassenobjekte: Array<IStreetElement>() });
+const streetGridDTO = reactive({ mapObjects: Array<IStreetElement>() });
 
 export function useStreetGridList() {
     return {
@@ -11,42 +11,38 @@ export function useStreetGridList() {
     }
 }
 
-export async function updateStreetGridList() {
-    const url = "api/mapobject";
+export async function updateStreetGridList(mapID: number) {
+    const url = "/api/map/objects";
 
     try {
-        // Todo, get map from backend
-        throw new Error();
-        const response = await fetch(url, { method: "GET" });
+        if (mapID === -1) { throw new Error("mapID is -1, make sure you are in a lobby."); }
+        const response = await fetch(`${url}/${mapID}`, { method: "GET" });
         if (!response.ok) {
             throw new Error(response.statusText);
         }
-    }
-    catch {
-        let json = '{"Strassenobjekte":[{"Objekt_ID":1,"X":0,"Y":0,"Rotation":0},{"Objekt_ID":0,"X":0,"Y":1,"Rotation":1},{"Objekt_ID":0,"X":0,"Y":2,"Rotation":1},{"Objekt_ID":1,"X":0,"Y":3,"Rotation":1},{"Objekt_ID":0,"X":1,"Y":0,"Rotation":2},{"Objekt_ID":0,"X":1,"Y":3,"Rotation":2},{"Objekt_ID":1,"X":1,"Y":6,"Rotation":0},{"Objekt_ID":0,"X":1,"Y":7,"Rotation":3},{"Objekt_ID":1,"X":1,"Y":8,"Rotation":1},{"Objekt_ID":0,"X":2,"Y":0,"Rotation":2},{"Objekt_ID":1,"X":2,"Y":2,"Rotation":0},{"Objekt_ID":2,"X":2,"Y":3,"Rotation":0},{"Objekt_ID":0,"X":2,"Y":4,"Rotation":3},{"Objekt_ID":0,"X":2,"Y":5,"Rotation":3},{"Objekt_ID":1,"X":2,"Y":6,"Rotation":2},{"Objekt_ID":0,"X":2,"Y":8,"Rotation":0},{"Objekt_ID":0,"X":3,"Y":0,"Rotation":0},{"Objekt_ID":0,"X":3,"Y":2,"Rotation":0},{"Objekt_ID":0,"X":3,"Y":3,"Rotation":2},{"Objekt_ID":0,"X":3,"Y":8,"Rotation":0},{"Objekt_ID":0,"X":4,"Y":0,"Rotation":0},{"Objekt_ID":0,"X":4,"Y":2,"Rotation":0},{"Objekt_ID":0,"X":4,"Y":3,"Rotation":2},{"Objekt_ID":0,"X":4,"Y":8,"Rotation":0},{"Objekt_ID":1,"X":5,"Y":0,"Rotation":3},{"Objekt_ID":0,"X":5,"Y":1,"Rotation":1},{"Objekt_ID":1,"X":5,"Y":2,"Rotation":2},{"Objekt_ID":0,"X":5,"Y":3,"Rotation":2},{"Objekt_ID":1,"X":5,"Y":7,"Rotation":0},{"Objekt_ID":1,"X":5,"Y":8,"Rotation":2},{"Objekt_ID":1,"X":6,"Y":3,"Rotation":3},{"Objekt_ID":0,"X":6,"Y":4,"Rotation":3},{"Objekt_ID":0,"X":6,"Y":5,"Rotation":3},{"Objekt_ID":0,"X":6,"Y":6,"Rotation":3},{"Objekt_ID":1,"X":6,"Y":7,"Rotation":2}]}';
-        streetGridDTO.Strassenobjekte = JSON.parse(json).Strassenobjekte;
+        const jsondata = await response.json();
+        console.log(JSON.stringify(jsondata));
+        streetGridDTO.mapObjects = jsondata;
+    } catch (error: any) {
+        console.log(error.statusText);
+        let json = '{"mapObjects":[{"objectTypeId":1,"x":2,"y":9,"rotation":0},{"objectTypeId":0,"x":2,"y":10,"rotation":1},{"objectTypeId":0,"x":2,"y":11,"rotation":1},{"objectTypeId":0,"x":2,"y":12,"rotation":1},{"objectTypeId":0,"x":2,"y":13,"rotation":1},{"objectTypeId":0,"x":2,"y":14,"rotation":1},{"objectTypeId":1,"x":2,"y":15,"rotation":1},{"objectTypeId":0,"x":3,"y":9,"rotation":0},{"objectTypeId":6,"x":3,"y":14,"rotation":0},{"objectTypeId":0,"x":3,"y":15,"rotation":2},{"objectTypeId":0,"x":4,"y":9,"rotation":0},{"objectTypeId":1,"x":4,"y":12,"rotation":0},{"objectTypeId":0,"x":4,"y":13,"rotation":1},{"objectTypeId":0,"x":4,"y":14,"rotation":1},{"objectTypeId":1,"x":4,"y":15,"rotation":2},{"objectTypeId":0,"x":5,"y":9,"rotation":0},{"objectTypeId":0,"x":5,"y":12,"rotation":2},{"objectTypeId":0,"x":6,"y":9,"rotation":0},{"objectTypeId":5,"x":6,"y":10,"rotation":0},{"objectTypeId":0,"x":6,"y":12,"rotation":2},{"objectTypeId":1,"x":7,"y":5,"rotation":0},{"objectTypeId":0,"x":7,"y":6,"rotation":1},{"objectTypeId":0,"x":7,"y":7,"rotation":1},{"objectTypeId":0,"x":7,"y":8,"rotation":1},{"objectTypeId":2,"x":7,"y":9,"rotation":0},{"objectTypeId":0,"x":7,"y":10,"rotation":1},{"objectTypeId":0,"x":7,"y":11,"rotation":1},{"objectTypeId":1,"x":7,"y":12,"rotation":2},{"objectTypeId":1,"x":7,"y":14,"rotation":0},{"objectTypeId":0,"x":7,"y":15,"rotation":1},{"objectTypeId":0,"x":7,"y":16,"rotation":1},{"objectTypeId":1,"x":7,"y":17,"rotation":1},{"objectTypeId":0,"x":8,"y":5,"rotation":2},{"objectTypeId":3,"x":8,"y":8,"rotation":0},{"objectTypeId":0,"x":8,"y":9,"rotation":2},{"objectTypeId":3,"x":8,"y":10,"rotation":0},{"objectTypeId":0,"x":8,"y":14,"rotation":2},{"objectTypeId":0,"x":8,"y":17,"rotation":0},{"objectTypeId":0,"x":9,"y":5,"rotation":2},{"objectTypeId":4,"x":9,"y":8,"rotation":0},{"objectTypeId":0,"x":9,"y":9,"rotation":2},{"objectTypeId":3,"x":9,"y":10,"rotation":0},{"objectTypeId":0,"x":9,"y":14,"rotation":2},{"objectTypeId":0,"x":9,"y":17,"rotation":0},{"objectTypeId":0,"x":10,"y":5,"rotation":2},{"objectTypeId":4,"x":10,"y":8,"rotation":0},{"objectTypeId":0,"x":10,"y":9,"rotation":2},{"objectTypeId":0,"x":10,"y":14,"rotation":2},{"objectTypeId":0,"x":10,"y":17,"rotation":0},{"objectTypeId":1,"x":11,"y":5,"rotation":3},{"objectTypeId":0,"x":11,"y":6,"rotation":1},{"objectTypeId":0,"x":11,"y":7,"rotation":1},{"objectTypeId":0,"x":11,"y":8,"rotation":1},{"objectTypeId":2,"x":11,"y":9,"rotation":0},{"objectTypeId":0,"x":11,"y":10,"rotation":1},{"objectTypeId":0,"x":11,"y":11,"rotation":1},{"objectTypeId":0,"x":11,"y":12,"rotation":1},{"objectTypeId":0,"x":11,"y":13,"rotation":1},{"objectTypeId":2,"x":11,"y":14,"rotation":0},{"objectTypeId":0,"x":11,"y":15,"rotation":1},{"objectTypeId":0,"x":11,"y":16,"rotation":1},{"objectTypeId":1,"x":11,"y":17,"rotation":2},{"objectTypeId":0,"x":12,"y":9,"rotation":0},{"objectTypeId":0,"x":12,"y":14,"rotation":0},{"objectTypeId":0,"x":13,"y":9,"rotation":0},{"objectTypeId":0,"x":13,"y":14,"rotation":0},{"objectTypeId":1,"x":14,"y":9,"rotation":3},{"objectTypeId":0,"x":14,"y":10,"rotation":1},{"objectTypeId":0,"x":14,"y":11,"rotation":1},{"objectTypeId":0,"x":14,"y":12,"rotation":1},{"objectTypeId":0,"x":14,"y":13,"rotation":1},{"objectTypeId":1,"x":14,"y":14,"rotation":2}]}';
+        streetGridDTO.mapObjects = JSON.parse(json).mapObjects;
     }
 }
 
-export async function postStreetGrid(dto: StreetGridDTO) {
+export async function postStreetGrid(mapID: number, dto: StreetGridDTO) {
     const url = "/api/mapobject";
+    let jsonstring = JSON.stringify(dto);
+    console.log(jsonstring);
     try {
-        let response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-        let data = await response.json();
-        let id = data.length;
-        console.log(dto);
-        response = await fetch(url + '/1', { 
+        const response = await fetch(`${url}/${mapID}`, { 
             method: 'POST',
-            body: JSON.stringify(dto),
-            headers: {'Content-Type': 'application/json; charset=UTF-8' }
+            body: jsonstring,
+            headers: {'Content-Type': 'application/json;' }
         });
         if (!response.ok) {
             throw new Error(response.statusText);
         }
-        console.log(response.body);
     } 
     catch (error) {
         console.log(error);

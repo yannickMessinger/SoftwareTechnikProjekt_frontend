@@ -9,11 +9,13 @@
     import { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import { IStreetElement } from '../../services/streetplaner/IStreetElement';
     import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
+    import { useLobbyList } from '../../services/useLobbyList';
     const { bus } = useEventBus();
 
     var gridSizeX = 20;
     var gridSizeY = 30;
     const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" } });
+    const lobbyState = useLobbyList().activeLobbyState;
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -39,10 +41,12 @@
     var streetGridDTO: StreetGridDTO;
 
     onMounted(() => {
+        // get blockList from backend
+        // get streetgrid from backend via mapID
         blockList = useBlockList().blockList;
         streetGridDTO = useStreetGridList().streetGridDTO;
         updateBlockList();
-        updateStreetGridList().then(() => {
+        updateStreetGridList(lobbyState.mapID).then(() => {
             loadStreetGrid(streetGridDTO);
         });
 
@@ -80,32 +84,34 @@
         }
     }
     
+    // converts StreetGrid into json and sends it to backend
     function saveStreetGrid() {
-        let dto: StreetGridDTO = { Strassenobjekte: Array<IStreetElement>() };
+        let dto: StreetGridDTO = { mapObjects: Array<IStreetElement>() };
         for(let row=0; row<streetGrid.length; row++) {
             for(let col=0; col<streetGrid[0].length; col++) {
                 let ele = streetGrid[row][col];
                 if(ele.id !== -1) {
-                    dto.Strassenobjekte.push( { Objekt_ID: ele.id, 
-                                                X: ele.posX,
-                                                Y: ele.posY,
-                                                Rotation: ele.rotation
+                    dto.mapObjects.push( { objectTypeId: ele.id, 
+                                                x: ele.posX,
+                                                y: ele.posY,
+                                                rotation: ele.rotation
                                             } );
                 }
             }
         }
-        postStreetGrid(dto);
+        postStreetGrid(lobbyState.mapID, dto);
     }
     
+    // load StreetGrid from backend dto
     function loadStreetGrid(dto: StreetGridDTO) {
         resetGrid();
-        for(let ele of dto.Strassenobjekte) {
-            streetGrid[ele.X][ele.Y] = { 
-                id: ele.Objekt_ID, 
-                posX: ele.X, 
-                posY: ele.Y, 
-                rotation: ele.Rotation, 
-                texture: blockList[ele.Objekt_ID].texture};
+        for(let ele of dto.mapObjects) {
+            streetGrid[ele.x][ele.y] = { 
+                id: ele.objectTypeId, 
+                posX: ele.x, 
+                posY: ele.y, 
+                rotation: ele.rotation, 
+                texture: blockList[ele.objectTypeId].texture };
         }
     }
 
