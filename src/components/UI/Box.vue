@@ -32,15 +32,25 @@
     let registrationMode = ref(false)
     let loginService = new LoginService();
     
-    function login() {
+    async function login() {
+        let responseBody
         if (registrationMode.value) {
-            loginService.register(username.value, password.value)
+            responseBody = await loginService.register(username.value, password.value)
+            
+            if (responseBody != null) {
+                console.log(responseBody)
+            }else {
+                console.log("Status 400")
+            }
         }else{
-            loginService.login(username.value, password.value)
+            responseBody = await loginService.login(username.value, password.value)
+            if (responseBody != null) {
+                console.log(responseBody)
+            }else {
+                console.log("Status 400")
+            }
         }
-        
         router.push('/');
-        
     }
 
     function registration() {
