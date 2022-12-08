@@ -36,6 +36,7 @@
     // onClick handles click on specific cell
     function onClick(cell: any) {
         // set texture of clicked cell to dummy
+        //console.log(`x: ${cell.posX} y:${cell.posY}`)
         if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
             streetGrid[cell.posX][cell.posY].id = toolState.block.id;
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
