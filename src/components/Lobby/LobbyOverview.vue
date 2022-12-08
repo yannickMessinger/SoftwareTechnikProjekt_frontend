@@ -1,6 +1,5 @@
 <!-- Component that displays overview of existing lobbys and active players, also possible to add new Lobbys. Style not complete!-->
 <template>
-  <h3>Lobby Component</h3>
   <div v-if="showAddLobby">
     <input type="text" v-model="lobbyNameInput" placeholder="enter lobbyname" />
     <input
@@ -21,23 +20,22 @@
     </button>
   </div>
 
-  <div class="flex-container">
+    <div>
+      <MyMaps :liste="mapsList.mapslist"></MyMaps>
+    </div>
     <div v-if="lobbyList.lobbylist.length > 0">
       <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
     </div>
     <div v-else>
       <p>No lobbys available:(</p>
     </div>
-    <div> <!--v-if="lobbyList.lobbylist.length > 0"-->
-      <PlayerList :liste="playerList.playerlist"></PlayerList>
-    </div>
     
-  </div>
+    
 
-  <!--Button to manually refresh Lobbylist-->
+  <!--Button to manually refresh Lobbylist
   <button @click="updateLobbys()">Refresh</button>
   <button @click="setShowLobby()">Add new Lobby</button>
-  <button>Play</button>
+  <button>Play</button>-->
 </template>
 
 <script setup lang="ts">
@@ -47,9 +45,11 @@ import {
   updateLobbyList,
   createNewLobby,
 } from "../../services/useLobbyList";
+import { useMyMaps } from "../../services/useMyMaps";
 import { usePlayerList } from "../../services/usePlayerList";
 import { E_LobbyMode } from "../../typings/E_LobbyMode";
 import LobbyList from "./LobbyList.vue";
+import MyMaps from "./MyMaps.vue";
 import PlayerList from "./PlayerList.vue";
 
 onMounted(async () => {
@@ -57,7 +57,7 @@ onMounted(async () => {
 });
 
 const { lobbyList } = useLobbyList();
-const { playerList } = usePlayerList();
+const { mapsList } = useMyMaps();
 const showAddLobby = ref(false);
 const lobbyNameInput = ref("");
 const playerNumberInput = ref(0);

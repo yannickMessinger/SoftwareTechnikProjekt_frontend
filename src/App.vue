@@ -1,12 +1,10 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
+
 
 </script>
 
 <template>
   <router-view />
-
 </template>
 
 <style>
@@ -74,6 +72,7 @@
     --woe-violet-80: #29005a;
     --woe-violet-90: #1a0033;
 
+
     --btn-primary: var(--woe-green-60);
     --btn-primary-hover: var(--woe-green-70);
     --btn-secondary: var(--woe-blue-60);
@@ -89,7 +88,7 @@
     font-weight: 400;
 
     color-scheme: light dark;
-    color: rgba(255, 255, 255, 0.87);
+    color: var(--woe-black);
     background-color: #242424;
 
 
@@ -97,6 +96,12 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+
+
+  }
+
+  *{
+    margin: 0;
   }
 
   .prim.btn.green {
@@ -135,24 +140,84 @@
     background: var(--btn-cancle-hover);
   }
 
-  body {
-    margin: 0;
-    /*display: flex;**/
-    /*place-items: center;*/
-    min-width: 320px;
-    min-height: 100vh;
+  #editor-tool{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 6em;
+    height: 6em;
+    border: 1px solid var(--woe-black);
   }
 
+  .editor-tool-not-active{
+    background-color: transparent;
+  }
+
+  .editor-tool-active{
+    background-color: var(--woe-orange-30);
+  }
+    
+  .editor-tool-btn{
+    background-size: cover;
+    background-position: center;
+    width: 4em;
+    height: 4em;
+    border: none;
+    background-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background: var(--woe-white);
+    color: var(--woe-black);
+  }
+
+  h2{
+    margin-top: 0.83em;
+    margin-bottom: 0.83em;
+  }
+  
   @media (prefers-color-scheme: light) {
     :root {
       color: #213547;
-      background-color: #ffffff;
+      background-color: var(--woe-white-almost);
     }
     a:hover {
       color: #747bff;
     }
     button {
-      background-color: #f9f9f9;
+      background-color: var(--woe-white-almost);
+    }
+
+    input{
+      background-color: var(--woe-white-almost);
+      color: var(--woe-black)
     }
   }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color: #213547;
+      background-color: var(--woe-white-almost);
+    }
+    a:hover {
+      color: #747bff;
+    }
+    button {
+      background-color: var(--woe-white-almost);
+    }
+
+    input{
+      background-color: var(--woe-white-almost);
+      color: var(--woe-black);
+    }
+
+    select{
+      background-color: var(--woe-white-almost);
+      color: var(--woe-black);
+    }
+}
 </style>
