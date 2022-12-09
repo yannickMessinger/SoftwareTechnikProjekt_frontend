@@ -4,7 +4,10 @@
     import type { IGridElement } from '../../services/streetplaner/IGridElement';
     import useEventBus from '../../services/eventBus';
     import ToolEnum from '../../services/streetplaner/ToolEnum';
+    import {useGridSize} from '../../services/useGridSize';
+
     const { bus } = useEventBus();
+    const { gridSize } = useGridSize();
 
     var gridSizeX = 20;
     var gridSizeY = 30;
@@ -28,9 +31,9 @@
     resetGrid();
 
     // initialize gridSize
-    const gridSize = ref(40);
+    //const gridSize = ref(40);
     // initialize gridSizePx used in css
-    const gridSizePx = computed(() => gridSize.value.toString() + "px");
+    const gridSizePx = computed(() => gridSize.size.toString() + "px");
     var mouseDown = false;
 
     // onClick handles click on specific cell
@@ -82,7 +85,7 @@
 
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
-        <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
+        <div v-for="ele in row" :key="ele.id" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
             <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false" :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"/>
         </div>
     </div>

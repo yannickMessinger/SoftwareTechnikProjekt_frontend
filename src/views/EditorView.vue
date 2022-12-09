@@ -15,6 +15,8 @@
             <ListBlocksComponent v-if="elementBarVisible"/>
             <span v-if="elementBarVisible">Gebäude</span>
             <BuildingBlocksComponent v-if="elementBarVisible"/>
+            <BasicButton display="Plus" :btn_click="() => {increaseSize(1)}" />
+            <BasicButton display="Minus" :btn_click="() => {decreaseSize(1)}" />
         </div>
     </div>
     <div class="grid">
@@ -37,11 +39,12 @@
     import Header from '../components/Header.vue'
     import Chat from '../components/UI/Chat.vue'
     import BasicButton from '../components/Buttons/BasicButton.vue'
+    import { useGridSize } from '../services/useGridSize'
 
     const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, { question: "Möchtest du die gesamte Karte zurücksetzen? Die Aktion ist unwiderruflich."});
     const {emit, bus} = useEventBus();
     const disableResetButton = ref(false);
-   
+    const { gridSize, increaseSize, decreaseSize } = useGridSize();
     const headerText_tool = "Werkzeuge"
     const headerText_elements = "Elemente"
     const elementBarVisible = ref(false);

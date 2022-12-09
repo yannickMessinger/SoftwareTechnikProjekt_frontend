@@ -96,32 +96,10 @@ watch(
 </script>
 
 <template>
-  
   <div v-for="element in blockList" :key="element.id" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClick(element)">
         <button v-if="element != null" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
         <p v-if="element != null">{{element.name}}</p>
   </div>
-  <!--
-  <div class="blockListContainer">
-    <div v-for="element in blockList" class="blockListElement">
-      <button
-        :disabled="!isCreateTool"
-        :class="
-          element.name === selectedBlock.block.name
-            ? 'blockListButtonActive'
-            : 'blockListButton'
-        "
-        @click="onBlockClicked(element)"
-      >
-        <img
-          v-if="element != null"
-          :src="element.texture"
-          class="blockListImg"
-        />
-      </button>
-    </div>
-  </div>
-  -->
 </template>
 
 <style>
