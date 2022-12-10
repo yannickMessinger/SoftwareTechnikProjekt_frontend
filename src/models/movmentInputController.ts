@@ -47,9 +47,11 @@ export class MovmentInputController{
         const delta = this.clock.getDelta(); // seconds
         const movespeed = 200*delta; //speed
         const rotateAngle = Math.PI / 2 * delta; //rotation Angle
+        var tempSave = new THREE.Vector3(0,0,0);
+        tempSave = this.objects.value.position;
 
         if(this.pressedKey == "w"){
-            this.objects.value.position.z += 1;
+            tempSave = this.objects.value.position.z += 1;    
             console.log(this.objects.value.position);
         }
         if(this.pressedKey == "s"){
