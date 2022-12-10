@@ -1,17 +1,20 @@
 
 import * as THREE from 'three'
-
-import { MovmentInput } from './MovementInput';
+import { KeyboardState } from './KeyboardState';
 
 
 export class MovmentInputController{
+    public camera: any;
     public KEYS: any;
+    public previousKeys: any;
     public objects: any;
     public box: any;
     public target: any;
     public translation: any;
     public pressedKey: any;
     public clock: any;
+    public keyboard: KeyboardState;
+
 
 
     //temp data
@@ -22,24 +25,24 @@ export class MovmentInputController{
     moveVelocity = 2
 
 
-    constructor(objects: any){
-        
+    constructor(objects: any, camera: any){
         this.objects = objects;  
+        this.camera = camera;
         this.target = document;
         this.clock = new THREE.Clock();
         this.translation = new THREE.Vector3(0,1,0);
         this.KEYS = {"a": 65, "s": 83, "w": 'w', "d": 68};
+        this.keyboard = new KeyboardState();
         this.initialize();
     }
 
     initialize() {
-        this.target.addEventListener('keydown',(e: KeyboardEvent) => this.onKeyDown(e),false);
-        this.target.addEventListener('keyup',(e: KeyboardEvent) => this.onKeyUp(e),false);  
     }
 
     public update(){
         const velocity = 0.05;
         this.updateTranslation();
+        this.updateCamera();
     }
 
     updateTranslation(){   
@@ -47,55 +50,33 @@ export class MovmentInputController{
         const movespeed = 2*delta; //speed
         const rotateAngle = Math.PI / 2 * delta; //rotation Angle
 
-        if(this.pressedKey == "w"){
+        if(this.keyboard.pressed("W")){
             this.objects.value.mesh.translateZ(-movespeed); 
         }
-        if(this.pressedKey == "s"){
+        if(this.keyboard.pressed("S")){
             this.objects.value.mesh.translateZ(movespeed);
         }
-        if(this.pressedKey == "d"){
+        if(this.keyboard.pressed("D")){
             this.objects.value.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
         }
-        if(this.pressedKey == "a"){
+        if(this.keyboard.pressed("A")){
             this.objects.value.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
         }
-        
-        
-    }
-
-    onKeyDown(e: KeyboardEvent) {
-        this.pressedKey = e.key;
-    }
-
-    onKeyUp(e: KeyboardEvent) {
-        this.pressedKey = null;
-    }
-
-    private directionOffset(keysPressed: any) {
-        var directionOffset = 0 // w
-
-        if (keysPressed[this.KEYS.W]) {
-            if (keysPressed[this.KEYS.A]) {
-                directionOffset = Math.PI / 4 // w+a
-            } else if (keysPressed[this.KEYS.D]) {
-                directionOffset = - Math.PI / 4 // w+d
-            }
-        } else if (keysPressed[this.KEYS.S]) {
-            if (keysPressed[this.KEYS.A]) {
-                directionOffset = Math.PI / 4 + Math.PI / 2 // s+a
-            } else if (keysPressed[this.KEYS.D]) {
-                directionOffset = -Math.PI / 4 - Math.PI / 2 // s+d
-            } else {
-                directionOffset = Math.PI // s
-            }
-        } else if (keysPressed[this.KEYS.A]) {
-            directionOffset = Math.PI / 2 // a
-        } else if (keysPressed[this.KEYS.D]) {
-            directionOffset = - Math.PI / 2 // d
+        if(this.keyboard.pressed("Q")){
+            this.objects.value.mesh.translateY(movespeed)
         }
-
-        return directionOffset
+        if(this.keyboard.pressed("E")){
+            this.objects.value.mesh.translateY(-movespeed)
+        }
     }
+    updateCamera(){
+        let relativeCameraOffset = new THREE.Vector3(0,0.5,2);
+        let cameraOffset = relativeCameraOffset.applyMatrix4( this.objects.value.mesh.matrixWorld);
 
-    
+        this.camera.value.camera.position.x = cameraOffset.x;
+        this.camera.value.camera.position.y = cameraOffset.y;
+        this.camera.value.camera.position.z = cameraOffset.z;
+        
+        this.camera.value.camera.lookAt( this.objects.value.mesh.position);
+    }
 }
