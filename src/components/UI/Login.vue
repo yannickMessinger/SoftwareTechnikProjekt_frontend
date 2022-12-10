@@ -12,7 +12,7 @@
                 <label v-if="registrationMode">Passwort erneut eingeben</label>
                 <input v-if="registrationMode" v-model="passwordRepeat" type="password" placeholder="Passwort" required />
                 <hr>
-                <BasicButton class="sec btn blue" :display="registrationMode ? 'Registrieren' : 'Login'" :btn_click="sendUsername"/>
+                <BasicButton class="sec btn blue" :display="registrationMode ? 'Registrieren' : 'Login'" :btn_click="login"/>
                 <BasicButton class="ter btn grey" :display="registrationMode ? 'Zurück zum Login' : 'Registrieren'" :btn_click="registration"/>
             </div>
         </div>
@@ -24,22 +24,39 @@
     import useUser from "../../services/UserStore";
     import router from "../../router/router"
     import BasicButton from '../Buttons/BasicButton.vue';
+    import { LoginService } from "../../services/Login/LoginService";	
 
     let username = ref("")
     let password = ref("")
     let passwordRepeat = ref("")
     let registrationMode = ref(false)
-    const { name, setName, sendName } = useUser();
-
-    function sendUsername() {
-        setName(username.value);
-        sendName()
-        // Methode, wenn auf Button geklickt wird hier hin...
+    let loginService = new LoginService();
+    
+    async function login() {
+        let responseBody
+        if (registrationMode.value) {
+            responseBody = await loginService.register(username.value, password.value)
+            
+            if (responseBody != null) {
+                console.log(responseBody)
+            }else {
+                console.log("Status 400")
+            }
+        }else{
+            responseBody = await loginService.login(username.value, password.value)
+            if (responseBody != null) {
+                console.log(responseBody)
+            }else {
+                console.log("Status 400")
+            }
+        }
         router.push('/');
     }
+
     function registration() {
         registrationMode.value = !registrationMode.value
     }
+
 </script>
 
 <style scoped>
