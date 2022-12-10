@@ -19,9 +19,35 @@ export default defineComponent({
     const box = ref();
     const camera = ref();
     const fpsCamera = new FirstPersonCamera(camera, box)
-    let gridSizeX = 10;
-    let gridSizeY = 10;
+    let gridSizeX = 40;
+    let gridSizeY = 40;
     const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
+    const fieldSize = 4;
+    const buildingIDMap = new Map().set('haus','/../../../src/assets/3D_Models/Building/Markt.gltf');
+    let path:string = '/../../../src/assets/3D_Models/Building/Markt.gltf';
+    let intersection_path = '/../../../src/assets/3D_Models/Streets/intersection_road.gltf'
+    let testArr:any = []
+  
+    function initTestArray(){
+      
+      for(let i=0; i<10; i++){
+        testArr.push({x:i,z:0, path:intersection_path})
+      }
+      
+    }
+
+    initTestArray();
+
+
+    function calcCoordinateX(n:number){
+      console.log(`n:${n}`)
+      console.log((gridSizeX * (-0.5)) + (n * fieldSize) + (fieldSize / 2))
+      return (gridSizeX * (-0.5)) + (n * fieldSize) + (fieldSize / 2);
+    }
+
+    function calcCoordinateZ(n:number){
+      return (gridSizeY * (-0.5)) + (n * fieldSize) + (fieldSize / 2);
+    }
 
     onMounted(() => {
       renderer.value.onBeforeRender(() => {
@@ -29,12 +55,19 @@ export default defineComponent({
       });
     })
 
+    console.log(testArr);
+
     return {
       renderer,
       camera,
       box,
       fpsCamera,
-      streetGrid
+      streetGrid,
+      calcCoordinateX,
+      calcCoordinateZ,
+      buildingIDMap,
+      path,
+      testArr
     }
   }
 });
@@ -49,15 +82,20 @@ export default defineComponent({
      <!-- <GltfModel src="/../../../src/assets/3D_Models/Building/Haus.gltf" :position="{x: 0, y:0, z:0}" :scale="{x: 0.4, y:0.4, z:0.4}"/>-->
       <!--<GltfModel src="/../../../src/assets/3D_Models/Building/Haus - Hoch.gltf" :position="{x: -5, y:0, z:-15}" :scale="{x: 0.4, y:0.4, z:0.4}"/>-->
       <!-- <GltfModel src="/../../../src/assets/3D_Models/Building/Markt.gltf" :position="{x: 5, y:0, z:-15}" :scale="{x: 0.4, y:0.4, z:0.4}"/>-->
-      <Plane :width="10" :height="10" :rotation="{x: -Math.PI /2}" :position="{x:0, y:0, z:0}" receive-shadow>
+      <Plane :width="40" :height="40" :rotation="{x: -Math.PI /2}" :position="{x:0, y:0, z:0}" receive-shadow>
         <PhongMaterial color="#999999" :props="{ depthWrite: false }" /></Plane>
       
-        <div v-for = "row in streetGrid">
-            <div v-for="column in row">
-              <Plane :width="1" :height="1" :rotation="{x: -Math.PI /2}" :position="{x:0, y:0, z:0}" receive-shadow>
-              <PhongMaterial color="#FF0000" :props="{ depthWrite: false }" /></Plane>
-            </div>
+        
+        <div v-for = "building in testArr">
+            
+              <!--<Plane :width="4" :height="4" :rotation="{x: -Math.PI /2}" :position="{x:calcCoordinateX(n), y:0, z:-18}" receive-shadow>
+              <PhongMaterial color="#FF0000" :props="{ depthWrite: false }" /></Plane>-->
+              <GltfModel v-bind:src="building.path" :position="{x:calcCoordinateX(building.x), y:0.5, z: calcCoordinateZ(building.z)}" :scale="{x: 0.05, y:0.05, z:0.05}" :rotation="{x:0, y:0, z:0}"/>
+              
         </div>
+        
+
+        
 
       
      
