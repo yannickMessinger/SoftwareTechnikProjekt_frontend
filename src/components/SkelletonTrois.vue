@@ -7,26 +7,19 @@ export default defineComponent({
   components: { Box, Camera, Renderer, Scene, PointLight, LambertMaterial },
 
   setup() {
-    const rendererC = ref();
+    const renderer = ref();
     const box = ref();
     const camera = ref();
     const moveableObject = new MovmentInputController(box);
 
     onMounted(() => {
-      const renderer = rendererC.value as RendererPublicInterface;
-      const mesh = (box.value as MeshPublicInterface).mesh
-      renderer.onBeforeRender(() => {
-        console.log(box.value.position);
+      renderer.value.onBeforeRender(() => {
         moveableObject.update();
-        mesh!.position.z = box.value.position.z
-        mesh!.position.x = box.value.position.x
-
-        mesh!.rotation.y = box.value.rotation.y
       });
     })
 
     return {
-      rendererC,
+      renderer,
       camera,
       box,
       moveableObject,
@@ -36,7 +29,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <Renderer antialias resize="window" ref="rendererC" :orbit-ctrl="{enableDamping: true}">
+  <Renderer width="600" height="800" ref="renderer">
     <Camera ref="camera" :position="{ x:0, y:0, z: 0 }">
     </Camera>
     <Scene background="#4DBA87">

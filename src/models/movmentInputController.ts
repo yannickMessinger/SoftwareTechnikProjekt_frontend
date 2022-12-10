@@ -1,5 +1,6 @@
 
 import * as THREE from 'three'
+
 import { MovmentInput } from './MovementInput';
 
 
@@ -11,7 +12,6 @@ export class MovmentInputController{
     public translation: any;
     public pressedKey: any;
     public clock: any;
-    public inputMovement: MovmentInput;
 
 
     //temp data
@@ -27,7 +27,6 @@ export class MovmentInputController{
         this.objects = objects;  
         this.target = document;
         this.clock = new THREE.Clock();
-        this.inputMovement = new MovmentInput;
         this.translation = new THREE.Vector3(0,1,0);
         this.KEYS = {"a": 65, "s": 83, "w": 'w', "d": 68};
         this.initialize();
@@ -45,40 +44,30 @@ export class MovmentInputController{
 
     updateTranslation(){   
         const delta = this.clock.getDelta(); // seconds
-        const movespeed = 200*delta; //speed
+        const movespeed = 2*delta; //speed
         const rotateAngle = Math.PI / 2 * delta; //rotation Angle
-        var tempSave = new THREE.Vector3(0,0,0);
-        tempSave = this.objects.value.position;
 
         if(this.pressedKey == "w"){
-            tempSave = this.objects.value.position.z += 1;    
-            console.log(this.objects.value.position);
+            this.objects.value.mesh.translateZ(-movespeed); 
         }
         if(this.pressedKey == "s"){
-            this.objects.value.position.z -=1;
-            console.log(this.objects.value.position);
+            this.objects.value.mesh.translateZ(movespeed);
         }
         if(this.pressedKey == "d"){
-            this.objects.value.rotation.y += rotateAngle;
-            console.log(this.objects.value.position);
-            console.log(this.objects.value.rotation)
+            this.objects.value.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
         }
         if(this.pressedKey == "a"){
-            this.objects.value.rotation.y -= rotateAngle;
-            console.log(this.objects.value.position);
-            console.log(this.objects.value.rotation)
+            this.objects.value.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
         }
         
         
     }
 
     onKeyDown(e: KeyboardEvent) {
-        console.log(e.key);
         this.pressedKey = e.key;
     }
 
     onKeyUp(e: KeyboardEvent) {
-        console.log(e.key + "lifted");
         this.pressedKey = null;
     }
 
