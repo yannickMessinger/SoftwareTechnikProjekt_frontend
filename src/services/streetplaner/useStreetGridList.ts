@@ -11,6 +11,7 @@ export function useStreetGridList() {
     }
 }
 
+// updates streetGridDTO with map objects of map with mapID
 export async function updateStreetGridList(mapID: number) {
     const url = "/api/map/objects";
 
@@ -21,7 +22,6 @@ export async function updateStreetGridList(mapID: number) {
             throw new Error(response.statusText);
         }
         const jsondata = await response.json();
-        console.log(JSON.stringify(jsondata));
         streetGridDTO.mapObjects = jsondata;
     } catch (error: any) {
         console.log(error.statusText);
@@ -30,10 +30,10 @@ export async function updateStreetGridList(mapID: number) {
     }
 }
 
+// posts map objects of dto (StreetGridDTO of map with mapID) to backend
 export async function postStreetGrid(mapID: number, dto: StreetGridDTO) {
     const url = "/api/mapobject";
     let jsonstring = JSON.stringify(dto);
-    console.log(jsonstring);
     try {
         const response = await fetch(`${url}/${mapID}`, { 
             method: 'POST',

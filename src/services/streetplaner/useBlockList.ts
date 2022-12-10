@@ -15,6 +15,7 @@ export function useBlockList() {
     }
 }
 
+// fetches blocklist from backend (currently only frontend)
 export async function updateBlockList(): Promise<void> {
     const url = "api/block";
 
@@ -27,7 +28,6 @@ export async function updateBlockList(): Promise<void> {
         }
     }
     catch {
-        // Todo, load from json format
         blockList.splice(0, blockList.length);
         blockList.push(...[
             { groupId: 0, group: "Testobject1",id: 0,type:"???",name:"Gerade",rotation: 0,texture: (pathToPictures+"object-icons/Road_straight.svg")},
