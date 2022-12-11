@@ -29,9 +29,22 @@ export default defineComponent({
     const fieldSize = 10;
     /*Map of 3d-model paths*/
     const buildingIDMap = new Map()
-    buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road.gltf');
-    buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/intersection_road.gltf');
-    buildingIDMap.set(2,'/../../../src/assets/3D_Models/Streets/curved_road.gltf');
+    buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf');
+    buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/curved_road_rotated.gltf');
+    buildingIDMap.set(2,'/../../../src/assets/3D_Models/Streets/intersection_road.gltf');
+
+    /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
+    const rotationMap = new Map()
+    /*No rotation*/
+    rotationMap.set(0, 0)
+    /*90 degree rotation*/
+    rotationMap.set(1, Math.PI/2)
+    /*180 degree rotation*/
+    rotationMap.set(2, Math.PI)
+    /*270 degree rotation*/
+    rotationMap.set(3, 3*Math.PI/2)
+
+  
 
     let building:string = '/../../../src/assets/3D_Models/Building/Markt.gltf';
     
@@ -88,7 +101,10 @@ export default defineComponent({
       calcCoordinateX,
       calcCoordinateZ,
       buildingIDMap,
-      mapElements
+      mapElements,
+      rotationMap,
+      gridSizeX,
+      gridSizeY
     }
   }
 });
@@ -100,19 +116,15 @@ export default defineComponent({
     </Camera>
     <Scene background="#4DBA87">
       <AmbientLight></AmbientLight>
-     <!-- <GltfModel src="/../../../src/assets/3D_Models/Building/Haus.gltf" :position="{x: 0, y:0, z:0}" :scale="{x: 0.4, y:0.4, z:0.4}"/>-->
-      <!--<GltfModel src="/../../../src/assets/3D_Models/Building/Haus - Hoch.gltf" :position="{x: -5, y:0, z:-15}" :scale="{x: 0.4, y:0.4, z:0.4}"/>-->
-      <!-- <GltfModel src="/../../../src/assets/3D_Models/Building/Markt.gltf" :position="{x: 5, y:0, z:-15}" :scale="{x: 0.4, y:0.4, z:0.4}"/>-->
-      <Plane :width="100" :height="100" :rotation="{x: -Math.PI /2}" :position="{x:0, y:0, z:0}" receive-shadow>
+      <Plane :width=gridSizeX :height=gridSizeY :rotation="{x: -Math.PI /2}" :position="{x:0, y:0, z:0}" receive-shadow>
         <PhongMaterial color="#999999" :props="{ depthWrite: false }" /></Plane>
       
+        <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>
         
         <!--All elements placed in the editor are read from the list and placed in the scene-->
         <div v-for = "ele in mapElements">
-          
-            
-            <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{x:calcCoordinateX(ele.x), y:0, z: calcCoordinateZ(ele.y)}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>
-          </div>    
+          <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{x:calcCoordinateX(ele.x), y:0, z: calcCoordinateZ(ele.y)}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:rotationMap.get(ele.rotation), z:0}"/>
+        </div>    
         
       
 
