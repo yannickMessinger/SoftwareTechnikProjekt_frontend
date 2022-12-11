@@ -33,9 +33,9 @@ const { emit, bus } = useEventBus();
 const isCreateTool = ref(false);
 /**entrys in blocklist */
 blockList[0] = {
-  groupId: 0,
+  groupId: 1,
   group: "Testobject1",
-  id: 0,
+  id: 3,
   type: "Building",
   name: "Big Building",
   rotation: 0,
@@ -44,25 +44,25 @@ blockList[0] = {
 blockList[1] = {
   groupId: 1,
   group: "Testobject2",
-  id: 1,
+  id: 4,
   type: "Building",
   name: "Building",
   rotation: 0,
   texture: Building,
 };
 blockList[2] = {
-  groupId: 2,
+  groupId: 1,
   group: "Testobject3",
-  id: 2,
+  id: 5,
   type: "Building",
   name: "Markt",
   rotation: 0,
   texture: Supermarkt,
 };
 blockList[3] = {
-  groupId: 0,
+  groupId: 1,
   group: "Testobject4",
-  id: 0,
+  id: 6,
   type: "Building",
   name: "Stadium",
   rotation: 0,
