@@ -10,12 +10,15 @@
     import { IStreetElement } from '../../services/streetplaner/IStreetElement';
     import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
     import { useLobbyList } from '../../services/useLobbyList';
+    import { useEditor } from '../../services/Editor/useEditor';
     const { bus } = useEventBus();
 
     var gridSizeX = 20;
     var gridSizeY = 30;
     const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" } });
     const lobbyState = useLobbyList().activeLobbyState;
+
+    const { mapObjects, createMessage, deleteMessage, updateMessage, updateMap, receiveEditorUpdates} = useEditor(lobbyState.mapID);
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -44,21 +47,19 @@
         // get blockList from backend
         // get streetgrid from backend via mapID
         blockList = useBlockList().blockList;
-        streetGridDTO = useStreetGridList().streetGridDTO;
         updateBlockList();
-        updateStreetGridList(lobbyState.mapID).then(() => {
-            loadStreetGrid(streetGridDTO);
-        });
-
+        receiveEditorUpdates();
     });
 
     // onClick handles click on specific cell
     function onClick(cell: any) {
-        // set texture of clicked cell to dummy
+        const element = streetGrid[cell.posX][cell.posY];
+
         if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
             streetGrid[cell.posX][cell.posY].id = toolState.block.id;
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+            createMessage({ objectTypeId: element.id, x: element.posX, y: element.posY, rotation: element.rotation });
         }
         if (toolState.tool == ToolEnum.ROTATE) {
             streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4;
