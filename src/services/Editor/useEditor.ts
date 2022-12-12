@@ -1,5 +1,5 @@
 import {reactive, readonly} from "vue";
-import {CompatClient, Stomp} from "@stomp/stompjs";
+import {Client, CompatClient, Stomp} from "@stomp/stompjs";
 
 const ws_url = 'ws://localhost:8080/stomp'
 const DEST = '/topic/public'
@@ -48,7 +48,7 @@ export function useEditor(mapId: number) {
         deleteMessage,
         updateMessage,
         updateMap,
-        connect
+        receiveEditorUpdates
     }
 }
 
@@ -72,22 +72,24 @@ function updateMap() {
     }
 }
 
-function connect(event: Event) {
-    let socket = new WebSocket(ws_url)
-    stompClient = Stomp.over(socket)
-    stompClient.connect({}, onConnected, onError)
-    event.preventDefault()
+function receiveEditorUpdates() {
+    updateMap();
+
+    const stompClient = new Client({ brokerURL: ws_url });
+    stompClient.onWebSocketError = (error) => { editorState.errormessage = error.message };
+    stompClient.onStompError = (frame) => { editorState.errormessage = frame.body };
+
+    stompClient.onConnect = (frame) => {
+        stompClient.subscribe(DEST, (message) => {
+            const editorUpdate: IStompMessage = JSON.parse(message.body);
+            onMessageReceived(editorUpdate);
+        })
+    }
+
+    stompClient.activate();
 }
 
-function onConnected() {
-    stompClient.subscribe(DEST, onMessageReceived)
-}
-
-function onError(error: Error) {
-    editorState.errormessage = error.message
-}
-
-function createMessage(event: Event, message: IMapObject) {
+function createMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
             id: editorState.mapId,
@@ -102,8 +104,6 @@ function createMessage(event: Event, message: IMapObject) {
             JSON.stringify(editorMessage)
         )
     }
-
-    event.preventDefault()
 }
 
 function deleteMessage(event: Event, message: IMapObject) {
@@ -144,19 +144,18 @@ function updateMessage(event: Event, message: IMapObject) {
     event.preventDefault()
 }
 
-function onMessageReceived(payload: { body: string }) {
-    const message: IStompMessage = JSON.parse(payload.body)
-
-    if (editorState.mapId === message.id) {
-        if (message.type === 'CREATE') {
-            editorState.objectList.push(message.content)
-        } else if (message.type === 'DELETE') {
+function onMessageReceived(payload: IStompMessage) {
+    console.log(payload);
+    if (editorState.mapId === payload.id) {
+        if (payload.type === 'CREATE') {
+            editorState.objectList.push(payload.content)
+        } else if (payload.type === 'DELETE') {
             editorState.objectList = editorState.objectList.filter(
-                (obj) => obj.objectTypeId != message.content.objectTypeId)
-        } else if (message.type === 'UPDATE') {
+                (obj) => obj.objectTypeId != payload.content.objectTypeId)
+        } else if (payload.type === 'UPDATE') {
             editorState.objectList.forEach((obj, index) => {
-                if (obj.objectTypeId === message.content.objectTypeId) {
-                    editorState.objectList[index] = message.content
+                if (obj.objectTypeId === payload.content.objectTypeId) {
+                    editorState.objectList[index] = payload.content
                 }
             })
         }
