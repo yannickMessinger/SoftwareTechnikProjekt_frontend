@@ -1,5 +1,6 @@
 import {reactive, readonly} from "vue";
 import {Client, CompatClient, Stomp} from "@stomp/stompjs";
+import { IMapObject } from "../streetplaner/IMapObject";
 
 const ws_url = 'ws://localhost:8080/stomp'
 const DEST = '/topic/public'
@@ -10,13 +11,6 @@ const UPDATE_MSG = '/app/editor.update'
 const MAP_API = '/api/map/objects/'
 
 let stompClient: CompatClient
-
-interface IMapObject {
-    objectTypeId: number,
-    x: number,
-    y: number,
-    rotation: number
-}
 
 interface IEditorState {
     objectList: IMapObject[],
@@ -106,7 +100,7 @@ function createMessage(message: IMapObject) {
     }
 }
 
-function deleteMessage(event: Event, message: IMapObject) {
+function deleteMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
             id: editorState.mapId,
@@ -121,11 +115,9 @@ function deleteMessage(event: Event, message: IMapObject) {
             JSON.stringify(editorMessage)
         )
     }
-
-    event.preventDefault()
 }
 
-function updateMessage(event: Event, message: IMapObject) {
+function updateMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
             id: editorState.mapId,
@@ -140,8 +132,6 @@ function updateMessage(event: Event, message: IMapObject) {
             JSON.stringify(editorMessage)
         )
     }
-
-    event.preventDefault()
 }
 
 function onMessageReceived(payload: IStompMessage) {

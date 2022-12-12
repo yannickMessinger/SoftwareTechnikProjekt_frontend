@@ -7,7 +7,7 @@
     import { useBlockList, updateBlockList } from '../../services/streetplaner/useBlockList';
     import { useStreetGridList, updateStreetGridList, postStreetGrid } from '../../services/streetplaner/useStreetGridList';
     import { IBlockElement } from '../../services/streetplaner/IBlockElement';
-    import { IStreetElement } from '../../services/streetplaner/IStreetElement';
+    import { IMapObject } from '../../services/streetplaner/IMapObject';
     import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
     import { useLobbyList } from '../../services/useLobbyList';
     import { useEditor } from '../../services/Editor/useEditor';
@@ -53,41 +53,65 @@
 
     // onClick handles click on specific cell
     function onClick(cell: any) {
-        const element = streetGrid[cell.posX][cell.posY];
-
+        let payload: IMapObject;
         if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
             streetGrid[cell.posX][cell.posY].id = toolState.block.id;
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
-            createMessage({ objectTypeId: element.id, x: element.posX, y: element.posY, rotation: element.rotation });
+            payload = { objectTypeId: toolState.block.id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: toolState.block.rotation };
+            createMessage(payload);
         }
         if (toolState.tool == ToolEnum.ROTATE) {
             streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4;
+            payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: streetGrid[cell.posX][cell.posY].rotation };
+            updateMessage(payload);
         }
         if (toolState.tool === ToolEnum.DELETE) {
+            payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: streetGrid[cell.posX][cell.posY].rotation };
             streetGrid[cell.posX][cell.posY].id = -1;
             streetGrid[cell.posX][cell.posY].rotation = 0;
             streetGrid[cell.posX][cell.posY].texture = "";
+            deleteMessage(payload);
         }
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
     function onMouseMove(cell: any, event: any) {
+        let payload: IMapObject;
         if (event.buttons === 1 && toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
             streetGrid[cell.posX][cell.posY].id = toolState.block.id;
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+            payload = { objectTypeId: toolState.block.id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: toolState.block.rotation };
+            createMessage(payload);
         }
         if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
+            payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: streetGrid[cell.posX][cell.posY].rotation };
             streetGrid[cell.posX][cell.posY].id = -1;
             streetGrid[cell.posX][cell.posY].rotation = 0;
             streetGrid[cell.posX][cell.posY].texture = "";
+            deleteMessage(payload);
         }
     }
     
     // converts StreetGrid into json and sends it to backend
     function saveStreetGrid() {
-        let dto: StreetGridDTO = { mapObjects: Array<IStreetElement>() };
+        let dto: StreetGridDTO = { mapObjects: Array<IMapObject>() };
         for(let row=0; row<streetGrid.length; row++) {
             for(let col=0; col<streetGrid[0].length; col++) {
                 let ele = streetGrid[row][col];

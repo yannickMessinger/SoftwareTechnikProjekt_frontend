@@ -1,8 +1,8 @@
 import { reactive } from "vue";
-import { IStreetElement } from "./IStreetElement";
+import { IMapObject } from "./IMapObject";
 import { StreetGridDTO } from "./StreetGridDTO";
 
-const streetGridDTO = reactive({ mapObjects: Array<IStreetElement>() });
+const streetGridDTO = reactive({ mapObjects: Array<IMapObject>() });
 
 export function useStreetGridList() {
     return {
