@@ -1,7 +1,7 @@
 <script lang="ts">
 import THREE from 'three';
 import { PointLight, Box, Camera, Renderer, Scene, LambertMaterial, GltfModel, AmbientLight,Plane,PhongMaterial } from 'troisjs';
-import { defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { FirstPersonCamera } from '../../models/FirstPersonCamera';
 import { IGridElement } from '../../services/streetplaner/IGridElement';
 import { useStreetGridList, updateStreetGridList } from '../../services/streetplaner/useStreetGridList';
@@ -48,13 +48,10 @@ export default defineComponent({
 
     let building:string = '/../../../src/assets/3D_Models/Building/Markt.gltf';
     
-    let mapElements:IStreetElement[] = Array();
+    const mapElements = computed(() => useStreetGridList().streetGridDTO.mapObjects);
     const lobbyState = useLobbyList().activeLobbyState;
 
-    mapElements = useStreetGridList().streetGridDTO.mapObjects;
-      updateStreetGridList(lobbyState.mapID).then(() => {
-        console.log(mapElements);
-        });
+    
     
   
     
@@ -78,12 +75,11 @@ export default defineComponent({
 
     onMounted(() => {
 
-      /*
-      mapElements = useStreetGridList().streetGridDTO.mapObjects;
-      updateStreetGridList(lobbyState.mapID).then(() => {
-        console.log(mapElements);
-        });
-      */
+      
+      
+      updateStreetGridList(lobbyState.mapID);
+      
+    
 
       renderer.value.onBeforeRender(() => {
         fpsCamera.update();
@@ -119,7 +115,7 @@ export default defineComponent({
       <Plane :width=gridSizeX :height=gridSizeY :rotation="{x: -Math.PI /2}" :position="{x:0, y:0, z:0}" receive-shadow>
         <PhongMaterial color="#999999" :props="{ depthWrite: false }" /></Plane>
       
-        <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>
+       <!--  <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>-->
         
         <!--All elements placed in the editor are read from the list and placed in the scene-->
         <div v-for = "ele in mapElements">
