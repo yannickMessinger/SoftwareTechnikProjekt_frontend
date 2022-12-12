@@ -24,13 +24,16 @@
 <script setup lang="ts">
     import {ref} from 'vue'
     import BasicButton from '../Buttons/BasicButton.vue';
+    import {useLogin} from '../../services/useLogin'
 
-    interface Message{
+    interface IMessage{
         name: string,
         text: string
     }
-    const chatHistory = ref<Message[]>([])
+
+    const chatHistory = ref<IMessage[]>([])
     const chatLength = 20
+    const {logindata} = useLogin()
     let input = ref("")
     let chat = ref()
     let visible = ref(false)
@@ -38,7 +41,7 @@
     function appendMessage(){
         let a = document.getElementById('msg-chat')
         if(input.value && a){
-            chatHistory.value.push({name: "user001: ", text: input.value}) // TODO: Username hier setzen
+            chatHistory.value.push({name: logindata.userName + ": ", text: input.value})
             chatHistory.value.length > chatLength ? chatHistory.value.shift() : undefined
             input.value = ""   
             a.scrollTop = a.scrollHeight
