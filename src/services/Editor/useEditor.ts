@@ -1,8 +1,8 @@
 import {reactive, readonly} from "vue";
-import {Client, CompatClient, Stomp} from "@stomp/stompjs";
+import { Client } from "@stomp/stompjs";
 import { IMapObject } from "../streetplaner/IMapObject";
 
-const ws_url = 'ws://localhost:8080/stomp'
+const ws_url = `ws://${window.location.host}/stomp`
 const DEST = '/topic/public'
 const SEND_MSG = '/app/editor.sendMessage'
 const CREATE_MSG = '/app/editor.create'
@@ -10,7 +10,7 @@ const DELETE_MSG = '/app/editor.delete'
 const UPDATE_MSG = '/app/editor.update'
 const MAP_API = '/api/map/objects/'
 
-let stompClient: CompatClient
+let stompClient: Client
 
 interface IEditorState {
     objectList: IMapObject[],
@@ -69,15 +69,19 @@ function updateMap() {
 function receiveEditorUpdates() {
     updateMap();
 
-    const stompClient = new Client({ brokerURL: ws_url });
+    stompClient = new Client({ brokerURL: ws_url });
     stompClient.onWebSocketError = (error) => { editorState.errormessage = error.message };
     stompClient.onStompError = (frame) => { editorState.errormessage = frame.body };
 
     stompClient.onConnect = (frame) => {
+        console.log("connected");
         stompClient.subscribe(DEST, (message) => {
             const editorUpdate: IStompMessage = JSON.parse(message.body);
             onMessageReceived(editorUpdate);
         })
+    }
+    stompClient.onDisconnect = () => {
+        console.log("disconnected");
     }
 
     stompClient.activate();
@@ -91,12 +95,11 @@ function createMessage(message: IMapObject) {
             content: message,
             type: 'CREATE'
         }
-
-        stompClient.send(
-            CREATE_MSG,
-            {},
-            JSON.stringify(editorMessage)
-        )
+        stompClient.publish({
+            destination: CREATE_MSG,
+            headers: {},
+            body: JSON.stringify(editorMessage)
+        })
     }
 }
 
@@ -109,11 +112,11 @@ function deleteMessage(message: IMapObject) {
             type: 'DELETE'
         }
 
-        stompClient.send(
-            DELETE_MSG,
-            {},
-            JSON.stringify(editorMessage)
-        )
+        stompClient.publish({
+            destination: DELETE_MSG,
+            headers: {},
+            body: JSON.stringify(editorMessage)
+        })
     }
 }
 
@@ -126,11 +129,11 @@ function updateMessage(message: IMapObject) {
             type: 'UPDATE'
         }
 
-        stompClient.send(
-            UPDATE_MSG,
-            {},
-            JSON.stringify(editorMessage)
-        )
+        stompClient.publish({
+            destination: UPDATE_MSG,
+            headers: {},
+            body: JSON.stringify(editorMessage)
+        })
     }
 }
 
