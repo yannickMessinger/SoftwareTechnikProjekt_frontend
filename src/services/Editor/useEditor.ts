@@ -91,9 +91,9 @@ function createMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
             id: editorState.mapId,
+            type: 'CREATE',
             author: editorState.userName,
-            content: message,
-            type: 'CREATE'
+            content: message            
         }
         stompClient.publish({
             destination: CREATE_MSG,
@@ -107,9 +107,9 @@ function deleteMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
             id: editorState.mapId,
+            type: 'DELETE',
             author: editorState.userName,
-            content: message,
-            type: 'DELETE'
+            content: message            
         }
 
         stompClient.publish({
@@ -124,9 +124,9 @@ function updateMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
             id: editorState.mapId,
+            type: 'UPDATE',
             author: editorState.userName,
-            content: message,
-            type: 'UPDATE'
+            content: message
         }
 
         stompClient.publish({
