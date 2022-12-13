@@ -57,6 +57,7 @@ export default function useUser() {
     userID: computed(() => state.userId ),
     activeLobby: computed(() => state.activeLobby),
     setName,
+    setId,
     sendName,
     setActiveLobby
   };
