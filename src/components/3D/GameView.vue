@@ -124,7 +124,7 @@ export default defineComponent({
         
         <!--All elements placed in the editor are read from the list and placed in the scene-->
         <div v-for = "ele in mapElements">
-          <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{x:calcCoordinateX(ele.x), y:0, z: calcCoordinateZ(ele.y)}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:rotationMap.get(ele.rotation), z:0}"/>
+          <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{x:calcCoordinateX(ele.y), y:0, z: calcCoordinateZ(ele.x)}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:rotationMap.get(ele.rotation), z:0}"/>
         </div>    
         
       
