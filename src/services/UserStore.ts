@@ -8,7 +8,7 @@ const state = reactive<User>({
   userName: "",
   activeLobby: {
     lobbyId: -1,
-    mapID: -1,
+    mapId: -1,
     lobbyName: "",
     numOfPlayers: 0,
     lobbyModeEnum: E_LobbyMode.BUILD_MODE
@@ -55,7 +55,7 @@ async function postActiveLobby(lobby:ILobby) {
 export default function useUser() {
   return {
     name: computed(() => state.userName),
-    userID: computed(() => state.userId ),
+    userId: computed(() => state.userId ),
     activeLobby: computed(() => state.activeLobby),
     setName,
     setId,
