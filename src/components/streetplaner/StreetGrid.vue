@@ -18,7 +18,7 @@
     const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" } });
     const lobbyState = useUser().activeLobby;
 
-    const { mapObjects, createMessage, deleteMessage, updateMessage, updateMap, receiveEditorUpdates, updateMapId } = useEditor(lobbyState.value.mapID);
+    const { editorState, createMessage, deleteMessage, updateMessage, updateMap, receiveEditorUpdates, updateMapId } = useEditor(lobbyState.value.mapId);
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -41,7 +41,7 @@
     const gridSizePx = computed(() => gridSize.value.toString() + "px");
     // declare blockList
     var blockList: Array<IBlockElement>;
-    var streetGridDTO: StreetGridDTO;
+    watch(() => editorState.mapObjects, () => loadStreetGrid(editorState))
 
     onMounted(() => {
         // get blockList from backend
@@ -49,7 +49,7 @@
         blockList = useBlockList().blockList;
         updateBlockList();
         receiveEditorUpdates();
-        updateMapId(lobbyState.value.mapID);
+        updateMapId(lobbyState.value.mapId);
         updateMap();
     });
 
@@ -133,7 +133,7 @@
                 }
             }
         }
-        postStreetGrid(lobbyState.value.mapID, dto);
+        postStreetGrid(lobbyState.value.mapId, dto);
     }
     
     // load StreetGrid from backend dto
