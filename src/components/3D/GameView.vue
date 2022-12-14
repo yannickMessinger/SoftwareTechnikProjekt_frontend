@@ -30,7 +30,7 @@ export default defineComponent({
     /*Map of 3d-model paths*/
     const buildingIDMap = new Map()
     buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road.gltf');
-    buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/curved_road_rotated.gltf');
+    buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/curved_road.gltf');
     buildingIDMap.set(2,'/../../../src/assets/3D_Models/Streets/intersection_road.gltf');
 
     /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
