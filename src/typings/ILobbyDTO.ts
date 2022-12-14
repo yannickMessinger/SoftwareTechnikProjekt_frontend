@@ -1,12 +1,12 @@
 import { E_LobbyMode } from "./E_LobbyMode"
-import { IPlayerListItem } from "./IPlayerListItem"
+import IUser from "./IUser"
 
 export interface ILobbyDTO {
-    lobbyID?:number
-    hostID?:number
-    mapID?:number
+    lobbyId:number
+    hostId?:number
+    mapId:number
     lobbyName:string
     numOfPlayers: number
     lobbyModeEnum: E_LobbyMode
-    playerList?: IPlayerListItem[]
+    playerList?: IUser[]
 }
