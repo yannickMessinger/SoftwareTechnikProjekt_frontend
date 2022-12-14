@@ -1,4 +1,4 @@
-import { computed, reactive } from "vue";
+import { computed, reactive, readonly } from "vue";
 import User from '../typings/IUser';
 import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobby } from "../typings/ILobby";
@@ -11,7 +11,8 @@ const state = reactive<User>({
     mapId: -1,
     lobbyName: "",
     numOfPlayers: 0,
-    lobbyModeEnum: E_LobbyMode.BUILD_MODE
+    lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+    playerList: []
   }
 });
 
@@ -42,7 +43,9 @@ async function sendName():Promise<void> {
 
 async function setActiveLobby(lobby: ILobby):Promise<void> {
   state.activeLobby = lobby;
-  await postActiveLobby(lobby);
+  console.log(state.activeLobby);
+  // await postActiveLobby(lobby);
+  state.activeLobby.playerList?.push(state);
 }
 
 async function postActiveLobby(lobby:ILobby) {
@@ -52,15 +55,24 @@ async function postActiveLobby(lobby:ILobby) {
   console.log("setActiveLobby() -> post player to lobby - response", response);
 }
 
+function updateActiveLobbyPlayerList(players: User[]) {
+  for (let p of players) {
+    state.activeLobby.playerList?.push(p);
+  }
+  console.log(state.activeLobby.playerList);
+}
+
 export default function useUser() {
   return {
     name: computed(() => state.userName),
     userId: computed(() => state.userId ),
     activeLobby: computed(() => state.activeLobby),
+    user: readonly<User>(state),
     setName,
     setId,
     sendName,
-    setActiveLobby
+    setActiveLobby,
+    updateActiveLobbyPlayerList
   };
 }
 

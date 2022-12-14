@@ -3,7 +3,7 @@ import { IPlayerListState } from "../typings/IPlayerListState";
 import IUser from "../typings/IUser";
 import useUser from "./UserStore";
 
-const { activeLobby } = useUser();
+const { activeLobby, setActiveLobby, updateActiveLobbyPlayerList } = useUser();
 const playerState = reactive<IPlayerListState>({
     playerlist: Array<IUser>(),
     errormsg: ""
@@ -18,13 +18,9 @@ export async function fetchPlayerList(): Promise<void> {
     })
     const result = await response.json();
     console.log("fetch playerlist response", result);
-    for(let i of result) {
-        playerState.playerlist.push({
-            userId: i.userId,
-            userName: i.userName
-        })
-    }
-    console.log("playerState", playerState);
+    // hier die liste der spieler in aktiver Lobby updaten
+    // activeLobby.value.playerList = result;
+    playerState.playerlist = result;
 }
 
 export async function updatePlayerList() {
@@ -48,7 +44,6 @@ export async function updatePlayerList() {
     })
     
 }
-
 
 export function usePlayerList(){
     return {

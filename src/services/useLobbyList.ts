@@ -9,30 +9,36 @@ import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobbyListState } from "../typings/ILobbyListState";
 import useUser from "./UserStore";
 import { ILobbyDTO } from "../typings/ILobbyDTO";
+import { Client } from "@stomp/stompjs";
+import { useEditor } from "./Editor/useEditor";
+import { fetchPlayerList } from "./usePlayerList";
+import IUser from "../typings/IUser";
 
-const { userId, setActiveLobby } = useUser();
+const ws_url = `ws://${window.location.host}/stomp`;
+const DEST = '/topic/public';
+const SEND_MSG = '/app/lobby.sendMessage';
+const JOIN_MSG = '/app/lobby.join';
 
+let stompClient: Client;
+const {user, userId, activeLobby, setActiveLobby } = useUser();
+
+interface IStompMessage {
+  playerContent: IUser,
+  lobbyContent: ILobby,
+  type: string
+}
 
 const lobbyState = reactive<ILobbyListState>({
   lobbylist: Array<ILobbyDTO>(),
   errormsg: "",
 });
 
-const activeLobbyState = reactive<ILobbyDTO>({
-    lobbyId: -1,
-    hostId: -1,
-    mapId: -1,
-    lobbyName:"",
-    numOfPlayers: -1,
-    lobbyModeEnum: E_LobbyMode.BUILD_MODE
-})
-
 export function useLobbyList() {
   return {
     lobbyList: lobbyState,
-    activeLobbyState: activeLobbyState,
     updateLobbyList,
-    updateLobby
+    receiveLobbyUpdates,
+    joinMessage
   };
 }
 
@@ -63,27 +69,27 @@ export async function updateLobbyList(): Promise<void> {
   }
 }
 
-export async function updateLobby(id: number) {
-  const url = "/api/lobby";
+// export async function updateLobby(id: number) {
+//   const url = "/api/lobby";
 
-  try {
-    const response = await fetch(`${url}/${id}`, { method: "GET" });
-    if (!response.ok) {
-      console.log("can't get active lobby");
-    }
-    const jsondata: ILobbyDTO = await response.json();
-    activeLobbyState.hostId = jsondata.hostId;
-    activeLobbyState.lobbyId = jsondata.lobbyId;
-    activeLobbyState.lobbyModeEnum = jsondata.lobbyModeEnum;
-    activeLobbyState.lobbyName = jsondata.lobbyName;
-    activeLobbyState.mapId = jsondata.mapId;
-    activeLobbyState.numOfPlayers = jsondata.numOfPlayers;
-    activeLobbyState.playerList = jsondata.playerList;
-    setActiveLobby(activeLobbyState);
-  } catch (error) {
-    console.log(error);
-  }
-}
+//   try {
+//     const response = await fetch(`${url}/${id}`, { method: "GET" });
+//     if (!response.ok) {
+//       console.log("can't get active lobby");
+//     }
+//     const jsondata: ILobbyDTO = await response.json();
+//     activeLobbyState.hostID = jsondata.hostID;
+//     activeLobbyState.lobbyID = jsondata.lobbyID;
+//     activeLobbyState.lobbyModeEnum = jsondata.lobbyModeEnum;
+//     activeLobbyState.lobbyName = jsondata.lobbyName;
+//     activeLobbyState.mapID = jsondata.mapID;
+//     activeLobbyState.numOfPlayers = jsondata.numOfPlayers;
+//     activeLobbyState.playerList = jsondata.playerList;
+//     setActiveLobby(activeLobbyState);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
 
 //adds new lobby and sends it to backend, then update of lobbylist
 export async function createNewLobby(
@@ -93,7 +99,6 @@ export async function createNewLobby(
 ) {
   console.log(`User ID from useLobbyList  ${userId.value}`);
   const url = "/api/lobby";
-
 
   const addLobby: IAddLobbyRequestDTO = {
     lobbyName: addLobbyName,
@@ -111,10 +116,79 @@ export async function createNewLobby(
       body: JSON.stringify(addLobby),
     });
     let id = await res.json();
-    updateLobby(id);
+    setActiveLobby(id);
 
     await updateLobbyList();
   } catch (error) {
     console.log(error);
+  }
+}
+
+function joinMessage() {
+  if (stompClient && (userId.value !== undefined) && (activeLobby.value.lobbyId !== undefined)) {
+    const lobbyMessage: IStompMessage = {
+      playerContent: {
+        userId: user.userId,
+        userName: user.userName,
+        activeLobby: {
+            lobbyId: user.activeLobby.lobbyId,
+            mapId: user.activeLobby.mapId,
+            lobbyName: user.activeLobby.lobbyName,
+            numOfPlayers: user.activeLobby.numOfPlayers,
+            lobbyModeEnum: user.activeLobby.lobbyModeEnum
+        }
+      },
+      lobbyContent: {
+          lobbyId: user.activeLobby.lobbyId,
+          hostId: user.activeLobby.hostId,
+          mapId: user.activeLobby.mapId,
+          lobbyName: user.activeLobby.lobbyName,
+          numOfPlayers: user.activeLobby.numOfPlayers,
+          lobbyModeEnum: user.activeLobby.lobbyModeEnum
+      },
+      type: 'JOIN'
+    };
+    console.log(lobbyMessage.lobbyContent);
+    stompClient.publish({
+      destination: JOIN_MSG,
+      headers: {},
+      body: JSON.stringify(lobbyMessage)
+    });
+  }
+}
+
+function receiveLobbyUpdates() {
+  stompClient = new Client({
+    brokerURL: ws_url
+  });
+  stompClient.onWebSocketError = (error) => {console.log("error", error.message)}
+  stompClient.onStompError = (frame) => { console.log("error", frame.body)}
+
+  stompClient.onConnect = (frame) => {
+    console.log("lobby ws connected");
+    stompClient.subscribe(DEST, (message) => {
+      const lobbyUpdate: IStompMessage = JSON.parse(message.body);
+      onMessageReceived(lobbyUpdate);
+    })
+  }
+
+  stompClient.onDisconnect = () => {
+    console.log("lobby ws disconnected");
+  }
+
+  stompClient.activate();
+}
+
+async function onMessageReceived(payload: IStompMessage) {
+  if (payload.lobbyContent.lobbyId === activeLobby.value.lobbyId) {
+    if (payload.type ===  'JOIN') {
+      console.log("received message JOIN");
+      await fetchPlayerList();
+      activeLobby.value.playerList?.push({
+        userId:payload.playerContent.userId,
+        userName:payload.playerContent.userName,
+        activeLobby:payload.lobbyContent
+      });
+    }
   }
 }
