@@ -10,7 +10,7 @@ import { ILobbyListState } from "../typings/ILobbyListState";
 import useUser from "./UserStore";
 import { ILobbyDTO } from "../typings/ILobbyDTO";
 
-const {userID} = useUser();
+const { userID, setActiveLobby } = useUser();
 
 
 const lobbyState = reactive<ILobbyListState>({
@@ -79,6 +79,7 @@ export async function updateLobby(id: number) {
     activeLobbyState.mapID = jsondata.mapID;
     activeLobbyState.numOfPlayers = jsondata.numOfPlayers;
     activeLobbyState.playerList = jsondata.playerList;
+    setActiveLobby(activeLobbyState);
   } catch (error) {
     console.log(error);
   }

@@ -3,12 +3,11 @@ import { E_LobbyMode } from "./E_LobbyMode"
 import IUser from "./IUser"
 
 export interface ILobby {
-    lobbyID?:number
+    lobbyId?:number
     hostID?:number
-    mapID?:number
+    mapID:number
     lobbyName:string
     numOfPlayers: number
     lobbyModeEnum: E_LobbyMode
-    hostID?:string
-    playerList?: IPlayerListItem[]
+    playerList?: IUser[]
 }

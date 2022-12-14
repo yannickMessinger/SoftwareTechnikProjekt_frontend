@@ -7,7 +7,8 @@ const state = reactive<User>({
   userId:  undefined,
   userName: "",
   activeLobby: {
-    lobbyId: 0,
+    lobbyId: -1,
+    mapID: -1,
     lobbyName: "",
     numOfPlayers: 0,
     lobbyModeEnum: E_LobbyMode.BUILD_MODE

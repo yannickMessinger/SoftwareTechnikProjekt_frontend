@@ -35,15 +35,20 @@ const editorState = reactive<IEditorState>({
 
 export function useEditor(mapId: number) {
     editorState.mapId = mapId
-
+    console.log(mapId);
     return {
         mapObjects: readonly(editorState),
         createMessage,
         deleteMessage,
         updateMessage,
         updateMap,
-        receiveEditorUpdates
+        receiveEditorUpdates,
+        updateMapId
     }
+}
+
+function updateMapId(mapId: number) {
+    editorState.mapId = mapId;
 }
 
 function updateMap() {
@@ -141,10 +146,12 @@ function onMessageReceived(payload: IStompMessage) {
     console.log(payload);
     if (editorState.mapId === payload.id) {
         if (payload.type === 'CREATE') {
-            editorState.objectList.push(payload.content)
+            editorState.objectList = editorState.objectList.filter(
+                (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y);
+            editorState.objectList.push(payload.content);
         } else if (payload.type === 'DELETE') {
             editorState.objectList = editorState.objectList.filter(
-                (obj) => obj.objectTypeId != payload.content.objectTypeId)
+                (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y);
         } else if (payload.type === 'UPDATE') {
             editorState.objectList.forEach((obj, index) => {
                 if (obj.objectTypeId === payload.content.objectTypeId) {
@@ -153,4 +160,5 @@ function onMessageReceived(payload: IStompMessage) {
             })
         }
     }
+    console.log(editorState.objectList);
 }
