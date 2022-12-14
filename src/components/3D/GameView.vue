@@ -81,7 +81,7 @@ export default defineComponent({
 
       
       
-      updateStreetGridList(lobbyState.mapID);
+      updateStreetGridList(lobbyState.mapId);
       console.log("ON MOUNTED")
       console.log(mapElements);
     
