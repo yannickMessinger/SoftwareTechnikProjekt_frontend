@@ -9,16 +9,16 @@
     import { IBlockElement } from '../../services/streetplaner/IBlockElement';
     import { IMapObject } from '../../services/streetplaner/IMapObject';
     import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
-    import { useLobbyList } from '../../services/useLobbyList';
+    import useUser from '../../services/UserStore';
     import { useEditor } from '../../services/Editor/useEditor';
     const { bus } = useEventBus();
 
     var gridSizeX = 20;
     var gridSizeY = 30;
     const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" } });
-    const lobbyState = useLobbyList().activeLobbyState;
+    const lobbyState = useUser().activeLobby;
 
-    const { mapObjects, createMessage, deleteMessage, updateMessage, updateMap, receiveEditorUpdates} = useEditor(lobbyState.mapID);
+    const { editorState, createMessage, deleteMessage, updateMessage, updateMap, receiveEditorUpdates, updateMapId } = useEditor(lobbyState.value.mapId);
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -41,7 +41,7 @@
     const gridSizePx = computed(() => gridSize.value.toString() + "px");
     // declare blockList
     var blockList: Array<IBlockElement>;
-    var streetGridDTO: StreetGridDTO;
+    watch(() => editorState.mapObjects, () => loadStreetGrid(editorState))
 
     onMounted(() => {
         // get blockList from backend
@@ -49,6 +49,8 @@
         blockList = useBlockList().blockList;
         updateBlockList();
         receiveEditorUpdates();
+        updateMapId(lobbyState.value.mapId);
+        updateMap();
     });
 
     // onClick handles click on specific cell
@@ -86,27 +88,33 @@
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
     function onMouseMove(cell: any, event: any) {
+        let currCellContent = streetGrid[cell.posX][cell.posY];
         // Todo, add check so stomp message will only send when a change is made
         let payload: IMapObject;
         if (event.buttons === 1 && toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
-            streetGrid[cell.posX][cell.posY].id = toolState.block.id;
-            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
-            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
-            payload = { objectTypeId: toolState.block.id,
+            if (currCellContent.id !== toolState.block.id || (currCellContent.id !== toolState.block.id && currCellContent.rotation !== toolState.block.rotation)) {
+                streetGrid[cell.posX][cell.posY].id = toolState.block.id;
+                streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
+                streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+                payload = { objectTypeId: toolState.block.id,
                         x: cell.posX,
                         y: cell.posY,
                         rotation: toolState.block.rotation };
-            createMessage(payload);
+                createMessage(payload);
+            }
+            
         }
         if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
-            payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
-                        x: cell.posX,
-                        y: cell.posY,
-                        rotation: streetGrid[cell.posX][cell.posY].rotation };
-            streetGrid[cell.posX][cell.posY].id = -1;
-            streetGrid[cell.posX][cell.posY].rotation = 0;
-            streetGrid[cell.posX][cell.posY].texture = "";
-            deleteMessage(payload);
+            if (currCellContent.id !== -1) {            
+                payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                            x: cell.posX,
+                            y: cell.posY,
+                            rotation: streetGrid[cell.posX][cell.posY].rotation };
+                streetGrid[cell.posX][cell.posY].id = -1;
+                streetGrid[cell.posX][cell.posY].rotation = 0;
+                streetGrid[cell.posX][cell.posY].texture = "";
+                deleteMessage(payload);
+            }
         }
     }
     
@@ -125,7 +133,7 @@
                 }
             }
         }
-        postStreetGrid(lobbyState.mapID, dto);
+        postStreetGrid(lobbyState.value.mapId, dto);
     }
     
     // load StreetGrid from backend dto

@@ -13,7 +13,7 @@ const MAP_API = '/api/map/objects/'
 let stompClient: Client
 
 interface IEditorState {
-    objectList: IMapObject[],
+    mapObjects: IMapObject[],
     errormessage: string,
     mapId: number,
     userName: string
@@ -27,7 +27,7 @@ interface IStompMessage {
 }
 
 const editorState = reactive<IEditorState>({
-    objectList: Array<IMapObject>(),
+    mapObjects: Array<IMapObject>(),
     errormessage: '',
     mapId: 0,
     userName: ''
@@ -35,15 +35,20 @@ const editorState = reactive<IEditorState>({
 
 export function useEditor(mapId: number) {
     editorState.mapId = mapId
-
+    console.log(mapId);
     return {
-        mapObjects: readonly(editorState),
+        editorState: editorState,
         createMessage,
         deleteMessage,
         updateMessage,
         updateMap,
-        receiveEditorUpdates
+        receiveEditorUpdates,
+        updateMapId
     }
+}
+
+function updateMapId(mapId: number) {
+    editorState.mapId = mapId;
 }
 
 function updateMap() {
@@ -58,7 +63,7 @@ function updateMap() {
                 return resp.json()
             })
             .then((jsonData: IMapObject[]) => {
-                editorState.objectList = jsonData
+                editorState.mapObjects = jsonData
             })
             .catch((reason) => {
                 editorState.errormessage = `Error: ${reason}`
@@ -141,16 +146,19 @@ function onMessageReceived(payload: IStompMessage) {
     console.log(payload);
     if (editorState.mapId === payload.id) {
         if (payload.type === 'CREATE') {
-            editorState.objectList.push(payload.content)
+            editorState.mapObjects = editorState.mapObjects.filter(
+                (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y);
+            editorState.mapObjects.push(payload.content);
         } else if (payload.type === 'DELETE') {
-            editorState.objectList = editorState.objectList.filter(
-                (obj) => obj.objectTypeId != payload.content.objectTypeId)
+            editorState.mapObjects = editorState.mapObjects.filter(
+                (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y);
         } else if (payload.type === 'UPDATE') {
-            editorState.objectList.forEach((obj, index) => {
+            editorState.mapObjects.forEach((obj, index) => {
                 if (obj.objectTypeId === payload.content.objectTypeId) {
-                    editorState.objectList[index] = payload.content
+                    editorState.mapObjects[index] = payload.content
                 }
             })
         }
     }
+    console.log(editorState.mapObjects);
 }
