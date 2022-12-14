@@ -66,7 +66,7 @@
                         rotation: toolState.block.rotation };
             createMessage(payload);
         }
-        if (toolState.tool == ToolEnum.ROTATE) {
+        if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].id !== -1) {
             streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4;
             payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
                         x: cell.posX,
@@ -139,6 +139,7 @@
     // load StreetGrid from backend dto
     function loadStreetGrid(dto: StreetGridDTO) {
         resetGrid();
+        console.log(dto.mapObjects);
         for(let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = { 
                 id: ele.objectTypeId, 
