@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stomp/stompjs": "^6.1.2",
     "three": "^0.136.0",
     "troisjs": "^0.3.4",
     "vue": "^3.2.41",
