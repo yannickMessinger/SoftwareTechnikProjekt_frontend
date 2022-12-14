@@ -10,7 +10,7 @@ import { ILobbyListState } from "../typings/ILobbyListState";
 import useUser from "./UserStore";
 import { ILobbyDTO } from "../typings/ILobbyDTO";
 
-const {userID} = useUser();
+const {logindata} = useUser();
 
 
 const lobbyState = reactive<ILobbyListState>({
@@ -90,7 +90,7 @@ export async function createNewLobby(
   addNumOfPlayers: number,
   addLobbyMode: E_LobbyMode
 ) {
-  console.log(`User ID from useLobbyList  ${userID.value}`);
+  console.log(`User ID from useLobbyList  ${logindata.userId}`);
   const url = "/api/lobby";
 
 
@@ -98,7 +98,7 @@ export async function createNewLobby(
     lobbyName: addLobbyName,
     numOfPlayers: addNumOfPlayers,
     lobbyModeEnum: addLobbyMode,
-    hostID: userID.value
+    hostID: logindata.userId
   };
 
   console.log(addLobby)

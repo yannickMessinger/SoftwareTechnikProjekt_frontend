@@ -1,11 +1,14 @@
-import { computed, reactive } from "vue";
+import { computed, reactive, readonly } from "vue";
 import User from '../typings/IUser';
 import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobby } from "../typings/ILobby";
+import { IGetPlayerResponseDTO } from "../typings/IGetPlayerResponseDTO";
 
 const state = reactive<User>({
-  userId:  undefined,
-  userName: "",
+  userId: 0 as IGetPlayerResponseDTO["userId"],
+  userName: "" as IGetPlayerResponseDTO["userName"],
+  errormessage:"",
+  loggedIn: false,
   activeLobby: {
     lobbyId: 0,
     lobbyName: "",
@@ -13,14 +16,6 @@ const state = reactive<User>({
     lobbyModeEnum: E_LobbyMode.BUILD_MODE
   }
 });
-
-function setId(id:number): void {
-  state.userId = id;
-}
-
-function setName(name: string): void {
-  state.userName = name;
-}
 
 async function sendName():Promise<void> {
   const response = await fetch('/api/player', {
@@ -35,7 +30,7 @@ async function sendName():Promise<void> {
 
   console.log("sendName():", response);
   const jsondata = await response.json();
-  setId(Number(jsondata));
+  state.userId = Number(jsondata)
   console.log("state.userId", state.userId);
 }
 
@@ -51,14 +46,74 @@ async function postActiveLobby(lobby:ILobby) {
   console.log("setActiveLobby() -> post player to lobby - response", response);
 }
 
+async function register(username:string, password:string): Promise<any> {
+  return fetch("/api/player", {
+      method: "POST",
+      headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+  },
+  body: JSON.stringify({
+          userName: username as IGetPlayerResponseDTO["userName"],
+          password: password
+      })
+  })
+  .then(response=> {
+      if (response.status === 200) {
+          return response.json()
+      } else {
+          return null
+      }
+  })
+  .then(data=>{ return data })
+  .catch(err => console.log(err))
+}
+
+async function login(username:string, password:string): Promise<{userId: number, userName: string} | null> {
+  return fetch("/api/player/login", {
+      method: "POST",
+      headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+  },
+  body: JSON.stringify({
+          userName: username as IGetPlayerResponseDTO["userName"],
+          password: password
+      })
+  })
+  .then(response=> {
+      if (response.status === 200) {
+          return response.json()
+      } else {
+          return null
+      }
+  })
+  .then(data =>{ 
+      console.log(data)
+      if(data != null){
+          const loginDataResponse: IGetPlayerResponseDTO = data
+          state.userName = loginDataResponse.userName
+          state.userId = loginDataResponse.userId
+          state.errormessage = ""
+          state.loggedIn = true
+          console.log(state)
+      }
+      return data 
+  })
+  .catch((err) => {
+    state.loggedIn = false
+    state.errormessage = err
+      console.log(state.errormessage)
+      })
+}
+
 export default function useUser() {
   return {
-    name: computed(() => state.userName),
-    userID: computed(() => state.userId ),
-    activeLobby: computed(() => state.activeLobby),
-    setName,
+    logindata : readonly(state),
     sendName,
-    setActiveLobby
+    setActiveLobby,
+    login,
+    register
   };
 }
 

@@ -3,7 +3,7 @@ import { IPlayerListState } from "../typings/IPlayerListState";
 import IUser from "../typings/IUser";
 import useUser from "./UserStore";
 
-const { activeLobby } = useUser();
+const { logindata, activeLobby } = useUser();
 const playerState = reactive<IPlayerListState>({
     playerlist: Array<IUser>(),
     errormsg: ""
@@ -13,7 +13,7 @@ const playerState = reactive<IPlayerListState>({
  * fetches the playerlist of the active lobby which is saved in the UserStore under activeLobby
  */
 export async function fetchPlayerList(): Promise<void> {
-    const response = await fetch(`/api/lobby/get_players/${activeLobby.value?.lobbyId}`, {
+    const response = await fetch(`/api/lobby/get_players/${logindata.activeLobby?.lobbyID}`, {
         method: 'GET'
     })
     const result = await response.json();

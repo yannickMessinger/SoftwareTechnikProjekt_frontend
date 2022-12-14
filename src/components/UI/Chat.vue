@@ -24,7 +24,7 @@
 <script setup lang="ts">
     import {ref} from 'vue'
     import BasicButton from '../Buttons/BasicButton.vue';
-    import {useLogin} from '../../services/useLogin'
+    import useUser from '../../services/UserStore'
 
     interface IMessage{
         name: string,
@@ -33,7 +33,7 @@
 
     const chatHistory = ref<IMessage[]>([])
     const chatLength = 20
-    const {logindata} = useLogin()
+    const {logindata} = useUser()
     let input = ref("")
     let chat = ref()
     let visible = ref(false)

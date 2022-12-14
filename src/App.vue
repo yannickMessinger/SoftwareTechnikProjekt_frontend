@@ -180,6 +180,10 @@
     margin-bottom: 0.83em;
   }
   
+  input:focus {
+    outline: none;
+    box-shadow: 0 0 2px var(--woe-blue-60);
+  }
   @media (prefers-color-scheme: light) {
     :root {
       color: #213547;

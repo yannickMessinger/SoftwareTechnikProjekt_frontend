@@ -6,13 +6,13 @@
             </div>
             <div class="content-form">
                 <label>Benutzer</label>
-                <input v-model="username" type="text" placeholder="Username" required />
+                <input :class="usernameError != '' ? 'error-input' : '' " v-model="username" type="text" placeholder="Username" required />
                 <label class="error">{{usernameError}}</label>
                 <label>Passwort</label>
-                <input v-model="password" type="password" placeholder="Passwort" required />
+                <input v-model="password" :class="passwordError != '' ? 'error-input' : '' " type="password" placeholder="Passwort" required />
                 <label class="error">{{passwordError}}</label>
                 <label v-if="registrationMode">Passwort erneut eingeben</label>
-                <input v-if="registrationMode" v-model="passwordRepeat" type="password" placeholder="Passwort" required />
+                <input v-if="registrationMode" :class="passwordError != '' ? 'error-input' : '' " v-model="passwordRepeat" type="password" placeholder="Passwort" required />
                 <label v-if="registrationMode" class="error">{{passwordError}}</label>
                 <hr>
                 <BasicButton v-if="!registrationMode" class="sec btn blue" :display="'Login'" :btn_click="loginCheck"/>
@@ -26,10 +26,9 @@
 
 <script setup lang="ts">
     import { ref } from "vue";
-    import useUser from "../../services/UserStore";
     import router from "../../router/router"
     import BasicButton from '../Buttons/BasicButton.vue';
-    import {useLogin} from '../../services/useLogin'	
+    import useUser from '../../services/UserStore'
 
     const username = ref("")
     const password = ref("")
@@ -38,7 +37,7 @@
     const headline = ref("Login")
     const usernameError = ref("")
     const passwordError = ref("")
-    const {logindata ,login, register} = useLogin()
+    const {login, register} = useUser()
     
     async function loginCheck() {
         let responseBody = await login(username.value, password.value)
@@ -48,8 +47,8 @@
             router.push('/');
         } else {
             usernameError.value = "Username und Passwort Kombination gibt es nicht"
+            passwordError.value = "Username und Passwort Kombination gibt es nicht"
             console.log("Status 400")
-            console.log(logindata.errormessage)
         }
     }
 
@@ -74,6 +73,7 @@
         password.value = ""
         passwordRepeat.value = ""
         usernameError.value = ""
+        passwordError.value = ""
     }
 </script>
 
@@ -136,6 +136,10 @@
 
     .error {
         color: red;
+    }
+    
+    .error-input{
+        border-color: red;
     }
 
 </style>
