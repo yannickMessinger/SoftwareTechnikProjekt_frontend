@@ -29,7 +29,7 @@ export default defineComponent({
     const fieldSize = 10;
     /*Map of 3d-model paths*/
     const buildingIDMap = new Map()
-    buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf');
+    buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road.gltf');
     buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/curved_road_rotated.gltf');
     buildingIDMap.set(2,'/../../../src/assets/3D_Models/Streets/intersection_road.gltf');
 
