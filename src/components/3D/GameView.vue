@@ -44,17 +44,21 @@ export default defineComponent({
     /*270 degree rotation*/
     rotationMap.set(3, 3*Math.PI/2)
 
-  
+    
 
     let building:string = '/../../../src/assets/3D_Models/Building/Markt.gltf';
     
+    resetMapEles()
     const mapElements = computed(() => useStreetGridList().streetGridDTO.mapObjects);
     const lobbyState = useLobbyList().activeLobbyState;
-
+    console.log("INIT MAP ELES");
+    console.log(mapElements);
     
     
   
-    
+    function resetMapEles(){
+      useStreetGridList().resetMapEles();
+    }
 
     /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
@@ -63,13 +67,13 @@ export default defineComponent({
 
     /*Calculates X coordinates position of loaded Model */
     function calcCoordinateX(n:number){
-      console.log((gridSizeX * (-0.5)) + (n * fieldSize) + (fieldSize / 2))
+      //console.log((gridSizeX * (-0.5)) + (n * fieldSize) + (fieldSize / 2))
       return (gridSizeX * (-0.5)) + (n * fieldSize) + (fieldSize / 2);
     }
 
     /*Calculates Z coordinates position of loaded Model */
     function calcCoordinateZ(n:number){
-      console.log((gridSizeY * (-0.5)) + (n * fieldSize) + (fieldSize / 2))
+      //console.log((gridSizeY * (-0.5)) + (n * fieldSize) + (fieldSize / 2))
       return (gridSizeY * (-0.5)) + (n * fieldSize) + (fieldSize / 2);
     }
 
@@ -78,7 +82,8 @@ export default defineComponent({
       
       
       updateStreetGridList(lobbyState.mapID);
-      
+      console.log("ON MOUNTED")
+      console.log(mapElements);
     
 
       renderer.value.onBeforeRender(() => {

@@ -7,7 +7,8 @@ const streetGridDTO = reactive({ mapObjects: Array<IStreetElement>() });
 export function useStreetGridList() {
     return {
         streetGridDTO: streetGridDTO,
-        updateStreetGridList
+        updateStreetGridList,
+        resetMapEles
     }
 }
 
@@ -47,4 +48,9 @@ export async function postStreetGrid(mapID: number, dto: StreetGridDTO) {
     catch (error) {
         console.log(error);
     }
+}
+
+
+export function resetMapEles(){
+    streetGridDTO.mapObjects.splice(0, streetGridDTO.mapObjects.length);
 }
