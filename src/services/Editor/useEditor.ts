@@ -3,13 +3,14 @@ import { Client } from "@stomp/stompjs";
 import { IMapObject } from "../streetplaner/IMapObject";
 
 const ws_url = `ws://${window.location.host}/stomp`
-const DEST = '/topic/public'
+const DEST = '/topic/editor'
 const CREATE_MSG = '/app/editor.create'
 const DELETE_MSG = '/app/editor.delete'
 const UPDATE_MSG = '/app/editor.update'
 const MAP_API = '/api/map/objects/'
 
 let stompClient: Client
+let updateCounter: number
 
 interface IEditorState {
     mapObjects: IMapObject[],
@@ -72,6 +73,8 @@ function updateMap() {
 
 function receiveEditorUpdates() {
     updateMap();
+
+    updateCounter = 0;
 
     stompClient = new Client({ brokerURL: ws_url });
     stompClient.onWebSocketError = (error) => { editorState.errormessage = error.message };
@@ -142,7 +145,6 @@ function updateMessage(message: IMapObject) {
 }
 
 function onMessageReceived(payload: IStompMessage) {
-    console.log(payload);
     if (editorState.mapId === payload.id) {
         if (payload.type === 'CREATE') {
             editorState.mapObjects = editorState.mapObjects.filter(
@@ -157,5 +159,4 @@ function onMessageReceived(payload: IStompMessage) {
             editorState.mapObjects.push(payload.content);
         }
     }
-    console.log(editorState.mapObjects);
 }

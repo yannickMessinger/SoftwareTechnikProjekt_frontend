@@ -27,13 +27,13 @@
         toolState.block = val[0];
     });
     watch(() => bus.value.get('grid-reset-event'), (val) => {
-        if (val) { resetGrid(); }
+        if (val) { deleteAllGridElements(); }
     });
     watch(() => bus.value.get('grid-save-event'), (val) => { saveStreetGrid(); });
 
     // create and initialize streetGrid
     const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
-    resetGrid();
+    fillGridEmpty();
 
     // initialize gridSize
     const gridSize = ref(40);
@@ -138,7 +138,7 @@
     
     // load StreetGrid from backend dto
     function loadStreetGrid(dto: StreetGridDTO) {
-        resetGrid();
+        fillGridEmpty();
         console.log(dto.mapObjects);
         for(let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = { 
@@ -150,11 +150,27 @@
         }
     }
 
-    function resetGrid() {
+    function fillGridEmpty() {
         // fill streetGrid with empty IGridElements
         for(let row=0; row<streetGrid.length; row++) {
             for(let col=0; col<streetGrid[0].length; col++) {
                 streetGrid[row][col] = { id: -1, posX: row, posY: col, rotation: 0, texture: ""};
+            }
+        }
+    }
+
+    // deletes all grid elements via stomp
+    function deleteAllGridElements() {
+        for(let row=0; row<streetGrid.length; row++) {
+            for(let col=0; col<streetGrid[0].length; col++) {
+                if (streetGrid[row][col] !== null && streetGrid[row][col].id !== -1) {
+                    let cell = streetGrid[row][col];
+                    let payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                                    x: cell.posX,
+                                    y: cell.posY,
+                                    rotation: streetGrid[cell.posX][cell.posY].rotation };
+                    deleteMessage(payload);
+                }
             }
         }
     }
