@@ -46,7 +46,7 @@
         blockList = useBlockList().blockList;
         streetGridDTO = useStreetGridList().streetGridDTO;
         updateBlockList();
-        updateStreetGridList(lobbyState.mapID).then(() => {
+        updateStreetGridList(lobbyState.mapId).then(() => {
             loadStreetGrid(streetGridDTO);
         });
 
@@ -99,7 +99,7 @@
                 }
             }
         }
-        postStreetGrid(lobbyState.mapID, dto);
+        postStreetGrid(lobbyState.mapId, dto);
     }
     
     // load StreetGrid from backend dto
