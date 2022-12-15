@@ -24,25 +24,29 @@ import { ILobby } from "../../typings/ILobby";
 import BasicButton from "../Buttons/BasicButton.vue";
 import useUser from "../../services/UserStore";
 import router from "../../router/router";
+import { useLobbyList } from "../../services/useLobbyList";
+import { onMounted } from "vue";
 
 const props = defineProps<{
   lobby: ILobby;
 }>();
 
 const {setActiveLobby} = useUser();
+const {receiveLobbyUpdates, joinMessage} = useLobbyList();
 
 //for later purposes to link to selected lobby via Vue Router
 async function selectLobby(){
-    console.log(props.lobby.lobbyId, props.lobby.lobbyName);
-    await setActiveLobby(props.lobby);
-    console.log("user has active lobby");
+    setActiveLobby(props.lobby);
+    // websocket: hier muss nachricht ans backend gesendet werden, dass neuer User beigetreten ist
+    joinMessage()
     router.push({
         path: '/lobbyview'
     })
 }
 
-
-
+onMounted(() => {
+    receiveLobbyUpdates();
+})
 
 </script>
 

@@ -4,7 +4,6 @@ import { IMapObject } from "../streetplaner/IMapObject";
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = '/topic/public'
-const SEND_MSG = '/app/editor.sendMessage'
 const CREATE_MSG = '/app/editor.create'
 const DELETE_MSG = '/app/editor.delete'
 const UPDATE_MSG = '/app/editor.update'
@@ -153,11 +152,9 @@ function onMessageReceived(payload: IStompMessage) {
             editorState.mapObjects = editorState.mapObjects.filter(
                 (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y);
         } else if (payload.type === 'UPDATE') {
-            editorState.mapObjects.forEach((obj, index) => {
-                if (obj.objectTypeId === payload.content.objectTypeId) {
-                    editorState.mapObjects[index] = payload.content
-                }
-            })
+            editorState.mapObjects = editorState.mapObjects.filter(
+                (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y);
+            editorState.mapObjects.push(payload.content);
         }
     }
     console.log(editorState.mapObjects);
