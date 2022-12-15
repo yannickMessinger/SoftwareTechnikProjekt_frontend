@@ -116,6 +116,7 @@ export async function createNewLobby(
       body: JSON.stringify(addLobby),
     });
     let id = await res.json();
+    console.log(id)
     setActiveLobby(id);
 
     await updateLobbyList();
