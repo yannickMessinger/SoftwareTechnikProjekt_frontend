@@ -10,7 +10,6 @@ const UPDATE_MSG = '/app/editor.update'
 const MAP_API = '/api/map/objects/'
 
 let stompClient: Client
-let updateCounter: number
 
 interface IEditorState {
     mapObjects: IMapObject[],
@@ -73,8 +72,6 @@ function updateMap() {
 
 function receiveEditorUpdates() {
     updateMap();
-
-    updateCounter = 0;
 
     stompClient = new Client({ brokerURL: ws_url });
     stompClient.onWebSocketError = (error) => { editorState.errormessage = error.message };
