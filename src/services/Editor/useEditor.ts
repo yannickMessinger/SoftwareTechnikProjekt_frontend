@@ -7,6 +7,7 @@ const DEST = '/topic/editor'
 const CREATE_MSG = '/app/editor.create'
 const DELETE_MSG = '/app/editor.delete'
 const UPDATE_MSG = '/app/editor.update'
+const RESET_MSG = '/app/editor.reset'
 const MAP_API = '/api/map/objects/'
 
 let stompClient: Client
@@ -40,6 +41,7 @@ export function useEditor(mapId: number) {
         createMessage,
         deleteMessage,
         updateMessage,
+        resetMessage,
         updateMap,
         receiveEditorUpdates,
         updateMapId
@@ -141,6 +143,24 @@ function updateMessage(message: IMapObject) {
     }
 }
 
+function resetMessage() {
+    const message: IMapObject = { objectTypeId: -1, x: 0, y: 0, rotation: 0 };
+    if (message && stompClient) {
+        const editorMessage: IStompMessage = {
+            id: editorState.mapId,
+            type: 'RESET',
+            author: editorState.userName,
+            content: message
+        }
+
+        stompClient.publish({
+            destination: RESET_MSG,
+            headers: {},
+            body: JSON.stringify(editorMessage)
+        })
+    }
+}
+
 function onMessageReceived(payload: IStompMessage) {
     if (editorState.mapId === payload.id) {
         if (payload.type === 'CREATE') {
@@ -154,6 +174,8 @@ function onMessageReceived(payload: IStompMessage) {
             editorState.mapObjects = editorState.mapObjects.filter(
                 (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y);
             editorState.mapObjects.push(payload.content);
+        } else if (payload.type === 'RESET') {
+            updateMap();
         }
     }
 }

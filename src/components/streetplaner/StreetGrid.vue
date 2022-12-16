@@ -18,7 +18,7 @@
     const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" } });
     const lobbyState = useUser().activeLobby;
 
-    const { editorState, createMessage, deleteMessage, updateMessage, updateMap, receiveEditorUpdates, updateMapId } = useEditor(lobbyState.value.mapId);
+    const { editorState, createMessage, deleteMessage, updateMessage, resetMessage, updateMap, receiveEditorUpdates, updateMapId } = useEditor(lobbyState.value.mapId);
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -27,7 +27,7 @@
         toolState.block = val[0];
     });
     watch(() => bus.value.get('grid-reset-event'), (val) => {
-        if (val) { deleteAllGridElements(); }
+        if (val) { resetMessage(); }
     });
     watch(() => bus.value.get('grid-save-event'), (val) => { saveStreetGrid(); });
 
@@ -155,22 +155,6 @@
         for(let row=0; row<streetGrid.length; row++) {
             for(let col=0; col<streetGrid[0].length; col++) {
                 streetGrid[row][col] = { id: -1, posX: row, posY: col, rotation: 0, texture: ""};
-            }
-        }
-    }
-
-    // deletes all grid elements via stomp
-    function deleteAllGridElements() {
-        for(let row=0; row<streetGrid.length; row++) {
-            for(let col=0; col<streetGrid[0].length; col++) {
-                if (streetGrid[row][col] !== null && streetGrid[row][col].id !== -1) {
-                    let cell = streetGrid[row][col];
-                    let payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
-                                    x: cell.posX,
-                                    y: cell.posY,
-                                    rotation: streetGrid[cell.posX][cell.posY].rotation };
-                    deleteMessage(payload);
-                }
             }
         }
     }
