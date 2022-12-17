@@ -4,11 +4,13 @@ import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobby } from "../typings/ILobby";
 import { ILobbyDTO } from "../typings/ILobbyDTO";
 
+
 const state = reactive<User>({
   userId:  undefined,
   userName: "",
   activeLobby: {
     lobbyId: -1,
+    hostId:-1,
     mapId: -1,
     lobbyName: "",
     numOfPlayers: 0,
@@ -42,38 +44,44 @@ async function sendName():Promise<void> {
   console.log("state.userId", state.userId);
 }
 
-async function setActiveLobby(id: ILobby):Promise<void> {
+
+
+
+async function setActiveLobby(lobby: ILobby):Promise<void> {
   //state.activeLobby = lobby;
   
-
+ 
   const url = "/api/lobby";
+  console.log(`setActiveLobby Name:${lobby.lobbyName}, hostID: ${lobby.hostId}`)
+  await addPlayerToLobby(lobby);
 
+  //ggf. unnötig?
  try {
-    const response = await fetch(`${url}/${id}`, { method: "GET" });
+    const response = await fetch(`${url}/${lobby.lobbyId}`, { method: "GET" });
     if (!response.ok) {
-     console.log("can't get active lobby");
+     console.log("error setActiveLobby");
     }
     const jsondata: ILobbyDTO = await response.json();
     state.activeLobby.lobbyId = jsondata.lobbyId;
+    state.activeLobby.hostId = jsondata.hostId;
     state.activeLobby.lobbyModeEnum = jsondata.lobbyModeEnum;
     state.activeLobby.lobbyName = jsondata.lobbyName;
     state.activeLobby.mapId = jsondata.mapId;
     state.activeLobby.numOfPlayers = jsondata.numOfPlayers;
     state.activeLobby.playerList = jsondata.playerList;
     
+    console.log(`NACH FETCH: setActiveLobby Name:${state.activeLobby.lobbyName}, hostID: ${state.activeLobby.hostId}`)
   } catch (error) {
      console.log(error);
-   }
-   //await postActiveLobby(lobby);
+  }
    
-  //state.activeLobby.playerList?.push(state);
 }
 
-async function postActiveLobby(lobby:ILobby) {
+async function addPlayerToLobby(lobby:ILobby) {
   const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
     method: 'POST',
   });
-  console.log("setActiveLobby() -> post player to lobby - response", response);
+  console.log("added Player to Lobby", response);
 }
 
 function updateActiveLobbyPlayerList(players: User[]) {
@@ -83,10 +91,12 @@ function updateActiveLobbyPlayerList(players: User[]) {
   console.log(state.activeLobby.playerList);
 }
 
+
 export default function useUser() {
   return {
     name: computed(() => state.userName),
     userId: computed(() => state.userId ),
+    hostId: computed(() => state.activeLobby.hostId),
     activeLobby: computed(() => state.activeLobby),
     user: readonly<User>(state),
     setName,
@@ -94,6 +104,7 @@ export default function useUser() {
     sendName,
     setActiveLobby,
     updateActiveLobbyPlayerList
+    
   };
 }
 

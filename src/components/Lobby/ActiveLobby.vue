@@ -4,23 +4,29 @@
     </div>
     <div class="container">
         <div class="LobbyName">
-            <p><b>Rüdigers Lobby</b></p>
+            <p><b>{{activeLobby.lobbyName}}</b></p>
             
         </div>
         <div class="LobbyClose">
             <button class="red">Lobby Schließen</button>
         </div>
         <div class="PlayMode">
-            <p><b>Modus:</b> Fahrmodus</p>
+            <p><b>Modus:</b> {{activeLobby.lobbyModeEnum}}</p>
         </div>
         <div class="SwitchMode">
-            <button>Planungs-Modus</button>
+            <div v-if="userId === activeLobby.hostId">
+                <button @click="switchActiveLobbyMode">Planungs-Modus</button>
+            </div>
+            <div v-else>
+                <button class="red">DERFSTE NED!</button>
+            </div>
+            
         </div>
         <div class="Button1">
             <button>Weitermachen</button>
         </div>
         <div class="Button2">
-            <button class="green">Fahren</button>
+            <button class="green" @click="switchActiveLobbyMode">Fahren</button>
         </div>
         <div class="Button3">
             <button class="grey">Lobby verlassen</button>
@@ -30,7 +36,27 @@
 
 
 <script setup lang="ts">
+import useUser from "../../services/UserStore";
+import { E_LobbyMode } from "../../typings/E_LobbyMode";
+import { useLobbyList } from "../../services/useLobbyList";
+const { user, userId,hostId, activeLobby, setActiveLobby } = useUser();
 
+
+function switchActiveLobbyMode(){
+  if(activeLobby.value.lobbyModeEnum === E_LobbyMode.BUILD_MODE){
+    console.log("set to PLAYMODE!");
+    activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE;
+    useLobbyList().changeLobbyModeMessage();
+  }else if(activeLobby.value.lobbyModeEnum === E_LobbyMode.PLAY_MODE){
+    console.log("set to BUILDMODE");
+    activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE;
+    useLobbyList().changeLobbyModeMessage();
+  }
+  //Todo: Lobby im backend updaten!
+  
+}
+console.log(`UserID von ActiveLobby: ${userId.value}`);
+console.log(`Host ID Active Lobby: ${hostId}`)
 </script>
 
 <style scoped>
