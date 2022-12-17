@@ -26,16 +26,17 @@ import PlayerListItem from './PlayerListItem.vue';
 import IUser from '../../typings/IUser';
 import { usePlayerList } from '../../services/usePlayerList';
 import { onMounted } from 'vue';
+import { useLobbyList } from '../../services/useLobbyList';
 
 //PlayerList passed from backend
 const props = defineProps<{
     liste: Readonly<IUser[]>,
 }>()
 
-const { playerListState, fetchPlayerList } = usePlayerList()
+const { playerListState } = usePlayerList()
 
 onMounted(async () => {
-    await fetchPlayerList;
+    
 })
 
 </script>

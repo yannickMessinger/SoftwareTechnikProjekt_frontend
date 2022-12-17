@@ -7,7 +7,7 @@ import { IGridElement } from '../../services/streetplaner/IGridElement';
 import { useStreetGridList, updateStreetGridList } from '../../services/streetplaner/useStreetGridList';
 import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
 import { useLobbyList } from '../../services/useLobbyList';
-import { IStreetElement } from '../../services/streetplaner/IStreetElement';
+import { IMapObject } from '../../services/streetplaner/IMapObject';
 
 
 export default defineComponent({
@@ -81,7 +81,7 @@ export default defineComponent({
 
       
       
-      updateStreetGridList(lobbyState.mapID);
+      updateStreetGridList(lobbyState.mapId);
       console.log("ON MOUNTED")
       console.log(mapElements);
     

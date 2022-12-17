@@ -1,4 +1,4 @@
-export interface IStreetElement {
+export interface IMapObject {
     objectTypeId: number,
     x: number,
     y: number,

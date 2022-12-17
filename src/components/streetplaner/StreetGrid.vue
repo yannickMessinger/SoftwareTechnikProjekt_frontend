@@ -7,15 +7,18 @@
     import { useBlockList, updateBlockList } from '../../services/streetplaner/useBlockList';
     import { useStreetGridList, updateStreetGridList, postStreetGrid } from '../../services/streetplaner/useStreetGridList';
     import { IBlockElement } from '../../services/streetplaner/IBlockElement';
-    import { IStreetElement } from '../../services/streetplaner/IStreetElement';
+    import { IMapObject } from '../../services/streetplaner/IMapObject';
     import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
-    import { useLobbyList } from '../../services/useLobbyList';
+    import useUser from '../../services/UserStore';
+    import { useEditor } from '../../services/Editor/useEditor';
     const { bus } = useEventBus();
 
     var gridSizeX = 20;
     var gridSizeY = 30;
     const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" } });
-    const lobbyState = useLobbyList().activeLobbyState;
+    const lobbyState = useUser().activeLobby;
+
+    const { editorState, createMessage, deleteMessage, updateMessage, updateMap, receiveEditorUpdates, updateMapId } = useEditor(lobbyState.value.mapId);
 
     watch(() => bus.value.get('tool-select-event'), (val) => {
         toolState.tool = val[0];
@@ -38,56 +41,86 @@
     const gridSizePx = computed(() => gridSize.value.toString() + "px");
     // declare blockList
     var blockList: Array<IBlockElement>;
-    var streetGridDTO: StreetGridDTO;
+    watch(() => editorState.mapObjects, () => loadStreetGrid(editorState))
 
     onMounted(() => {
         // get blockList from backend
         // get streetgrid from backend via mapID
         blockList = useBlockList().blockList;
-        streetGridDTO = useStreetGridList().streetGridDTO;
         updateBlockList();
-        updateStreetGridList(lobbyState.mapID).then(() => {
-            loadStreetGrid(streetGridDTO);
-        });
-
+        receiveEditorUpdates();
+        updateMapId(lobbyState.value.mapId);
+        updateMap();
     });
 
     // onClick handles click on specific cell
     function onClick(cell: any) {
-        // set texture of clicked cell to dummy
-        //console.log(`x: ${cell.posX} y:${cell.posY}`)
+        let payload: IMapObject;
         if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
             streetGrid[cell.posX][cell.posY].id = toolState.block.id;
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+            payload = { objectTypeId: toolState.block.id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: toolState.block.rotation };
+            createMessage(payload);
         }
-        if (toolState.tool == ToolEnum.ROTATE) {
+        if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].id !== -1) {
             streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4;
+            payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: streetGrid[cell.posX][cell.posY].rotation };
+            updateMessage(payload);
         }
         if (toolState.tool === ToolEnum.DELETE) {
+            payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: streetGrid[cell.posX][cell.posY].rotation };
             streetGrid[cell.posX][cell.posY].id = -1;
             streetGrid[cell.posX][cell.posY].rotation = 0;
             streetGrid[cell.posX][cell.posY].texture = "";
+            deleteMessage(payload);
         }
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
     function onMouseMove(cell: any, event: any) {
+        let currCellContent = streetGrid[cell.posX][cell.posY];
+        // Todo, add check so stomp message will only send when a change is made
+        let payload: IMapObject;
         if (event.buttons === 1 && toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
-            streetGrid[cell.posX][cell.posY].id = toolState.block.id;
-            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
-            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+            if (currCellContent.id !== toolState.block.id || (currCellContent.id !== toolState.block.id && currCellContent.rotation !== toolState.block.rotation)) {
+                streetGrid[cell.posX][cell.posY].id = toolState.block.id;
+                streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
+                streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+                payload = { objectTypeId: toolState.block.id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: toolState.block.rotation };
+                createMessage(payload);
+            }
+            
         }
         if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
-            streetGrid[cell.posX][cell.posY].id = -1;
-            streetGrid[cell.posX][cell.posY].rotation = 0;
-            streetGrid[cell.posX][cell.posY].texture = "";
+            if (currCellContent.id !== -1) {            
+                payload = { objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                            x: cell.posX,
+                            y: cell.posY,
+                            rotation: streetGrid[cell.posX][cell.posY].rotation };
+                streetGrid[cell.posX][cell.posY].id = -1;
+                streetGrid[cell.posX][cell.posY].rotation = 0;
+                streetGrid[cell.posX][cell.posY].texture = "";
+                deleteMessage(payload);
+            }
         }
     }
     
     // converts StreetGrid into json and sends it to backend
     function saveStreetGrid() {
-        let dto: StreetGridDTO = { mapObjects: Array<IStreetElement>() };
+        let dto: StreetGridDTO = { mapObjects: Array<IMapObject>() };
         for(let row=0; row<streetGrid.length; row++) {
             for(let col=0; col<streetGrid[0].length; col++) {
                 let ele = streetGrid[row][col];
@@ -100,12 +133,13 @@
                 }
             }
         }
-        postStreetGrid(lobbyState.mapID, dto);
+        postStreetGrid(lobbyState.value.mapId, dto);
     }
     
     // load StreetGrid from backend dto
     function loadStreetGrid(dto: StreetGridDTO) {
         resetGrid();
+        console.log(dto.mapObjects);
         for(let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = { 
                 id: ele.objectTypeId, 
