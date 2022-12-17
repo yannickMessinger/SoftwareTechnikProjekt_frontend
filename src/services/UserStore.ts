@@ -66,7 +66,7 @@ async function setActiveLobby(id: ILobby):Promise<void> {
    }
    //await postActiveLobby(lobby);
    
-  state.activeLobby.playerList?.push(state);
+  //state.activeLobby.playerList?.push(state);
 }
 
 async function postActiveLobby(lobby:ILobby) {
