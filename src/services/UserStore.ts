@@ -2,6 +2,7 @@ import { computed, reactive, readonly } from "vue";
 import User from '../typings/IUser';
 import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobby } from "../typings/ILobby";
+import { ILobbyDTO } from "../typings/ILobbyDTO";
 
 const state = reactive<User>({
   userId:  undefined,
@@ -41,10 +42,30 @@ async function sendName():Promise<void> {
   console.log("state.userId", state.userId);
 }
 
-async function setActiveLobby(lobby: ILobby):Promise<void> {
-  state.activeLobby = lobby;
-  console.log(state.activeLobby);
-  // await postActiveLobby(lobby);
+async function setActiveLobby(id: ILobby):Promise<void> {
+  //state.activeLobby = lobby;
+  
+
+  const url = "/api/lobby";
+
+ try {
+    const response = await fetch(`${url}/${id}`, { method: "GET" });
+    if (!response.ok) {
+     console.log("can't get active lobby");
+    }
+    const jsondata: ILobbyDTO = await response.json();
+    state.activeLobby.lobbyId = jsondata.lobbyId;
+    state.activeLobby.lobbyModeEnum = jsondata.lobbyModeEnum;
+    state.activeLobby.lobbyName = jsondata.lobbyName;
+    state.activeLobby.mapId = jsondata.mapId;
+    state.activeLobby.numOfPlayers = jsondata.numOfPlayers;
+    state.activeLobby.playerList = jsondata.playerList;
+    
+  } catch (error) {
+     console.log(error);
+   }
+   //await postActiveLobby(lobby);
+   
   state.activeLobby.playerList?.push(state);
 }
 
