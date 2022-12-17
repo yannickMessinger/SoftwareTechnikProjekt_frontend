@@ -18,14 +18,20 @@
     </div>
     <div class="SwitchMode">
       <div v-if="userId === activeLobby.hostId">
-        <button @click="switchActiveLobbyMode">Planungs-Modus</button>
+        <button @click=" setActiveLobbyToBuildMode">Planungs-Modus</button>
       </div>
     </div>
     <div class="Button1">
       <button>Weitermachen</button>
     </div>
     <div class="Button2">
-      <button class="green" @click="switchActiveLobbyMode">Fahren</button>
+      <div v-if="userId === activeLobby.hostId">
+        <button class="green" @click="setActiveLobbyToPlayMode">Fahren</button>
+      </div>
+      <div v-else>
+        <button class="green">Fahren</button>
+      </div>
+     
     </div>
     <div class="Button3">
       <button class="grey">Lobby verlassen</button>
@@ -51,8 +57,16 @@ function switchActiveLobbyMode() {
   }
   //Todo: Lobby im backend updaten!
 }
-console.log(`UserID von ActiveLobby: ${userId.value}`);
-console.log(`Host ID Active Lobby: ${hostId}`);
+
+function setActiveLobbyToBuildMode(){
+  activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE;
+    useLobbyList().changeLobbyModeMessage();
+}
+
+function setActiveLobbyToPlayMode(){
+  activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE;
+    useLobbyList().changeLobbyModeMessage();
+}
 </script>
 
 <style scoped>
