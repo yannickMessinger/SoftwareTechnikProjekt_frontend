@@ -22,7 +22,7 @@ export class MovmentInputController{
 
     //constant
    
-    moveVelocity = 2
+    moveVelocity = 0;
 
 
     constructor(objects: any, camera: any){
@@ -51,10 +51,18 @@ export class MovmentInputController{
         const rotateAngle = Math.PI / 2 * delta; //rotation Angle
 
         if(this.keyboard.pressed("W")){
-            this.objects.value.mesh.translateZ(-movespeed); 
+            if(this.moveVelocity < .2){
+                this.moveVelocity += movespeed/20;
+                console.log("w velocity" + this.moveVelocity)
+            } 
+            this.objects.value.mesh.translateZ(-this.moveVelocity); 
         }
         if(this.keyboard.pressed("S")){
-            this.objects.value.mesh.translateZ(movespeed);
+            if(this.moveVelocity >= 0){
+                this.moveVelocity -= movespeed/30
+            }else{
+                this.objects.value.mesh.translateZ(movespeed);
+            }   
         }
         if(this.keyboard.pressed("D")){
             this.objects.value.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
@@ -68,15 +76,23 @@ export class MovmentInputController{
         if(this.keyboard.pressed("E")){
             this.objects.value.mesh.translateY(-movespeed)
         }
+        if(!this.keyboard.pressed("W") && this.moveVelocity > 0){
+            if(this.moveVelocity > 0){
+                this.moveVelocity -= movespeed/30
+                this.objects.value.mesh.translateZ(-this.moveVelocity)
+                console.log(this.moveVelocity)
+            }
+            
+        }
     }
     updateCamera(){
         let relativeCameraOffset = new THREE.Vector3(0,0.5,2);
         let cameraOffset = relativeCameraOffset.applyMatrix4( this.objects.value.mesh.matrixWorld);
 
-        this.camera.value.camera.position.x = cameraOffset.x;
-        this.camera.value.camera.position.y = cameraOffset.y;
-        this.camera.value.camera.position.z = cameraOffset.z;
+        this.camera.value.camera.position.x = this.objects.value.mesh.position.x
+        this.camera.value.camera.position.y = this.objects.value.mesh.position.y
+        this.camera.value.camera.position.z = this.objects.value.mesh.position.z
+        this.camera.value.camera.setRotationFromEuler(this.objects.value.mesh.rotation)
         
-        this.camera.value.camera.lookAt( this.objects.value.mesh.position);
     }
 }
