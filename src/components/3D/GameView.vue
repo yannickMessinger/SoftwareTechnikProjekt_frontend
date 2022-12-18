@@ -36,6 +36,8 @@ export default defineComponent({
     buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road.gltf');
     buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/curved_road.gltf');
     buildingIDMap.set(2,'/../../../src/assets/3D_Models/Streets/intersection_road.gltf');
+    buildingIDMap.set(4,'/../../../src/assets/3D_Models/Building/Haus.gltf');
+
     buildingIDMap.set(17, '/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf');
     buildingIDMap.set(18, '/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf');
     buildingIDMap.set(19, '/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf');
@@ -60,20 +62,21 @@ export default defineComponent({
     //useStreetGridList().createDummyList();
     resetMapEles()
     
-   
-    //const mapElements = computed(() => useStreetGridList().createDummyList());
+    useStreetGridList().createDummyList()
+    const mapElements = computed(() => useStreetGridList().gameMap.gameMapObjects);
+    
     const lobbyState = activeLobby;
     //console.log("INIT MAP ELES");
     //console.log(mapElements);
-    const enviroment = makeEnviroment()
-    const mapElements = computed(() => useStreetGridList().streetGridDTO.mapObjects);
+    //const enviroment = makeEnviroment()
+    //const mapElements = computed(() => useStreetGridList().streetGridDTO.mapObjects);
     console.log("INIT MAP ELES");
     console.log(mapElements);
     
     
   
     function resetMapEles(){
-       useStreetGridList().resetMapEles();
+       //useStreetGridList().resetMapEles();
        useStreetGridList().resetGameMap();
     }
 
@@ -157,7 +160,7 @@ export default defineComponent({
       rotationMap,
       gridSizeX,
       gridSizeY,
-      enviroment
+      //enviroment
     }
   }
 });
@@ -173,11 +176,10 @@ export default defineComponent({
         <PhongMaterial color="#999999" :props="{ depthWrite: false }" /></Plane>
       
        <!--  <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>-->
-       <GltfModel src="/../../../src/assets/3D_Models/Enviroment/enviroment_kachel_2.gltf" :position="{x:5, y:0, z: 5}" :scale="{x: 0.5, y:0.5, z:0.5}"/>
 
-       <div v-for="ele in enviroment">
+       <!--<div v-for="ele in enviroment">
         <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{x:calcCoordinateX(ele.y), y:0, z: calcCoordinateZ(ele.x)}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:rotationMap.get(ele.rotation), z:0}"/>
-       </div>
+       </div>-->
 
         <!-- All elements placed in the editor are read from the list and placed in the scene-->
         <div v-for = "ele in mapElements">

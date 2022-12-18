@@ -68,40 +68,22 @@ export function resetGameMap(){
     gameMap.gameMapObjects.splice(0, streetGridDTO.mapObjects.length);
 }
 
+function randomNumer(min: number, max: number) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+  }
+  
 export function createDummyList():void{
     //const  dummyList :  Array<IMapObject> = []
+    let counter = 0;
     for(let i = 0; i < 10; i++){
         for (let j = 0; j < 10; j++){
-            gameMap.gameMapObjects.push({objectTypeId:0, x:i, y:j, rotation:0})
+            //gameMap.gameMapObjects.push({objectTypeId:17, x:i, y:j, rotation:0})
+            gameMap.gameMapObjects[counter]  = {objectTypeId:randomNumer(17,20), x: i, y: j, rotation:randomNumer(0,3)}
+            counter +=1;
         }
     }
-
     console.log(gameMap.gameMapObjects);
-
-      
-        
-        streetGridDTO.mapObjects.forEach((mapObj, streetGridIndex) => {
-            gameMap.gameMapObjects.forEach((ele, dummyListIndex) =>{
-                if(mapObj.x === ele.x && mapObj.y === ele.y){
-                    console.log("GLEICH!!")
-                    
-
-                    gameMap.gameMapObjects[dummyListIndex].objectTypeId = streetGridDTO.mapObjects[streetGridIndex].objectTypeId
-                    
-
-                    
-                }
-            })
-            
-                
-            
+        streetGridDTO.mapObjects.forEach((mapObj) => { 
+            gameMap.gameMapObjects[(mapObj.x*10) + mapObj.y] = mapObj
         })
-
-        
-
-
-       
-
-        
-    
 }
