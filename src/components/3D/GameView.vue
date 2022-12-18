@@ -8,6 +8,9 @@ import { useStreetGridList, updateStreetGridList } from '../../services/streetpl
 import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
 import { useLobbyList } from '../../services/useLobbyList';
 import { IMapObject } from '../../services/streetplaner/IMapObject';
+import useUser from '../../services/UserStore';
+
+
 
 
 export default defineComponent({
@@ -18,6 +21,7 @@ export default defineComponent({
     const box = ref();
     const camera = ref();
     const fpsCamera = new FirstPersonCamera(camera, box)
+    const { user, userId, hostId, activeLobby, setActiveLobby } = useUser();
     /*Defines the Grid Size in length by the number ob fields*/ 
     let gridSizeX = 100;
     /*Defines the Grid Size in height by the number ob fields*/ 
@@ -31,7 +35,8 @@ export default defineComponent({
     const buildingIDMap = new Map()
     buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road.gltf');
     buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/curved_road.gltf');
-    buildingIDMap.set(2,'/../../../src/assets/3D_Models/Streets/intersection_road.gltf');
+    buildingIDMap.set(2,'/../../../src/assets/3D_Models/Building/Markt.gltf');
+    
 
     /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
     const rotationMap = new Map()
@@ -46,11 +51,14 @@ export default defineComponent({
 
     
 
-    let building:string = '/../../../src/assets/3D_Models/Building/Markt.gltf';
     
+    useStreetGridList().createDummyList();
+    console.log( useStreetGridList().createDummyList())
+
     resetMapEles()
-    const mapElements = computed(() => useStreetGridList().streetGridDTO.mapObjects);
-    const lobbyState = useLobbyList().activeLobbyState;
+    //const mapElements = computed(() => useStreetGridList().streetGridDTO.mapObjects);
+    const mapElements = computed(() => useStreetGridList().createDummyList());
+    const lobbyState = activeLobby;
     console.log("INIT MAP ELES");
     console.log(mapElements);
     
@@ -81,7 +89,7 @@ export default defineComponent({
 
       
       
-      updateStreetGridList(lobbyState.mapId);
+      updateStreetGridList(lobbyState.value.mapId);
       console.log("ON MOUNTED")
       console.log(mapElements);
     

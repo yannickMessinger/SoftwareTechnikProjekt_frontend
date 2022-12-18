@@ -8,7 +8,8 @@ export function useStreetGridList() {
     return {
         streetGridDTO: streetGridDTO,
         updateStreetGridList,
-        resetMapEles
+        resetMapEles,
+        createDummyList
     }
 }
 
@@ -53,4 +54,59 @@ export async function postStreetGrid(mapId: number, dto: StreetGridDTO) {
 
 export function resetMapEles(){
     streetGridDTO.mapObjects.splice(0, streetGridDTO.mapObjects.length);
+}
+
+export function createDummyList():Array<IMapObject>{
+    const  dummyList :  Array<IMapObject> = []
+    for(let i = 0; i < 10; i++){
+        for (let j = 0; j < 10; j++){
+            dummyList.push({objectTypeId:0, x:i, y:j, rotation:0})
+        }
+    }
+
+    /*
+    for(let a = 0; a < dummyList.length; a++){
+        for(let b = 0; b < streetGridDTO.mapObjects.length; b++){
+            if(dummyList[a].x === streetGridDTO.mapObjects[a].x && dummyList[a].y === streetGridDTO.mapObjects[a].y){
+                console.log("GLEICH!!");
+            }
+        }
+    }*/
+
+    /*
+     return dummyList.map((ele) => {
+        
+        const index = streetGridDTO.mapObjects.findIndex((mapObj) => {
+            console.log("GLEICH")
+            return mapObj.x === ele.x && mapObj.y === ele.y
+        })
+        let mapObject : IMapObject = {...ele}
+        if(index !== -1){
+        console.log("GLEICH");
+        mapObject.x =  streetGridDTO.mapObjects[index].x;
+        mapObject.y =  streetGridDTO.mapObjects[index].y;    
+       
+        }
+        return mapObject;
+
+        */
+        
+        streetGridDTO.mapObjects.forEach((mapObj, index) => {
+            dummyList.forEach((ele, index) =>{
+                if(mapObj.x === ele.x && mapObj.y === ele.y){
+                    console.log("GLEICH!!")
+                    mapObj.objectTypeId = ele.objectTypeId
+                    
+                }
+            })
+            
+                
+            
+        })
+
+
+   return dummyList;
+
+    
+    
 }
