@@ -34,8 +34,7 @@ export default defineComponent({
     /*Map of 3d-model paths*/
     const buildingIDMap = new Map()
     buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road.gltf');
-    buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/curved_road.gltf');
-    buildingIDMap.set(2,'/../../../src/assets/3D_Models/Building/Markt.gltf');
+    buildingIDMap.set(1,'/../../../src/assets/3D_Models/Building/Markt.gltf');
     
 
     /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
@@ -52,20 +51,24 @@ export default defineComponent({
     
 
     
-    useStreetGridList().createDummyList();
-    console.log( useStreetGridList().createDummyList())
+    //useStreetGridList().createDummyList();
+    //console.log( useStreetGridList().createDummyList())
 
+    //useStreetGridList().createDummyList();
     resetMapEles()
-    //const mapElements = computed(() => useStreetGridList().streetGridDTO.mapObjects);
-    const mapElements = computed(() => useStreetGridList().createDummyList());
+    
+    const mapElements = computed(() => useStreetGridList().gameMap.gameMapObjects);
+   
+    //const mapElements = computed(() => useStreetGridList().createDummyList());
     const lobbyState = activeLobby;
-    console.log("INIT MAP ELES");
-    console.log(mapElements);
+    //console.log("INIT MAP ELES");
+    //console.log(mapElements);
     
     
   
     function resetMapEles(){
-      useStreetGridList().resetMapEles();
+       useStreetGridList().resetMapEles();
+       useStreetGridList().resetGameMap();
     }
 
     /*Models position are saved from the Backend counting from 0 upwards.

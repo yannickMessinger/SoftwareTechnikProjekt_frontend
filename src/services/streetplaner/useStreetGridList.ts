@@ -3,13 +3,19 @@ import { IMapObject } from "./IMapObject";
 import { StreetGridDTO } from "./StreetGridDTO";
 
 const streetGridDTO = reactive({ mapObjects: Array<IMapObject>() });
+const gameMap = reactive({ gameMapObjects: Array<IMapObject>() });
+createDummyList();
+
 
 export function useStreetGridList() {
     return {
         streetGridDTO: streetGridDTO,
+        gameMap:gameMap,
         updateStreetGridList,
         resetMapEles,
+        resetGameMap,
         createDummyList
+        
     }
 }
 
@@ -25,6 +31,7 @@ export async function updateStreetGridList(mapId: number) {
         }
         const jsondata = await response.json();
         streetGridDTO.mapObjects = jsondata;
+        createDummyList()
     } catch (error: any) {
         console.log(error.statusText);
         let json = '{"mapObjects":[{"objectTypeId":1,"x":2,"y":9,"rotation":0},{"objectTypeId":0,"x":2,"y":10,"rotation":1},{"objectTypeId":0,"x":2,"y":11,"rotation":1},{"objectTypeId":0,"x":2,"y":12,"rotation":1},{"objectTypeId":0,"x":2,"y":13,"rotation":1},{"objectTypeId":0,"x":2,"y":14,"rotation":1},{"objectTypeId":1,"x":2,"y":15,"rotation":1},{"objectTypeId":0,"x":3,"y":9,"rotation":0},{"objectTypeId":6,"x":3,"y":14,"rotation":0},{"objectTypeId":0,"x":3,"y":15,"rotation":2},{"objectTypeId":0,"x":4,"y":9,"rotation":0},{"objectTypeId":1,"x":4,"y":12,"rotation":0},{"objectTypeId":0,"x":4,"y":13,"rotation":1},{"objectTypeId":0,"x":4,"y":14,"rotation":1},{"objectTypeId":1,"x":4,"y":15,"rotation":2},{"objectTypeId":0,"x":5,"y":9,"rotation":0},{"objectTypeId":0,"x":5,"y":12,"rotation":2},{"objectTypeId":0,"x":6,"y":9,"rotation":0},{"objectTypeId":5,"x":6,"y":10,"rotation":0},{"objectTypeId":0,"x":6,"y":12,"rotation":2},{"objectTypeId":1,"x":7,"y":5,"rotation":0},{"objectTypeId":0,"x":7,"y":6,"rotation":1},{"objectTypeId":0,"x":7,"y":7,"rotation":1},{"objectTypeId":0,"x":7,"y":8,"rotation":1},{"objectTypeId":2,"x":7,"y":9,"rotation":0},{"objectTypeId":0,"x":7,"y":10,"rotation":1},{"objectTypeId":0,"x":7,"y":11,"rotation":1},{"objectTypeId":1,"x":7,"y":12,"rotation":2},{"objectTypeId":1,"x":7,"y":14,"rotation":0},{"objectTypeId":0,"x":7,"y":15,"rotation":1},{"objectTypeId":0,"x":7,"y":16,"rotation":1},{"objectTypeId":1,"x":7,"y":17,"rotation":1},{"objectTypeId":0,"x":8,"y":5,"rotation":2},{"objectTypeId":3,"x":8,"y":8,"rotation":0},{"objectTypeId":0,"x":8,"y":9,"rotation":2},{"objectTypeId":3,"x":8,"y":10,"rotation":0},{"objectTypeId":0,"x":8,"y":14,"rotation":2},{"objectTypeId":0,"x":8,"y":17,"rotation":0},{"objectTypeId":0,"x":9,"y":5,"rotation":2},{"objectTypeId":4,"x":9,"y":8,"rotation":0},{"objectTypeId":0,"x":9,"y":9,"rotation":2},{"objectTypeId":3,"x":9,"y":10,"rotation":0},{"objectTypeId":0,"x":9,"y":14,"rotation":2},{"objectTypeId":0,"x":9,"y":17,"rotation":0},{"objectTypeId":0,"x":10,"y":5,"rotation":2},{"objectTypeId":4,"x":10,"y":8,"rotation":0},{"objectTypeId":0,"x":10,"y":9,"rotation":2},{"objectTypeId":0,"x":10,"y":14,"rotation":2},{"objectTypeId":0,"x":10,"y":17,"rotation":0},{"objectTypeId":1,"x":11,"y":5,"rotation":3},{"objectTypeId":0,"x":11,"y":6,"rotation":1},{"objectTypeId":0,"x":11,"y":7,"rotation":1},{"objectTypeId":0,"x":11,"y":8,"rotation":1},{"objectTypeId":2,"x":11,"y":9,"rotation":0},{"objectTypeId":0,"x":11,"y":10,"rotation":1},{"objectTypeId":0,"x":11,"y":11,"rotation":1},{"objectTypeId":0,"x":11,"y":12,"rotation":1},{"objectTypeId":0,"x":11,"y":13,"rotation":1},{"objectTypeId":2,"x":11,"y":14,"rotation":0},{"objectTypeId":0,"x":11,"y":15,"rotation":1},{"objectTypeId":0,"x":11,"y":16,"rotation":1},{"objectTypeId":1,"x":11,"y":17,"rotation":2},{"objectTypeId":0,"x":12,"y":9,"rotation":0},{"objectTypeId":0,"x":12,"y":14,"rotation":0},{"objectTypeId":0,"x":13,"y":9,"rotation":0},{"objectTypeId":0,"x":13,"y":14,"rotation":0},{"objectTypeId":1,"x":14,"y":9,"rotation":3},{"objectTypeId":0,"x":14,"y":10,"rotation":1},{"objectTypeId":0,"x":14,"y":11,"rotation":1},{"objectTypeId":0,"x":14,"y":12,"rotation":1},{"objectTypeId":0,"x":14,"y":13,"rotation":1},{"objectTypeId":1,"x":14,"y":14,"rotation":2}]}';
@@ -54,48 +61,34 @@ export async function postStreetGrid(mapId: number, dto: StreetGridDTO) {
 
 export function resetMapEles(){
     streetGridDTO.mapObjects.splice(0, streetGridDTO.mapObjects.length);
+    
 }
 
-export function createDummyList():Array<IMapObject>{
-    const  dummyList :  Array<IMapObject> = []
+export function resetGameMap(){
+    gameMap.gameMapObjects.splice(0, streetGridDTO.mapObjects.length);
+}
+
+export function createDummyList():void{
+    //const  dummyList :  Array<IMapObject> = []
     for(let i = 0; i < 10; i++){
         for (let j = 0; j < 10; j++){
-            dummyList.push({objectTypeId:0, x:i, y:j, rotation:0})
+            gameMap.gameMapObjects.push({objectTypeId:0, x:i, y:j, rotation:0})
         }
     }
 
-    /*
-    for(let a = 0; a < dummyList.length; a++){
-        for(let b = 0; b < streetGridDTO.mapObjects.length; b++){
-            if(dummyList[a].x === streetGridDTO.mapObjects[a].x && dummyList[a].y === streetGridDTO.mapObjects[a].y){
-                console.log("GLEICH!!");
-            }
-        }
-    }*/
+    console.log(gameMap.gameMapObjects);
 
-    /*
-     return dummyList.map((ele) => {
+      
         
-        const index = streetGridDTO.mapObjects.findIndex((mapObj) => {
-            console.log("GLEICH")
-            return mapObj.x === ele.x && mapObj.y === ele.y
-        })
-        let mapObject : IMapObject = {...ele}
-        if(index !== -1){
-        console.log("GLEICH");
-        mapObject.x =  streetGridDTO.mapObjects[index].x;
-        mapObject.y =  streetGridDTO.mapObjects[index].y;    
-       
-        }
-        return mapObject;
-
-        */
-        
-        streetGridDTO.mapObjects.forEach((mapObj, index) => {
-            dummyList.forEach((ele, index) =>{
+        streetGridDTO.mapObjects.forEach((mapObj, streetGridIndex) => {
+            gameMap.gameMapObjects.forEach((ele, dummyListIndex) =>{
                 if(mapObj.x === ele.x && mapObj.y === ele.y){
                     console.log("GLEICH!!")
-                    mapObj.objectTypeId = ele.objectTypeId
+                    
+
+                    gameMap.gameMapObjects[dummyListIndex].objectTypeId = streetGridDTO.mapObjects[streetGridIndex].objectTypeId
+                    
+
                     
                 }
             })
@@ -104,9 +97,11 @@ export function createDummyList():Array<IMapObject>{
             
         })
 
+        
 
-   return dummyList;
 
-    
+       
+
+        
     
 }
