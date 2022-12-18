@@ -48,41 +48,10 @@ async function sendName():Promise<void> {
 
 
 async function setActiveLobby(lobby: ILobby):Promise<void> {
-  //state.activeLobby = lobby;
-  
- 
-  const url = "/api/lobby";
-  console.log(`setActiveLobby Name:${lobby.lobbyName}, hostID: ${lobby.hostId}`)
-  await addPlayerToLobby(lobby);
-
-  //ggf. unnötig?
- try {
-    const response = await fetch(`${url}/${lobby.lobbyId}`, { method: "GET" });
-    if (!response.ok) {
-     console.log("error setActiveLobby");
-    }
-    const jsondata: ILobbyDTO = await response.json();
-    state.activeLobby.lobbyId = jsondata.lobbyId;
-    state.activeLobby.hostId = jsondata.hostId;
-    state.activeLobby.lobbyModeEnum = jsondata.lobbyModeEnum;
-    state.activeLobby.lobbyName = jsondata.lobbyName;
-    state.activeLobby.mapId = jsondata.mapId;
-    state.activeLobby.numOfPlayers = jsondata.numOfPlayers;
-    state.activeLobby.playerList = jsondata.playerList;
-    
-    console.log(`NACH FETCH: setActiveLobby Name:${state.activeLobby.lobbyName}, hostID: ${state.activeLobby.hostId}`)
-  } catch (error) {
-     console.log(error);
-  }
-   
+  state.activeLobby = lobby;
 }
 
-async function addPlayerToLobby(lobby:ILobby) {
-  const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
-    method: 'POST',
-  });
-  console.log("added Player to Lobby", response);
-}
+
 
 function updateActiveLobbyPlayerList(players: User[]) {
   for (let p of players) {

@@ -13,6 +13,9 @@ const playerState = reactive<IPlayerListState>({
  * fetches the playerlist of the active lobby which is saved in the UserStore under activeLobby
  */
 export async function fetchPlayerList(): Promise<void> {
+    console.log(`LobbyID aus usePlayerList: ${activeLobby.value?.lobbyId} MapID aus usePlayerList: ${activeLobby.value?.mapId}`);
+   
+
     const response = await fetch(`/api/lobby/get_players/${activeLobby.value?.lobbyId}`, {
         method: 'GET'
     })

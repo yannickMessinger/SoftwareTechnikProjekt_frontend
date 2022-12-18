@@ -27,6 +27,7 @@ const {activeLobby} = useUser();
 const players = reactive({value:activeLobby.value.playerList});
 
 onMounted(async () => {
+
   //await fetchPlayerList();
 });
 

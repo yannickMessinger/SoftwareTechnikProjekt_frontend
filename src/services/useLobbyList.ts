@@ -61,8 +61,8 @@ export async function updateLobbyList(): Promise<void> {
     }
 
     const jsondata: ILobbyDTO[] = await response.json();
-    console.log("JSONDATA");
-    console.log(jsondata);
+    //console.log("JSONDATA");
+    //console.log(jsondata);
 
     lobbyState.lobbylist = jsondata;
     lobbyState.errormsg = "";
@@ -99,7 +99,7 @@ export async function createNewLobby(
   addNumOfPlayers: number,
   addLobbyMode: E_LobbyMode
 ) {
-  console.log(`User ID from useLobbyList  ${userId.value}`);
+  //console.log(`User ID from useLobbyList  ${userId.value}`);
   const url = "/api/lobby";
 
   const addLobby: IAddLobbyRequestDTO = {
@@ -109,7 +109,7 @@ export async function createNewLobby(
     hostId: userId.value,
   };
 
-  console.log(addLobby);
+  //console.log(addLobby);
 
   try {
     const res = await fetch(url, {
@@ -128,6 +128,7 @@ export async function createNewLobby(
 }
 
 function joinMessage() {
+  console.log(`Lobby ID aus joinMessage: ${ activeLobby.value.lobbyId}, mapId: ${activeLobby.value.mapId}`)
   if (
     stompClient &&
     userId.value !== undefined &&
@@ -230,7 +231,6 @@ function receiveLobbyUpdates() {
 async function onMessageReceived(payload: IStompMessage) {
   if (payload.lobbyContent.lobbyId === activeLobby.value.lobbyId) {
     if (payload.type === "JOIN") {
-      console.log("received message JOIN");
       await fetchPlayerList();
       activeLobby.value.playerList?.push({
         userId: payload.playerContent.userId,
@@ -239,7 +239,6 @@ async function onMessageReceived(payload: IStompMessage) {
       });
     }
     if(payload.type === "SWITCH_MODE"){
-      console.log("switch mode nachricht vom backend erhalten!!");
       activeLobby.value.lobbyModeEnum = payload.lobbyContent.lobbyModeEnum
     }
   }
