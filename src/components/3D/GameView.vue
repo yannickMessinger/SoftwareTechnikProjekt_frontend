@@ -1,14 +1,8 @@
 <script lang="ts">
-import THREE from 'three';
 import { PointLight, Box, Camera, Renderer, Scene, LambertMaterial, GltfModel, AmbientLight,Plane,PhongMaterial } from 'troisjs';
 import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { FirstPersonCamera } from '../../models/FirstPersonCamera';
-import { IGridElement } from '../../services/streetplaner/IGridElement';
-import { useStreetGridList, updateStreetGridList } from '../../services/streetplaner/useStreetGridList';
-import { StreetGridDTO } from '../../services/streetplaner/StreetGridDTO';
-import { useLobbyList } from '../../services/useLobbyList';
-import { IMapObject } from '../../services/streetplaner/IMapObject';
-import useUser from '../../services/UserStore';
+import { useGameView } from '../../services/3DGameView/useGameView';
 
 
 
@@ -21,13 +15,16 @@ export default defineComponent({
     const box = ref();
     const camera = ref();
     const fpsCamera = new FirstPersonCamera(camera, box)
-    const { user, userId, hostId, activeLobby, setActiveLobby } = useUser();
+   
     /*Defines the Grid Size in length by the number ob fields*/ 
     let gridSizeX = 100;
     /*Defines the Grid Size in height by the number ob fields*/ 
     let gridSizeY = 100;
+
     let m=10
     let n = 10
+
+    useGameView().setMapWidthAndMapHeight(m,n);
     /*Array of Buildings and Streets passed from 2D Planner*/
     
     const fieldSize = 10;
@@ -56,62 +53,12 @@ export default defineComponent({
 
     
     
-    //useStreetGridList().createDummyList();
-    //console.log( useStreetGridList().createDummyList())
-
-    //useStreetGridList().createDummyList();
-    resetMapEles()
     
-    useStreetGridList().createDummyList()
-    const mapElements = computed(() => useStreetGridList().gameMap.gameMapObjects);
+    useGameView().resetGameMapObjects();    
     
-    const lobbyState = activeLobby;
-    //console.log("INIT MAP ELES");
-    //console.log(mapElements);
-    //const enviroment = makeEnviroment()
-    //const mapElements = computed(() => useStreetGridList().streetGridDTO.mapObjects);
-    console.log("INIT MAP ELES");
-    console.log(mapElements);
-    
-    
-  
-    function resetMapEles(){
-       //useStreetGridList().resetMapEles();
-       useStreetGridList().resetGameMap();
-    }
-
-    /*
-    function makeFinalArray(){
-      const finalElements : Array<IStreetElement>= [];
-        for(let i = 0; i < <any>mapElements[1].length; i++){
-          finalElements[mapElements[i].x] = ele
-        }
-        for(let i = 0; i < gridSizeY/fieldSize; i++){
-          for(let j = 0; j < gridSizeX/fieldSize; j++){
-          }
-        }
-    }
-    */
+    const mapElements = computed(() => useGameView().gameState.gameMapObjects);
     
 
-    function makeEnviroment(){
-      const enviroElements : Array<IMapObject>= [];
-        let counter = 0;
-      for(let i = 0; i < gridSizeY/fieldSize; i++){
-        for(let j = 0; j < gridSizeX/fieldSize; j++){
-          enviroElements[counter] = {objectTypeId:randomNumer(17,20), x: i, y: j, rotation:randomNumer(0,3)}
-          counter +=1;
-          //console.log("count: " + counter + " i: " + i + " j: " + j);
-        }
-        
-      }
-      return enviroElements;
-    }
-    /*Generates a random number between given numbers (min and max included)
-      Used du randomly select between 4 diffrent enviroment modules and for choosing random rotation for enviroment modules */
-    function randomNumer(min: number, max: number) { // min and max included 
-      return Math.floor(Math.random() * (max - min + 1) + min)
-    }
 
 
     /*Models position are saved from the Backend counting from 0 upwards.
@@ -135,9 +82,9 @@ export default defineComponent({
 
       
       
-      updateStreetGridList(lobbyState.value.mapId);
-      console.log("ON MOUNTED")
-      console.log(mapElements);
+      
+      useGameView().updateMapObjsFromGameState();
+     
     
 
       renderer.value.onBeforeRender(() => {
