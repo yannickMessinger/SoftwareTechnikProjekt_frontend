@@ -1,26 +1,33 @@
 {
-  "name": "frontend-swt02",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "three": "^0.136.0",
-    "troisjs": "^0.3.4",
-    "vue": "^3.2.41",
-    "vue-router": "^4.1.6",
-    "vuejs-confirm-dialog": "^0.4.3"
-  },
-  "devDependencies": {
-    "@types/node": "^18.11.9",
-    "@types/three": "^0.136.1",
-    "@vitejs/plugin-vue": "^3.2.0",
-    "typescript": "^4.6.4",
-    "vite": "^3.2.3",
-    "vue-tsc": "^1.0.9"
-  }
+    "name": "frontend-swt02",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc && vite build",
+        "preview": "vite preview",
+        "prepare": "husky install"
+    },
+    "dependencies": {
+        "three": "^0.136.0",
+        "troisjs": "^0.3.4",
+        "vue": "^3.2.41",
+        "vue-router": "^4.1.6",
+        "vuejs-confirm-dialog": "^0.4.3"
+    },
+    "devDependencies": {
+        "@types/node": "^18.11.9",
+        "@types/three": "^0.136.1",
+        "@vitejs/plugin-vue": "^3.2.0",
+        "husky": "^8.0.2",
+        "lint-staged": "^13.1.0",
+        "prettier": "2.8.1",
+        "typescript": "^4.6.4",
+        "vite": "^3.2.3",
+        "vue-tsc": "^1.0.9"
+    },
+    "lint-staged": {
+        "**/*": "prettier --write --ignore-unknown"
+    }
 }
