@@ -2,7 +2,7 @@
  *Data class to fetch and update the List of existing Lobbys
  */
 
-import { reactive, readonly } from "vue";
+import { reactive } from "vue";
 import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO";
 import { ILobby } from "../typings/ILobby";
 import { E_LobbyMode } from "../typings/E_LobbyMode";
@@ -10,13 +10,11 @@ import { ILobbyListState } from "../typings/ILobbyListState";
 import useUser from "./UserStore";
 import { ILobbyDTO } from "../typings/ILobbyDTO";
 import { Client } from "@stomp/stompjs";
-import { useEditor } from "./Editor/useEditor";
 import { fetchPlayerList } from "./usePlayerList";
 import IUser from "../typings/IUser";
 
 const ws_url = `ws://${window.location.host}/stomp`;
 const DEST = "/topic/public";
-const SEND_MSG = "/app/lobby.sendMessage";
 const JOIN_MSG = "/app/lobby.join";
 const SWITCHMODE_MSG = "/app/lobby.switchMode";
 
@@ -40,7 +38,7 @@ export function useLobbyList() {
     updateLobbyList,
     receiveLobbyUpdates,
     joinMessage,
-    changeLobbyModeMessage
+    changeLobbyModeMessage,
   };
 }
 
@@ -61,8 +59,6 @@ export async function updateLobbyList(): Promise<void> {
     }
 
     const jsondata: ILobbyDTO[] = await response.json();
-    //console.log("JSONDATA");
-    //console.log(jsondata);
 
     lobbyState.lobbylist = jsondata;
     lobbyState.errormsg = "";
@@ -71,35 +67,12 @@ export async function updateLobbyList(): Promise<void> {
   }
 }
 
-// export async function updateLobby(id: number) {
-//   const url = "/api/lobby";
-
-//   try {
-//     const response = await fetch(`${url}/${id}`, { method: "GET" });
-//     if (!response.ok) {
-//       console.log("can't get active lobby");
-//     }
-//     const jsondata: ILobbyDTO = await response.json();
-//     activeLobbyState.hostID = jsondata.hostID;
-//     activeLobbyState.lobbyID = jsondata.lobbyID;
-//     activeLobbyState.lobbyModeEnum = jsondata.lobbyModeEnum;
-//     activeLobbyState.lobbyName = jsondata.lobbyName;
-//     activeLobbyState.mapID = jsondata.mapID;
-//     activeLobbyState.numOfPlayers = jsondata.numOfPlayers;
-//     activeLobbyState.playerList = jsondata.playerList;
-//     setActiveLobby(activeLobbyState);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
 //adds new lobby and sends it to backend, then update of lobbylist
 export async function createNewLobby(
   addLobbyName: string,
   addNumOfPlayers: number,
   addLobbyMode: E_LobbyMode
 ) {
-  //console.log(`User ID from useLobbyList  ${userId.value}`);
   const url = "/api/lobby";
 
   const addLobby: IAddLobbyRequestDTO = {
@@ -109,8 +82,6 @@ export async function createNewLobby(
     hostId: userId.value,
   };
 
-  //console.log(addLobby);
-
   try {
     const res = await fetch(url, {
       method: "POST",
@@ -118,8 +89,6 @@ export async function createNewLobby(
       body: JSON.stringify(addLobby),
     });
     let id = await res.json();
-    console.log(id);
-    //setActiveLobby(id);
 
     await updateLobbyList();
   } catch (error) {
@@ -127,8 +96,10 @@ export async function createNewLobby(
   }
 }
 
+/*method that publishes a "JOIN" message to backend via Websocket connection on path /app/lobby.join, 
+purpose to update playerlist of active lobby for all players that joined that particullar lobby.
+*/
 function joinMessage() {
-  console.log(`Lobby ID aus joinMessage: ${ activeLobby.value.lobbyId}, mapId: ${activeLobby.value.mapId}`)
   if (
     stompClient &&
     userId.value !== undefined &&
@@ -165,6 +136,8 @@ function joinMessage() {
   }
 }
 
+/*method that fires a "SWITCH_MODE" message to path /app/lobby.switchMode in backend via Websocket connetction.
+Purpose to update Lobbymode of current active Lobby for all players who joined that lobby. */
 function changeLobbyModeMessage() {
   if (
     stompClient &&
@@ -202,6 +175,9 @@ function changeLobbyModeMessage() {
   });
 }
 
+/*function to activate Websockets on specific destination in backend. 
+Also for errorhandling if connection could not successfully be established.
+If new message is arriving it is passed to onMessageReceived function*/
 function receiveLobbyUpdates() {
   stompClient = new Client({
     brokerURL: ws_url,
@@ -228,6 +204,12 @@ function receiveLobbyUpdates() {
   stompClient.activate();
 }
 
+/*function that is called if new message is arriving on websocket, looks for message type and
+is performing specific actions depending on message type.
+
+If message tpye if of type "JOIN", the playerlist of this current lobby is updated with the payload for all players that joined the lobby.
+If message is of type "SWITCH_MODE", the lobbymode is changed to the payload content of the message for all players of the lobby.
+*/
 async function onMessageReceived(payload: IStompMessage) {
   if (payload.lobbyContent.lobbyId === activeLobby.value.lobbyId) {
     if (payload.type === "JOIN") {
@@ -238,8 +220,8 @@ async function onMessageReceived(payload: IStompMessage) {
         activeLobby: payload.lobbyContent,
       });
     }
-    if(payload.type === "SWITCH_MODE"){
-      activeLobby.value.lobbyModeEnum = payload.lobbyContent.lobbyModeEnum
+    if (payload.type === "SWITCH_MODE") {
+      activeLobby.value.lobbyModeEnum = payload.lobbyContent.lobbyModeEnum;
     }
   }
 }

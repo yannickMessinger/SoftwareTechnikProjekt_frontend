@@ -1,3 +1,11 @@
+<!--
+    Component that reperents the current Lobby that the current user choose to join.
+    If User is host of Lobby, he is allowed to switch the Lobby Modes. If he is not the
+    host, buttons that would change the lobby mode are not displayed.
+
+    By clicking on button "Fahren": Lobbymode is changed to playmode
+    By clicking on button "Planungsmodus": Lobbymode is changed to buildmode
+-->
 <template>
   <div class="headline">
     <h2>Aktive Lobby</h2>
@@ -45,19 +53,7 @@ import { E_LobbyMode } from "../../typings/E_LobbyMode";
 import { useLobbyList } from "../../services/useLobbyList";
 const { user, userId, hostId, activeLobby, setActiveLobby } = useUser();
 
-function switchActiveLobbyMode() {
-  if (activeLobby.value.lobbyModeEnum === E_LobbyMode.BUILD_MODE) {
-    console.log("set to PLAYMODE!");
-    activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE;
-    useLobbyList().changeLobbyModeMessage();
-  } else if (activeLobby.value.lobbyModeEnum === E_LobbyMode.PLAY_MODE) {
-    console.log("set to BUILDMODE");
-    activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE;
-    useLobbyList().changeLobbyModeMessage();
-  }
-  //Todo: Lobby im backend updaten!
-}
-
+//Methods to switch Lobbymode
 function setActiveLobbyToBuildMode(){
   activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE;
     useLobbyList().changeLobbyModeMessage();

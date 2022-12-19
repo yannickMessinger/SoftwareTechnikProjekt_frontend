@@ -36,9 +36,10 @@ const {receiveLobbyUpdates, joinMessage} = useLobbyList();
 
 //for later purposes to link to selected lobby via Vue Router
 async function selectLobby(){
+    //set ActiveLoppy property to the selected Lobby
     setActiveLobby(props.lobby);
-    //console.log(`MapID aus Lobby ${props.lobby.mapId}`)
-    // websocket: hier muss nachricht ans backend gesendet werden, dass neuer User beigetreten ist
+    
+    //fires JOINED event to backend to trigger persistence operations and inform other players on channel and update data
     joinMessage()
     router.push({
         path: '/lobbyview'
@@ -46,6 +47,7 @@ async function selectLobby(){
 }
 
 onMounted(() => {
+    //activate websockets connection to listen for incoming updates
     receiveLobbyUpdates();
 })
 
