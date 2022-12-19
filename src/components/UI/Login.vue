@@ -52,6 +52,8 @@
     import BasicButton from "../Buttons/BasicButton.vue"
     import { LoginService } from "../../services/Login/LoginService"
 
+    const { name, setName, setId } = useUser()
+
     let username = ref("")
     let password = ref("")
     let passwordRepeat = ref("")
@@ -77,7 +79,8 @@
                 password.value
             )
             if (responseBody != null) {
-                console.log(responseBody)
+                setName(responseBody.userName)
+                setId(responseBody.userId)
             } else {
                 console.log("Status 400")
             }

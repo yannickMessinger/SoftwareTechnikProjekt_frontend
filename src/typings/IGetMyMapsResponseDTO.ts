@@ -1,7 +1,7 @@
 //needs to be edited to Backend configuration
 
 export interface IGetMyMapsResponseDTO {
-    userID: number
+    userId: number
     lobbyName: string
     date: Date
 }

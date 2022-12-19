@@ -1,6 +1,6 @@
 export class LoginService {
     async register(username: string, password: string): Promise<any> {
-        return fetch("http://127.0.0.1:8080/api/player", {
+        return fetch("/api/player", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -28,7 +28,7 @@ export class LoginService {
         username: string,
         password: string
     ): Promise<{ userId: number; userName: string } | null> {
-        return fetch("http://127.0.0.1:8080/api/player/login", {
+        return fetch("/api/player/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

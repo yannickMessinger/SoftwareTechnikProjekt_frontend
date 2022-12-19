@@ -10,7 +10,7 @@ import { ILobbyListState } from "../typings/ILobbyListState"
 import useUser from "./UserStore"
 import { ILobbyDTO } from "../typings/ILobbyDTO"
 
-const { userID } = useUser()
+const { userId, setActiveLobby } = useUser()
 
 const lobbyState = reactive<ILobbyListState>({
     lobbylist: Array<ILobbyDTO>(),
@@ -18,9 +18,9 @@ const lobbyState = reactive<ILobbyListState>({
 })
 
 const activeLobbyState = reactive<ILobbyDTO>({
-    lobbyID: -1,
-    hostID: -1,
-    mapID: -1,
+    lobbyId: -1,
+    hostId: -1,
+    mapId: -1,
     lobbyName: "",
     numOfPlayers: -1,
     lobbyModeEnum: E_LobbyMode.BUILD_MODE,
@@ -71,11 +71,11 @@ export async function updateLobby(id: number) {
             console.log("can't get active lobby")
         }
         const jsondata: ILobbyDTO = await response.json()
-        activeLobbyState.hostID = jsondata.hostID
-        activeLobbyState.lobbyID = jsondata.lobbyID
+        activeLobbyState.hostId = jsondata.hostId
+        activeLobbyState.lobbyId = jsondata.lobbyId
         activeLobbyState.lobbyModeEnum = jsondata.lobbyModeEnum
         activeLobbyState.lobbyName = jsondata.lobbyName
-        activeLobbyState.mapID = jsondata.mapID
+        activeLobbyState.mapId = jsondata.mapId
         activeLobbyState.numOfPlayers = jsondata.numOfPlayers
         activeLobbyState.playerList = jsondata.playerList
     } catch (error) {
@@ -89,14 +89,14 @@ export async function createNewLobby(
     addNumOfPlayers: number,
     addLobbyMode: E_LobbyMode
 ) {
-    console.log(`User ID from useLobbyList  ${userID.value}`)
+    console.log(`User ID from useLobbyList  ${userId.value}`)
     const url = "/api/lobby"
 
     const addLobby: IAddLobbyRequestDTO = {
         lobbyName: addLobbyName,
         numOfPlayers: addNumOfPlayers,
         lobbyModeEnum: addLobbyMode,
-        hostID: userID.value,
+        hostId: userId.value,
     }
 
     console.log(addLobby)
