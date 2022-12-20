@@ -15,8 +15,9 @@ import IUser from "../typings/IUser";
 
 const ws_url = `ws://${window.location.host}/stomp`;
 const DEST = "/topic/lobby";
-const JOIN_MSG = "/app/lobby.join";
 const SWITCHMODE_MSG = "/app/lobby.switchMode";
+const JOIN_MSG = "/app/lobby.join";
+
 
 let stompClient: Client;
 const { user, userId, activeLobby, setActiveLobby } = useUser();
