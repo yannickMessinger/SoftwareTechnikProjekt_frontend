@@ -1,4 +1,4 @@
-import { computed, reactive } from "vue";
+import { computed, reactive, readonly } from "vue";
 import User from '../typings/IUser';
 import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobby } from "../typings/ILobby";
@@ -56,7 +56,7 @@ export default function useUser() {
   return {
     name: computed(() => state.userName),
     userId: computed(() => state.userId ),
-    activeLobby: computed(() => state.activeLobby),
+    activeLobby: readonly<ILobby>(state.activeLobby),
     setName,
     setId,
     sendName,
