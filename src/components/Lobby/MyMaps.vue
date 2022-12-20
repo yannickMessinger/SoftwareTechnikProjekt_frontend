@@ -15,10 +15,13 @@
 </template>
 
 <script setup lang="ts">
+    //marc
     import MyMapsListItem from "./MyMapsListItem.vue"
     import { IMyMapsListItem } from "../../typings/IMyMapsListitem"
     import { useMyMaps } from "../../services/useMyMaps"
 
+
+    //marc
     const props = defineProps<{
         liste: Readonly<IMyMapsListItem[]>
     }>()
