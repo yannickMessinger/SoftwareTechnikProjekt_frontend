@@ -42,31 +42,8 @@ async function sendName():Promise<void> {
   console.log("state.userId", state.userId);
 }
 
-async function setActiveLobby(id: ILobby):Promise<void> {
-  //state.activeLobby = lobby;
-  
-
-  const url = "/api/lobby";
-
- try {
-    const response = await fetch(`${url}/${id}`, { method: "GET" });
-    if (!response.ok) {
-     console.log("can't get active lobby");
-    }
-    const jsondata: ILobbyDTO = await response.json();
-    state.activeLobby.lobbyId = jsondata.lobbyId;
-    state.activeLobby.lobbyModeEnum = jsondata.lobbyModeEnum;
-    state.activeLobby.lobbyName = jsondata.lobbyName;
-    state.activeLobby.mapId = jsondata.mapId;
-    state.activeLobby.numOfPlayers = jsondata.numOfPlayers;
-    state.activeLobby.playerList = jsondata.playerList;
-    
-  } catch (error) {
-     console.log(error);
-   }
-   //await postActiveLobby(lobby);
-   
-  state.activeLobby.playerList?.push(state);
+async function setActiveLobby(lobby: ILobby):Promise<void> {
+  state.activeLobby = lobby;
 }
 
 async function postActiveLobby(lobby:ILobby) {
