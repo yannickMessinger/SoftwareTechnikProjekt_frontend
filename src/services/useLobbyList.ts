@@ -15,7 +15,7 @@ import { fetchPlayerList } from "./usePlayerList";
 import IUser from "../typings/IUser";
 
 const ws_url = `ws://${window.location.host}/stomp`;
-const DEST = '/topic/public';
+const DEST = '/topic/lobby';
 const SEND_MSG = '/app/lobby.sendMessage';
 const JOIN_MSG = '/app/lobby.join';
 
