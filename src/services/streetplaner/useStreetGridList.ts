@@ -1,8 +1,8 @@
-import { reactive } from "vue"
-import { IMapObject } from "./IMapObject"
-import { StreetGridDTO } from "./StreetGridDTO"
+import { reactive } from "vue";
+import { IStreetElement } from "./IStreetElement";
+import { StreetGridDTO } from "./StreetGridDTO";
 
-const streetGridDTO = reactive({ mapObjects: Array<IMapObject>() })
+const streetGridDTO = reactive({ mapObjects: Array<IStreetElement>() });
 
 export function useStreetGridList() {
     return {
@@ -12,14 +12,12 @@ export function useStreetGridList() {
 }
 
 // updates streetGridDTO with map objects of map with mapID
-export async function updateStreetGridList(mapId: number) {
-    const url = "/api/map/objects"
+export async function updateStreetGridList(mapID: number) {
+    const url = "/api/map/objects";
 
     try {
-        if (mapId === -1) {
-            throw new Error("mapID is -1, make sure you are in a lobby.")
-        }
-        const response = await fetch(`${url}/${mapId}`, { method: "GET" })
+        if (mapID === -1) { throw new Error("mapID is -1, make sure you are in a lobby."); }
+        const response = await fetch(`${url}/${mapID}`, { method: "GET" });
         if (!response.ok) {
             throw new Error(response.statusText)
         }
@@ -34,12 +32,12 @@ export async function updateStreetGridList(mapId: number) {
 }
 
 // posts map objects of dto (StreetGridDTO of map with mapID) to backend
-export async function postStreetGrid(mapId: number, dto: StreetGridDTO) {
-    const url = "/api/mapobject"
-    let jsonstring = JSON.stringify(dto)
+export async function postStreetGrid(mapID: number, dto: StreetGridDTO) {
+    const url = "/api/mapobject";
+    let jsonstring = JSON.stringify(dto);
     try {
-        const response = await fetch(`${url}/${mapId}`, {
-            method: "POST",
+        const response = await fetch(`${url}/${mapID}`, { 
+            method: 'POST',
             body: jsonstring,
             headers: { "Content-Type": "application/json;" },
         })
