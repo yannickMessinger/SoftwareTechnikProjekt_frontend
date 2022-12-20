@@ -1,19 +1,19 @@
 <script setup lang="ts">
-/**Imports: */
-import { reactive, ref, watch } from "vue";
-import type { IBlockElement } from "../../services/streetplaner/IBlockElement";
-import useEventBus from "../../services/eventBus";
-import ToolEnum from "../../services/streetplaner/ToolEnum";
-import BigBuilding from "../../assets/2D_Models/Buildings/BigBuilding.png";
-import Building from "../../assets/2D_Models/Buildings/Building.png";
-import Supermarkt from "../../assets/2D_Models/Buildings/Supermarkt.png";
-import Stadium from "../../assets/2D_Models/Buildings/Stadium.png";
-/**Variables: */
-const pathToPictures = "/img/streetplaner/";
-var totalBlockNumber = 4; /** number of blocks in blocklist*/
-var blockList: IBlockElement[] = Array(totalBlockNumber).fill(
-  []
-); /** List of all blocks placable in street editor*/
+    /**Imports: */
+    import { reactive, ref, watch } from "vue"
+    import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
+    import useEventBus from "../../services/eventBus"
+    import ToolEnum from "../../services/streetplaner/ToolEnum"
+    import BigBuilding from "../../assets/2D_Models/Buildings/BigBuilding.png"
+    import Building from "../../assets/2D_Models/Buildings/Building.png"
+    import Supermarkt from "../../assets/2D_Models/Buildings/Supermarkt.png"
+    import Stadium from "../../assets/2D_Models/Buildings/Stadium.png"
+    /**Variables: */
+    const pathToPictures = "/img/streetplaner/"
+    var totalBlockNumber = 4 /** number of blocks in blocklist*/
+    var blockList: IBlockElement[] = Array(totalBlockNumber).fill(
+        []
+    ) /** List of all blocks placable in street editor*/
 
 /*default block element*/
 var defaultBlock: IBlockElement = {
@@ -82,26 +82,39 @@ function onBlockClick(clickedBlock: any) {
   emit("block-select-event", selectedBlock.block);
 }
 
-/** sets buttons to clickable if create tool is selected, or not clickable if its not */
-watch(
-  () => bus.value.get("tool-select-event"),
-  (val) => {
-    if (val == ToolEnum.CREATE) {
-      isCreateTool.value = true;
-    } else {
-      isCreateTool.value = false;
-    }
-  }
-);
+    /** sets buttons to clickable if create tool is selected, or not clickable if its not */
+    watch(
+        () => bus.value.get("tool-select-event"),
+        (val) => {
+            if (val == ToolEnum.CREATE) {
+                isCreateTool.value = true
+            } else {
+                isCreateTool.value = false
+            }
+        }
+    )
 </script>
 
 <template>
-  
-  <div v-for="element in blockList" :key="element.id" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClick(element)">
-        <button v-if="element != null" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
-        <p v-if="element != null">{{element.name}}</p>
-  </div>
-  <!--
+    <div
+        v-for="element in blockList"
+        :key="element.id"
+        id="editor-tool"
+        :class="
+            element.name === selectedBlock.block.name
+                ? 'editor-tool-active'
+                : 'editor-tool-not-active'
+        "
+        @click="onBlockClick(element)"
+    >
+        <button
+            v-if="element != null"
+            class="editor-tool-btn"
+            :style="{ backgroundImage: `url(${element.texture})` }"
+        />
+        <p v-if="element != null">{{ element.name }}</p>
+    </div>
+    <!--
   <div class="blockListContainer">
     <div v-for="element in blockList" class="blockListElement">
       <button
@@ -125,8 +138,8 @@ watch(
 </template>
 
 <style>
-  *{
-    color: var(--woe-black);
-    font-size: 1em;
-  }
+    * {
+        color: var(--woe-black);
+        font-size: 1em;
+    }
 </style>
