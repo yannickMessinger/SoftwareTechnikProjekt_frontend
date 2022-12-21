@@ -78,6 +78,7 @@ export async function updateLobby(id: number) {
         activeLobbyState.mapId = jsondata.mapId
         activeLobbyState.numOfPlayers = jsondata.numOfPlayers
         activeLobbyState.playerList = jsondata.playerList
+        setActiveLobby(activeLobbyState)
     } catch (error) {
         console.log(error)
     }
