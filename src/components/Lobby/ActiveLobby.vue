@@ -4,25 +4,29 @@
     </div>
     <div class="container">
         <div class="LobbyName">
+            <!-- korrekter Lobbyname anzeigen-->
             <p><b>Rüdigers Lobby</b></p>
         </div>
         <div class="LobbyClose">
+            <!-- für Host lobby schließen für Client lobby verlassen anzeigen-->
             <button class="red">Lobby Schließen</button>
+            <button class="red">Lobby verlassen</button>
+        </div>
+        <div class="KartenName">
+            <!-- korrekten Kartennamen anzeigen-->
+            <p><b>Rüdigers Karte</b></p>
         </div>
         <div class="PlayMode">
+            <!-- auf den Switch Button reagieren und korrekten Modus anzeigen-->
             <p><b>Modus:</b> Fahrmodus</p>
         </div>
         <div class="SwitchMode">
-            <button>Planungs-Modus</button>
-        </div>
-        <div class="Button1">
-            <button>Weitermachen</button>
+            <button>Wechseln</button>
         </div>
         <div class="Button2">
-            <button class="green">Fahren</button>
-        </div>
-        <div class="Button3">
-            <button class="grey">Lobby verlassen</button>
+            <!-- boolean einbauen entweder Bauansicht oder Fahransicht anzeigen je nach Lobbymodus-->
+            <button class="green">zur Bauansicht</button>
+            <button class="green">zur Fahransicht</button>
         </div>
     </div>
 </template>
