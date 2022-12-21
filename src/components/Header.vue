@@ -1,9 +1,5 @@
 <template>
     <div class="header">
-        <span>AktUser: {{user.userName}}</span>
-        <span>ActiveLobby: {{user.activeLobby.lobbyName}}</span>
-        <span>AktMap: {{user.activeLobby.mapId}}</span>
-        <span>AktLobbyM: {{user.activeLobby.lobbyModeEnum}}</span>
         <span>{{text}}</span>
         <BasicButton v-if=displayHomebutton id="home" display="" :btn_click="() => {router.push('/')}"/>
     </div>
