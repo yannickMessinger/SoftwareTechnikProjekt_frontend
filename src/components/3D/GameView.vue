@@ -36,7 +36,9 @@ export default defineComponent({
     buildingIDMap.set(0,'/../../../src/assets/3D_Models/Streets/straight_road.gltf');
     buildingIDMap.set(1,'/../../../src/assets/3D_Models/Streets/curved_road.gltf');
     buildingIDMap.set(2,'/../../../src/assets/3D_Models/Streets/intersection_road.gltf');
-    buildingIDMap.set(4,'/../../../src/assets/3D_Models/Building/Haus.gltf');
+    buildingIDMap.set(3,'/../../../src/assets/3D_Models/Building/house_high.gltf');
+    buildingIDMap.set(4,'/../../../src/assets/3D_Models/Building/house.gltf');
+    buildingIDMap.set(5,'/../../../src/assets/3D_Models/Building/shop.gltf');
 
     buildingIDMap.set(17, '/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf');
     buildingIDMap.set(18, '/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf');
@@ -48,11 +50,11 @@ export default defineComponent({
     /*No rotation*/
     rotationMap.set(0, 0)
     /*90 degree rotation*/
-    rotationMap.set(1, Math.PI/2)
+    rotationMap.set(1, 3*Math.PI/2)
     /*180 degree rotation*/
     rotationMap.set(2, Math.PI)
     /*270 degree rotation*/
-    rotationMap.set(3, 3*Math.PI/2)
+    rotationMap.set(3, Math.PI/2)
 
     
     
