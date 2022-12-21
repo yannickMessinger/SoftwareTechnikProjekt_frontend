@@ -42,25 +42,32 @@
     async function loginCheck() {
         let responseBody = await login(username.value, password.value)
         
-        if (responseBody != null) {
-            console.log(responseBody)
+        if (responseBody?.hasOwnProperty("userId") && responseBody?.hasOwnProperty("userName")) {
             router.push('/');
         } else {
             usernameError.value = "Username und Passwort Kombination gibt es nicht"
             passwordError.value = "Username und Passwort Kombination gibt es nicht"
-            console.log("Status 400")
         }
     }
 
     async function registrationCheck(){
+        usernameError.value = ""
+        passwordError.value = ""
+
         if(password.value == passwordRepeat.value){
             let responseBody = await register(username.value, password.value)
-            passwordError.value = ""
-            if (responseBody != null) {
-                console.log(responseBody)
-                toggleMode()
-            } else {
-                console.log("Status 400")   
+            switch(responseBody){
+                case -1:
+                    usernameError.value = "Ungültige Eingabe"
+                    passwordError.value = "Ungültige Eingabe"
+                    break
+                case -2:
+                    usernameError.value = "Username bereits vergeben"
+                    break
+                case null:
+                    break
+                default:
+                    toggleMode()
             }
         }  else {
             passwordError.value = "Passwort stimmt nicht überein"

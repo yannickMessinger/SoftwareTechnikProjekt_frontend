@@ -59,7 +59,7 @@ async function register(username:string, password:string): Promise<any> {
       })
   })
   .then(response=> {
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 400) {
           return response.json()
       } else {
           return null
@@ -82,7 +82,7 @@ async function login(username:string, password:string): Promise<{userId: number,
       })
   })
   .then(response=> {
-      if (response.status === 200) {
+      if (response.status === 200 || response.status === 400) {
           return response.json()
       } else {
           return null
