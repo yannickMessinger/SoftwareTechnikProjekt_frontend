@@ -15,72 +15,72 @@
         []
     ) /** List of all blocks placable in street editor*/
 
-/*default block element*/
-var defaultBlock: IBlockElement = {
-  groupId: -1,
-  group: "no data",
-  id: -1,
-  type: "no data",
-  name: "no Object selected",
-  rotation: 0,
-  texture: pathToPictures + "no-data.png",
-};
-/**  currently selected block */
-const selectedBlock = reactive({ block: defaultBlock });
-/** bus event */
-const { emit, bus } = useEventBus();
-/** boolean value that controls weather blocks are clicable or not */
-const isCreateTool = ref(false);
-/**entrys in blocklist */
-blockList[0] = {
-  groupId: 1,
-  group: "Testobject1",
-  id: 3,
-  type: "Building",
-  name: "Big Building",
-  rotation: 0,
-  texture: BigBuilding,
-};
-blockList[1] = {
-  groupId: 1,
-  group: "Testobject2",
-  id: 4,
-  type: "Building",
-  name: "Building",
-  rotation: 0,
-  texture: Building,
-};
-blockList[2] = {
-  groupId: 1,
-  group: "Testobject3",
-  id: 5,
-  type: "Building",
-  name: "Markt",
-  rotation: 0,
-  texture: Supermarkt,
-};
-blockList[3] = {
-  groupId: 1,
-  group: "Testobject4",
-  id: 6,
-  type: "Building",
-  name: "Stadium",
-  rotation: 0,
-  texture: Stadium,
-};
-/**function activated by clicking on an block */
-function onBlockClick(clickedBlock: any) {
-  /** if the selected block is the clicked block, it gets deselected by restoring the default block
-   * otherwhise the clicked block is now the selected block.
-   */
-  if (selectedBlock.block.id == clickedBlock.id) {
-    selectedBlock.block = defaultBlock;
-  } else {
-    selectedBlock.block = clickedBlock;
-  }
-  /** fires a block select event to mark a selected block change. Sends out this blocks name*/
-  emit("block-select-event", selectedBlock.block);
-}
+    /*default block element*/
+    var defaultBlock: IBlockElement = {
+        groupId: -1,
+        group: "no data",
+        id: -1,
+        type: "no data",
+        name: "no Object selected",
+        rotation: 0,
+        texture: pathToPictures + "no-data.png",
+    }
+    /**  currently selected block */
+    const selectedBlock = reactive({ block: defaultBlock })
+    /** bus event */
+    const { emit, bus } = useEventBus()
+    /** boolean value that controls weather blocks are clicable or not */
+    const isCreateTool = ref(false)
+    /**entrys in blocklist */
+    blockList[0] = {
+        groupId: 1,
+        group: "Testobject1",
+        id: 3,
+        type: "Building",
+        name: "Big Building",
+        rotation: 0,
+        texture: BigBuilding,
+    }
+    blockList[1] = {
+        groupId: 1,
+        group: "Testobject2",
+        id: 4,
+        type: "Building",
+        name: "Building",
+        rotation: 0,
+        texture: Building,
+    }
+    blockList[2] = {
+        groupId: 1,
+        group: "Testobject3",
+        id: 5,
+        type: "Building",
+        name: "Markt",
+        rotation: 0,
+        texture: Supermarkt,
+    }
+    blockList[3] = {
+        groupId: 1,
+        group: "Testobject4",
+        id: 6,
+        type: "Building",
+        name: "Stadium",
+        rotation: 0,
+        texture: Stadium,
+    }
+    /**function activated by clicking on an block */
+    function onBlockClick(clickedBlock: any) {
+        /** if the selected block is the clicked block, it gets deselected by restoring the default block
+         * otherwhise the clicked block is now the selected block.
+         */
+        if (selectedBlock.block.id == clickedBlock.id) {
+            selectedBlock.block = defaultBlock
+        } else {
+            selectedBlock.block = clickedBlock
+        }
+        /** fires a block select event to mark a selected block change. Sends out this blocks name*/
+        emit("block-select-event", selectedBlock.block)
+    }
 
     /** sets buttons to clickable if create tool is selected, or not clickable if its not */
     watch(

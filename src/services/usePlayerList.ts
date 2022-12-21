@@ -1,4 +1,5 @@
 import { computed, reactive, readonly } from "vue"
+import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { IPlayerListState } from "../typings/IPlayerListState"
 import IUser from "../typings/IUser"
 import useUser from "./UserStore"
@@ -14,7 +15,7 @@ const playerState = reactive<IPlayerListState>({
  */
 export async function fetchPlayerList(): Promise<void> {
     const response = await fetch(
-        `/api/lobby/get_players/${activeLobby.value?.lobbyId}`,
+        `/api/lobby/get_players/${activeLobby.value.lobbyId}`,
         {
             method: "GET",
         }
@@ -25,6 +26,13 @@ export async function fetchPlayerList(): Promise<void> {
         playerState.playerlist.push({
             userId: i.userId,
             userName: i.userName,
+            activeLobby: {
+                lobbyId: -1,
+                mapId: -1,
+                lobbyName: "",
+                numOfPlayers: 0,
+                lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+            },
         })
     }
     console.log("playerState", playerState)

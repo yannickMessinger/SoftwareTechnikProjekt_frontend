@@ -1,5 +1,5 @@
-import { IStreetElement } from "./IStreetElement";
+import { IMapObject } from "./IMapObject";
 
 export interface StreetGridDTO {
-    mapObjects: Array<IStreetElement>
+    mapObjects: Array<IMapObject>
 }
