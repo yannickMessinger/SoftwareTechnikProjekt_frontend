@@ -97,6 +97,16 @@
                         <p class="textfield">keine Karten vorhanden</p>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <button
+                            id="startLobbyButton"
+                            @click="addNewCardClickAction()"
+                        >
+                            Karte hinzufuegen
+                        </button>
+                    </td>
+                </tr>
             </table>
         </div>
     </div>
@@ -202,14 +212,14 @@
             var removedCard = null
             switch (removedIndex) {
                 case 0:
-                    console.log("delete list head (shift)")
+                    /*delete list head (shift)*/
                     removedCard = cardList.shift()
                     break
                 case -1:
                     console.warn("-1: Deleted Item not found")
                     break
                 default:
-                    console.log("delete list element (splice)")
+                    /* delete list element (splice) */
                     removedCard = cardList.splice(removedIndex, removedIndex)
             }
             if (cardList.length == 0) {
@@ -225,7 +235,8 @@
     }
 
     function addNewCardClickAction() {
-        //Feature Request (#227 add new map button)
+        //TODO Add call popup here #282 und console.log entfernen
+        console.log("Karte hinzufuegen geklickt, popup fehlt noch")
     }
 
     /**
