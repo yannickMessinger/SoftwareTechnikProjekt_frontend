@@ -3,7 +3,7 @@
     <div class="headline">
         <h2>Spieler</h2>
         <h3 v-if="playerListState.errormsg">{{ playerListState.errormsg }}</h3>
-        <h4 v-else>{{ props.liste.length }}/anzMaxSpielerEinfügen</h4>
+        <h4 v-else>Spieler Onlne: {{ props.liste.length }}</h4>
     </div>
     <div class="playerList">
         <table>

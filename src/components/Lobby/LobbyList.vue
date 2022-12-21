@@ -3,15 +3,7 @@
     <div class="headline">
         <h2>Lobbys</h2>
 
-        <BasicButton
-            class="sec btn blue"
-            display="Lobby erstellen"
-            :btn_click="
-                () => {
-                    router.push('/create')
-                }
-            "
-        />
+      
     </div>
 
     <div class="content">
