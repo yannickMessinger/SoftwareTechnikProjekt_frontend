@@ -10,11 +10,8 @@
             <p id="header">
                 <BasicButton v-if="elementBarVisible" class="tools-back-btn" display=" " :btn_click="switchMode"/>
             </p>
-            <span>{{header}}</span>
             <ListToolsComponent v-if="!elementBarVisible" />
             <ListBlocksComponent v-if="elementBarVisible"/>
-            <span v-if="elementBarVisible">Gebäude</span>
-            <BuildingBlocksComponent v-if="elementBarVisible"/>
         </div> 
     </div>
     
@@ -51,10 +48,7 @@
     const {emit, bus} = useEventBus();
     const disableResetButton = ref(false);
     const { gridSize } = useGridSize();
-    const headerText_tool = "Werkzeuge"
-    const headerText_elements = "Elemente"
     const elementBarVisible = ref(false);
-    const header = ref(headerText_tool)
 
     onConfirm(() => {
         emit('grid-reset-event', true);
@@ -66,12 +60,10 @@
 
     function switchMode(){
         elementBarVisible.value = !elementBarVisible.value
-        header.value === headerText_elements ? header.value = headerText_tool : undefined
     }
 
     watch(() => bus.value.get('create-toggle-view'), (val) => {
         elementBarVisible.value = !elementBarVisible.value
-        header.value == headerText_tool ? header.value = headerText_elements : undefined
         console.log(elementBarVisible.value)
         console.log(val);
     });

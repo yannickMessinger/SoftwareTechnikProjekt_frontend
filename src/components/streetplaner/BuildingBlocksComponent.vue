@@ -96,15 +96,25 @@ watch(
 </script>
 
 <template>
+  <span>Gebäude</span>
   <div v-for="element in blockList" :key="element.id" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClick(element)">
         <button v-if="element != null" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
         <p v-if="element != null">{{element.name}}</p>
   </div>
 </template>
 
-<style>
+<style scoped>
   *{
     color: var(--woe-black);
     font-size: 1em;
   }
+
+  span{
+        margin: 0;
+        font-size: 1em;
+        color: var(--woe-black);
+        font-weight: bold;
+        margin-bottom: 8px;
+        
+    }
 </style>

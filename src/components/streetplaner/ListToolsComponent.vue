@@ -49,6 +49,7 @@
 </script>
 
 <template>
+    <span>Werkzeuge</span>
     <div v-for="element in toolList" :key="element.id" id="editor-tool" :class="element.name === selectedTool.tool.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onToolClick(element)">
         <button v-if="element != null" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
         <p v-if="element != null">{{element.name}}</p>
@@ -59,5 +60,14 @@
     *{
         color: var(--woe-black);
         font-size: 1em;
+    }
+
+    span{
+        margin: 0;
+        font-size: 1em;
+        color: var(--woe-black);
+        font-weight: bold;
+        margin-bottom: 8px;
+        
     }
 </style>
