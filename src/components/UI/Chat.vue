@@ -18,15 +18,15 @@
             />
         </header>
         <transition name="slide">
-            <div id="msg-chat" v-bind="chat" v-if="visible">
+            <div id="msg-chat" v-bind="chatRef" v-if="visible">
                 <div
                     id="msg-message"
-                    v-for="(item, index) in chatHistory"
+                    v-for="(item, index) in chat.chatList"
                     :key="index"
                 >
                     <p class="">
-                        <strong>{{ item.name }}</strong
-                        >{{ item.text }}
+                        <strong>{{ item.author }}</strong
+                        >:{{ item.message }}
                     </p>
                 </div>
             </div>
@@ -50,8 +50,10 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from "vue"
+    import { onMounted, ref } from "vue"
     import BasicButton from "../Buttons/BasicButton.vue"
+    import { useChat } from "../../services/Chat/useChat"
+    import useUser from "../../services/UserStore"
 
     interface Message {
         name: string
@@ -60,13 +62,22 @@
     const chatHistory = ref<Message[]>([])
     const chatLength = 20
     let input = ref("")
-    let chat = ref()
+    let chatRef = ref()
     let visible = ref(false)
+    const { name, setName, setId } = useUser()
+    const { chat, sendMessage, connect } = useChat(name.value)
+
+    onMounted(() => {
+        connect()
+    })
 
     function appendMessage() {
         let a = document.getElementById("msg-chat")
         if (input.value && a) {
-            chatHistory.value.push({ name: "user001: ", text: input.value }) // TODO: Username hier setzen
+            //chatHistory.value.push({ name: "user001: ", text: input.value }) // TODO: Username hier setzen
+            //chat.chatList.push({ message: input.value, author: name.value })
+
+            sendMessage(input.value)
             chatHistory.value.length > chatLength
                 ? chatHistory.value.shift()
                 : undefined
