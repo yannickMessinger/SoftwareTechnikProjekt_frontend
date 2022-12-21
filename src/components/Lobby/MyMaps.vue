@@ -110,6 +110,7 @@
     import { reactive, watch, ref } from "vue"
     import type { ICardElement } from "../../services/Lobby/ICardElement"
     import useEventBus from "../../services/eventBus"
+    import router from "../../router/router"
 
     /** Variablen: */
     /** bus event */
@@ -130,9 +131,9 @@
     )
 
     /**Card List Data Import from Backend or load default list */
-    console.log("Cards:")
     if (backendOfflineDebugMode) {
         /**TODO Remove Debug Components */
+        console.warn("Unable to reach Backend Server, insert default Maps")
         cardList[0] = { id: 0, name: "Testmap 1", date: new Date("1997-06-07") }
         cardList[1] = { id: 1, name: "Testmap 2", date: new Date("1997-06-07") }
         cardList[2] = { id: 2, name: "Testmap 3", date: new Date("1997-06-07") }
@@ -141,7 +142,6 @@
         //TODO import list data from backend here (#229 connect backend)
     }
     //TODO Compile imported data into card Elements (#229 connect backend, #42 need card informations)
-    console.log(cardList.length)
 
     watch(
         () => bus.value.get("lobby-closed-event"),
@@ -181,6 +181,7 @@
                 selectedCard.card = clickedCard
                 isHost.value = true
                 isLobbyOpen.value = true
+                router.push("/create")
             } else {
                 selectedCard.card = clickedCard
             }
@@ -195,13 +196,9 @@
         if (clickedCard.id == selectedCard.card.id) {
             /*TODO What if deleted card is active card? (#228) */
         } else {
-            console.log("Delete Action")
-            console.log("List-old:")
-            console.log(cardList.length)
             var removedIndex = cardList.findIndex(
                 (cardElement) => cardElement.id == clickedCard.id
             )
-            console.log("removedIndex: " + removedIndex)
             var removedCard = null
             switch (removedIndex) {
                 case 0:
@@ -215,8 +212,6 @@
                     console.log("delete list element (splice)")
                     removedCard = cardList.splice(removedIndex, removedIndex)
             }
-            console.log("List-new:")
-            console.log(cardList.length)
             if (cardList.length == 0) {
                 isEmpty.value = true
             }
@@ -233,14 +228,14 @@
         //Feature Request (#227 add new map button)
     }
 
-    /** 
-    const props = defineProps<{
-        liste: Readonly<IMyMapsListItem[]>
-    }>()
+    /**
+const props = defineProps<{
+    liste: Readonly<IMyMapsListItem[]>
+}>()
 
-    const { mapsList } = useMyMaps()
+const { mapsList } = useMyMaps()
 
-    */
+*/
 </script>
 
 <style scoped>
