@@ -57,7 +57,18 @@
     import Chat from "../UI/Chat.vue"
     import { E_LobbyMode } from "../../typings/E_LobbyMode"
     import { useLobbyList } from "../../services/useLobbyList"
-    const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
+    import { useChat } from "../../services/Chat/useChat"
+    import { onMounted } from "vue"
+
+    const { name, user, userId, hostId, activeLobby, setActiveLobby } =
+        useUser()
+    const { updateActiveChatLobbyId } = useChat(name.value)
+
+    onMounted(() => {
+        //activate websockets connection to listen for incoming updates
+        //updates lobbyid for  local lobbychat
+        updateActiveChatLobbyId(activeLobby.value.lobbyId)
+    })
 
     //Methods to switch Lobbymode
     function setActiveLobbyToBuildMode() {

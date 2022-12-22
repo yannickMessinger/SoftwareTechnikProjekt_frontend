@@ -5,7 +5,7 @@ const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/chat"
 const ADD_MSG = "/app/chat.addUser"
 const SEND_MSG = "/app/chat.sendMessage"
-const LOBBY_MSG = "/app/chat.lobbyChat"
+const LOBBY_MSG = "/app/chat.lobbyChat/"
 const message_notification = new Audio(
     "src/assets/audio/chat/message_notification/msn.mp3"
 )
@@ -38,12 +38,13 @@ const chatState = reactive<IChatState>({
     activeLobbyId: -1,
 })
 
-function updateActiveLobbyId(id: number) {
+//update of active lobby for ws connectivity
+function updateActiveChatLobbyId(id: number) {
     if (chatState.activeLobbyId === -1) {
         console.log("invalid active lobby")
     }
     chatState.activeLobbyId = id
-    console.log(`active chat lobby id updated auf${chatState.activeLobbyId}`)
+    connectLobbyWs()
 }
 
 export function useChat(username: string) {
@@ -54,7 +55,7 @@ export function useChat(username: string) {
         sendMessage,
         sendLobbyMessage,
         connect,
-        updateActiveLobbyId,
+        updateActiveChatLobbyId,
     }
 }
 
@@ -79,7 +80,27 @@ function onError(error: Error) {
     chatState.errormessage = error.message
 }
 
-function sendMessage(/*event: Event,*/ message: string) {
+//connect second ws for local lobbychat
+function connectLobbyWs() {
+    let socket = new WebSocket(ws_url)
+    stompClient = Stomp.over(socket)
+    stompClient.connect({}, onConnectedLobbyWs, onErrorLobbyWs)
+}
+
+//subscribes ws to lobby specific path
+function onConnectedLobbyWs() {
+    stompClient.subscribe(
+        `/topic/chat/lobby/${chatState.activeLobbyId}`,
+        onLobbyMessageReceived
+    )
+}
+
+function onErrorLobbyWs(error: Error) {
+    console.log("ERROR CONNECT LOCAL LOBBY WS")
+    chatState.errormessage = error.message
+}
+
+function sendMessage(message: string) {
     if (message && stompClient) {
         const chatMessage: IStompMessage = {
             author: chatState.userName,
@@ -90,10 +111,9 @@ function sendMessage(/*event: Event,*/ message: string) {
 
         stompClient.send(SEND_MSG, {}, JSON.stringify(chatMessage))
     }
-
-    //event.preventDefault()
 }
 
+//sends lobby inter message to specific endpoint
 function sendLobbyMessage(/*event: Event,*/ message: string) {
     console.log(chatState.activeLobbyId)
     if (message && stompClient) {
@@ -104,10 +124,12 @@ function sendLobbyMessage(/*event: Event,*/ message: string) {
             lobbyId: chatState.activeLobbyId,
         }
 
-        stompClient.send(LOBBY_MSG, {}, JSON.stringify(chatMessage))
+        stompClient.send(
+            LOBBY_MSG + chatMessage.lobbyId,
+            {},
+            JSON.stringify(chatMessage)
+        )
     }
-
-    //event.preventDefault()
 }
 
 function onMessageReceived(payload: { body: string }) {
@@ -123,17 +145,6 @@ function onMessageReceived(payload: { body: string }) {
             message: message.author + " left",
             author: message.author,
         })
-    } else if (message.type === "LOBBYMSG") {
-        console.log("lobby spec msg")
-
-        if (chatState.activeLobbyId === message.lobbyId) {
-            console.log("gleichhhh")
-
-            chatState.chatList.push({
-                message: message.content,
-                author: message.author,
-            })
-        }
     } else {
         message_notification.play()
         chatState.chatList.push({
@@ -141,4 +152,13 @@ function onMessageReceived(payload: { body: string }) {
             author: message.author,
         })
     }
+}
+
+function onLobbyMessageReceived(payload: { body: string }) {
+    const message = JSON.parse(payload.body)
+
+    chatState.chatList.push({
+        message: message.content,
+        author: message.author,
+    })
 }
