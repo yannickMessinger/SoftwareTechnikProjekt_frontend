@@ -2,12 +2,13 @@ import { CompatClient, Stomp } from "@stomp/stompjs"
 import { reactive, readonly } from "vue"
 import useUser from "../UserStore"
 
-const { activeLobby } = useUser()
+const { activeLobby, userId } = useUser()
 
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/chat"
 const ADD_MSG = "/app/chat.addUser"
 const SEND_MSG = "/app/chat.sendMessage"
+const LOBBY_MSG = "/app/chat.lobbyChat"
 
 let stompClient: CompatClient
 
@@ -40,6 +41,7 @@ export function useChat(username: string) {
     return {
         chat: readonly(chatState),
         sendMessage,
+        sendLobbyMessage,
         connect,
     }
 }
@@ -79,6 +81,20 @@ function sendMessage(/*event: Event,*/ message: string) {
     //event.preventDefault()
 }
 
+function sendLobbyMessage(/*event: Event,*/ message: string) {
+    if (message && stompClient) {
+        const chatMessage: IStompMessage = {
+            author: chatState.userName,
+            content: message,
+            type: "CHAT",
+        }
+
+        stompClient.send(LOBBY_MSG, {}, JSON.stringify(chatMessage))
+    }
+
+    //event.preventDefault()
+}
+
 function onMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
 
@@ -92,6 +108,12 @@ function onMessageReceived(payload: { body: string }) {
             message: message.author + " left",
             author: message.author,
         })
+    } else if (message.type === "LOBBYMSG") {
+        console.log("lobby spec msg")
+        console.log(
+            `kam aus LobbyID: ${activeLobby.value.lobbyId} activeLobby.value.lobbyId`
+        )
+        console.log(activeLobby.value.playerList)
     } else {
         chatState.chatList.push({
             message: message.content,
