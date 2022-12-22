@@ -64,11 +64,12 @@
     let input = ref("")
     let chatRef = ref()
     let visible = ref(false)
-    const { name, setName, setId } = useUser()
-    const { chat, sendMessage, connect } = useChat(name.value)
+    const { name, setName, setId, activeLobby } = useUser()
+    const { chat, sendMessage, connect, sendLobbyMessage } = useChat(name.value)
 
     onMounted(() => {
         connect()
+        console.log(`chat lobby id ${chat.activeLobbyId}`)
     })
 
     function appendMessage() {
@@ -76,8 +77,12 @@
         if (input.value && a) {
             //chatHistory.value.push({ name: "user001: ", text: input.value }) // TODO: Username hier setzen
             //chat.chatList.push({ message: input.value, author: name.value })
+            if (chat.activeLobbyId !== -1) {
+                sendLobbyMessage(input.value)
+            } else {
+                sendMessage(input.value)
+            }
 
-            sendMessage(input.value)
             chatHistory.value.length > chatLength
                 ? chatHistory.value.shift()
                 : undefined

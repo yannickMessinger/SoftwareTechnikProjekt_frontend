@@ -21,18 +21,22 @@
     import router from "../../router/router"
     import { useLobbyList } from "../../services/useLobbyList"
     import { onMounted } from "vue"
+    import { useChat } from "../../services/Chat/useChat"
 
     const props = defineProps<{
         lobby: ILobby
     }>()
 
-    const { setActiveLobby } = useUser()
+    const { setActiveLobby, name } = useUser()
     const { receiveLobbyUpdates, joinMessage } = useLobbyList()
+    const { updateActiveLobbyId } = useChat(name.value)
 
     //for later purposes to link to selected lobby via Vue Router
     async function selectLobby() {
         //set ActiveLoppy property to the selected Lobby
         setActiveLobby(props.lobby)
+        //updates lobbyid for chat
+        updateActiveLobbyId(props.lobby.lobbyId)
 
         //fires JOINED event to backend to trigger persistence operations and inform other players on channel and update data
         joinMessage()
