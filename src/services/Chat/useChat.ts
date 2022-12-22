@@ -6,6 +6,9 @@ const DEST = "/topic/chat"
 const ADD_MSG = "/app/chat.addUser"
 const SEND_MSG = "/app/chat.sendMessage"
 const LOBBY_MSG = "/app/chat.lobbyChat"
+const message_notification = new Audio(
+    "src/assets/audio/chat/message_notification/msn.mp3"
+)
 
 let stompClient: CompatClient
 
@@ -125,12 +128,14 @@ function onMessageReceived(payload: { body: string }) {
 
         if (chatState.activeLobbyId === message.lobbyId) {
             console.log("gleichhhh")
+
             chatState.chatList.push({
                 message: message.content,
                 author: message.author,
             })
         }
     } else {
+        message_notification.play()
         chatState.chatList.push({
             message: message.content,
             author: message.author,
