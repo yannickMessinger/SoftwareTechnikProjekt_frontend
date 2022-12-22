@@ -4,7 +4,7 @@ import { IPlayerListState } from "../typings/IPlayerListState"
 import IUser from "../typings/IUser"
 import useUser from "./UserStore"
 
-const { activeLobby } = useUser()
+const { activeLobby, setActiveLobby, updateActiveLobbyPlayerList } = useUser()
 const playerState = reactive<IPlayerListState>({
     playerlist: Array<IUser>(),
     errormsg: "",
@@ -15,31 +15,17 @@ const playerState = reactive<IPlayerListState>({
  */
 export async function fetchPlayerList(): Promise<void> {
     const response = await fetch(
-        `/api/lobby/get_players/${activeLobby.value.lobbyId}`,
+        `/api/lobby/get_players/${activeLobby.value?.lobbyId}`,
         {
             method: "GET",
         }
     )
     const result = await response.json()
     console.log("fetch playerlist response", result)
-    for (let i of result) {
-        playerState.playerlist.push({
-            userId: i.userId,
-            userName: i.userName,
-            activeLobby: {
-                lobbyId: -1,
-                mapId: -1,
-                lobbyName: "",
-                numOfPlayers: 0,
-                lobbyModeEnum: E_LobbyMode.BUILD_MODE,
-            },
-        })
-    }
-    console.log("playerState", playerState)
+    playerState.playerlist = result
 }
 
 export async function updatePlayerList() {
-    console.log("Update PlayerList")
     const url = "/api/player"
     fetch(url)
         .then((resp) => {

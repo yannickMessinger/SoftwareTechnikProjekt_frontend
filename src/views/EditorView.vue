@@ -55,6 +55,7 @@
     import Header from "../components/Header.vue"
     import Chat from "../components/UI/Chat.vue"
     import BasicButton from "../components/Buttons/BasicButton.vue"
+    import useUser from "../services/UserStore"
 
     const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, {
         question:
@@ -62,6 +63,7 @@
     })
     const { emit, bus } = useEventBus()
     const disableResetButton = ref(false)
+    const disableStreetGrid = ref(false)
 
     const headerText_tool = "Werkzeuge"
     const headerText_elements = "Elemente"

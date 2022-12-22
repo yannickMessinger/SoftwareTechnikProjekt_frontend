@@ -8,10 +8,12 @@ const state = reactive<User>({
     userName: "",
     activeLobby: {
         lobbyId: -1,
+        hostId: -1,
         mapId: -1,
         lobbyName: "",
         numOfPlayers: 0,
         lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+        playerList: [],
     },
 })
 
@@ -34,35 +36,33 @@ async function sendName(): Promise<void> {
         }),
     })
 
-    console.log("sendName():", response)
     const jsondata = await response.json()
     setId(Number(jsondata))
-    console.log("state.userId", state.userId)
 }
 
+//sets active Lobby property of the current User
 async function setActiveLobby(lobby: ILobby): Promise<void> {
     state.activeLobby = lobby
-    await postActiveLobby(lobby)
 }
 
-async function postActiveLobby(lobby: ILobby) {
-    const response = await fetch(
-        `/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`,
-        {
-            method: "POST",
-        }
-    )
-    console.log("setActiveLobby() -> post player to lobby - response", response)
+function updateActiveLobbyPlayerList(players: User[]) {
+    for (let p of players) {
+        state.activeLobby.playerList?.push(p)
+    }
+    console.log(state.activeLobby.playerList)
 }
 
 export default function useUser() {
     return {
         name: computed(() => state.userName),
         userId: computed(() => state.userId),
+        hostId: computed(() => state.activeLobby.hostId),
         activeLobby: computed(() => state.activeLobby),
+        user: readonly<User>(state),
         setName,
         setId,
         sendName,
         setActiveLobby,
+        updateActiveLobbyPlayerList,
     }
 }

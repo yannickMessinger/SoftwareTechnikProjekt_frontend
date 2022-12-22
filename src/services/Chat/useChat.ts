@@ -1,5 +1,8 @@
 import { CompatClient, Stomp } from "@stomp/stompjs"
 import { reactive, readonly } from "vue"
+import useUser from "../UserStore"
+
+const { activeLobby } = useUser()
 
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/chat"

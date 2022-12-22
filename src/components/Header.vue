@@ -1,5 +1,9 @@
 <template>
     <div class="header">
+        <span>AktUser: {{ user.userName }}</span>
+        <span>ActiveLobby: {{ user.activeLobby.lobbyName }}</span>
+        <span>AktMap: {{ user.activeLobby.mapId }}</span>
+        <span>AktLobbyM: {{ user.activeLobby.lobbyModeEnum }}</span>
         <span>{{ text }}</span>
         <BasicButton
             v-if="displayHomebutton"
@@ -17,6 +21,9 @@
 <script setup lang="ts">
     import router from "../router/router"
     import BasicButton from "./Buttons/BasicButton.vue"
+    import useUser from "../services/UserStore"
+
+    const { user } = useUser()
 
     const props = defineProps({
         text: {
