@@ -98,19 +98,32 @@
 
     // onClick handles click on specific cell
     function onClick(cell: any, e: any) {
+        let currCellContent = streetGrid[cell.posX][cell.posY]
         let payload: IMapObject
         if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
+            // Todo, cars only placeable on roads
             if (toolState.block.id === 7) {
-                let rect = e.target.getBoundingClientRect()
-                let x = (e.clientX - rect.left) / gridSize.value
-                let y = (e.clientY - rect.top) / gridSize.value
-                streetGrid[cell.posX][cell.posY].game_assets.push({
-                    objectTypeId: toolState.block.id,
-                    x: x,
-                    y: y,
-                    rotation: toolState.block.rotation,
-                    texture: toolState.block.texture,
-                })
+                if (currCellContent.id !== -1) {
+                    let rect = e.target.getBoundingClientRect()
+                    let x = (e.clientX - rect.left) / gridSize.value
+                    let y = (e.clientY - rect.top) / gridSize.value
+                    streetGrid[cell.posX][cell.posY].game_assets.push({
+                        objectTypeId: toolState.block.id,
+                        x: x,
+                        y: y,
+                        rotation: toolState.block.rotation,
+                        texture: toolState.block.texture,
+                    })
+                    payload = {
+                        objectTypeId: currCellContent.id,
+                        x: cell.posX,
+                        y: cell.posY,
+                        rotation: currCellContent.rotation,
+                        game_assets:
+                            streetGrid[cell.posX][cell.posY].game_assets,
+                    }
+                    updateMessage(payload)
+                }
             } else {
                 streetGrid[cell.posX][cell.posY].id = toolState.block.id
                 streetGrid[cell.posX][cell.posY].rotation =
@@ -122,6 +135,7 @@
                     x: cell.posX,
                     y: cell.posY,
                     rotation: toolState.block.rotation,
+                    game_assets: streetGrid[cell.posX][cell.posY].game_assets,
                 }
                 createMessage(payload)
             }
@@ -137,6 +151,7 @@
                 x: cell.posX,
                 y: cell.posY,
                 rotation: streetGrid[cell.posX][cell.posY].rotation,
+                game_assets: streetGrid[cell.posX][cell.posY].game_assets,
             }
             updateMessage(payload)
         }
@@ -146,6 +161,7 @@
                 x: cell.posX,
                 y: cell.posY,
                 rotation: streetGrid[cell.posX][cell.posY].rotation,
+                game_assets: [],
             }
             streetGrid[cell.posX][cell.posY].id = -1
             streetGrid[cell.posX][cell.posY].rotation = 0
@@ -163,7 +179,8 @@
         if (
             event.buttons === 1 &&
             toolState.tool === ToolEnum.CREATE &&
-            toolState.block.id !== -1
+            toolState.block.id !== -1 &&
+            toolState.block.id !== 7
         ) {
             if (
                 currCellContent.id !== toolState.block.id ||
@@ -180,6 +197,7 @@
                     x: cell.posX,
                     y: cell.posY,
                     rotation: toolState.block.rotation,
+                    game_assets: [],
                 }
                 createMessage(payload)
             }
@@ -191,6 +209,7 @@
                     x: cell.posX,
                     y: cell.posY,
                     rotation: streetGrid[cell.posX][cell.posY].rotation,
+                    game_assets: [],
                 }
                 streetGrid[cell.posX][cell.posY].id = -1
                 streetGrid[cell.posX][cell.posY].rotation = 0
@@ -212,6 +231,7 @@
                         x: ele.posX,
                         y: ele.posY,
                         rotation: ele.rotation,
+                        game_assets: [],
                     })
                 }
             }
@@ -251,6 +271,30 @@
         }
     }
 
+    function calcCoordX(id: string, relativeX: number) {
+        let bodyRect = document.body.getBoundingClientRect()
+        let element = document.getElementById(id)
+        let posX = 0
+        if (element) {
+            let elemRect = element.getBoundingClientRect()
+            posX = elemRect.left - bodyRect.left + gridSize.value * relativeX
+        }
+        console.log(posX)
+        return posX
+    }
+
+    function calcCoordY(id: string, relativeY: number) {
+        let bodyRect = document.body.getBoundingClientRect()
+        let element = document.getElementById(id)
+        let posY = 0
+        if (element) {
+            let elemRect = element.getBoundingClientRect()
+            posY = elemRect.top - bodyRect.top + gridSize.value * relativeY
+        }
+        console.log(posY)
+        return posY
+    }
+
     // disable right click context menu
     window.addEventListener(
         "contextmenu",
@@ -268,6 +312,7 @@
             class="grid-item grid-size col no-drag"
             @click="onClick(ele, $event)"
             @mousemove="onMouseMove(ele, $event)"
+            :id="`cell_${ele.posX}_${ele.posY}`"
         >
             <img
                 v-if="ele.texture != ''"
@@ -283,8 +328,16 @@
                     draggable="false"
                     :style="{
                         transform: 'rotate(' + asset.rotation * 90 + 'deg)',
-                        left: '10px',
-                        top: '10px',
+                        left:
+                            calcCoordX(
+                                `cell_${ele.posX}_${ele.posY}`,
+                                asset.x
+                            ) + 'px',
+                        top:
+                            calcCoordY(
+                                `cell_${ele.posX}_${ele.posY}`,
+                                asset.y
+                            ) + 'px',
                     }"
                 />
             </div>
@@ -319,7 +372,7 @@
     .asset-img {
         width: v-bind(assetSizePx);
         height: v-bind(assetSizePx);
-        position: relative;
+        position: absolute;
     }
     .no-drag {
         user-select: none;
