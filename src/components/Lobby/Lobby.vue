@@ -19,22 +19,32 @@
     import BasicButton from "../Buttons/BasicButton.vue"
     import useUser from "../../services/UserStore"
     import router from "../../router/router"
+    import { useLobbyList } from "../../services/useLobbyList"
+    import { onMounted } from "vue"
 
     const props = defineProps<{
         lobby: ILobby
     }>()
 
     const { setActiveLobby } = useUser()
+    const { receiveLobbyUpdates, joinMessage } = useLobbyList()
 
     //for later purposes to link to selected lobby via Vue Router
     async function selectLobby() {
-        console.log(props.lobby.lobbyId, props.lobby.lobbyName)
-        await setActiveLobby(props.lobby)
-        console.log("user has active lobby")
+        //set ActiveLoppy property to the selected Lobby
+        setActiveLobby(props.lobby)
+
+        //fires JOINED event to backend to trigger persistence operations and inform other players on channel and update data
+        joinMessage()
         router.push({
             path: "/lobbyview",
         })
     }
+
+    onMounted(() => {
+        //activate websockets connection to listen for incoming updates
+        receiveLobbyUpdates()
+    })
 </script>
 
 <style scoped>
