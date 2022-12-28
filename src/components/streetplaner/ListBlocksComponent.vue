@@ -40,7 +40,7 @@
         type: "???",
         name: "Gerade",
         rotation: 0,
-        texture: pathToPictures + "object-icons/Road_straight.svg",
+        texture: pathToPictures + "object-icons/Road_straight.png",
     }
     blockList[1] = {
         groupId: 0,
@@ -49,7 +49,7 @@
         type: "???",
         name: "Kurve",
         rotation: 0,
-        texture: pathToPictures + "object-icons/Road_curve.svg",
+        texture: pathToPictures + "object-icons/Road_curve.png",
     }
     blockList[2] = {
         groupId: 1,
@@ -58,16 +58,7 @@
         type: "???",
         name: "Kreuzung",
         rotation: 0,
-        texture: pathToPictures + "object-icons/Road_cross.svg",
-    }
-    blockList[3] = {
-        groupId: 1,
-        group: "test",
-        id: 7,
-        type: "???",
-        name: "Auto",
-        rotation: 0,
-        texture: pathToPictures + "object-icons/car-top-view.svg",
+        texture: pathToPictures + "object-icons/Road_cross.png",
     }
 
     /**function activated by clicking on an block */
