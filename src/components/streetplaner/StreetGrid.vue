@@ -231,7 +231,7 @@
                         x: ele.posX,
                         y: ele.posY,
                         rotation: ele.rotation,
-                        game_assets: [],
+                        game_assets: ele.game_assets,
                     })
                 }
             }
