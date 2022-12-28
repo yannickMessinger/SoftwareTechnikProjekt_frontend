@@ -60,6 +60,15 @@
         rotation: 0,
         texture: pathToPictures + "object-icons/Road_cross.svg",
     }
+    blockList[3] = {
+        groupId: 1,
+        group: "test",
+        id: 7,
+        type: "???",
+        name: "Auto",
+        rotation: 0,
+        texture: pathToPictures + "object-icons/car-top-view.svg",
+    }
 
     /**function activated by clicking on an block */
     function onBlockClicked(clickedBlock: any) {

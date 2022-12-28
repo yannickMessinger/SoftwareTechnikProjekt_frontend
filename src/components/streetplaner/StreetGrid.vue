@@ -78,6 +78,7 @@
     const gridSize = ref(40)
     // initialize gridSizePx used in css
     const gridSizePx = computed(() => gridSize.value.toString() + "px")
+    const assetSizePx = computed(() => (gridSize.value / 4).toString() + "px")
     // declare blockList
     var blockList: Array<IBlockElement>
     watch(
@@ -96,19 +97,34 @@
     })
 
     // onClick handles click on specific cell
-    function onClick(cell: any) {
+    function onClick(cell: any, e: any) {
         let payload: IMapObject
         if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
-            streetGrid[cell.posX][cell.posY].id = toolState.block.id
-            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
-            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
-            payload = {
-                objectTypeId: toolState.block.id,
-                x: cell.posX,
-                y: cell.posY,
-                rotation: toolState.block.rotation,
+            if (toolState.block.id === 7) {
+                let rect = e.target.getBoundingClientRect()
+                let x = (e.clientX - rect.left) / gridSize.value
+                let y = (e.clientY - rect.top) / gridSize.value
+                streetGrid[cell.posX][cell.posY].game_assets.push({
+                    objectTypeId: toolState.block.id,
+                    x: x,
+                    y: y,
+                    rotation: toolState.block.rotation,
+                    texture: toolState.block.texture,
+                })
+            } else {
+                streetGrid[cell.posX][cell.posY].id = toolState.block.id
+                streetGrid[cell.posX][cell.posY].rotation =
+                    toolState.block.rotation
+                streetGrid[cell.posX][cell.posY].texture =
+                    toolState.block.texture
+                payload = {
+                    objectTypeId: toolState.block.id,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: toolState.block.rotation,
+                }
+                createMessage(payload)
             }
-            createMessage(payload)
         }
         if (
             toolState.tool == ToolEnum.ROTATE &&
@@ -136,10 +152,11 @@
             streetGrid[cell.posX][cell.posY].texture = ""
             deleteMessage(payload)
         }
+        console.log(streetGrid)
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
-    function onMouseMove(cell: any, event: any) {
+    function onMouseMove(cell: any, event: MouseEvent) {
         let currCellContent = streetGrid[cell.posX][cell.posY]
         // Todo, add check so stomp message will only send when a change is made
         let payload: IMapObject
@@ -213,6 +230,7 @@
                 posY: ele.y,
                 rotation: ele.rotation,
                 texture: blockList[ele.objectTypeId].texture,
+                game_assets: [],
             }
         }
     }
@@ -227,6 +245,7 @@
                     posY: col,
                     rotation: 0,
                     texture: "",
+                    game_assets: [],
                 }
             }
         }
@@ -247,7 +266,7 @@
         <div
             v-for="ele in row"
             class="grid-item grid-size col no-drag"
-            @click="onClick(ele)"
+            @click="onClick(ele, $event)"
             @mousemove="onMouseMove(ele, $event)"
         >
             <img
@@ -257,6 +276,18 @@
                 draggable="false"
                 :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"
             />
+            <div v-for="asset in ele.game_assets">
+                <img
+                    :src="asset.texture"
+                    class="no-drag asset-img"
+                    draggable="false"
+                    :style="{
+                        transform: 'rotate(' + asset.rotation * 90 + 'deg)',
+                        left: '10px',
+                        top: '10px',
+                    }"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -284,6 +315,11 @@
         width: 100%;
         height: 100%;
         display: block;
+    }
+    .asset-img {
+        width: v-bind(assetSizePx);
+        height: v-bind(assetSizePx);
+        position: relative;
     }
     .no-drag {
         user-select: none;
