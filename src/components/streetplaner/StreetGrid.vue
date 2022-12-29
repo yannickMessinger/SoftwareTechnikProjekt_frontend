@@ -168,7 +168,6 @@
             streetGrid[cell.posX][cell.posY].texture = ""
             deleteMessage(payload)
         }
-        console.log(streetGrid)
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
@@ -250,7 +249,7 @@
                 posY: ele.y,
                 rotation: ele.rotation,
                 texture: blockList[ele.objectTypeId].texture,
-                game_assets: [],
+                game_assets: ele.game_assets,
             }
         }
     }
@@ -279,7 +278,6 @@
             let elemRect = element.getBoundingClientRect()
             posX = elemRect.left - bodyRect.left + gridSize.value * relativeX
         }
-        console.log(posX)
         return posX
     }
 
@@ -291,7 +289,6 @@
             let elemRect = element.getBoundingClientRect()
             posY = elemRect.top - bodyRect.top + gridSize.value * relativeY
         }
-        console.log(posY)
         return posY
     }
 
