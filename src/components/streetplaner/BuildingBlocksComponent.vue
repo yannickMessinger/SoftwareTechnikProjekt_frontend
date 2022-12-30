@@ -96,50 +96,25 @@
 </script>
 
 <template>
-    <div
-        v-for="element in blockList"
-        :key="element.id"
-        id="editor-tool"
-        :class="
-            element.name === selectedBlock.block.name
-                ? 'editor-tool-active'
-                : 'editor-tool-not-active'
-        "
-        @click="onBlockClick(element)"
-    >
-        <button
-            v-if="element != null"
-            class="editor-tool-btn"
-            :style="{ backgroundImage: `url(${element.texture})` }"
-        />
-        <p v-if="element != null">{{ element.name }}</p>
-    </div>
-    <!--
-  <div class="blockListContainer">
-    <div v-for="element in blockList" class="blockListElement">
-      <button
-        :disabled="!isCreateTool"
-        :class="
-          element.name === selectedBlock.block.name
-            ? 'blockListButtonActive'
-            : 'blockListButton'
-        "
-        @click="onBlockClicked(element)"
-      >
-        <img
-          v-if="element != null"
-          :src="element.texture"
-          class="blockListImg"
-        />
-      </button>
-    </div>
+  <span>Gebäude</span>
+  <div v-for="element in blockList" :key="element.id" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClick(element)">
+        <button v-if="element != null" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
+        <p v-if="element != null">{{element.name}}</p>
   </div>
-  -->
 </template>
 
-<style>
-    * {
-        color: var(--woe-black);
+<style scoped>
+  *{
+    color: var(--woe-black);
+    font-size: 1em;
+  }
+
+  span{
+        margin: 0;
         font-size: 1em;
+        color: var(--woe-black);
+        font-weight: bold;
+        margin-bottom: 8px;
+        
     }
 </style>
