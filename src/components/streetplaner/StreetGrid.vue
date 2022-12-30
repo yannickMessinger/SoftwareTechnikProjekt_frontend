@@ -78,9 +78,9 @@
     fillGridEmpty()
 
     // initialize gridSize
-    const gridSize = ref(40)
+    //const gridSize = ref(40)
     // initialize gridSizePx used in css
-    const gridSizePx = computed(() => gridSize.value.toString() + "px")
+    const gridSizePx = computed(() => gridSize.size.toString() + "px")
     // declare blockList
     var blockList: Array<IBlockElement>
     watch(
