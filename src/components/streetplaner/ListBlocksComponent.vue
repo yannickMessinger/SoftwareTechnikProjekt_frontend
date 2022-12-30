@@ -22,6 +22,7 @@
     
     /*default block element*/
     var defaultBlock: IBlockElement = {
+    var defaultBlock: IBlockElement = {
         groupId: -1,
         group: "no data",
         id: -1,
@@ -30,11 +31,19 @@
         rotation: 0,
         texture: pathToPictures + "no-data.png",
     }
+        type: "no data",
+        name: "no Object selected",
+        rotation: 0,
+        texture: pathToPictures + "no-data.png",
+    }
     /**  currently selected block */
+    const selectedBlock = reactive({ block: defaultBlock })
     const selectedBlock = reactive({ block: defaultBlock })
     /** bus event */
     const { emit, bus } = useEventBus()
+    const { emit, bus } = useEventBus()
     /** boolean value that controls weather blocks are clicable or not */
+    const isCreateTool = ref(false)
     const isCreateTool = ref(false)
     /**entrys in blocklist */
     blockList[0] = {groupId: 0, group: "Testobject1", id: 0, type: "Straße", name: "Gerade", rotation: 0, texture: pathToPictures + "object-icons/Road_straight.svg"}
@@ -47,6 +56,7 @@
     buildingList[3] = {groupId: 3, group: "Testobject4", id: 6, type: "Gebäude", name: "Stadion", rotation: 0, texture: Stadium};
     /**function activated by clicking on an block */
     function onBlockClicked(clickedBlock: any) {
+    function onBlockClicked(clickedBlock: any) {
         /** if the selected block is the clicked block, it gets deselected by restoring the default block
          * otherwhise the clicked block is now the selected block.
          */
@@ -54,8 +64,14 @@
             selectedBlock.block = defaultBlock
         } else {
             selectedBlock.block = clickedBlock
+         */
+        if (selectedBlock.block.id == clickedBlock.id) {
+            selectedBlock.block = defaultBlock
+        } else {
+            selectedBlock.block = clickedBlock
         }
         /** fires a block select event to mark a selected block change. Sends out this blocks name*/
+        emit("block-select-event", selectedBlock.block)
         emit("block-select-event", selectedBlock.block)
     }
 
@@ -68,7 +84,16 @@
             } else {
                 isCreateTool.value = false
             }
+    watch(
+        () => bus.value.get("tool-select-event"),
+        (val) => {
+            if (val == ToolEnum.CREATE) {
+                isCreateTool.value = true
+            } else {
+                isCreateTool.value = false
+            }
         }
+    )
     )
 </script>
 
@@ -86,6 +111,7 @@
 </template>
 
 <style scoped>
+    * {
     * {
         color: var(--woe-black);
         font-size: 1em;
