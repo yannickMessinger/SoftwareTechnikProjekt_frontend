@@ -4,10 +4,10 @@
 -->
 <script setup lang="ts">
     /**Imports: */
-    import { reactive, ref, watch } from 'vue';
-    import type { IBlockElement } from '../../services/streetplaner/IBlockElement';
-    import useEventBus from '../../services/eventBus';
-    import ToolEnum from '../../services/streetplaner/ToolEnum';
+    import { reactive, ref, watch } from "vue"
+    import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
+    import useEventBus from "../../services/eventBus"
+    import ToolEnum from "../../services/streetplaner/ToolEnum"
     import BigBuilding from "../../assets/2D_Models/Buildings/BigBuilding.png";
     import Building from "../../assets/2D_Models/Buildings/Building.png";
     import Supermarkt from "../../assets/2D_Models/Buildings/Supermarkt.png";
@@ -21,52 +21,79 @@
     var buildingList: IBlockElement[] = Array(totalBuildinigNumber).fill([])
     
     /*default block element*/
-    var defaultBlock: IBlockElement = { 
+    var defaultBlock: IBlockElement = {
         groupId: -1,
         group: "no data",
         id: -1,
-        type:"no data",
-        name:"no Object selected",
-        rotation:0,
-        texture: (pathToPictures+"no-data.png")
-    };
+        type: "no data",
+        name: "no Object selected",
+        rotation: 0,
+        texture: pathToPictures + "no-data.png",
+    }
     /**  currently selected block */
-    const selectedBlock = reactive({block: defaultBlock});
+    const selectedBlock = reactive({ block: defaultBlock })
     /** bus event */
-    const {emit, bus} =useEventBus();
+    const { emit, bus } = useEventBus()
     /** boolean value that controls weather blocks are clicable or not */
-    const isCreateTool = ref(false);
+    const isCreateTool = ref(false)
     /**entrys in blocklist */
-    blockList[0] = { groupId: 0,group: "Testobject1",id: 0,type:"???",name:"Gerade",rotation: 0,texture: (pathToPictures+"object-icons/Road_straight.svg")};
-    blockList[1] = { groupId: 0,group: "Testobject1",id: 1,type:"???",name:"Kurve",rotation: 0,texture: (pathToPictures+"object-icons/Road_curve.svg")};
-    blockList[2] = { groupId: 1,group: "Testobject2",id: 2,type:"???",name:"Kreuzung",rotation: 0,texture: (pathToPictures+"object-icons/Road_cross.svg")};
+    blockList[0] = {
+        groupId: 0,
+        group: "Testobject1",
+        id: 0,
+        type: "???",
+        name: "Gerade",
+        rotation: 0,
+        texture: pathToPictures + "object-icons/Road_straight.svg",
+    }
+    blockList[1] = {
+        groupId: 0,
+        group: "Testobject1",
+        id: 1,
+        type: "???",
+        name: "Kurve",
+        rotation: 0,
+        texture: pathToPictures + "object-icons/Road_curve.svg",
+    }
+    blockList[2] = {
+        groupId: 1,
+        group: "Testobject2",
+        id: 2,
+        type: "???",
+        name: "Kreuzung",
+        rotation: 0,
+        texture: pathToPictures + "object-icons/Road_cross.svg",
+    }
 
     buildingList[0] = {groupId: 0, group: "Testobject1", id: 0, type: "Building", name: "Big Building", rotation: 0, texture: BigBuilding};
     buildingList[1] = {groupId: 1, group: "Testobject2", id: 1, type: "Building", name: "Building", rotation: 0, texture: Building};
     buildingList[2] = {groupId: 2, group: "Testobject3", id: 2, type: "Building", name: "Markt", rotation: 0, texture: Supermarkt};
     buildingList[3] = {groupId: 0, group: "Testobject4", id: 0, type: "Building", name: "Stadium", rotation: 0, texture: Stadium};
     /**function activated by clicking on an block */
-    function onBlockClicked(clickedBlock: any){
+    function onBlockClicked(clickedBlock: any) {
         /** if the selected block is the clicked block, it gets deselected by restoring the default block
          * otherwhise the clicked block is now the selected block.
-        */
-        if(selectedBlock.block.id==clickedBlock.id){
-            selectedBlock.block = defaultBlock;
-        }else{
-            selectedBlock.block = clickedBlock;
+         */
+        if (selectedBlock.block.id == clickedBlock.id) {
+            selectedBlock.block = defaultBlock
+        } else {
+            selectedBlock.block = clickedBlock
         }
         /** fires a block select event to mark a selected block change. Sends out this blocks name*/
-        emit("block-select-event", selectedBlock.block);
+        emit("block-select-event", selectedBlock.block)
     }
 
     /** sets buttons to clickable if create tool is selected, or not clickable if its not */
-    watch(() =>  bus.value.get('tool-select-event'), (val) => {
-        if(val == ToolEnum.CREATE){
-            isCreateTool.value = true;
-        }else{
-            isCreateTool.value = false;
+    watch(
+        () => bus.value.get("tool-select-event"),
+        (val) => {
+            if (val == ToolEnum.CREATE) {
+                isCreateTool.value = true
+            } else {
+                isCreateTool.value = false
+            }
         }
-    });
+    )
 </script>
 
 <template>
@@ -83,7 +110,7 @@
 </template>
 
 <style scoped>
-    *{
+    * {
         color: var(--woe-black);
         font-size: 1em;
     }

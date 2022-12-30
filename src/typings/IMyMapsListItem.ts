@@ -1,4 +1,4 @@
 export interface IMyMapsListItem {
-    name: string,
+    name: string
     datum: string
 }

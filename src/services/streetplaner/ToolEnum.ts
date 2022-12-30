@@ -3,7 +3,7 @@ enum ToolEnum {
     EDIT = "edit",
     ROTATE = "rotate",
     DELETE = "delete",
-    EMPTY = "empty"
+    EMPTY = "empty",
 }
 
-export default ToolEnum;
+export default ToolEnum
