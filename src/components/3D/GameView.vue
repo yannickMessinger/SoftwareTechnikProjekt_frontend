@@ -40,16 +40,27 @@
             const box = ref()
             const camera = ref()
             const fpsCamera = new FirstPersonCamera(camera, box)
+            const {
+                gameState,
+                setMapWidthAndMapHeight,
+                resetGameMapObjects,
+                updateMapObjsFromGameState,
+            } = useGameView()
+            console.log(
+                `Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
+            )
+            console.log(gameState.sizeX * gameState.fieldSize)
+            console.log(gameState.sizeY * gameState.fieldSize)
 
             /*Defines the Grid Size in length by the number ob fields*/
             let gridSizeX = 100
             /*Defines the Grid Size in height by the number ob fields*/
             let gridSizeY = 100
 
-            let m = 10
-            let n = 10
+            let mapWidth = 10
+            let mapHeight = 10
 
-            useGameView().setMapWidthAndMapHeight(m, n)
+            setMapWidthAndMapHeight(mapWidth, mapHeight)
             /*Array of Buildings and Streets passed from 2D Planner*/
 
             const fieldSize = 10
@@ -128,11 +139,9 @@
             /*270 degree rotation*/
             assetRotationMap.set(3, (3 * Math.PI) / 2)
 
-            useGameView().resetGameMapObjects()
+            resetGameMapObjects()
 
-            const mapElements = computed(
-                () => useGameView().gameState.gameMapObjects
-            )
+            const mapElements = computed(() => gameState.gameMapObjects)
 
             /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
@@ -175,7 +184,10 @@
             }
 
             onMounted(() => {
-                useGameView().updateMapObjsFromGameState()
+                console.log(
+                    `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
+                )
+                updateMapObjsFromGameState()
 
                 renderer.value.onBeforeRender(() => {
                     fpsCamera.update()

@@ -1,7 +1,9 @@
 import { reactive, ref } from "vue"
 import { IMapObject } from "../streetplaner/IMapObject"
 import useUser from "../UserStore"
+
 const { activeLobby } = useUser()
+
 const mapWidth = ref()
 const mapHeight = ref()
 
@@ -11,23 +13,23 @@ const mapHeight = ref()
  * @param mapObjsFromBackEnd : list of mapobjects that have been placed in Editor, fetched from backend. List gameMapObjects is updated with these values
  *
  */
-const gameState = reactive({
+interface IGameState {
+    gameMapObjects: IMapObject[]
+    mapObjsFromBackEnd: IMapObject[]
+    sizeX: number
+    sizeY: number
+    fieldSize: number
+    mapId: number
+}
+
+const gameState = reactive<IGameState>({
     gameMapObjects: Array<IMapObject>(),
     mapObjsFromBackEnd: Array<IMapObject>(),
-    init: false,
+    sizeX: -1,
+    sizeY: -1,
+    fieldSize: -1,
+    mapId: -1,
 })
-
-/**
- *
- * @param width sets counter variable for loop of function fillGameState
- * @param height sets counter variable for loop of function fillGameState
- * coming from GameView
- */
-
-export function setMapWidthAndMapHeight(width: number, height: number) {
-    mapWidth.value = width
-    mapHeight.value = height
-}
 
 export function useGameView() {
     return {
@@ -37,7 +39,31 @@ export function useGameView() {
         fillGameState,
         updateMapObjsFromGameState,
         setMapWidthAndMapHeight,
+        setGameStateSizes,
+        setGameStateMapId,
     }
+}
+
+function setGameStateSizes(sizeX: number, sizeY: number, fieldSize: number) {
+    gameState.sizeX = sizeX
+    gameState.sizeY = sizeY
+    gameState.fieldSize = fieldSize
+}
+
+/**
+ *
+ * @param width sets counter variable for loop of function fillGameState
+ * @param height sets counter variable for loop of function fillGameState
+ * coming from GameView
+ */
+
+function setGameStateMapId(mapId: number) {
+    gameState.mapId = mapId
+}
+
+function setMapWidthAndMapHeight(width: number, height: number) {
+    mapWidth.value = width
+    mapHeight.value = height
 }
 
 /**
@@ -97,8 +123,8 @@ function randomNumer(min: number, max: number) {
  */
 export function fillGameState(): void {
     let counter = 0
-    for (let i = 0; i < mapWidth.value; i++) {
-        for (let j = 0; j < mapHeight.value; j++) {
+    for (let i = 0; i < mapHeight.value; i++) {
+        for (let j = 0; j < mapWidth.value; j++) {
             gameState.gameMapObjects[counter] = {
                 objectTypeId: randomNumer(17, 20),
                 x: i,

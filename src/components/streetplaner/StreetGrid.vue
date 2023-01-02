@@ -18,7 +18,9 @@
     import { StreetGridDTO } from "../../services/streetplaner/StreetGridDTO"
     import useUser from "../../services/UserStore"
     import { useEditor } from "../../services/Editor/useEditor"
+    import { useGameView } from "../../services/3DGameView/useGameView"
     const { bus } = useEventBus()
+    const { setGameStateSizes, setGameStateMapId } = useGameView()
 
     var gridSizeX = 20
     var gridSizeY = 30
@@ -89,10 +91,14 @@
     onMounted(() => {
         // get blockList from backend
         // get streetgrid from backend via mapID
+
+        setGameStateSizes(gridSizeY, gridSizeX, gridSize.value)
+
         blockList = useBlockList().blockList
         updateBlockList()
         receiveEditorUpdates()
         updateMapId(lobbyState.value.mapId)
+        setGameStateMapId(lobbyState.value.mapId)
         updateMap()
     })
 
