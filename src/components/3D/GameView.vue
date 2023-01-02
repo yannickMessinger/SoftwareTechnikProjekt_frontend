@@ -96,6 +96,16 @@
                 "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf"
             )
 
+            buildingIDMap.set(
+                21,
+                "/../../../src/assets/3D_Models/Vehicles/taxi.gltf"
+            )
+
+            buildingIDMap.set(
+                22,
+                "/../../../src/assets/3D_Models/Vehicles/car_1.gltf"
+            )
+
             /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
             const rotationMap = new Map()
             /*No rotation*/
@@ -106,6 +116,17 @@
             rotationMap.set(2, Math.PI)
             /*270 degree rotation*/
             rotationMap.set(3, Math.PI / 2)
+
+            const assetRotationMap = new Map()
+
+            /*No rotation*/
+            assetRotationMap.set(0, 0)
+            /*90 degree rotation*/
+            assetRotationMap.set(1, Math.PI / 2)
+            /*180 degree rotation*/
+            assetRotationMap.set(2, Math.PI)
+            /*270 degree rotation*/
+            assetRotationMap.set(3, (3 * Math.PI) / 2)
 
             useGameView().resetGameMapObjects()
 
@@ -120,14 +141,37 @@
 
             /*Calculates X coordinates position of loaded Model */
             function calcCoordinateX(n: number) {
-                //console.log((gridSizeX * (-0.5)) + (n * fieldSize) + (fieldSize / 2))
-                return gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
+                let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
+                //console.log(`GameObj x: ${x}`)
+                return x
             }
 
             /*Calculates Z coordinates position of loaded Model */
             function calcCoordinateZ(n: number) {
-                //console.log((gridSizeY * (-0.5)) + (n * fieldSize) + (fieldSize / 2))
-                return gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
+                let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
+                //console.log(`GameObj z: ${z}`)
+                return z
+            }
+
+            function calcAssetCoordinateX(
+                xCoordCenter: number,
+                xCoordAsset: number
+            ) {
+                let originX = xCoordCenter - fieldSize / 2
+                let x = originX + xCoordAsset * fieldSize
+
+                return x
+            }
+
+            /*Calculates Z coordinates position of loaded Model */
+            function calcAssetCoordinateZ(
+                yCoordCenter: number,
+                yCoordAsset: number
+            ) {
+                let originZ = yCoordCenter - fieldSize / 2
+                let z = originZ + yCoordAsset * fieldSize
+
+                return z
             }
 
             onMounted(() => {
@@ -145,11 +189,15 @@
                 fpsCamera,
                 calcCoordinateX,
                 calcCoordinateZ,
+                calcAssetCoordinateX,
+                calcAssetCoordinateZ,
                 buildingIDMap,
                 mapElements,
                 rotationMap,
+                assetRotationMap,
                 gridSizeX,
                 gridSizeY,
+                fieldSize,
             }
         },
     })
@@ -193,6 +241,28 @@
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
                 />
+                <div v-for="asset in ele.game_assets">
+                    <GltfModel
+                        v-bind:src="buildingIDMap.get(22)"
+                        :position="{
+                            x: calcAssetCoordinateX(
+                                calcCoordinateX(ele.y),
+                                asset.x
+                            ),
+                            y: 0.75,
+                            z: calcAssetCoordinateZ(
+                                calcCoordinateZ(ele.x),
+                                asset.y
+                            ),
+                        }"
+                        :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
+                        :rotation="{
+                            x: 0,
+                            y: assetRotationMap.get(asset.rotation),
+                            z: 0,
+                        }"
+                    />
+                </div>
             </div>
         </Scene>
     </Renderer>

@@ -35,7 +35,7 @@ const editorState = reactive<IEditorState>({
 
 export function useEditor(mapId: number) {
     editorState.mapId = mapId
-    console.log(mapId)
+    //console.log(mapId)
     return {
         editorState: editorState,
         createMessage,
@@ -84,7 +84,7 @@ function receiveEditorUpdates() {
     }
 
     stompClient.onConnect = (frame) => {
-        console.log("connected")
+        //console.log("connected")
         stompClient.subscribe(DEST, (message) => {
             const editorUpdate: IStompMessage = JSON.parse(message.body)
             onMessageReceived(editorUpdate)

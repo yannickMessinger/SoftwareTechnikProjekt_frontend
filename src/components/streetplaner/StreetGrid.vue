@@ -99,6 +99,7 @@
     // onClick handles click on specific cell
     function onClick(cell: any, e: any) {
         let currCellContent = streetGrid[cell.posX][cell.posY]
+        console.log(`x:${cell.posX} y:${cell.posY}`)
         let payload: IMapObject
         if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
             // Todo, cars only placeable on roads
@@ -107,6 +108,7 @@
                     let rect = e.target.getBoundingClientRect()
                     let x = (e.clientX - rect.left) / gridSize.value
                     let y = (e.clientY - rect.top) / gridSize.value
+                    console.log(`x:${x} y:${y}`)
                     streetGrid[cell.posX][cell.posY].game_assets.push({
                         objectTypeId: toolState.block.id,
                         x: x,
@@ -241,7 +243,7 @@
     // load StreetGrid from backend dto
     function loadStreetGrid(dto: StreetGridDTO) {
         fillGridEmpty()
-        console.log(dto.mapObjects)
+        //console.log(dto.mapObjects)
         for (let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = {
                 id: ele.objectTypeId,

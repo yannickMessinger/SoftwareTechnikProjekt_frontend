@@ -104,6 +104,7 @@ export function fillGameState(): void {
                 x: i,
                 y: j,
                 rotation: randomNumer(0, 3),
+                game_assets: [],
             }
             counter += 1
         }
@@ -112,4 +113,6 @@ export function fillGameState(): void {
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
         gameState.gameMapObjects[mapObj.x * 10 + mapObj.y] = mapObj
     })
+
+    console.log(gameState.gameMapObjects)
 }
