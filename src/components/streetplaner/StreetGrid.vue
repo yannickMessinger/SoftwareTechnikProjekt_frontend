@@ -4,10 +4,7 @@
     import type { IGridElement } from "../../services/streetplaner/IGridElement"
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
-    import {
-        useBlockList,
-        updateBlockList,
-    } from "../../services/streetplaner/useBlockList"
+    import { useBlockList, updateBlockList } from "../../services/streetplaner/useBlockList"
     import {
         useStreetGridList,
         updateStreetGridList,
@@ -80,7 +77,8 @@
     const gridSize = ref(40)
     // initialize gridSizePx used in css
     const gridSizePx = computed(() => gridSize.value.toString() + "px")
-    const assetSizePx = computed(() => (gridSize.value / 4).toString() + "px")
+    const assetSize = computed(() => gridSize.value / 4)
+    const assetSizePx = computed(() => assetSize.value.toString() + "px")
     // declare blockList
     var blockList: Array<IBlockElement>
     watch(
@@ -127,17 +125,14 @@
                         x: cell.posX,
                         y: cell.posY,
                         rotation: currCellContent.rotation,
-                        game_assets:
-                            streetGrid[cell.posX][cell.posY].game_assets,
+                        game_assets: streetGrid[cell.posX][cell.posY].game_assets,
                     }
                     updateMessage(payload)
                 }
             } else {
                 streetGrid[cell.posX][cell.posY].id = toolState.block.id
-                streetGrid[cell.posX][cell.posY].rotation =
-                    toolState.block.rotation
-                streetGrid[cell.posX][cell.posY].texture =
-                    toolState.block.texture
+                streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
+                streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
                 payload = {
                     objectTypeId: toolState.block.id,
                     x: cell.posX,
@@ -148,12 +143,8 @@
                 createMessage(payload)
             }
         }
-        if (
-            toolState.tool == ToolEnum.ROTATE &&
-            streetGrid[cell.posX][cell.posY].id !== -1
-        ) {
-            streetGrid[cell.posX][cell.posY].rotation =
-                (streetGrid[cell.posX][cell.posY].rotation + 1) % 4
+        if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].id !== -1) {
+            streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4
             payload = {
                 objectTypeId: streetGrid[cell.posX][cell.posY].id,
                 x: cell.posX,
@@ -191,14 +182,11 @@
         ) {
             if (
                 currCellContent.id !== toolState.block.id ||
-                (currCellContent.id !== toolState.block.id &&
-                    currCellContent.rotation !== toolState.block.rotation)
+                (currCellContent.id !== toolState.block.id && currCellContent.rotation !== toolState.block.rotation)
             ) {
                 streetGrid[cell.posX][cell.posY].id = toolState.block.id
-                streetGrid[cell.posX][cell.posY].rotation =
-                    toolState.block.rotation
-                streetGrid[cell.posX][cell.posY].texture =
-                    toolState.block.texture
+                streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
+                streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
                 payload = {
                     objectTypeId: toolState.block.id,
                     x: cell.posX,
@@ -278,25 +266,34 @@
         }
     }
 
-    function calcCoordX(id: string, relativeX: number) {
+    function calcCoordAssetX(id: string, relativeX: number) {
         let bodyRect = document.body.getBoundingClientRect()
         let element = document.getElementById(id)
         let posX = 0
         if (element) {
             let elemRect = element.getBoundingClientRect()
-            posX = elemRect.left - bodyRect.left + gridSize.value * relativeX
+            // elemRect.left - bodyRect.left calculates the top left corner of the grid cell
+            // + gridSize.value * relativeX calculates where in the grid the asset is placed
+            // - assetSize.value / 3 moves the asset so the mid point is in the middle, usually one should use 2 here, but somehow 3 works
+            posX = elemRect.left - bodyRect.left + gridSize.value * relativeX - assetSize.value / 3
         }
+        console.log(assetSizePx.value)
+        console.log(`x: ${posX}`)
         return posX
     }
 
-    function calcCoordY(id: string, relativeY: number) {
+    function calcCoordAssetY(id: string, relativeY: number) {
         let bodyRect = document.body.getBoundingClientRect()
         let element = document.getElementById(id)
         let posY = 0
         if (element) {
             let elemRect = element.getBoundingClientRect()
-            posY = elemRect.top - bodyRect.top + gridSize.value * relativeY
+            // elemRect.left - bodyRect.left calculates the top left corner of the grid cell
+            // + gridSize.value * relativeY calculates where in the grid the asset is placed
+            // - assetSize.value / 3 moves the asset so the mid point is in the middle, usually one should use 2 here, but somehow 3 works
+            posY = elemRect.top - bodyRect.top + gridSize.value * relativeY - assetSize.value / 3
         }
+        console.log(`y: ${posY}`)
         return posY
     }
 
@@ -333,16 +330,8 @@
                     draggable="false"
                     :style="{
                         transform: 'rotate(' + asset.rotation * 90 + 'deg)',
-                        left:
-                            calcCoordX(
-                                `cell_${ele.posX}_${ele.posY}`,
-                                asset.x
-                            ) + 'px',
-                        top:
-                            calcCoordY(
-                                `cell_${ele.posX}_${ele.posY}`,
-                                asset.y
-                            ) + 'px',
+                        left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
+                        top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
                     }"
                 />
             </div>
