@@ -4,7 +4,7 @@
     import type { IGridElement } from "../../services/streetplaner/IGridElement"
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
-    import {useGridSize} from '../../services/useGridSize';
+    import { useGridSize } from "../../services/useGridSize"
 
     import {
         useBlockList,
@@ -29,7 +29,7 @@
         block: { id: -1, rotation: 0, texture: "" },
     })
     const lobbyState = useUser().activeLobby
-    const { gridSize } = useGridSize();
+    const { gridSize } = useGridSize()
 
     const {
         editorState,
@@ -208,7 +208,6 @@
     // load StreetGrid from backend dto
     function loadStreetGrid(dto: StreetGridDTO) {
         fillGridEmpty()
-        console.log(dto.mapObjects)
         for (let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = {
                 id: ele.objectTypeId,
@@ -247,8 +246,20 @@
 
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
-        <div v-for="ele in row" :key="ele.id" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
-            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false" :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"/>
+        <div
+            v-for="ele in row"
+            :id="`cell_${ele.posX}_${ele.posY}`"
+            class="grid-item grid-size col no-drag"
+            @click="onClick(ele)"
+            @mousemove="onMouseMove(ele, $event)"
+        >
+            <img
+                v-if="ele.texture != ''"
+                :src="ele.texture"
+                class="no-drag grid-img"
+                draggable="false"
+                :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"
+            />
         </div>
     </div>
 </template>
