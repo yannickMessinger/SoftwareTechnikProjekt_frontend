@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="zoom-img"/>
-        <input type="range" v-model="value" min="20" max="100" @input="onInput" /> 
+        <input type="range" v-model="gridSize.size" min="10" max="100" @input="onInput" /> 
     </div>
   </template>
   
@@ -9,11 +9,10 @@
     import { ref } from 'vue'
     import { useGridSize } from '../services/useGridSize'
     
-    const value = ref(50)
+    const {gridSize} = useGridSize()
     const {changeSize} = useGridSize()
     function onInput(event:any) {
         changeSize(event.target.value)
-        value.value = event.target.value
       }
   </script>
 

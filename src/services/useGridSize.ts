@@ -1,6 +1,6 @@
 import { reactive, readonly } from 'vue'
 
-const sizeState = reactive({size: 40})
+const sizeState = reactive({size: 55})
 
 export function useGridSize() {
     function changeSize(value: number){
