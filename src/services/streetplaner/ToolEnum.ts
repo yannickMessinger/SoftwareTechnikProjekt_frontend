@@ -3,7 +3,8 @@ enum ToolEnum {
     EDIT = "edit",
     ROTATE = "rotate",
     DELETE = "delete",
-    EMPTY = "empty"
+    EMPTY = "empty",
+    PEDESTRIAN = "pedestrian",
 }
 
 export default ToolEnum;
