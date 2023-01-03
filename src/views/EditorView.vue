@@ -1,8 +1,6 @@
 <template>
     <Header text="World of eMobility" :displayHomebutton="true"></Header>
-    <button class="reset-button" @click="emit('grid-save-event', true)">
-        Save
-    </button>
+    <button class="reset-button" @click="emit('grid-save-event', true)">Save</button>
     <!-- Remove before merge with dev -->
     <DialogsWrapper />
     <div class="selected-block">
@@ -21,18 +19,15 @@
         ></BasicButton>
         <div class="tools">
             <p id="header">
-                <BasicButton
-                    v-if="elementBarVisible"
-                    class="tools-back-btn"
-                    display=" "
-                    :btn_click="switchMode"
-                />
+                <BasicButton v-if="elementBarVisible" class="tools-back-btn" display=" " :btn_click="switchMode" />
             </p>
             <span>{{ header }}</span>
             <ListToolsComponent v-if="!elementBarVisible" />
             <ListBlocksComponent v-if="elementBarVisible" />
             <span v-if="elementBarVisible">Gebäude</span>
             <BuildingBlocksComponent v-if="elementBarVisible" />
+            <span v-if="elementBarVisible">Fahrzeuge</span>
+            <ListAssetsComponent v-if="elementBarVisible" />
         </div>
     </div>
     <div class="grid">
@@ -48,6 +43,7 @@
     import BuildingBlocksComponent from "../components/streetplaner/BuildingBlocksComponent.vue"
     import ListToolsComponent from "../components/streetplaner/ListToolsComponent.vue"
     import ListBlocksComponent from "../components/streetplaner/ListBlocksComponent.vue"
+    import ListAssetsComponent from "../components/streetplaner/ListAssetsComponent.vue"
     import SelectedBlockComponent from "../components/streetplaner/SelectedBlockComponent.vue"
     import StreetGrid from "../components/streetplaner/StreetGrid.vue"
     import { createConfirmDialog } from "vuejs-confirm-dialog"
@@ -58,8 +54,7 @@
     import useUser from "../services/UserStore"
 
     const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, {
-        question:
-            "Möchtest du die gesamte Karte zurücksetzen? Die Aktion ist unwiderruflich.",
+        question: "Möchtest du die gesamte Karte zurücksetzen? Die Aktion ist unwiderruflich.",
     })
     const { emit, bus } = useEventBus()
     const disableResetButton = ref(false)
@@ -80,18 +75,14 @@
 
     function switchMode() {
         elementBarVisible.value = !elementBarVisible.value
-        header.value === headerText_elements
-            ? (header.value = headerText_tool)
-            : undefined
+        header.value === headerText_elements ? (header.value = headerText_tool) : undefined
     }
 
     watch(
         () => bus.value.get("create-toggle-view"),
         (val) => {
             elementBarVisible.value = !elementBarVisible.value
-            header.value == headerText_tool
-                ? (header.value = headerText_elements)
-                : undefined
+            header.value == headerText_tool ? (header.value = headerText_elements) : undefined
             //console.log(elementBarVisible.value)
             //console.log(val)
         }
