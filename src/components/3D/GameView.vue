@@ -11,15 +11,7 @@
         Plane,
         PhongMaterial,
     } from "troisjs"
-    import {
-        computed,
-        defineComponent,
-        onBeforeMount,
-        onBeforeUnmount,
-        onMounted,
-        reactive,
-        ref,
-    } from "vue"
+    import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
     import { FirstPersonCamera } from "../../models/FirstPersonCamera"
     import { useGameView } from "../../services/3DGameView/useGameView"
 
@@ -40,12 +32,8 @@
             const box = ref()
             const camera = ref()
             const fpsCamera = new FirstPersonCamera(camera, box)
-            const {
-                gameState,
-                setMapWidthAndMapHeight,
-                resetGameMapObjects,
-                updateMapObjsFromGameState,
-            } = useGameView()
+            const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } =
+                useGameView()
             console.log(
                 `Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
             )
@@ -57,65 +45,29 @@
             /*Defines the Grid Size in height by the number ob fields*/
             let gridSizeY = 100
 
+            //counter variables for loops to prefill map with dummy data
             let mapWidth = 10
             let mapHeight = 10
 
             setMapWidthAndMapHeight(mapWidth, mapHeight)
-            /*Array of Buildings and Streets passed from 2D Planner*/
 
             const fieldSize = 10
             /*Map of 3d-model paths*/
             const buildingIDMap = new Map()
-            buildingIDMap.set(
-                0,
-                "/../../../src/assets/3D_Models/Streets/straight_road.gltf"
-            )
-            buildingIDMap.set(
-                1,
-                "/../../../src/assets/3D_Models/Streets/curved_road.gltf"
-            )
-            buildingIDMap.set(
-                2,
-                "/../../../src/assets/3D_Models/Streets/intersection_road.gltf"
-            )
-            buildingIDMap.set(
-                3,
-                "/../../../src/assets/3D_Models/Building/house_high.gltf"
-            )
-            buildingIDMap.set(
-                4,
-                "/../../../src/assets/3D_Models/Building/house.gltf"
-            )
-            buildingIDMap.set(
-                5,
-                "/../../../src/assets/3D_Models/Building/shop.gltf"
-            )
-            buildingIDMap.set(
-                17,
-                "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf"
-            )
-            buildingIDMap.set(
-                18,
-                "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf"
-            )
-            buildingIDMap.set(
-                19,
-                "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf"
-            )
-            buildingIDMap.set(
-                20,
-                "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf"
-            )
+            buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
+            buildingIDMap.set(1, "/../../../src/assets/3D_Models/Streets/curved_road.gltf")
+            buildingIDMap.set(2, "/../../../src/assets/3D_Models/Streets/intersection_road.gltf")
+            buildingIDMap.set(3, "/../../../src/assets/3D_Models/Building/house_high.gltf")
+            buildingIDMap.set(4, "/../../../src/assets/3D_Models/Building/house.gltf")
+            buildingIDMap.set(5, "/../../../src/assets/3D_Models/Building/shop.gltf")
+            buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
+            buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
+            buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
+            buildingIDMap.set(20, "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf")
 
-            buildingIDMap.set(
-                21,
-                "/../../../src/assets/3D_Models/Vehicles/taxi.gltf"
-            )
+            buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
 
-            buildingIDMap.set(
-                22,
-                "/../../../src/assets/3D_Models/Vehicles/car_1.gltf"
-            )
+            buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
 
             /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
             const rotationMap = new Map()
@@ -128,6 +80,7 @@
             /*270 degree rotation*/
             rotationMap.set(3, Math.PI / 2)
 
+            /*Riadians is used to rotate game assets. The following map set the radians for the passed rotation value from backend*/
             const assetRotationMap = new Map()
 
             /*No rotation*/
@@ -141,6 +94,7 @@
 
             resetGameMapObjects()
 
+            /*Array of Buildings and Streets passed from 2D Planner*/
             const mapElements = computed(() => gameState.gameMapObjects)
 
             /*Models position are saved from the Backend counting from 0 upwards.
@@ -162,22 +116,25 @@
                 return z
             }
 
-            function calcAssetCoordinateX(
-                xCoordCenter: number,
-                xCoordAsset: number
-            ) {
+            /**
+             * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
+             * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
+             * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
+             */
+            function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
                 let originX = xCoordCenter - fieldSize / 2
                 let x = originX + xCoordAsset * fieldSize
 
                 return x
             }
 
-            /*Calculates Z coordinates position of loaded Model */
-            function calcAssetCoordinateZ(
-                yCoordCenter: number,
-                yCoordAsset: number
-            ) {
-                let originZ = yCoordCenter - fieldSize / 2
+            /**
+             * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
+             * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
+             * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
+             */
+            function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
+                let originZ = zCoordCenter - fieldSize / 2
                 let z = originZ + yCoordAsset * fieldSize
 
                 return z
@@ -217,12 +174,7 @@
 
 <template>
     <Renderer resize="window" ref="renderer">
-        <Camera
-            ref="camera"
-            :position="{ x: 0, y: 0, z: 0 }"
-            :look-at="{ x: 0, y: 0, z: -1 }"
-        >
-        </Camera>
+        <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
         <Scene background="#87CEEB">
             <AmbientLight></AmbientLight>
             <Plane
@@ -253,19 +205,14 @@
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
                 />
+                <!-- places all game assets of the current element-->
                 <div v-for="asset in ele.game_assets">
                     <GltfModel
                         v-bind:src="buildingIDMap.get(22)"
                         :position="{
-                            x: calcAssetCoordinateX(
-                                calcCoordinateX(ele.y),
-                                asset.x
-                            ),
+                            x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
                             y: 0.75,
-                            z: calcAssetCoordinateZ(
-                                calcCoordinateZ(ele.x),
-                                asset.y
-                            ),
+                            z: calcAssetCoordinateZ(calcCoordinateZ(ele.x), asset.y),
                         }"
                         :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                         :rotation="{

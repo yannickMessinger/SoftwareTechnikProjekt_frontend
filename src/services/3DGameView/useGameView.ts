@@ -22,6 +22,11 @@ interface IGameState {
     mapId: number
 }
 
+/**
+ * GameState obj that which gameMapObjects are passed to the 3D view to be rendered.
+ * Map Id is not used yet.
+ */
+
 const gameState = reactive<IGameState>({
     gameMapObjects: Array<IMapObject>(),
     mapObjsFromBackEnd: Array<IMapObject>(),
@@ -44,6 +49,12 @@ export function useGameView() {
     }
 }
 
+/**
+ * function to set different size properties of game state, maybe usefull for future purposes with variable map size.
+ * @param sizeX width
+ * @param sizeY height
+ * @param fieldSize size of a single map tile (square)
+ */
 function setGameStateSizes(sizeX: number, sizeY: number, fieldSize: number) {
     gameState.sizeX = sizeX
     gameState.sizeY = sizeY
@@ -117,7 +128,7 @@ function randomNumer(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 /**
- * first fills gameMapObjects list with dummy environment elements with random rotation.
+ * first fills gameMapObjects list with dummy environment elements with random rotation, each ele is initially equipped with an empty game assets array
  * then for each element of the mapObject from backend, the corresponding index in the gameMapObject list is calculated and the element
  * on this index gets replaced with the object from backend.
  */
@@ -139,6 +150,4 @@ export function fillGameState(): void {
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
         gameState.gameMapObjects[mapObj.x * 10 + mapObj.y] = mapObj
     })
-
-    console.log(gameState.gameMapObjects)
 }
