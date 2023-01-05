@@ -4,25 +4,26 @@
 -->
 <script setup lang="ts">
     /**Imports: */
-    import { reactive, ref, watch } from "vue"
+    import { onMounted, reactive, ref, watch } from "vue"
     import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
+    import { useBlockList, IBlockListState } from "../../services/streetplaner/useBlockList"
 
     /**Variables: */
     const pathToPictures = "/img/streetplaner/"
-    var totalBlockNumber = 3 /** number of blocks in blocklist*/
-    var blockList: IBlockElement[] = Array(totalBlockNumber).fill([]) /** List of all blocks placable in street editor*/
+    const { blockListState, updateBlockList } = useBlockList()
+    var blockList = reactive(Array<IBlockElement>()) /** List of all blocks placable in street editor*/
 
     /*default block element*/
     var defaultBlock: IBlockElement = {
         groupId: -1,
-        group: "no data",
-        id: -1,
+        objectTypeId: -1,
         type: "no data",
         name: "no Object selected",
         rotation: 0,
         texture: pathToPictures + "no-data.png",
+        model3d: "",
     }
     /**  currently selected block */
     const selectedBlock = reactive({ block: defaultBlock })
@@ -30,33 +31,26 @@
     const { emit, bus } = useEventBus()
     /** boolean value that controls weather blocks are clicable or not */
     const isCreateTool = ref(false)
-    /**entrys in blocklist */
-    blockList[0] = {
-        groupId: 0,
-        group: "Testobject1",
-        id: 0,
-        type: "???",
-        name: "Gerade",
-        rotation: 0,
-        texture: pathToPictures + "object-icons/Road_straight.svg",
-    }
-    blockList[1] = {
-        groupId: 0,
-        group: "Testobject1",
-        id: 1,
-        type: "???",
-        name: "Kurve",
-        rotation: 0,
-        texture: pathToPictures + "object-icons/Road_curve.svg",
-    }
-    blockList[2] = {
-        groupId: 1,
-        group: "Testobject2",
-        id: 2,
-        type: "???",
-        name: "Kreuzung",
-        rotation: 0,
-        texture: pathToPictures + "object-icons/Road_cross.svg",
+
+    onMounted(() => {
+        updateBlockList()
+        getBlockList(blockListState)
+    })
+
+    function getBlockList(blockListState: IBlockListState) {
+        for (let ele of blockListState.list) {
+            if (ele.groupId === 0) {
+                blockList.push({
+                    groupId: ele.groupId,
+                    objectTypeId: ele.objectTypeId,
+                    type: ele.type,
+                    name: ele.name,
+                    rotation: ele.rotation,
+                    texture: ele.texture,
+                    model3d: ele.model3d,
+                })
+            }
+        }
     }
 
     /**function activated by clicking on an block */
@@ -64,7 +58,7 @@
         /** if the selected block is the clicked block, it gets deselected by restoring the default block
          * otherwhise the clicked block is now the selected block.
          */
-        if (selectedBlock.block.id == clickedBlock.id) {
+        if (selectedBlock.block.objectTypeId == clickedBlock.objectTypeId) {
             selectedBlock.block = defaultBlock
         } else {
             selectedBlock.block = clickedBlock
@@ -89,7 +83,7 @@
 <template>
     <div
         v-for="element in blockList"
-        :key="element.id"
+        :key="element.objectTypeId"
         id="editor-tool"
         :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
         @click="onBlockClicked(element)"

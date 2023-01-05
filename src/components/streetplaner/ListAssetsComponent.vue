@@ -1,24 +1,48 @@
 <script setup lang="ts">
     /**Imports: */
-    import { reactive, ref, watch } from "vue"
+    import { onMounted, reactive, ref, watch } from "vue"
     import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
+    import { IBlockListState, useBlockList } from "../../services/streetplaner/useBlockList"
 
     /**Variables: */
     const pathToPictures = "/img/streetplaner/"
-    var assetList: IBlockElement[] = [] /** List of all assets placable in street editor*/
+    var assetList = reactive(Array<IBlockElement>()) /** List of all blocks placable in street editor*/
+    const { blockListState, updateBlockList } = useBlockList()
 
     /*default asset element*/
     var defaultAsset: IBlockElement = {
         groupId: -1,
-        group: "no data",
-        id: -1,
+        objectTypeId: -1,
         type: "no data",
         name: "no Object selected",
         rotation: 0,
         texture: pathToPictures + "no-data.png",
+        model3d: "",
     }
+
+    onMounted(() => {
+        updateBlockList()
+        getAssetList(blockListState)
+    })
+
+    function getAssetList(blockListState: IBlockListState) {
+        for (let ele of blockListState.list) {
+            if (ele.groupId === 2) {
+                assetList.push({
+                    groupId: ele.groupId,
+                    objectTypeId: ele.objectTypeId,
+                    type: ele.type,
+                    name: ele.name,
+                    rotation: ele.rotation,
+                    texture: ele.texture,
+                    model3d: ele.model3d,
+                })
+            }
+        }
+    }
+
     /**  currently selected block */
     const selectedAsset = reactive({ block: defaultAsset })
     /** bus event */
@@ -26,22 +50,13 @@
     /** boolean value that controls weather blocks are clicable or not */
     const isCreateTool = ref(false)
     /**entrys in blocklist */
-    assetList[0] = {
-        groupId: 2,
-        group: "Assets",
-        id: 7,
-        type: "ASSET",
-        name: "Auto",
-        rotation: 0,
-        texture: pathToPictures + "object-icons/car-top-view.svg",
-    }
 
     /**function activated by clicking on an block */
     function onAssetClick(clickedAsset: any) {
         /** if the selected block is the clicked block, it gets deselected by restoring the default block
          * otherwhise the clicked block is now the selected block.
          */
-        if (selectedAsset.block.id == clickedAsset.id) {
+        if (selectedAsset.block.objectTypeId == clickedAsset.objectTypeId) {
             selectedAsset.block = defaultAsset
         } else {
             selectedAsset.block = clickedAsset
@@ -66,7 +81,7 @@
 <template>
     <div
         v-for="element in assetList"
-        :key="element.id"
+        :key="element.objectTypeId"
         id="editor-tool"
         :class="element.name === selectedAsset.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
         @click="onAssetClick(element)"

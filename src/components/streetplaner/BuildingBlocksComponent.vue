@@ -1,29 +1,24 @@
 <script setup lang="ts">
     /**Imports: */
-    import { reactive, ref, watch } from "vue"
+    import { onMounted, reactive, ref, watch } from "vue"
     import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
-    import BigBuilding from "../../assets/2D_Models/Buildings/BigBuilding.png"
-    import Building from "../../assets/2D_Models/Buildings/Building.png"
-    import Supermarkt from "../../assets/2D_Models/Buildings/Supermarkt.png"
-    import Stadium from "../../assets/2D_Models/Buildings/Stadium.png"
+    import { useBlockList, IBlockListState } from "../../services/streetplaner/useBlockList"
     /**Variables: */
     const pathToPictures = "/img/streetplaner/"
-    var totalBlockNumber = 4 /** number of blocks in blocklist*/
-    var blockList: IBlockElement[] = Array(totalBlockNumber).fill(
-        []
-    ) /** List of all blocks placable in street editor*/
+    const { blockListState, updateBlockList } = useBlockList()
+    var blockList = reactive(Array<IBlockElement>()) /** List of all blocks placable in street editor*/
 
     /*default block element*/
     var defaultBlock: IBlockElement = {
         groupId: -1,
-        group: "no data",
-        id: -1,
+        objectTypeId: -1,
         type: "no data",
         name: "no Object selected",
         rotation: 0,
         texture: pathToPictures + "no-data.png",
+        model3d: "",
     }
     /**  currently selected block */
     const selectedBlock = reactive({ block: defaultBlock })
@@ -31,49 +26,34 @@
     const { emit, bus } = useEventBus()
     /** boolean value that controls weather blocks are clicable or not */
     const isCreateTool = ref(false)
-    /**entrys in blocklist */
-    blockList[0] = {
-        groupId: 1,
-        group: "Testobject1",
-        id: 3,
-        type: "Building",
-        name: "Big Building",
-        rotation: 0,
-        texture: BigBuilding,
+
+    onMounted(() => {
+        updateBlockList()
+        getBlockList(blockListState)
+    })
+
+    function getBlockList(blockListState: IBlockListState) {
+        for (let ele of blockListState.list) {
+            if (ele.groupId === 1) {
+                blockList.push({
+                    groupId: ele.groupId,
+                    objectTypeId: ele.objectTypeId,
+                    type: ele.type,
+                    name: ele.name,
+                    rotation: ele.rotation,
+                    texture: ele.texture,
+                    model3d: ele.model3d,
+                })
+            }
+        }
     }
-    blockList[1] = {
-        groupId: 1,
-        group: "Testobject2",
-        id: 4,
-        type: "Building",
-        name: "Building",
-        rotation: 0,
-        texture: Building,
-    }
-    blockList[2] = {
-        groupId: 1,
-        group: "Testobject3",
-        id: 5,
-        type: "Building",
-        name: "Markt",
-        rotation: 0,
-        texture: Supermarkt,
-    }
-    blockList[3] = {
-        groupId: 1,
-        group: "Testobject4",
-        id: 6,
-        type: "Building",
-        name: "Stadium",
-        rotation: 0,
-        texture: Stadium,
-    }
+
     /**function activated by clicking on an block */
     function onBlockClick(clickedBlock: any) {
         /** if the selected block is the clicked block, it gets deselected by restoring the default block
          * otherwhise the clicked block is now the selected block.
          */
-        if (selectedBlock.block.id == clickedBlock.id) {
+        if (selectedBlock.block.objectTypeId == clickedBlock.objectTypeId) {
             selectedBlock.block = defaultBlock
         } else {
             selectedBlock.block = clickedBlock
@@ -98,13 +78,9 @@
 <template>
     <div
         v-for="element in blockList"
-        :key="element.id"
+        :key="element.objectTypeId"
         id="editor-tool"
-        :class="
-            element.name === selectedBlock.block.name
-                ? 'editor-tool-active'
-                : 'editor-tool-not-active'
-        "
+        :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
         @click="onBlockClick(element)"
     >
         <button
