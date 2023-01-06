@@ -1,21 +1,33 @@
-import { computed, reactive, readonly } from "vue";
+import { computed, reactive, readonly, onMounted } from "vue";
 import User from '../typings/IUser';
 import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobby } from "../typings/ILobby";
 import { IGetPlayerResponseDTO } from "../typings/IGetPlayerResponseDTO";
+import { stat } from "fs";
 
 const state = reactive<User>({
   userId: 0 as IGetPlayerResponseDTO["userId"],
   userName: "" as IGetPlayerResponseDTO["userName"],
-  errormessage:"",
+  errormessage: "",
   loggedIn: false,
   activeLobby: {
-    lobbyId: 0,
+    lobbyID: 0,
     lobbyName: "",
     numOfPlayers: 0,
     lobbyModeEnum: E_LobbyMode.BUILD_MODE
   }
 });
+
+const userAsJsonString = computed(() => JSON.stringify(state))
+
+
+function retrieveUserFromLocalStorage(): User | null {
+  const userJsonString = localStorage.getItem('user')
+  if (userJsonString) {
+    return JSON.parse(userJsonString)
+  }
+  return null
+}
 
 async function sendName():Promise<void> {
   const response = await fetch('/api/player', {
@@ -40,7 +52,7 @@ async function setActiveLobby(lobby: ILobby):Promise<void> {
 }
 
 async function postActiveLobby(lobby:ILobby) {
-  const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
+  const response = await fetch(`/api/lobby/get_players/${lobby.lobbyID}?player_id=${state.userId}`, {
     method: 'POST',
   });
   console.log("setActiveLobby() -> post player to lobby - response", response);
@@ -97,6 +109,7 @@ async function login(username:string, password:string): Promise<{userId: number,
           state.errormessage = ""
           state.loggedIn = true
           console.log(state)
+          localStorage.setItem('user', userAsJsonString.value)
       }
       return data 
   })
@@ -107,12 +120,34 @@ async function login(username:string, password:string): Promise<{userId: number,
       })
 }
 
+const logout = () => {
+  state.loggedIn = false
+  state.activeLobby = undefined
+  state.userId = 0
+  state.errormessage = ""
+  localStorage.removeItem('user')
+  console.log("Test")
+  console.log(state)
+}
+
 export default function useUser() {
+  onMounted(() => {
+    const storedUser = retrieveUserFromLocalStorage()
+    if (storedUser) {
+      state.userId = storedUser.userId
+      state.userName = storedUser.userName
+      state.errormessage = storedUser.errormessage
+      state.loggedIn = true
+      state.activeLobby = storedUser.activeLobby
+    }
+  })
+
   return {
     logindata : readonly(state),
     sendName,
     setActiveLobby,
     login,
+    logout,
     register
   };
 }
