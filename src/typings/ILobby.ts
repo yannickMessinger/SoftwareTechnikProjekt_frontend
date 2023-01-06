@@ -9,6 +9,5 @@ export interface ILobby {
     lobbyName:string
     numOfPlayers: number
     lobbyModeEnum: E_LobbyMode
-    hostID?:string
     playerList?: IPlayerListItem[]
 }
