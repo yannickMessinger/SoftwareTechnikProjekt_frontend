@@ -23,7 +23,7 @@
     var gridSizeY = 30
     const toolState = reactive({
         tool: ToolEnum.EMPTY,
-        block: { id: -1, rotation: 0, texture: "" },
+        block: { objectTypeId: -1, groupId: -1, rotation: 0, texture: "" },
     })
     const lobbyState = useUser().activeLobby
 
@@ -92,8 +92,8 @@
 
         setGameStateSizes(gridSizeY, gridSizeX, gridSize.value)
 
-        blockList = useBlockList().blockList
         updateBlockList()
+        blockList = useBlockList().blockListState.list
         receiveEditorUpdates()
         updateMapId(lobbyState.value.mapId)
         setGameStateMapId(lobbyState.value.mapId)
@@ -105,23 +105,24 @@
         let currCellContent = streetGrid[cell.posX][cell.posY]
         console.log(`x:${cell.posX} y:${cell.posY}`)
         let payload: IMapObject
-        if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
+        if (toolState.tool === ToolEnum.CREATE && toolState.block.objectTypeId !== -1) {
             // Todo, cars only placeable on roads
-            if (toolState.block.id === 7) {
-                if (currCellContent.id !== -1) {
+            if (toolState.block.groupId === 2) {
+                // if block = asset
+                if (currCellContent.objectTypeId !== -1) {
                     let rect = e.target.getBoundingClientRect()
                     let x = (e.clientX - rect.left) / gridSize.value
                     let y = (e.clientY - rect.top) / gridSize.value
                     console.log(`x:${x} y:${y}`)
                     streetGrid[cell.posX][cell.posY].game_assets.push({
-                        objectTypeId: toolState.block.id,
+                        objectTypeId: toolState.block.objectTypeId,
                         x: x,
                         y: y,
                         rotation: toolState.block.rotation,
                         texture: toolState.block.texture,
                     })
                     payload = {
-                        objectTypeId: currCellContent.id,
+                        objectTypeId: currCellContent.objectTypeId,
                         x: cell.posX,
                         y: cell.posY,
                         rotation: currCellContent.rotation,
@@ -130,11 +131,11 @@
                     updateMessage(payload)
                 }
             } else {
-                streetGrid[cell.posX][cell.posY].id = toolState.block.id
+                streetGrid[cell.posX][cell.posY].objectTypeId = toolState.block.objectTypeId
                 streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
                 streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
                 payload = {
-                    objectTypeId: toolState.block.id,
+                    objectTypeId: toolState.block.objectTypeId,
                     x: cell.posX,
                     y: cell.posY,
                     rotation: toolState.block.rotation,
@@ -143,10 +144,10 @@
                 createMessage(payload)
             }
         }
-        if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].id !== -1) {
+        if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].objectTypeId !== -1) {
             streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4
             payload = {
-                objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
                 x: cell.posX,
                 y: cell.posY,
                 rotation: streetGrid[cell.posX][cell.posY].rotation,
@@ -156,13 +157,13 @@
         }
         if (toolState.tool === ToolEnum.DELETE) {
             payload = {
-                objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
                 x: cell.posX,
                 y: cell.posY,
                 rotation: streetGrid[cell.posX][cell.posY].rotation,
                 game_assets: [],
             }
-            streetGrid[cell.posX][cell.posY].id = -1
+            streetGrid[cell.posX][cell.posY].objectTypeId = -1
             streetGrid[cell.posX][cell.posY].rotation = 0
             streetGrid[cell.posX][cell.posY].texture = ""
             deleteMessage(payload)
@@ -177,18 +178,19 @@
         if (
             event.buttons === 1 &&
             toolState.tool === ToolEnum.CREATE &&
-            toolState.block.id !== -1 &&
-            toolState.block.id !== 7
+            toolState.block.objectTypeId !== -1 &&
+            toolState.block.groupId !== 2
         ) {
             if (
-                currCellContent.id !== toolState.block.id ||
-                (currCellContent.id !== toolState.block.id && currCellContent.rotation !== toolState.block.rotation)
+                currCellContent.objectTypeId !== toolState.block.objectTypeId ||
+                (currCellContent.objectTypeId !== toolState.block.objectTypeId &&
+                    currCellContent.rotation !== toolState.block.rotation)
             ) {
-                streetGrid[cell.posX][cell.posY].id = toolState.block.id
+                streetGrid[cell.posX][cell.posY].objectTypeId = toolState.block.objectTypeId
                 streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
                 streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
                 payload = {
-                    objectTypeId: toolState.block.id,
+                    objectTypeId: toolState.block.objectTypeId,
                     x: cell.posX,
                     y: cell.posY,
                     rotation: toolState.block.rotation,
@@ -198,15 +200,15 @@
             }
         }
         if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
-            if (currCellContent.id !== -1) {
+            if (currCellContent.objectTypeId !== -1) {
                 payload = {
-                    objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                    objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
                     x: cell.posX,
                     y: cell.posY,
                     rotation: streetGrid[cell.posX][cell.posY].rotation,
                     game_assets: [],
                 }
-                streetGrid[cell.posX][cell.posY].id = -1
+                streetGrid[cell.posX][cell.posY].objectTypeId = -1
                 streetGrid[cell.posX][cell.posY].rotation = 0
                 streetGrid[cell.posX][cell.posY].texture = ""
                 deleteMessage(payload)
@@ -220,9 +222,9 @@
         for (let row = 0; row < streetGrid.length; row++) {
             for (let col = 0; col < streetGrid[0].length; col++) {
                 let ele = streetGrid[row][col]
-                if (ele.id !== -1) {
+                if (ele.objectTypeId !== -1) {
                     dto.mapObjects.push({
-                        objectTypeId: ele.id,
+                        objectTypeId: ele.objectTypeId,
                         x: ele.posX,
                         y: ele.posY,
                         rotation: ele.rotation,
@@ -240,7 +242,7 @@
         //console.log(dto.mapObjects)
         for (let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = {
-                id: ele.objectTypeId,
+                objectTypeId: ele.objectTypeId,
                 posX: ele.x,
                 posY: ele.y,
                 rotation: ele.rotation,
@@ -255,7 +257,7 @@
         for (let row = 0; row < streetGrid.length; row++) {
             for (let col = 0; col < streetGrid[0].length; col++) {
                 streetGrid[row][col] = {
-                    id: -1,
+                    objectTypeId: -1,
                     posX: row,
                     posY: col,
                     rotation: 0,
