@@ -1,4 +1,4 @@
-import { ILobby } from "./ILobby"
+import { ILobby } from "./ILobby";
 
 export default interface IUser {
     userId: number | undefined,

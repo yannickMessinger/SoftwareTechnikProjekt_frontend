@@ -1,7 +1,7 @@
-/**
+/** 
  * author: Sean Dittmann
  * date: 11.11.2022
- *
+ * 
  * BlockElement - Block Element of streetplaner list for streetplaner blocks (like sraight, cross or curve block).
  * groupId - categoryId for the list like street or railway (useful Id system needs to be invented later)
  * group - text for category like street or railway
@@ -13,11 +13,11 @@
  */
 
 export interface IBlockElement {
-    groupId: number
-    group: string
-    id: number
-    type: string
-    name: string
-    rotation: number
+    groupId: number,
+    group: string,
+    id: number,
+    type: string,
+    name: string,
+    rotation: number,
     texture: string
 }
