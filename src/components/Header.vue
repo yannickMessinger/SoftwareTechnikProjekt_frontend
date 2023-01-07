@@ -22,13 +22,13 @@
         text: {
             type: String,
             required: false,
-            default: "Header Text Field"
+            default: "Header Text Field",
         },
         displayHomebutton: {
             type: Boolean,
             required: false,
-            default: true
-        }
+            default: true,
+        },
     })
 </script>
 
@@ -39,7 +39,6 @@
         justify-content: space-between;
         align-items: center;
         height: 5em;
-        
     }
     .header .right{
         display: flex;
@@ -51,7 +50,7 @@
         font-size: 1.5em;
         margin: 2em;
     }
-    #home{
+    #home {
         margin: 2em;
         width: 4em;
         height: 4em;

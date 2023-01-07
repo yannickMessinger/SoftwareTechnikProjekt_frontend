@@ -1,4 +1,4 @@
-export interface IGetPlayerResponseDTO{
+export interface IAddPlayerResponseDTO {
     userId: number
-    userName:string
+    userName: string
 }

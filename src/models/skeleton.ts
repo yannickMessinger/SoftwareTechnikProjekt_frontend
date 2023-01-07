@@ -4,7 +4,7 @@ export class Skeleton {
     legs: number
 
     constructor() {
-        this.title = 'Skeleton'
+        this.title = "Skeleton"
         this.arms = 2
         this.legs = 2
     }
