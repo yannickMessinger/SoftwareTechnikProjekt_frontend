@@ -18,6 +18,7 @@
     import { useGameView } from "../../services/3DGameView/useGameView"
     const { bus } = useEventBus()
     const { setGameStateSizes, setGameStateMapId } = useGameView()
+    const { blockListState, updateBlockList } = useBlockList()
 
     var gridSizeX = 20
     var gridSizeY = 30
@@ -85,6 +86,10 @@
         () => editorState.mapObjects,
         () => loadStreetGrid(editorState)
     )
+    watch(
+        () => blockListState.list,
+        () => (blockList = blockListState.list)
+    )
 
     onMounted(() => {
         // get blockList from backend
@@ -93,7 +98,6 @@
         setGameStateSizes(gridSizeY, gridSizeX, gridSize.value)
 
         updateBlockList()
-        blockList = useBlockList().blockListState.list
         receiveEditorUpdates()
         updateMapId(lobbyState.value.mapId)
         setGameStateMapId(lobbyState.value.mapId)
