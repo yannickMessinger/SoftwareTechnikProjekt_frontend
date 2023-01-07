@@ -84,11 +84,11 @@
             const assetRotationMap = new Map()
 
             /*No rotation*/
-            assetRotationMap.set(0, 0)
+            assetRotationMap.set(0, Math.PI)
             /*90 degree rotation*/
             assetRotationMap.set(1, Math.PI / 2)
             /*180 degree rotation*/
-            assetRotationMap.set(2, Math.PI)
+            assetRotationMap.set(2, 0)
             /*270 degree rotation*/
             assetRotationMap.set(3, (3 * Math.PI) / 2)
 
