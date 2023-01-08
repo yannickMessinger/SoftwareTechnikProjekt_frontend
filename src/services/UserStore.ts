@@ -11,7 +11,8 @@ const state = reactive<User>({
   errormessage: "",
   loggedIn: false,
   activeLobby: {
-    lobbyID: 0,
+    lobbyId: 0,
+    mapId : -1,
     lobbyName: "",
     numOfPlayers: 0,
     lobbyModeEnum: E_LobbyMode.BUILD_MODE
@@ -29,16 +30,16 @@ function retrieveUserFromLocalStorage(): User | null {
   return null
 }
 
-async function sendName():Promise<void> {
-  const response = await fetch('/api/player', {
-    method: 'POST',
-    headers: {
-      'Content-Type':'application/json',
-    },
-    body: JSON.stringify({
-      userName: state.userName
+async function sendName(): Promise<void> {
+    const response = await fetch("/api/player", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            userName: state.userName,
+        }),
     })
-  });
 
   console.log("sendName():", response);
   const jsondata = await response.json();
@@ -46,13 +47,13 @@ async function sendName():Promise<void> {
   console.log("state.userId", state.userId);
 }
 
-async function setActiveLobby(lobby: ILobby):Promise<void> {
-  state.activeLobby = lobby;
-  await postActiveLobby(lobby);
+async function setActiveLobby(lobby: ILobby): Promise<void> {
+    state.activeLobby = lobby 
+    await postActiveLobby(lobby)
 }
 
 async function postActiveLobby(lobby:ILobby) {
-  const response = await fetch(`/api/lobby/get_players/${lobby.lobbyID}?player_id=${state.userId}`, {
+  const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
     method: 'POST',
   });
   console.log("setActiveLobby() -> post player to lobby - response", response);
@@ -151,4 +152,3 @@ export default function useUser() {
     register
   };
 }
-
