@@ -1,89 +1,262 @@
 <script setup lang="ts">
-    import { computed } from '@vue/reactivity';
-    import { ref, reactive, watch } from 'vue';
-    import type { IGridElement } from '../../services/streetplaner/IGridElement';
-    import useEventBus from '../../services/eventBus';
-    import ToolEnum from '../../services/streetplaner/ToolEnum';
-    const { bus } = useEventBus();
+    import { computed } from "@vue/reactivity"
+    import { ref, reactive, watch, onMounted } from "vue"
+    import type { IGridElement } from "../../services/streetplaner/IGridElement"
+    import useEventBus from "../../services/eventBus"
+    import ToolEnum from "../../services/streetplaner/ToolEnum"
+    import {
+        useBlockList,
+        updateBlockList,
+    } from "../../services/streetplaner/useBlockList"
+    import {
+        useStreetGridList,
+        updateStreetGridList,
+        postStreetGrid,
+    } from "../../services/streetplaner/useStreetGridList"
+    import { IBlockElement } from "../../services/streetplaner/IBlockElement"
+    import { IMapObject } from "../../services/streetplaner/IMapObject"
+    import { StreetGridDTO } from "../../services/streetplaner/StreetGridDTO"
+    import useUser from "../../services/UserStore"
+    import { useEditor } from "../../services/Editor/useEditor"
+    const { bus } = useEventBus()
 
-    var gridSizeX = 20;
-    var gridSizeY = 30;
-    const toolState = reactive({ tool: ToolEnum.EMPTY, block: { id: -1, rotation: 0, texture: "" }});
+    var gridSizeX = 20
+    var gridSizeY = 30
+    const toolState = reactive({
+        tool: ToolEnum.EMPTY,
+        block: { id: -1, rotation: 0, texture: "" },
+    })
+    const lobbyState = useUser().activeLobby
 
-    watch(() => bus.value.get('tool-select-event'), (val) => {
-        toolState.tool = val[0];
-    });
-    watch(() => bus.value.get('block-select-event'), (val) => {
-        toolState.block = val[0];
-    });
-    watch(() => bus.value.get('grid-reset-event'), (val) => {
-        if (val) { resetGrid(); }
-    });
-    watch(() => bus.value.get('grid-reset-event'), (val) => {
-        if (val) { resetGrid(); }
-    });
+    const {
+        editorState,
+        createMessage,
+        deleteMessage,
+        updateMessage,
+        resetMessage,
+        updateMap,
+        receiveEditorUpdates,
+        updateMapId,
+    } = useEditor(lobbyState.value.mapId)
+
+    watch(
+        () => bus.value.get("tool-select-event"),
+        (val) => {
+            toolState.tool = val[0]
+        }
+    )
+    watch(
+        () => bus.value.get("block-select-event"),
+        (val) => {
+            toolState.block = val[0]
+        }
+    )
+    watch(
+        () => bus.value.get("grid-reset-event"),
+        (val) => {
+            if (val) {
+                resetMessage()
+            }
+        }
+    )
+    watch(
+        () => bus.value.get("grid-save-event"),
+        (val) => {
+            saveStreetGrid()
+        }
+    )
 
     // create and initialize streetGrid
-    const streetGrid: IGridElement[][] = reactive(Array(gridSizeX).fill([]).map(() => Array(gridSizeY).fill(null)));
-    resetGrid();
+    const streetGrid: IGridElement[][] = reactive(
+        Array(gridSizeX)
+            .fill([])
+            .map(() => Array(gridSizeY).fill(null))
+    )
+    fillGridEmpty()
 
     // initialize gridSize
-    const gridSize = ref(40);
+    const gridSize = ref(40)
     // initialize gridSizePx used in css
-    const gridSizePx = computed(() => gridSize.value.toString() + "px");
-    var mouseDown = false;
+    const gridSizePx = computed(() => gridSize.value.toString() + "px")
+    // declare blockList
+    var blockList: Array<IBlockElement>
+    watch(
+        () => editorState.mapObjects,
+        () => loadStreetGrid(editorState)
+    )
+
+    onMounted(() => {
+        // get blockList from backend
+        // get streetgrid from backend via mapID
+        blockList = useBlockList().blockList
+        updateBlockList()
+        receiveEditorUpdates()
+        updateMapId(lobbyState.value.mapId)
+        updateMap()
+    })
 
     // onClick handles click on specific cell
     function onClick(cell: any) {
-        // set texture of clicked cell to dummy
+        let payload: IMapObject
         if (toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
-            streetGrid[cell.posX][cell.posY].id = toolState.block.id;
-            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
-            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+            streetGrid[cell.posX][cell.posY].id = toolState.block.id
+            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
+            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
+            payload = {
+                objectTypeId: toolState.block.id,
+                x: cell.posX,
+                y: cell.posY,
+                rotation: toolState.block.rotation,
+            }
+            createMessage(payload)
         }
-        if (toolState.tool == ToolEnum.ROTATE) {
-            streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4;
+        if (
+            toolState.tool == ToolEnum.ROTATE &&
+            streetGrid[cell.posX][cell.posY].id !== -1
+        ) {
+            streetGrid[cell.posX][cell.posY].rotation =
+                (streetGrid[cell.posX][cell.posY].rotation + 1) % 4
+            payload = {
+                objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                x: cell.posX,
+                y: cell.posY,
+                rotation: streetGrid[cell.posX][cell.posY].rotation,
+            }
+            updateMessage(payload)
         }
         if (toolState.tool === ToolEnum.DELETE) {
-            streetGrid[cell.posX][cell.posY].id = -1;
-            streetGrid[cell.posX][cell.posY].rotation = 0;
-            streetGrid[cell.posX][cell.posY].texture = "";
+            payload = {
+                objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                x: cell.posX,
+                y: cell.posY,
+                rotation: streetGrid[cell.posX][cell.posY].rotation,
+            }
+            streetGrid[cell.posX][cell.posY].id = -1
+            streetGrid[cell.posX][cell.posY].rotation = 0
+            streetGrid[cell.posX][cell.posY].texture = ""
+            deleteMessage(payload)
         }
     }
 
     // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
     function onMouseMove(cell: any, event: any) {
-        if (event.buttons === 1 && toolState.tool === ToolEnum.CREATE && toolState.block.id !== -1) {
-            streetGrid[cell.posX][cell.posY].id = toolState.block.id;
-            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation;
-            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture;
+        let currCellContent = streetGrid[cell.posX][cell.posY]
+        // Todo, add check so stomp message will only send when a change is made
+        let payload: IMapObject
+        if (
+            event.buttons === 1 &&
+            toolState.tool === ToolEnum.CREATE &&
+            toolState.block.id !== -1
+        ) {
+            if (
+                currCellContent.id !== toolState.block.id ||
+                (currCellContent.id !== toolState.block.id &&
+                    currCellContent.rotation !== toolState.block.rotation)
+            ) {
+                streetGrid[cell.posX][cell.posY].id = toolState.block.id
+                streetGrid[cell.posX][cell.posY].rotation =
+                    toolState.block.rotation
+                streetGrid[cell.posX][cell.posY].texture =
+                    toolState.block.texture
+                payload = {
+                    objectTypeId: toolState.block.id,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: toolState.block.rotation,
+                }
+                createMessage(payload)
+            }
         }
         if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
-            streetGrid[cell.posX][cell.posY].id = -1;
-            streetGrid[cell.posX][cell.posY].rotation = 0;
-            streetGrid[cell.posX][cell.posY].texture = "";
+            if (currCellContent.id !== -1) {
+                payload = {
+                    objectTypeId: streetGrid[cell.posX][cell.posY].id,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: streetGrid[cell.posX][cell.posY].rotation,
+                }
+                streetGrid[cell.posX][cell.posY].id = -1
+                streetGrid[cell.posX][cell.posY].rotation = 0
+                streetGrid[cell.posX][cell.posY].texture = ""
+                deleteMessage(payload)
+            }
         }
     }
-    
-    function resetGrid() {
+
+    // converts StreetGrid into json and sends it to backend
+    function saveStreetGrid() {
+        let dto: StreetGridDTO = { mapObjects: Array<IMapObject>() }
+        for (let row = 0; row < streetGrid.length; row++) {
+            for (let col = 0; col < streetGrid[0].length; col++) {
+                let ele = streetGrid[row][col]
+                if (ele.id !== -1) {
+                    dto.mapObjects.push({
+                        objectTypeId: ele.id,
+                        x: ele.posX,
+                        y: ele.posY,
+                        rotation: ele.rotation,
+                    })
+                }
+            }
+        }
+        postStreetGrid(lobbyState.value.mapId, dto)
+    }
+
+    // load StreetGrid from backend dto
+    function loadStreetGrid(dto: StreetGridDTO) {
+        fillGridEmpty()
+        console.log(dto.mapObjects)
+        for (let ele of dto.mapObjects) {
+            streetGrid[ele.x][ele.y] = {
+                id: ele.objectTypeId,
+                posX: ele.x,
+                posY: ele.y,
+                rotation: ele.rotation,
+                texture: blockList[ele.objectTypeId].texture,
+            }
+        }
+    }
+
+    function fillGridEmpty() {
         // fill streetGrid with empty IGridElements
-        for(let row=0; row<streetGrid.length; row++) {
-            for(let col=0; col<streetGrid[0].length; col++) {
-                streetGrid[row][col] = { id: -1, posX: row, posY: col, rotation: 0, texture: ""};
+        for (let row = 0; row < streetGrid.length; row++) {
+            for (let col = 0; col < streetGrid[0].length; col++) {
+                streetGrid[row][col] = {
+                    id: -1,
+                    posX: row,
+                    posY: col,
+                    rotation: 0,
+                    texture: "",
+                }
             }
         }
     }
 
     // disable right click context menu
-    window.addEventListener('contextmenu', function (e) {
-        e.preventDefault();
-    }, false);
+    window.addEventListener(
+        "contextmenu",
+        function (e) {
+            e.preventDefault()
+        },
+        false
+    )
 </script>
 
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
-        <div v-for="ele in row" class="grid-item grid-size col no-drag" @click="onClick(ele)" @mousemove="onMouseMove(ele, $event)">
-            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false" :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"/>
+        <div
+            v-for="ele in row"
+            class="grid-item grid-size col no-drag"
+            @click="onClick(ele)"
+            @mousemove="onMouseMove(ele, $event)"
+        >
+            <img
+                v-if="ele.texture != ''"
+                :src="ele.texture"
+                class="no-drag grid-img"
+                draggable="false"
+                :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"
+            />
         </div>
     </div>
 </template>
@@ -112,11 +285,11 @@
         height: 100%;
         display: block;
     }
-    .no-drag {  
+    .no-drag {
         user-select: none;
-        -webkit-user-drag: none; 
-        -khtml-user-drag: none; 
-        -moz-user-drag: none; 
-        -o-user-drag: none; 
+        -webkit-user-drag: none;
+        -khtml-user-drag: none;
+        -moz-user-drag: none;
+        -o-user-drag: none;
     }
 </style>
