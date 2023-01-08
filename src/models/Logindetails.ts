@@ -1,4 +1,4 @@
 export default interface Logindetails {
-    username: string
+    username: string,
     password: string
 }

@@ -1,6 +1,7 @@
 // example from https://vuejs.org/guide/reusability/composables.html
 
-import { ref, onMounted, onUnmounted } from "vue"
+
+import { ref, onMounted, onUnmounted } from 'vue'
 
 // by convention, composable function names start with "use"
 export function useMouse() {
@@ -16,8 +17,8 @@ export function useMouse() {
 
     // a composable can also hook into its owner component's
     // lifecycle to setup and teardown side effects.
-    onMounted(() => window.addEventListener("mousemove", update))
-    onUnmounted(() => window.removeEventListener("mousemove", update))
+    onMounted(() => window.addEventListener('mousemove', update))
+    onUnmounted(() => window.removeEventListener('mousemove', update))
 
     // expose managed state as return value
     return { x, y }

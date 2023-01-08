@@ -1,49 +1,46 @@
 <script setup lang="ts">
     /**Imports: */
-    import { reactive, watch, ref } from "vue"
-    import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
-    import useEventBus from "../../services/eventBus"
-    import BasicButton from "../Buttons/BasicButton.vue"
+    import { reactive, watch, ref } from 'vue';
+    import type { IBlockElement } from '../../services/streetplaner/IBlockElement';
+    import useEventBus from '../../services/eventBus';
+    import BasicButton from '../Buttons/BasicButton.vue';
 
     /**Variables: */
-    const pathToPictures = "/img/streetplaner/"
-    const pathRotateButton = pathToPictures + "tool-icons/rotate.png"
+    const pathToPictures = "/img/streetplaner/";
+    const pathRotateButton = (pathToPictures+"tool-icons/rotate.png");
     /**currently selected object, default value is no object selected */
-    var defaultBlock: IBlockElement = {
+    var defaultBlock: IBlockElement = { 
         groupId: -1,
         group: "no data",
         id: -1,
-        type: "no data",
-        name: "no Block selected",
-        rotation: 0,
-        texture: pathToPictures + "no-data.png",
-    }
+        type:"no data",
+        name:"no Block selected",
+        rotation:0,
+        texture: (pathToPictures+"no-data.png")
+    };
     /** bus event */
-    const { emit, bus } = useEventBus()
+    const { emit,bus } = useEventBus();
     /**  currently selected block */
-    const selectedBlock = reactive({ block: defaultBlock })
-    const isDefault = ref(true)
+    const selectedBlock = reactive({block: defaultBlock});
+    const isDefault = ref(true);
     /** watch for selected block events to display selected block*/
-    watch(
-        () => bus.value.get("block-select-event"),
-        (val) => {
-            selectedBlock.block = val[0]
-            if (selectedBlock.block.id == defaultBlock.id) {
-                isDefault.value = true
-            } else {
-                isDefault.value = false
-            }
+    watch(() =>  bus.value.get('block-select-event'), (val) => {
+        selectedBlock.block = val[0];
+        if(selectedBlock.block.id==defaultBlock.id){
+            isDefault.value = true;
+        }else{
+            isDefault.value = false;
         }
-    )
+    });
     /** rotate event for clicking the rotate button in the details list to rotate the selected element */
-    function onRotateClick() {
-        if (!isDefault.value) {
-            selectedBlock.block.rotation = selectedBlock.block.rotation + 1
-            if (selectedBlock.block.rotation > 3) {
-                selectedBlock.block.rotation = 0
+    function onRotateClick(){
+        if(!isDefault.value){
+            selectedBlock.block.rotation = selectedBlock.block.rotation + 1;
+            if(selectedBlock.block.rotation>3){
+                selectedBlock.block.rotation = 0;
             }
             /** fires a block select event to mark a selected block change. Sends out this block*/
-            emit("block-select-event", selectedBlock.block)
+            emit("block-select-event", selectedBlock.block);
         }
     }
 </script>
@@ -51,40 +48,33 @@
 <template>
     <p>
         <span id="header">Zelle</span>
-        <BasicButton display="Drehen" :btn_click="onRotateClick" />
+        <BasicButton display="Drehen" :btn_click="onRotateClick"/>
     </p>
-    <img
-        v-if="selectedBlock != null"
-        :src="selectedBlock.block.texture"
-        class="selectedBlockImg"
-        :style="{
-            transform: 'rotate(' + selectedBlock.block.rotation * 90 + 'deg)',
-        }"
-    />
+        <img v-if="selectedBlock != null" :src="selectedBlock.block.texture" class="selectedBlockImg" :style="{ transform: 'rotate(' + selectedBlock.block.rotation * 90 + 'deg)' }"/>
     <p>
         <span>ID</span>
-        <span>{{ selectedBlock.block.id }}</span>
+        <span>{{selectedBlock.block.id}}</span>
     </p>
     <p>
         <span>Name</span>
-        <span>{{ selectedBlock.block.name }}</span>
+        <span>{{selectedBlock.block.name}}</span>
     </p>
     <p>
         <span>Type</span>
-        <span>{{ selectedBlock.block.type }}</span>
+        <span>{{selectedBlock.block.type}}</span>
     </p>
 </template>
 
 <style scoped>
-    * {
+    *{
         --margin-bottom: 12px;
-
+        
         font-size: 1em;
         margin: 0;
         color: var(--woe-black);
     }
 
-    .selectedBlockImg {
+    .selectedBlockImg{
         width: auto;
         height: auto;
         display: block;
@@ -92,23 +82,23 @@
         margin-bottom: var(--margin-bottom);
     }
 
-    p {
+    p{
         display: flex;
         justify-content: space-between;
         align-items: baseline;
     }
 
-    #header {
+    #header{
         font-weight: bold;
         margin-bottom: var(--margin-bottom);
     }
-    .selectedBlockRotateImg {
+    .selectedBlockRotateImg{
         width: 25%;
         height: 25%;
         border: solid 1px gray;
     }
-    .rotateButtonInDetails {
-        display: inline;
+    .rotateButtonInDetails{
+        display:inline;
         border: solid 2px black;
         background-color: grey;
     }

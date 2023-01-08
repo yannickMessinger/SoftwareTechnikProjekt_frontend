@@ -2,9 +2,9 @@
 
 import { E_LobbyMode } from "./E_LobbyMode"
 
-export interface IAddLobbyRequestDTO {
-    lobbyName: string
+export interface IAddLobbyRequestDTO{
+    lobbyName:string
     numOfPlayers: number
     lobbyModeEnum: E_LobbyMode
-    hostId?: number
+    hostID?:number
 }
