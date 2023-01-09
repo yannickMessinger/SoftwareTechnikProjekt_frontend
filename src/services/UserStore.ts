@@ -7,12 +7,9 @@ import { IGetPlayerResponseDTO } from "../typings/IGetPlayerResponseDTO"
 const state = reactive<User>({
     userId: 0, //as IGetPlayerResponseDTO["userId"],
     userName: "", // as IGetPlayerResponseDTO["userName"],
-    errormessage: "",
-    loggedIn: false,
     activeLobby: {
         lobbyId: -1,
         mapId: -1,
-        hostId: -1,
         lobbyName: "",
         numOfPlayers: 0,
         lobbyModeEnum: E_LobbyMode.BUILD_MODE,
@@ -47,14 +44,7 @@ async function sendName(): Promise<void> {
 }
 
 function setActiveLobby(lobby: ILobby) {
-    state.activeLobby.hostId = lobby.hostId
-    state.activeLobby.lobbyId = lobby.lobbyId
-    state.activeLobby.mapId = lobby.mapId
-    state.activeLobby.lobbyModeEnum = lobby.lobbyModeEnum
-    state.activeLobby.lobbyName = lobby.lobbyName
-    state.activeLobby.numOfPlayers = lobby.numOfPlayers
-    console.log(lobby)
-    console.log(state)
+    state.activeLobby = lobby
     postActiveLobby(lobby)
 }
 
