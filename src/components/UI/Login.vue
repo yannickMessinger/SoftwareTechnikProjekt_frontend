@@ -6,45 +6,19 @@
             </div>
             <div class="content-form">
                 <label>Benutzer</label>
-                <input :class="usernameError != '' ? 'error-input' : '' " 
-                    v-model="username"
-                    type="text"
-                    placeholder="Username"
-                    required
-                />
+                <input :class="usernameError != '' ? 'error-input' : '' " v-model="username" type="text" placeholder="Username" required />
                 <label class="error">{{usernameError}}</label>
                 <label>Passwort</label>
-                <input
-                    v-model="password" :class="passwordError != '' ? 'error-input' : '' "
-                    type="password"
-                    placeholder="Passwort"
-                    required
-                />
+                <input v-model="password" :class="passwordError != '' ? 'error-input' : '' " type="password" placeholder="Passwort" required />
                 <label class="error">{{passwordError}}</label>
                 <label v-if="registrationMode">Passwort erneut eingeben</label>
-                <input
-                    v-if="registrationMode" :class="passwordError != '' ? 'error-input' : '' "
-                    v-model="passwordRepeat"
-                    type="password"
-                    placeholder="Passwort"
-                    required
-                />
+                <input v-if="registrationMode" :class="passwordError != '' ? 'error-input' : '' " v-model="passwordRepeat" type="password" placeholder="Passwort" required />
                 <label v-if="registrationMode" class="error">{{passwordError}}</label>
-                <hr />
-                <BasicButton v-if="!registrationMode"
-                    class="sec btn blue"
-                    :display="'Login'" :btn_click="loginCheck"/>
-                <BasicButton v-if="!registrationMode" class="ter btn grey" :display="'Zum Registrieren'"
-                    :btn_click="toggleMode"
-                />
-                <BasicButton v-if="registrationMode"
-                    class="sec btn blue"
-                    :display="'Regist
-                        rieren'" :btn_click="registrationCheck"/>
-                <BasicButton v-if="registrationMode" class="ter btn grey" :display="'Zurück zum Login'
-                    "
-                    :btn_click="toggleMode"
-                />
+                <hr>
+                <BasicButton v-if="!registrationMode" class="sec btn blue" :display="'Login'" :btn_click="loginCheck"/>
+                <BasicButton v-if="!registrationMode" class="ter btn grey" :display="'Zum Registrieren'" :btn_click="toggleMode"/>
+                <BasicButton v-if="registrationMode" class="sec btn blue" :display="'Registrieren'" :btn_click="registrationCheck"/>
+                <BasicButton v-if="registrationMode" class="ter btn grey" :display="'Zurück zum Login'" :btn_click="toggleMode"/>
             </div>
         </div>
     </div>
@@ -111,24 +85,26 @@
 </script>
 
 <style scoped>
-    * {
+    *{
         box-sizing: border-box;
+        
     }
 
-    h2 {
+    h2{
         margin-top: 0.83em;
         margin-bottom: 0.83em;
     }
 
-    .container {
+    .container{
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         width: 100%;
+        
     }
 
-    .content {
+    .content{
         margin-top: 50px;
         padding: 24px;
         width: 500px;
@@ -136,22 +112,22 @@
         border-radius: 8px;
     }
 
-    .headline {
+    .headline{
         display: flex;
         justify-content: center;
         align-items: center;
         margin-bottom: 32px;
         position: relative;
-    }
+    } 
 
-    .content-form {
+    .content-form{
         display: flex;
         flex-direction: column;
         align-content: space-between;
         gap: 10px;
     }
 
-    input {
+    input{
         width: auto;
         height: 40px;
         padding: 8px 12px;

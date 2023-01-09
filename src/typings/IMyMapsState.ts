@@ -1,4 +1,4 @@
-import { IMyMapsListItem } from "./IMyMapsListitem"
+import { IMyMapsListItem } from "./IMyMapsListitem";
 
 export interface IMyMapsState {
     mapslist: IMyMapsListItem[]

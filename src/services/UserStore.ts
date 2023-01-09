@@ -1,28 +1,27 @@
 import { computed, reactive, readonly, onMounted } from "vue";
-import IUser from '../typings/IUser';
+import User from '../typings/IUser';
 import { E_LobbyMode } from "../typings/E_LobbyMode";
 import { ILobby } from "../typings/ILobby";
 import { IGetPlayerResponseDTO } from "../typings/IGetPlayerResponseDTO";
 import { stat } from "fs";
 
-const state = reactive<IUser>({
-    userId:0 as IGetPlayerResponseDTO["userId"],
-    userName: "" as IGetPlayerResponseDTO["userName"],
+const state = reactive<User>({
+  userId: 0 as IGetPlayerResponseDTO["userId"],
+  userName: "" as IGetPlayerResponseDTO["userName"],
   errormessage: "",
   loggedIn: false,
-    activeLobby: {
-        lobbyId: -1,
-        mapId: -1,
-        lobbyName: "",
-        numOfPlayers: 0,
-        lobbyModeEnum: E_LobbyMode.BUILD_MODE,
-    },
-})
+  activeLobby: {
+    lobbyID: 0,
+    lobbyName: "",
+    numOfPlayers: 0,
+    lobbyModeEnum: E_LobbyMode.BUILD_MODE
+  }
+});
 
 const userAsJsonString = computed(() => JSON.stringify(state))
 
 
-function retrieveUserFromLocalStorage(): IUser | null {
+function retrieveUserFromLocalStorage(): User | null {
   const userJsonString = localStorage.getItem('user')
   if (userJsonString) {
     return JSON.parse(userJsonString)
@@ -30,16 +29,16 @@ function retrieveUserFromLocalStorage(): IUser | null {
   return null
 }
 
-async function sendName(): Promise<void> {
-    const response = await fetch("/api/player", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            userName: state.userName,
-        }),
+async function sendName():Promise<void> {
+  const response = await fetch('/api/player', {
+    method: 'POST',
+    headers: {
+      'Content-Type':'application/json',
+    },
+    body: JSON.stringify({
+      userName: state.userName
     })
+  });
 
   console.log("sendName():", response);
   const jsondata = await response.json();
@@ -47,19 +46,16 @@ async function sendName(): Promise<void> {
   console.log("state.userId", state.userId);
 }
 
-async function setActiveLobby(lobby: ILobby): Promise<void> {
-    state.activeLobby = lobby
-    await postActiveLobby(lobby)
+async function setActiveLobby(lobby: ILobby):Promise<void> {
+  state.activeLobby = lobby;
+  await postActiveLobby(lobby);
 }
 
-async function postActiveLobby(lobby: ILobby) {
-    const response = await fetch(
-        `/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`,
-        {
-            method: "POST",
-        }
-    )
-    console.log("setActiveLobby() -> post player to lobby - response", response)
+async function postActiveLobby(lobby:ILobby) {
+  const response = await fetch(`/api/lobby/get_players/${lobby.lobbyID}?player_id=${state.userId}`, {
+    method: 'POST',
+  });
+  console.log("setActiveLobby() -> post player to lobby - response", response);
 }
 
 async function register(username:string, password:string): Promise<any> {
@@ -155,3 +151,4 @@ export default function useUser() {
     register
   };
 }
+
