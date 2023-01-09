@@ -4,7 +4,7 @@ import { IPlayerListState } from "../typings/IPlayerListState"
 import IUser from "../typings/IUser"
 import useUser from "./UserStore"
 
-const { logindata } = useUser();
+const { logindata } = useUser()
 const playerState = reactive<IPlayerListState>({
     playerlist: Array<IUser>(),
     errormsg: "",
@@ -14,6 +14,7 @@ const playerState = reactive<IPlayerListState>({
  * fetches the playerlist of the active lobby which is saved in the UserStore under activeLobby
  */
 export async function fetchPlayerList(): Promise<void> {
+    console.log(logindata)
     const response = await fetch(
         `/api/lobby/get_players/${logindata.activeLobby.lobbyId}`,
         {
@@ -26,8 +27,6 @@ export async function fetchPlayerList(): Promise<void> {
         playerState.playerlist.push({
             userId: i.userId,
             userName: i.userName,
-            loggedIn: true,
-            errormessage: "",
             activeLobby: {
                 lobbyId: -1,
                 mapId: -1,

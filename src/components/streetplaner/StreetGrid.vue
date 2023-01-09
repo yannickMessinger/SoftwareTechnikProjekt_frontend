@@ -91,6 +91,7 @@
         blockList = useBlockList().blockList
         updateBlockList()
         receiveEditorUpdates()
+        console.log(lobbyState.mapId)
         updateMapId(lobbyState.mapId)
         updateMap()
     })

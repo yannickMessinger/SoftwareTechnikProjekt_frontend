@@ -27,9 +27,9 @@
     const { setActiveLobby } = useUser()
 
     //for later purposes to link to selected lobby via Vue Router
-    async function selectLobby() {
+    function selectLobby() {
         console.log(props.lobby.lobbyId, props.lobby.lobbyName)
-        await setActiveLobby(props.lobby)
+        setActiveLobby(props.lobby)
         console.log("user has active lobby")
         router.push({
             path: "/lobbyview",

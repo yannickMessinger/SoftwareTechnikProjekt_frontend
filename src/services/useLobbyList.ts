@@ -10,8 +10,7 @@ import { ILobbyListState } from "../typings/ILobbyListState"
 import useUser from "./UserStore"
 import { ILobbyDTO } from "../typings/ILobbyDTO"
 
-const {logindata, setActiveLobby} = useUser();
-
+const { logindata, setActiveLobby } = useUser()
 
 const lobbyState = reactive<ILobbyListState>({
     lobbylist: Array<ILobbyDTO>(),
@@ -53,8 +52,6 @@ export async function updateLobbyList(): Promise<void> {
         }
 
         const jsondata: ILobbyDTO[] = await response.json()
-        console.log("JSONDATA")
-        console.log(jsondata)
 
         lobbyState.lobbylist = jsondata
         lobbyState.errormsg = ""
@@ -91,16 +88,15 @@ export async function createNewLobby(
     addNumOfPlayers: number,
     addLobbyMode: E_LobbyMode
 ) {
-  console.log(`User ID from useLobbyList  ${logindata.userId}`);
-  const url = "/api/lobby";
+    console.log(`User ID from useLobbyList  ${logindata.userId}`)
+    const url = "/api/lobby"
 
-
-  const addLobby: IAddLobbyRequestDTO = {
-    lobbyName: addLobbyName,
-    numOfPlayers: addNumOfPlayers,
-    lobbyModeEnum: addLobbyMode,
-    hostId: logindata.userId
-  };
+    const addLobby: IAddLobbyRequestDTO = {
+        lobbyName: addLobbyName,
+        numOfPlayers: addNumOfPlayers,
+        lobbyModeEnum: addLobbyMode,
+        hostId: logindata.userId,
+    }
 
     console.log(addLobby)
 
