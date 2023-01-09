@@ -1,24 +1,27 @@
-import { computed, reactive, onMounted, readonly } from "vue"
-import User from "../typings/IUser"
+import { computed, reactive, onMounted, readonly, isRef, isReactive } from "vue"
+import IUser from "../typings/IUser"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { ILobby } from "../typings/ILobby"
 import { IGetPlayerResponseDTO } from "../typings/IGetPlayerResponseDTO"
+import { stat } from "fs"
 
-const state = reactive<User>({
-    userId: 0, //as IGetPlayerResponseDTO["userId"],
-    userName: "", // as IGetPlayerResponseDTO["userName"],
-    activeLobby: {
+const state = reactive<IUser>({
+    userId: -1,
+    userName: "",
+    errormessage: "",
+    loggedIn: false,
+    activeLobby: reactive<ILobby>({
         lobbyId: -1,
         mapId: -1,
         lobbyName: "",
         numOfPlayers: 0,
         lobbyModeEnum: E_LobbyMode.BUILD_MODE,
-    },
+    }),
 })
 
 const userAsJsonString = computed(() => JSON.stringify(state))
 
-function retrieveUserFromLocalStorage(): User | null {
+function retrieveUserFromLocalStorage(): IUser | null {
     const userJsonString = localStorage.getItem("user")
     if (userJsonString) {
         return JSON.parse(userJsonString)
@@ -43,9 +46,11 @@ async function sendName(): Promise<void> {
     console.log("state.userId", state.userId)
 }
 
-function setActiveLobby(lobby: ILobby) {
+async function setActiveLobby(lobby: ILobby): Promise<void> {
     state.activeLobby = lobby
-    postActiveLobby(lobby)
+    console.log(lobby)
+    console.log(state)
+    await postActiveLobby(lobby)
 }
 
 async function postActiveLobby(lobby: ILobby) {
