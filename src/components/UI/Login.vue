@@ -39,7 +39,8 @@
                 />
                 <BasicButton v-if="registrationMode"
                     class="sec btn blue"
-                    :display="'Registrieren'" :btn_click="registrationCheck"/>
+                    :display="'Regist
+                        rieren'" :btn_click="registrationCheck"/>
                 <BasicButton v-if="registrationMode" class="ter btn grey" :display="'Zurück zum Login'
                     "
                     :btn_click="toggleMode"

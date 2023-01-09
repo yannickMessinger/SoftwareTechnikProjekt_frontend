@@ -18,23 +18,15 @@
     import { StreetGridDTO } from "../../services/streetplaner/StreetGridDTO"
     import useUser from "../../services/UserStore"
     import { useEditor } from "../../services/Editor/useEditor"
-    
-    // initialize gridSize
-    const gridSize = reactive({value: 40})
-    // initialize gridSizePx used in css
-    const gridSizePx = computed(() => {
-        console.log("GridSize: "+ gridSize.value)
-        return gridSize.value.toString() + "px"
-    })
     const { bus } = useEventBus()
-    const { logindata } = useUser()
+
     var gridSizeX = 20
     var gridSizeY = 30
     const toolState = reactive({
         tool: ToolEnum.EMPTY,
         block: { id: -1, rotation: 0, texture: "" },
     })
-    const lobbyState = logindata.activeLobby
+    const lobbyState = useUser().activeLobby
 
     const {
         editorState,
@@ -45,7 +37,7 @@
         updateMap,
         receiveEditorUpdates,
         updateMapId,
-    } = useEditor(lobbyState!.mapId)
+    } = useEditor(lobbyState.value.mapId)
 
     watch(
         () => bus.value.get("tool-select-event"),
@@ -82,8 +74,10 @@
     )
     fillGridEmpty()
 
-    
-
+    // initialize gridSize
+    const gridSize = ref(40)
+    // initialize gridSizePx used in css
+    const gridSizePx = computed(() => gridSize.value.toString() + "px")
     // declare blockList
     var blockList: Array<IBlockElement>
     watch(
@@ -92,13 +86,12 @@
     )
 
     onMounted(() => {
-        console.log("GridSizePx: " + gridSizePx.value)
         // get blockList from backend
         // get streetgrid from backend via mapID
         blockList = useBlockList().blockList
         updateBlockList()
         receiveEditorUpdates()
-        updateMapId(lobbyState!.mapId)
+        updateMapId(lobbyState.value.mapId)
         updateMap()
     })
 
@@ -206,7 +199,7 @@
                 }
             }
         }
-        postStreetGrid(lobbyState!.mapId, dto)
+        postStreetGrid(lobbyState.value.mapId, dto)
     }
 
     // load StreetGrid from backend dto
