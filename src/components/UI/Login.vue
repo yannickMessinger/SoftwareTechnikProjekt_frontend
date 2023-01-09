@@ -85,26 +85,24 @@
 </script>
 
 <style scoped>
-    *{
+    * {
         box-sizing: border-box;
-        
     }
 
-    h2{
+    h2 {
         margin-top: 0.83em;
         margin-bottom: 0.83em;
     }
 
-    .container{
+    .container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         width: 100%;
-        
     }
 
-    .content{
+    .content {
         margin-top: 50px;
         padding: 24px;
         width: 500px;
@@ -112,22 +110,22 @@
         border-radius: 8px;
     }
 
-    .headline{
+    .headline {
         display: flex;
         justify-content: center;
         align-items: center;
         margin-bottom: 32px;
         position: relative;
-    } 
+    }
 
-    .content-form{
+    .content-form {
         display: flex;
         flex-direction: column;
         align-content: space-between;
         gap: 10px;
     }
 
-    input{
+    input {
         width: auto;
         height: 40px;
         padding: 8px 12px;

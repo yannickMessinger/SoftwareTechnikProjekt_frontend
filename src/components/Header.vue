@@ -1,12 +1,21 @@
 <template>
     <div class="header">
-        <span>{{text}}</span>
+        <span>{{ text }}</span>
         <div class="right">
             <BasicButton v-if=logindata.loggedIn class="cncl btn red" display="Logout" :btn_click="() => {
                     logout() 
                     router.push('/login')
                 }"/>
-            <BasicButton v-if=displayHomebutton id="home" display="" :btn_click="() => {router.push('/')}"/>
+            <BasicButton
+            v-if="displayHomebutton"
+            id="home"
+            display=""
+            :btn_click="
+                () => {
+                    router.push('/')
+                }
+            "
+        />
         </div>
         
     </div>
@@ -22,13 +31,13 @@
         text: {
             type: String,
             required: false,
-            default: "Header Text Field"
+            default: "Header Text Field",
         },
         displayHomebutton: {
             type: Boolean,
             required: false,
-            default: true
-        }
+            default: true,
+        },
     })
 </script>
 
@@ -39,19 +48,18 @@
         justify-content: space-between;
         align-items: center;
         height: 5em;
-        
     }
     .header .right{
         display: flex;
         align-items: center;
         margin: 2em;
     }
-    span{
+    span {
         color: var(--woe-white-almost);
         font-size: 1.5em;
         margin: 2em;
     }
-    #home{
+    #home {
         margin: 2em;
         width: 4em;
         height: 4em;
