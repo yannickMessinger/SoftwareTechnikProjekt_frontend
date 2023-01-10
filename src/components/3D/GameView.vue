@@ -6,15 +6,11 @@
         Renderer,
         Scene,
         LambertMaterial,
+        GltfModel,
     } from "troisjs"
-    import {
-        defineComponent,
-        onBeforeMount,
-        onBeforeUnmount,
-        onMounted,
-        ref,
-    } from "vue"
-    import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+    import { defineComponent, onMounted, ref } from "vue"
+    import { CollisionService } from "../../services/3D/CollisionService"
+    import { MovmentInputController } from "../../models/MovementInputController"
 
     export default defineComponent({
         components: {
@@ -24,25 +20,43 @@
             Scene,
             PointLight,
             LambertMaterial,
+            GltfModel,
         },
 
         setup() {
             const renderer = ref()
+            const car = ref()
             const box = ref()
             const camera = ref()
-            const fpsCamera = new FirstPersonCamera(camera, box)
-
+            const markt = ref()
+            const collisionService = new CollisionService(car, box, markt)
+            const movement = new MovmentInputController(car, camera)
             onMounted(() => {
                 renderer.value.onBeforeRender(() => {
-                    fpsCamera.update()
+                    // collisionService.updateCarBoundingBox(car);
+                    // if (!collisionService.checkCollision()) {
+                    //     console.log("False");
+                    // } else {
+                    //     console.log(car.value.mesh.position)
+                    // }
+                    movement.update()
                 })
+                setInterval(() => {
+                    collisionService.updateCarBoundingBox(car)
+                    console.log(
+                        "collision check:",
+                        collisionService.checkCollision()
+                    )
+                }, 5000)
             })
-
             return {
                 renderer,
                 camera,
+                car,
                 box,
-                fpsCamera,
+                movement,
+                collisionService,
+                markt,
             }
         },
     })
@@ -58,9 +72,16 @@
         </Camera>
         <Scene background="#4DBA87">
             <PointLight :position="{ y: 50, z: 50 }" />
-            <Box ref="box" :position="{ x: 0, y: 0, z: -5 }">
+            <Box ref="car" :position="{ x: 0, y: 0, z: -5 }">
                 <LambertMaterial />
             </Box>
+            <Box ref="box" :position="{ x: 0, y: 0, z: -10 }">
+                <LambertMaterial />
+            </Box>
+            <GltfModel
+                ref="markt"
+                src="/../../../src/assets/3D_Models/Building/Markt.gltf"
+            />
         </Scene>
     </Renderer>
 </template>
