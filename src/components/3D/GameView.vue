@@ -29,6 +29,7 @@
             const box = ref()
             const camera = ref()
             const markt = ref()
+            const scene = ref()
             const collisionService = new CollisionService(car, box, markt)
             const movement = new MovmentInputController(car, camera)
             onMounted(() => {
@@ -39,13 +40,14 @@
                     collisionService.updateCarBoundingBox(car)
                     console.log(
                         "collision check:",
-                        collisionService.checkCollision()
+                        collisionService.checkCollision(scene)
                     )
                 }, 2000)
             })
             return {
                 renderer,
                 camera,
+                scene,
                 car,
                 box,
                 movement,
@@ -64,7 +66,7 @@
             :look-at="{ x: 0, y: 0, z: -1 }"
         >
         </Camera>
-        <Scene background="#4DBA87">
+        <Scene ref="scene" background="#4DBA87">
             <PointLight :position="{ y: 50, z: 50 }" />
             <Box ref="car" :position="{ x: 0, y: 0, z: -5 }">
                 <LambertMaterial />

@@ -17,15 +17,12 @@ export class CollisionService {
         this.carBB.setFromObject(this.car.value.mesh)
     }
 
-    checkCollision(): boolean {
+    checkCollision(scene: any): boolean {
+        console.log("Scene:", scene.value.scene.children)
         let boxBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
         boxBB.setFromObject(this.objects.value.mesh)
 
         let shopBB = new THREE.Box3().setFromObject(this.shop.value.o3d)
-        console.log(this.shop.value)
-
-        // let size = shopBB.getSize(new THREE.Vector3()).length();
-        // let center = shopBB.getCenter(new THREE.Vector3());
 
         if (this.carBB.intersectsBox(boxBB)) {
             return true
