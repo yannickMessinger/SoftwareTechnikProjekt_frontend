@@ -33,12 +33,6 @@
             const movement = new MovmentInputController(car, camera)
             onMounted(() => {
                 renderer.value.onBeforeRender(() => {
-                    // collisionService.updateCarBoundingBox(car);
-                    // if (!collisionService.checkCollision()) {
-                    //     console.log("False");
-                    // } else {
-                    //     console.log(car.value.mesh.position)
-                    // }
                     movement.update()
                 })
                 setInterval(() => {
@@ -47,7 +41,7 @@
                         "collision check:",
                         collisionService.checkCollision()
                     )
-                }, 5000)
+                }, 2000)
             })
             return {
                 renderer,
