@@ -1,4 +1,5 @@
 import { reactive, ref } from "vue"
+import { NpcCar } from "../../components/3D/NpcCar"
 import { IMapObject } from "../streetplaner/IMapObject"
 import useUser from "../UserStore"
 
@@ -6,6 +7,11 @@ const { activeLobby } = useUser()
 
 const mapWidth = ref()
 const mapHeight = ref()
+
+/*hardcoded values from GameView need modifying*/
+let gridSizeX = 100
+let gridSizeY = 100
+const fieldSize = 10
 
 /**
  * Gamestate obj with two lists containing necessary MapObjects
@@ -16,6 +22,7 @@ const mapHeight = ref()
 interface IGameState {
     gameMapObjects: IMapObject[]
     mapObjsFromBackEnd: IMapObject[]
+    npcCarMapFromuseGameview: Map<number, NpcCar>
     sizeX: number
     sizeY: number
     fieldSize: number
@@ -30,6 +37,7 @@ interface IGameState {
 const gameState = reactive<IGameState>({
     gameMapObjects: Array<IMapObject>(),
     mapObjsFromBackEnd: Array<IMapObject>(),
+    npcCarMapFromuseGameview: new Map<number, NpcCar>(),
     sizeX: -1,
     sizeY: -1,
     fieldSize: -1,
@@ -146,8 +154,60 @@ export function fillGameState(): void {
             counter += 1
         }
     }
-
+    gameState.npcCarMapFromuseGameview.clear()
+    let npcMapIndex = 0
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
+        if (mapObj.game_assets.length > 0) {
+            let tempCenterX = calcCoordinateX(mapObj.y)
+            let tempCenterY = calcCoordinateZ(mapObj.x)
+
+            mapObj.game_assets.forEach((gameAsset) => {
+                gameState.npcCarMapFromuseGameview.set(
+                    npcMapIndex,
+                    new NpcCar(
+                        calcAssetCoordinateX(tempCenterX, gameAsset.x),
+                        0,
+                        calcAssetCoordinateZ(tempCenterY, gameAsset.y),
+                        gameAsset.rotation,
+                        gridSizeX,
+                        gridSizeY,
+                        fieldSize,
+                        mapObj.x,
+                        mapObj.y
+                    )
+                )
+                npcMapIndex++
+            })
+        }
         gameState.gameMapObjects[mapObj.x * 10 + mapObj.y] = mapObj
     })
+
+    console.log(gameState.npcCarMapFromuseGameview)
+}
+
+//logic from game view, nneds to be encapsulated in npc obj
+function calcCoordinateX(n: number) {
+    let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
+    //console.log(`GameObj x: ${x}`)
+    return x
+}
+
+function calcCoordinateZ(n: number) {
+    let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
+    //console.log(`GameObj z: ${z}`)
+    return z
+}
+
+function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
+    let originX = xCoordCenter - fieldSize / 2
+    let x = originX + xCoordAsset * fieldSize
+
+    return x
+}
+
+function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
+    let originZ = zCoordCenter - fieldSize / 2
+    let z = originZ + yCoordAsset * fieldSize
+
+    return z
 }

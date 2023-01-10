@@ -14,6 +14,7 @@
     import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
     import { FirstPersonCamera } from "../../models/FirstPersonCamera"
     import { useGameView } from "../../services/3DGameView/useGameView"
+    import { NpcCar } from "./NpcCar"
 
     export default defineComponent({
         components: {
@@ -25,6 +26,7 @@
             AmbientLight,
             Plane,
             PhongMaterial,
+            LambertMaterial,
         },
 
         setup() {
@@ -48,10 +50,10 @@
             //counter variables for loops to prefill map with dummy data
             let mapWidth = 10
             let mapHeight = 10
+            const fieldSize = 10
 
             setMapWidthAndMapHeight(mapWidth, mapHeight)
 
-            const fieldSize = 10
             /*Map of 3d-model paths*/
             const buildingIDMap = new Map()
             buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
@@ -93,9 +95,11 @@
             assetRotationMap.set(3, (3 * Math.PI) / 2)
 
             resetGameMapObjects()
+            gameState.npcCarMapFromuseGameview.clear()
 
             /*Array of Buildings and Streets passed from 2D Planner*/
             const mapElements = computed(() => gameState.gameMapObjects)
+            const npcEles = computed(() => gameState.npcCarMapFromuseGameview)
 
             /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
@@ -148,10 +152,14 @@
 
                 renderer.value.onBeforeRender(() => {
                     fpsCamera.update()
+
+                    npcEles.value.get(0)!.positions.npcPosX += 0.001
+                    npcEles.value.get(0)!.checkMapEleLimit()
                 })
             })
 
             return {
+                npcEles,
                 renderer,
                 camera,
                 box,
@@ -187,12 +195,6 @@
                 <PhongMaterial color="#999999" :props="{ depthWrite: false }"
             /></Plane>
 
-            <!--  <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>-->
-
-            <!--<div v-for="ele in enviroment">
-        <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{x:calcCoordinateX(ele.y), y:0, z: calcCoordinateZ(ele.x)}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:rotationMap.get(ele.rotation), z:0}"/>
-       </div>-->
-
             <!-- All elements placed in the editor are read from the list and placed in the scene-->
             <div v-for="ele in mapElements">
                 <GltfModel
@@ -205,23 +207,24 @@
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
                 />
-                <!-- places all game assets of the current element-->
-                <div v-for="asset in ele.game_assets">
-                    <GltfModel
-                        v-bind:src="buildingIDMap.get(22)"
-                        :position="{
-                            x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
+            </div>
+
+            <div v-for="(asset, index) in npcEles">
+                <GltfModel
+                    v-bind:src="buildingIDMap.get(22)"
+                    :position="{
+                            x: npcEles.get(index)!.positions.npcPosX,
                             y: 0.75,
-                            z: calcAssetCoordinateZ(calcCoordinateZ(ele.x), asset.y),
+                            z: npcEles.get(index)!.positions.npcPosZ,
+                           
                         }"
-                        :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
-                        :rotation="{
+                    :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
+                    :rotation="{
                             x: 0,
-                            y: assetRotationMap.get(asset.rotation),
+                            y: assetRotationMap.get(npcEles.get(index)!.positions.npcRotation),
                             z: 0,
                         }"
-                    />
-                </div>
+                />
             </div>
         </Scene>
     </Renderer>
