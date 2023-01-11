@@ -2,87 +2,158 @@
     <div class="container">
         <div class="content">
             <div class="headline">
-                <h2>Login</h2>
+                <h2>{{ headline }}</h2>
             </div>
             <div class="content-form">
                 <label>Benutzer</label>
-                <input v-model="username" type="text" placeholder="Username" required />
+                <input
+                    :class="usernameError != '' ? 'error-input' : ''"
+                    v-model="username"
+                    type="text"
+                    placeholder="Username"
+                    required
+                />
+                <label class="error">{{ usernameError }}</label>
                 <label>Passwort</label>
-                <input v-model="password" type="password" placeholder="Passwort" required />
+                <input
+                    v-model="password"
+                    :class="passwordError != '' ? 'error-input' : ''"
+                    type="password"
+                    placeholder="Passwort"
+                    required
+                />
+                <label class="error">{{ passwordError }}</label>
                 <label v-if="registrationMode">Passwort erneut eingeben</label>
-                <input v-if="registrationMode" v-model="passwordRepeat" type="password" placeholder="Passwort" required />
-                <hr>
-                <BasicButton class="sec btn blue" :display="registrationMode ? 'Registrieren' : 'Login'" :btn_click="login"/>
-                <BasicButton class="ter btn grey" :display="registrationMode ? 'Zurück zum Login' : 'Registrieren'" :btn_click="registration"/>
+                <input
+                    v-if="registrationMode"
+                    :class="passwordError != '' ? 'error-input' : ''"
+                    v-model="passwordRepeat"
+                    type="password"
+                    placeholder="Passwort"
+                    required
+                />
+                <label v-if="registrationMode" class="error">{{
+                    passwordError
+                }}</label>
+                <hr />
+                <BasicButton
+                    v-if="!registrationMode"
+                    class="sec btn blue"
+                    :display="registrationMode ? 'Registrieren' : 'Login'"
+                    :btn_click="loginCheck"
+                />
+                <BasicButton
+                    v-if="!registrationMode"
+                    class="ter btn grey"
+                    :display="
+                        registrationMode ? 'Zurück zum Login' : 'Registrieren'
+                    "
+                    :btn_click="toggleMode"
+                />
+                <BasicButton
+                    v-if="registrationMode"
+                    class="sec btn blue"
+                    :display="'Registrieren'"
+                    :btn_click="registrationCheck"
+                />
+                <BasicButton
+                    v-if="registrationMode"
+                    class="ter btn grey"
+                    :display="'Zurück zum Login'"
+                    :btn_click="toggleMode"
+                />
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { ref } from "vue";
-    import useUser from "../../services/UserStore";
+    import { ref } from "vue"
+    import useUser from "../../services/UserStore"
     import router from "../../router/router"
-    import BasicButton from '../Buttons/BasicButton.vue';
-    import { LoginService } from "../../services/Login/LoginService";	
+    import BasicButton from "../Buttons/BasicButton.vue"
+    const { login, register, logindata } = useUser()
 
-    const { name, setName, setId } = useUser();
+    const username = ref("")
+    const password = ref("")
+    const passwordRepeat = ref("")
+    const registrationMode = ref(false)
+    const headline = ref("Login")
+    const usernameError = ref("")
+    const passwordError = ref("")
 
-    let username = ref("")
-    let password = ref("")
-    let passwordRepeat = ref("")
-    let registrationMode = ref(false)
-    let loginService = new LoginService();
-    
-    async function login() {
-        let responseBody
-        if (registrationMode.value) {
-            responseBody = await loginService.register(username.value, password.value)
-            
-            if (responseBody != null) {
-                console.log(responseBody)
-            }else {
-                console.log("Status 400")
-            }
-        }else{
-            responseBody = await loginService.login(username.value, password.value)
-            if (responseBody != null) {
-                setName(responseBody.userName)
-                setId(responseBody.userId)
-            }else {
-                console.log("Status 400")
-            }
+    async function loginCheck() {
+        let responseBody = await login(username.value, password.value)
+
+        if (
+            responseBody?.hasOwnProperty("userId") &&
+            responseBody?.hasOwnProperty("userName")
+        ) {
+            router.push("/")
+        } else {
+            usernameError.value =
+                "Username und Passwort Kombination gibt es nicht"
+            console.log("Status 400")
+            console.log(logindata.errormessage)
         }
-        router.push('/');
     }
 
-    function registration() {
+    async function registrationCheck() {
+        usernameError.value = ""
+        passwordError.value = ""
+        if (password.value == passwordRepeat.value) {
+            let responseBody = await register(username.value, password.value)
+            passwordError.value = ""
+            switch (responseBody) {
+                case -1:
+                    usernameError.value = "Ungültige Eingabe"
+                    passwordError.value = "Ungültige Eingabe"
+                    break
+                case -2:
+                    usernameError.value = "Username bereits vergeben"
+                    break
+                case null:
+                    break
+                default:
+                    toggleMode()
+            }
+        } else {
+            passwordError.value = "Passwort stimmt nicht überein"
+        }
+    }
+
+    function toggleMode() {
         registrationMode.value = !registrationMode.value
-    }
+        registrationMode.value == true
+            ? (headline.value = "Registrieren")
+            : (headline.value = "Login")
+        username.value = ""
+        password.value = ""
+        passwordRepeat.value = ""
 
+        usernameError.value = ""
+    }
 </script>
 
 <style scoped>
-    *{
+    * {
         box-sizing: border-box;
-        
     }
 
-    h2{
+    h2 {
         margin-top: 0.83em;
         margin-bottom: 0.83em;
     }
 
-    .container{
+    .container {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         width: 100%;
-        
     }
 
-    .content{
+    .content {
         margin-top: 50px;
         padding: 24px;
         width: 500px;
@@ -90,22 +161,22 @@
         border-radius: 8px;
     }
 
-    .headline{
+    .headline {
         display: flex;
         justify-content: center;
         align-items: center;
         margin-bottom: 32px;
         position: relative;
-    } 
+    }
 
-    .content-form{
+    .content-form {
         display: flex;
         flex-direction: column;
         align-content: space-between;
         gap: 10px;
     }
 
-    input{
+    input {
         width: auto;
         height: 40px;
         padding: 8px 12px;
@@ -117,5 +188,9 @@
         height: 1px;
         width: 100%;
         margin: 20px 0;
+    }
+
+    .error {
+        color: red;
     }
 </style>

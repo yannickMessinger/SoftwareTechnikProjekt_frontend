@@ -7,4 +7,4 @@ enum ToolEnum {
     PEDESTRIAN = "pedestrian",
 }
 
-export default ToolEnum;
+export default ToolEnum

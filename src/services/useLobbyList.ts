@@ -21,18 +21,27 @@ const JOIN_MSG = "/app/lobby.join";
 const SWITCHMODE_MSG = "/app/lobby.switchMode";
 
 let stompClient: Client;
-const { user, userId, activeLobby, setActiveLobby } = useUser();
+const { logindata, userId, activeLobby, setActiveLobby } = useUser();
 
 interface IStompMessage {
-  playerContent: IUser;
-  lobbyContent: ILobby;
-  type: string;
+    playerContent: IUser;
+    lobbyContent: ILobby;
+    type: string;
 }
 
 const lobbyState = reactive<ILobbyListState>({
-  lobbylist: Array<ILobbyDTO>(),
-  errormsg: "",
-});
+    lobbylist: Array<ILobbyDTO>(),
+    errormsg: "",
+})
+
+const activeLobbyState = reactive<ILobbyDTO>({
+  lobbyId: -1,
+  hostId: -1,
+  mapId: -1,
+  lobbyName: "",
+  numOfPlayers: -1,
+  lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+})
 
 export function useLobbyList() {
   return {
@@ -40,91 +49,92 @@ export function useLobbyList() {
     updateLobbyList,
     receiveLobbyUpdates,
     joinMessage,
-    changeLobbyModeMessage
+    changeLobbyModeMessage,
+    updateLobby,
+    activeLobbyState: activeLobbyState,
   };
 }
 
 //functions to fetch and update List of available lobbys from backend
 export async function updateLobbyList(): Promise<void> {
-  const url = "/api/lobby";
+    const url = "/api/lobby"
 
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-    });
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+        })
 
-    if (!response.ok) {
-      lobbyState.errormsg = response.statusText;
-      lobbyState.lobbylist = [];
-      console.log("error in fetching lobbylist");
-      throw new Error(response.statusText);
+        if (!response.ok) {
+            lobbyState.errormsg = response.statusText
+            lobbyState.lobbylist = []
+            console.log("error in fetching lobbylist")
+            throw new Error(response.statusText)
+        }
+
+        const jsondata: ILobbyDTO[] = await response.json()
+        console.log("JSONDATA")
+        console.log(jsondata)
+
+        lobbyState.lobbylist = jsondata
+        lobbyState.errormsg = ""
+    } catch (error) {
+        console.log(" error in updateLobbyList")
     }
-
-    const jsondata: ILobbyDTO[] = await response.json();
-    console.log("JSONDATA");
-    console.log(jsondata);
-
-    lobbyState.lobbylist = jsondata;
-    lobbyState.errormsg = "";
-  } catch (error) {
-    console.log(" error in updateLobbyList");
-  }
 }
 
-// export async function updateLobby(id: number) {
-//   const url = "/api/lobby";
+export async function updateLobby(id: number) {
+    const url = "/api/lobby"
 
-//   try {
-//     const response = await fetch(`${url}/${id}`, { method: "GET" });
-//     if (!response.ok) {
-//       console.log("can't get active lobby");
-//     }
-//     const jsondata: ILobbyDTO = await response.json();
-//     activeLobbyState.hostID = jsondata.hostID;
-//     activeLobbyState.lobbyID = jsondata.lobbyID;
-//     activeLobbyState.lobbyModeEnum = jsondata.lobbyModeEnum;
-//     activeLobbyState.lobbyName = jsondata.lobbyName;
-//     activeLobbyState.mapID = jsondata.mapID;
-//     activeLobbyState.numOfPlayers = jsondata.numOfPlayers;
-//     activeLobbyState.playerList = jsondata.playerList;
-//     setActiveLobby(activeLobbyState);
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
+    try {
+        const response = await fetch(`${url}/${id}`, { method: "GET" })
+        if (!response.ok) {
+            console.log("can't get active lobby")
+        }
+        const jsondata: ILobbyDTO = await response.json()
+        activeLobbyState.hostId = jsondata.hostId
+        activeLobbyState.lobbyId = jsondata.lobbyId
+        activeLobbyState.lobbyModeEnum = jsondata.lobbyModeEnum
+        activeLobbyState.lobbyName = jsondata.lobbyName
+        activeLobbyState.mapId = jsondata.mapId
+        activeLobbyState.numOfPlayers = jsondata.numOfPlayers
+        activeLobbyState.playerList = jsondata.playerList
+        setActiveLobby(activeLobbyState)
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 //adds new lobby and sends it to backend, then update of lobbylist
 export async function createNewLobby(
-  addLobbyName: string,
-  addNumOfPlayers: number,
-  addLobbyMode: E_LobbyMode
+    addLobbyName: string,
+    addNumOfPlayers: number,
+    addLobbyMode: E_LobbyMode
 ) {
-  console.log(`User ID from useLobbyList  ${userId.value}`);
-  const url = "/api/lobby";
+    console.log(`User ID from useLobbyList  ${userId.value}`)
+    const url = "/api/lobby"
 
-  const addLobby: IAddLobbyRequestDTO = {
-    lobbyName: addLobbyName,
-    numOfPlayers: addNumOfPlayers,
-    lobbyModeEnum: addLobbyMode,
-    hostId: userId.value,
-  };
+    const addLobby: IAddLobbyRequestDTO = {
+        lobbyName: addLobbyName,
+        numOfPlayers: addNumOfPlayers,
+        lobbyModeEnum: addLobbyMode,
+        hostId: userId.value,
+    }
 
-  console.log(addLobby);
+    console.log(addLobby)
 
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(addLobby),
-    });
-    let id = await res.json();
-    console.log(id);
-    //setActiveLobby(id);
+    try {
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(addLobby),
+        })
+        let id = await res.json()
+        await updateLobby(id)
 
-    await updateLobbyList();
-  } catch (error) {
-    console.log(error);
-  }
+        await updateLobbyList()
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 function joinMessage() {
@@ -135,23 +145,23 @@ function joinMessage() {
   ) {
     const lobbyMessage: IStompMessage = {
       playerContent: {
-        userId: user.userId,
-        userName: user.userName,
+        userId: logindata.userId,
+        userName: logindata.userName,
         activeLobby: {
-          lobbyId: user.activeLobby.lobbyId,
-          mapId: user.activeLobby.mapId,
-          lobbyName: user.activeLobby.lobbyName,
-          numOfPlayers: user.activeLobby.numOfPlayers,
-          lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+          lobbyId: logindata.activeLobby.lobbyId,
+          mapId: logindata.activeLobby.mapId,
+          lobbyName: logindata.activeLobby.lobbyName,
+          numOfPlayers: logindata.activeLobby.numOfPlayers,
+          lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
         },
       },
       lobbyContent: {
-        lobbyId: user.activeLobby.lobbyId,
-        hostId: user.activeLobby.hostId,
-        mapId: user.activeLobby.mapId,
-        lobbyName: user.activeLobby.lobbyName,
-        numOfPlayers: user.activeLobby.numOfPlayers,
-        lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+        lobbyId: logindata.activeLobby.lobbyId,
+        hostId: logindata.activeLobby.hostId,
+        mapId: logindata.activeLobby.mapId,
+        lobbyName: logindata.activeLobby.lobbyName,
+        numOfPlayers: logindata.activeLobby.numOfPlayers,
+        lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
       },
       type: "JOIN",
     };
@@ -173,23 +183,23 @@ function changeLobbyModeMessage() {
   }
   const switchModeMessage: IStompMessage = {
     playerContent: {
-      userId: user.userId,
-      userName: user.userName,
+      userId: logindata.userId,
+      userName: logindata.userName,
       activeLobby: {
-        lobbyId: user.activeLobby.lobbyId,
-        mapId: user.activeLobby.mapId,
-        lobbyName: user.activeLobby.lobbyName,
-        numOfPlayers: user.activeLobby.numOfPlayers,
-        lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+        lobbyId: logindata.activeLobby.lobbyId,
+        mapId: logindata.activeLobby.mapId,
+        lobbyName: logindata.activeLobby.lobbyName,
+        numOfPlayers: logindata.activeLobby.numOfPlayers,
+        lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
       },
     },
     lobbyContent: {
-      lobbyId: user.activeLobby.lobbyId,
-      hostId: user.activeLobby.hostId,
-      mapId: user.activeLobby.mapId,
-      lobbyName: user.activeLobby.lobbyName,
-      numOfPlayers: user.activeLobby.numOfPlayers,
-      lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+      lobbyId: logindata.activeLobby.lobbyId,
+      hostId: logindata.activeLobby.hostId,
+      mapId: logindata.activeLobby.mapId,
+      lobbyName: logindata.activeLobby.lobbyName,
+      numOfPlayers: logindata.activeLobby.numOfPlayers,
+      lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
     },
     type: "SWITCH_MODE",
   };

@@ -1,110 +1,176 @@
-import { computed, reactive, readonly } from "vue";
-import User from '../typings/IUser';
-import { E_LobbyMode } from "../typings/E_LobbyMode";
-import { ILobby } from "../typings/ILobby";
-import { ILobbyDTO } from "../typings/ILobbyDTO";
+import { computed, reactive, readonly } from "vue"
+import IUser from "../typings/IUser"
+import { E_LobbyMode } from "../typings/E_LobbyMode"
+import { ILobby } from "../typings/ILobby"
+import { ILoginStateDTO } from "../typings/ILoginStateDTO"
+import router from "../router/router"
 
+let reloginTried = false
 
-const state = reactive<User>({
-  userId:  undefined,
-  userName: "",
-  activeLobby: {
-    lobbyId: -1,
-    hostId:-1,
-    mapId: -1,
-    lobbyName: "",
-    numOfPlayers: 0,
-    lobbyModeEnum: E_LobbyMode.BUILD_MODE,
-    playerList: []
-  }
-});
+const state = reactive<IUser>({
+    userId: undefined,
+    userName: "",
+    errormessage: "",
+    loggedIn: false,
+    activeLobby: {
+        lobbyId: -1,
+        mapId: -1,
+        lobbyName: "",
+        numOfPlayers: 0,
+        lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+    },
+})
 
-function setId(id:number): void {
-  state.userId = id;
+async function retrieveUserFromLocalStorage() {
+    const userString = localStorage.getItem("user-e-mobility")
+    if (userString) {
+        const data = JSON.parse(userString)
+        const loginResponse = await login(data.username, data.password)
+        if (
+            loginResponse?.hasOwnProperty("userId") &&
+            loginResponse?.hasOwnProperty("userName")
+        ) {
+            router.push("/")
+        }
+    }
+}
+
+function setId(id: number): void {
+    state.userId = id
 }
 
 function setName(name: string): void {
-  state.userName = name;
+    state.userName = name
 }
 
-async function sendName():Promise<void> {
-  const response = await fetch('/api/player', {
-    method: 'POST',
-    headers: {
-      'Content-Type':'application/json',
-    },
-    body: JSON.stringify({
-      userName: state.userName
+async function sendName(): Promise<void> {
+    const response = await fetch("/api/player", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            userName: state.userName,
+        }),
     })
-  });
 
-  console.log("sendName():", response);
-  const jsondata = await response.json();
-  setId(Number(jsondata));
-  console.log("state.userId", state.userId);
+    console.log("sendName():", response)
+    const jsondata = await response.json()
+    setId(Number(jsondata))
+    console.log("state.userId", state.userId)
 }
 
+async function register(username: string, password: string): Promise<any> {
+    return fetch("/api/player", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({
+            userName: username,
+            password: password,
+        }),
+    })
+        .then((response) => {
+            if (response.status === 200 || response.status === 400) {
+                return response.json()
+            } else {
+                throw new Error(response.statusText)
+            }
+        })
+        .then((data) => {
+            return data
+        })
+        .catch((err) => console.log(err))
+}
 
+async function login(
+    username: string,
+    password: string
+): Promise<{ userId: number; userName: string } | null> {
+    return fetch("/api/player/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({
+            userName: username,
+            password: password,
+        }),
+    })
+        .then((response) => {
+            if (response.status === 200) {
+                localStorage.setItem(
+                    "user-e-mobility",
+                    JSON.stringify({ username, password })
+                )
+                return response.json()
+            }
+            if (response.status === 400) {
+                return response.json()
+            } else {
+                throw new Error(response.statusText)
+            }
+        })
+        .then((data) => {
+            const loginDataResponse: ILoginStateDTO = data
+            setName(loginDataResponse.userName)
+            setId(loginDataResponse.userId)
+            state.errormessage = ""
+            state.loggedIn = true
+            return data
+        })
+        .catch((err) => console.log(err))
+}
 
-
-async function setActiveLobby(lobby: ILobby):Promise<void> {
-  //state.activeLobby = lobby;
-  
- 
-  const url = "/api/lobby";
-  console.log(`setActiveLobby Name:${lobby.lobbyName}, hostID: ${lobby.hostId}`)
-  await addPlayerToLobby(lobby);
-
-  //ggf. unnötig?
- try {
-    const response = await fetch(`${url}/${lobby.lobbyId}`, { method: "GET" });
-    if (!response.ok) {
-     console.log("error setActiveLobby");
+function logout() {
+    localStorage.removeItem("user-e-mobility")
+    state.loggedIn = false
+    state.errormessage = ""
+    state.activeLobby = {
+        lobbyId: -1,
+        mapId: -1,
+        lobbyName: "",
+        numOfPlayers: 0,
+        lobbyModeEnum: E_LobbyMode.BUILD_MODE,
     }
-    const jsondata: ILobbyDTO = await response.json();
-    state.activeLobby.lobbyId = jsondata.lobbyId;
-    state.activeLobby.hostId = jsondata.hostId;
-    state.activeLobby.lobbyModeEnum = jsondata.lobbyModeEnum;
-    state.activeLobby.lobbyName = jsondata.lobbyName;
-    state.activeLobby.mapId = jsondata.mapId;
-    state.activeLobby.numOfPlayers = jsondata.numOfPlayers;
-    state.activeLobby.playerList = jsondata.playerList;
-    
-    console.log(`NACH FETCH: setActiveLobby Name:${state.activeLobby.lobbyName}, hostID: ${state.activeLobby.hostId}`)
-  } catch (error) {
-     console.log(error);
-  }
-   
+    setId(-1)
+    setName("")
 }
 
-async function addPlayerToLobby(lobby:ILobby) {
-  const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
-    method: 'POST',
-  });
-  console.log("added Player to Lobby", response);
+async function setActiveLobby(lobby: ILobby): Promise<void> {
+    state.activeLobby = lobby
+    await postActiveLobby(lobby)
 }
 
-function updateActiveLobbyPlayerList(players: User[]) {
-  for (let p of players) {
-    state.activeLobby.playerList?.push(p);
-  }
-  console.log(state.activeLobby.playerList);
+async function postActiveLobby(lobby: ILobby) {
+    const response = await fetch(
+        `/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`,
+        {
+            method: "POST",
+        }
+    )
+    console.log("setActiveLobby() -> post player to lobby - response", response)
 }
-
 
 export default function useUser() {
-  return {
-    name: computed(() => state.userName),
-    userId: computed(() => state.userId ),
-    hostId: computed(() => state.activeLobby.hostId),
-    activeLobby: computed(() => state.activeLobby),
-    user: readonly<User>(state),
-    setName,
-    setId,
-    sendName,
-    setActiveLobby,
-    updateActiveLobbyPlayerList
-    
-  };
+    if (!state.loggedIn && !reloginTried) {
+        reloginTried = true
+        retrieveUserFromLocalStorage()
+    }
+    return {
+        logindata: readonly(state),
+        name: computed(() => state.userName),
+        userId: computed(() => state.userId),
+        activeLobby: computed(() => state.activeLobby),
+        setName,
+        setId,
+        sendName,
+        setActiveLobby,
+        login,
+        register,
+        logout,
+    }
 }
-

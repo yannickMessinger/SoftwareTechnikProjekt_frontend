@@ -1,4 +1,4 @@
-export interface IAddPlayerRequestDTO{
-    userId: number
-    userName:string
+export interface IAddPlayerRequestDTO {
+    userName: string
+    password: string
 }
