@@ -32,6 +32,7 @@
             const scene = ref()
             const collisionService = new CollisionService(car, box, markt)
             const movement = new MovmentInputController(car, camera)
+            
             onMounted(() => {
                 renderer.value.onBeforeRender(() => {
                     movement.update()
@@ -43,7 +44,8 @@
                         collisionService.checkCollision(scene)
                     )
                 }, 2000)
-            })
+            });
+
             return {
                 renderer,
                 camera,

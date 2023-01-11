@@ -6,6 +6,7 @@ export class CollisionService {
     public shop: any
     public carBB: any
 
+    //BB is Bounding Box
     constructor(car: any, objects: any, shop: any) {
         this.car = car
         this.objects = objects
@@ -18,7 +19,7 @@ export class CollisionService {
     }
 
     checkCollision(scene: any): boolean {
-        console.log("Scene:", scene.value.scene.children)
+        console.log(scene.value.scene)
         let boxBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
         boxBB.setFromObject(this.objects.value.mesh)
 
