@@ -4,12 +4,10 @@
     import type { IGridElement } from "../../services/streetplaner/IGridElement"
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
+    import { useGridSize } from "../../services/useGridSize"
+
     import { useBlockList, updateBlockList } from "../../services/streetplaner/useBlockList"
-    import {
-        useStreetGridList,
-        updateStreetGridList,
-        postStreetGrid,
-    } from "../../services/streetplaner/useStreetGridList"
+    import { useStreetGridList, updateStreetGridList, postStreetGrid } from "../../services/streetplaner/useStreetGridList"
     import { IBlockElement } from "../../services/streetplaner/IBlockElement"
     import { IMapObject } from "../../services/streetplaner/IMapObject"
     import { StreetGridDTO } from "../../services/streetplaner/StreetGridDTO"
@@ -27,6 +25,7 @@
         block: { objectTypeId: -1, groupId: -1, rotation: 0, texture: "" },
     })
     const lobbyState = useUser().activeLobby
+    const { gridSize } = useGridSize()
 
     const {
         editorState,
@@ -75,10 +74,10 @@
     fillGridEmpty()
 
     // initialize gridSize
-    const gridSize = ref(40)
+    //const gridSize = ref(40)
     // initialize gridSizePx used in css
-    const gridSizePx = computed(() => gridSize.value.toString() + "px")
-    const assetSize = computed(() => gridSize.value / 4)
+    const gridSizePx = computed(() => gridSize.size.toString() + "px")
+    const assetSize = computed(() => gridSize.size / 4)
     const assetSizePx = computed(() => assetSize.value.toString() + "px")
     // declare blockList
     var blockList: Array<IBlockElement>
@@ -95,7 +94,7 @@
         // get blockList from backend
         // get streetgrid from backend via mapID
 
-        setGameStateSizes(gridSizeY, gridSizeX, gridSize.value)
+        setGameStateSizes(gridSizeY, gridSizeX, gridSize.size)
 
         updateBlockList()
         receiveEditorUpdates()
@@ -115,8 +114,8 @@
                 // only place asset if it's placed on a road
                 if (currCellContent.groupId === 0) {
                     let rect = e.target.getBoundingClientRect()
-                    let x = (e.clientX - rect.left) / gridSize.value
-                    let y = (e.clientY - rect.top) / gridSize.value
+                    let x = (e.clientX - rect.left) / gridSize.size
+                    let y = (e.clientY - rect.top) / gridSize.size
                     console.log(`x:${x} y:${y}`)
                     streetGrid[cell.posX][cell.posY].game_assets.push({
                         objectTypeId: toolState.block.objectTypeId,
@@ -243,7 +242,7 @@
     // load StreetGrid from backend dto
     function loadStreetGrid(dto: StreetGridDTO) {
         fillGridEmpty()
-        //console.log(dto.mapObjects)
+        console.log(dto.mapObjects)
         for (let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = {
                 objectTypeId: ele.objectTypeId,
@@ -283,7 +282,7 @@
             // elemRect.left - bodyRect.left calculates the top left corner of the grid cell
             // + gridSize.value * relativeX calculates where in the grid the asset is placed
             // - assetSize.value / 3 moves the asset so the mid point is in the middle, usually one should use 2 here, but somehow 3 works
-            posX = elemRect.left - bodyRect.left + gridSize.value * relativeX - assetSize.value / 3
+            posX = elemRect.left - bodyRect.left + gridSize.size * relativeX - assetSize.value / 3
         }
         console.log(assetSizePx.value)
         console.log(`x: ${posX}`)
@@ -299,7 +298,7 @@
             // elemRect.left - bodyRect.left calculates the top left corner of the grid cell
             // + gridSize.value * relativeY calculates where in the grid the asset is placed
             // - assetSize.value / 3 moves the asset so the mid point is in the middle, usually one should use 2 here, but somehow 3 works
-            posY = elemRect.top - bodyRect.top + gridSize.value * relativeY - assetSize.value / 3
+            posY = elemRect.top - bodyRect.top + gridSize.size * relativeY - assetSize.value / 3
         }
         console.log(`y: ${posY}`)
         return posY
@@ -319,17 +318,17 @@
     <div v-for="row in streetGrid" class="row no-drag">
         <div
             v-for="ele in row"
+            :id="`cell_${ele.posX}_${ele.posY}`"
             class="grid-item grid-size col no-drag"
             @click="onClick(ele, $event)"
             @mousemove="onMouseMove(ele, $event)"
-            :id="`cell_${ele.posX}_${ele.posY}`"
         >
             <img
                 v-if="ele.texture != ''"
                 :src="ele.texture"
                 class="no-drag grid-img"
                 draggable="false"
-                :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)' }"
+                :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }"
             />
             <div v-for="asset in ele.game_assets">
                 <img
@@ -365,6 +364,7 @@
     }
     .grid-item {
         border: solid 1px black;
+        z-index: 0;
     }
     .grid-img {
         width: 100%;

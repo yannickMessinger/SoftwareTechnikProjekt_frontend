@@ -51,22 +51,24 @@
 
 <script setup lang="ts">
     import { ref } from "vue"
+    import useUser from "../../services/UserStore"
     import BasicButton from "../Buttons/BasicButton.vue"
+   
 
-    interface Message {
+    interface IMessage {
         name: string
         text: string
     }
-    const chatHistory = ref<Message[]>([])
+    const chatHistory = ref<IMessage[]>([])
     const chatLength = 20
+    const username = useUser().name.value
     let input = ref("")
-    let chat = ref()
     let visible = ref(false)
 
     function appendMessage() {
         let a = document.getElementById("msg-chat")
         if (input.value && a) {
-            chatHistory.value.push({ name: "user001: ", text: input.value }) // TODO: Username hier setzen
+            chatHistory.value.push({ name: username + ": ", text: input.value })
             chatHistory.value.length > chatLength
                 ? chatHistory.value.shift()
                 : undefined

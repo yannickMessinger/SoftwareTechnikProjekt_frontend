@@ -80,7 +80,11 @@
         v-for="element in blockList"
         :key="element.objectTypeId"
         id="editor-tool"
-        :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
+        :class="
+            element.name === selectedBlock.block.name
+                ? 'editor-tool-active'
+                : 'editor-tool-not-active'
+        "
         @click="onBlockClick(element)"
     >
         <button
@@ -113,9 +117,18 @@
   -->
 </template>
 
-<style>
-    * {
-        color: var(--woe-black);
+<style scoped>
+  *{
+    color: var(--woe-black);
+    font-size: 1em;
+  }
+
+  span{
+        margin: 0;
         font-size: 1em;
+        color: var(--woe-black);
+        font-weight: bold;
+        margin-bottom: 8px;
+        
     }
 </style>

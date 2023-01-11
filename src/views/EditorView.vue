@@ -4,7 +4,7 @@
     <!-- Remove before merge with dev -->
     <DialogsWrapper />
     <div class="selected-block">
-        <SelectedBlockComponent />
+        <SelectedBlockComponent/>
     </div>
     <div class="container">
         <BasicButton
@@ -21,19 +21,21 @@
             <p id="header">
                 <BasicButton v-if="elementBarVisible" class="tools-back-btn" display=" " :btn_click="switchMode" />
             </p>
-            <span>{{ header }}</span>
             <ListToolsComponent v-if="!elementBarVisible" />
             <ListBlocksComponent v-if="elementBarVisible" />
-            <span v-if="elementBarVisible">Gebäude</span>
-            <BuildingBlocksComponent v-if="elementBarVisible" />
-            <span v-if="elementBarVisible">Fahrzeuge</span>
-            <ListAssetsComponent v-if="elementBarVisible" />
         </div>
     </div>
+    
     <div class="grid">
         <StreetGrid />
     </div>
-    <Chat />
+    <Chat/>
+    <div class="container-slider">
+        <div class="border-slider">
+            <Slider class="slider"/>
+        </div>
+    </div>
+    
 </template>
 
 <script setup lang="ts">
@@ -52,6 +54,8 @@
     import Chat from "../components/UI/Chat.vue"
     import BasicButton from "../components/Buttons/BasicButton.vue"
     import useUser from "../services/UserStore"
+    import { useGridSize } from '../services/useGridSize'
+    import Slider from '../components/Slider.vue'
 
     const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, {
         question: "Möchtest du die gesamte Karte zurücksetzen? Die Aktion ist unwiderruflich.",
@@ -59,7 +63,7 @@
     const { emit, bus } = useEventBus()
     const disableResetButton = ref(false)
     const disableStreetGrid = ref(false)
-
+    const { gridSize } = useGridSize();
     const headerText_tool = "Werkzeuge"
     const headerText_elements = "Elemente"
     const elementBarVisible = ref(false)
@@ -113,8 +117,6 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100%;
-        width: 100%;
         overflow: scroll;
     }
     .selected-block {
@@ -131,6 +133,7 @@
         overflow: hidden;
         position: fixed;
         background-color: var(--woe-white);
+        z-index: 2;
     }
 
     .reset-btn {
@@ -159,6 +162,7 @@
         overflow-y: scroll;
         background-color: var(--woe-white);
         position: fixed;
+        z-index: 2;
     }
 
     .tools-back-btn {
@@ -170,23 +174,36 @@
         background-position: center;
         background-image: url(../assets/Icons/back.svg);
     }
-    /* Style angefangen für den Slider
+    
     .container-slider{
         display: flex;
         flex-flow: row-reverse;
-        bottom: 0px;
-        background-color: gray;
+        bottom: 0;
+        position: fixed;
+        width: 100%;
+    }
+
+    .border-slider{
+        display: flex;
+        justify-content: center;
+        padding: 2em 1em 2em 1em;
+        border-top: 1px solid var(--woe-black);
+        border-left: 1px solid var(--woe-black);
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+        border-top-left-radius: var(--border-radius);
+        background-color: var(--woe-white);
+        width: 25%;
     }
     .slider{
-        width: 25%;
+        width: 75%;
         outline: none;
-        opacity: 0.7;
         transition: opacity .2s;
-        position: fixed;
     }
 
     .slider:hover {
         opacity: 1;
     }
-    */
+    
 </style>

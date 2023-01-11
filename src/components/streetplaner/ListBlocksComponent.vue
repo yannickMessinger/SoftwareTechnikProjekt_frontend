@@ -9,11 +9,15 @@
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
     import { useBlockList, IBlockListState } from "../../services/streetplaner/useBlockList"
+import { computed } from "@vue/reactivity"
 
     /**Variables: */
     const pathToPictures = "/img/streetplaner/"
     const { blockListState, updateBlockList } = useBlockList()
-    var blockList = reactive(Array<IBlockElement>()) /** List of all blocks placable in street editor*/
+    var allBlockList = reactive(Array<IBlockElement>()) /** List of all blocks placable in street editor*/
+    const blockList = computed(() => allBlockList.filter((ele) => ele.groupId === 0))
+    const buildingList = computed(() => allBlockList.filter((ele) => ele.groupId === 1))
+    const assetList = computed(() => allBlockList.filter((ele) => ele.groupId === 2))
 
     /*default block element*/
     var defaultBlock: IBlockElement = {
@@ -39,19 +43,19 @@
 
     function getBlockList(blockListState: IBlockListState) {
         for (let ele of blockListState.list) {
-            if (ele.groupId === 0) {
-                blockList.push({
-                    groupId: ele.groupId,
-                    objectTypeId: ele.objectTypeId,
-                    type: ele.type,
-                    name: ele.name,
-                    rotation: ele.rotation,
-                    texture: ele.texture,
-                    model3d: ele.model3d,
-                })
-            }
+            allBlockList.push({
+                groupId: ele.groupId,
+                objectTypeId: ele.objectTypeId,
+                type: ele.type,
+                name: ele.name,
+                rotation: ele.rotation,
+                texture: ele.texture,
+                model3d: ele.model3d,
+            })
         }
     }
+
+    
 
     /**function activated by clicking on an block */
     function onBlockClicked(clickedBlock: any) {
@@ -81,15 +85,20 @@
 </script>
 
 <template>
-    <div
-        v-for="element in blockList"
-        :key="element.objectTypeId"
-        id="editor-tool"
-        :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
-        @click="onBlockClicked(element)"
-    >
-        <button class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }" />
-        <p v-if="element != null">{{ element.name }}</p>
+    <span>Elemente</span>
+    <div v-for="element in blockList" :key="element.objectTypeId" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClicked(element)">
+        <button v-if="element.groupId === 0" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
+        <p v-if="element != null && element.groupId === 0">{{element.name}}</p>
+    </div>
+    <span>Gebäude</span>
+    <div v-for="element in buildingList" :key="element.objectTypeId" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClicked(element)">
+        <button v-if="element.groupId === 1" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
+        <p v-if="element != null && element.groupId === 1">{{element.name}}</p>
+    </div>
+    <span>Fahrzeuge</span>
+    <div v-for="element in assetList" :key="element.objectTypeId" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClicked(element)">
+        <button v-if="element.groupId === 2" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
+        <p v-if="element != null && element.groupId === 2">{{element.name}}</p>
     </div>
 </template>
 
@@ -97,5 +106,14 @@
     * {
         color: var(--woe-black);
         font-size: 1em;
+    }
+
+    span{
+        margin: 0;
+        font-size: 1em;
+        color: var(--woe-black);
+        font-weight: bold;
+        margin-bottom: 8px;
+        
     }
 </style>

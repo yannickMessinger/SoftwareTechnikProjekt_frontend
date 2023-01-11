@@ -1,4 +1,4 @@
-export interface IGetPlayerResponseDTO {
+export interface ILoginStateDTO {
     userId: number
     userName: string
 }
