@@ -51,8 +51,9 @@
 
 <script setup lang="ts">
     import { ref } from "vue"
-    import BasicButton from "../Buttons/BasicButton.vue"
     import useUser from "../../services/UserStore"
+    import BasicButton from "../Buttons/BasicButton.vue"
+   
 
     interface IMessage {
         name: string
@@ -60,9 +61,8 @@
     }
     const chatHistory = ref<IMessage[]>([])
     const chatLength = 20
-    const username = useUser().name
+    const username = useUser().name.value
     let input = ref("")
-    let chat = ref()
     let visible = ref(false)
 
     function appendMessage() {
