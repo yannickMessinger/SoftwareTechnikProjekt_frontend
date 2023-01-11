@@ -148,6 +148,6 @@ export function fillGameState(): void {
     }
 
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
-        gameState.gameMapObjects[mapObj.x * 10 + mapObj.y] = mapObj
+        gameState.gameMapObjects[mapObj.x * mapWidth.value + mapObj.y] = mapObj
     })
 }

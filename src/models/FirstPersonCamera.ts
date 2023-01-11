@@ -32,7 +32,7 @@ export class FirstPersonCamera {
     }
 
     update() {
-        const velocity = 0.002 // random velocity
+        const velocity = 0.01 // random velocity
         this.updateRotation(velocity)
         this.updateCamera()
         this.updateTranslation(velocity)

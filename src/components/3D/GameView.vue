@@ -40,18 +40,19 @@
             console.log(gameState.sizeX * gameState.fieldSize)
             console.log(gameState.sizeY * gameState.fieldSize)
 
-            /*Defines the Grid Size in length by the number ob fields*/
-            let gridSizeX = 100
-            /*Defines the Grid Size in height by the number ob fields*/
-            let gridSizeY = 100
 
             //counter variables for loops to prefill map with dummy data
-            let mapWidth = 10
-            let mapHeight = 10
+            let mapWidth = 30
+            let mapHeight = 20
 
             setMapWidthAndMapHeight(mapWidth, mapHeight)
 
             const fieldSize = 10
+
+            /*Defines the Grid Size in length by the number ob fields*/
+            let gridSizeX = fieldSize * 30
+            /*Defines the Grid Size in height by the number ob fields*/
+            let gridSizeY = fieldSize * 20
             /*Map of 3d-model paths*/
             const buildingIDMap = new Map()
             buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
