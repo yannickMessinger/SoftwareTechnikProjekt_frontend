@@ -42,7 +42,8 @@ export function useEditor(mapId: number) {
         updateMessage,
         updateMap,
         receiveEditorUpdates,
-        updateMapId
+        updateMapId,
+        postPedestrians
     }
 }
 
@@ -158,4 +159,26 @@ function onMessageReceived(payload: IStompMessage) {
         }
     }
     console.log(editorState.mapObjects);
+}
+
+/**
+ * post amount of pedestrians to backend to generate
+ * @param mapId
+ * @param amount
+ */
+async function postPedestrians(mapId: number, amount: number) {
+    const PEDESTRIANS_URL = '/api/mapobject/pedestrian/';
+    let bodyContent = JSON.stringify({pedestrianAmount: amount});
+    try {
+        const response = await fetch(`${PEDESTRIANS_URL}/${mapId}`, {
+            method: 'POST',
+            body: bodyContent,
+            headers: {'Content-Type':'application/json;'}
+        });
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+    } catch (error) {
+        console.log(error);
+    }
 }

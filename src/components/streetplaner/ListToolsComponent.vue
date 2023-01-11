@@ -20,6 +20,7 @@
     /** currently selected tool */
     const selectedTool = reactive({tool: defaultTool});
     const {emit}=useEventBus();
+    const pedestriansAmount = ref(0);
     const popupTrigger = ref(false);
     
     /**entrys in toollist */ 
@@ -52,6 +53,11 @@
     function togglePopup() {
       popupTrigger.value = !popupTrigger.value;
     }
+
+    function sendPedestrian(e: { target: { value: number; }; }) {
+      pedestriansAmount.value = e.target.value
+    }
+
 </script>
 
 <template>
@@ -65,7 +71,7 @@
     </div>
     <Popup v-if="popupTrigger" :ClosePopup="() => togglePopup()">
       <p>Wie viele Fussgänger sollen zufällig in der Spielwelt positioniert werden?</p>
-      <input type="number" min="0"/>
+      <input type="number" min="0" :value="pedestriansAmount" @change="e => sendPedestrian(e)" />
     </Popup>
 </template>
 
