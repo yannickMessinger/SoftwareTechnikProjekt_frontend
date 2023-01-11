@@ -158,23 +158,10 @@ export function fillGameState(): void {
     let npcMapIndex = 0
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
         if (mapObj.game_assets.length > 0) {
-            let tempCenterX = calcCoordinateX(mapObj.y)
-            let tempCenterY = calcCoordinateZ(mapObj.x)
-
             mapObj.game_assets.forEach((gameAsset) => {
                 gameState.npcCarMapFromuseGameview.set(
                     npcMapIndex,
-                    new NpcCar(
-                        calcAssetCoordinateX(tempCenterX, gameAsset.x),
-                        0,
-                        calcAssetCoordinateZ(tempCenterY, gameAsset.y),
-                        gameAsset.rotation,
-                        gridSizeX,
-                        gridSizeY,
-                        fieldSize,
-                        mapObj.x,
-                        mapObj.y
-                    )
+                    new NpcCar(gameAsset.x, 0, gameAsset.y, gameAsset.rotation, gridSizeX, gridSizeY, fieldSize, mapObj)
                 )
                 npcMapIndex++
             })
@@ -183,31 +170,4 @@ export function fillGameState(): void {
     })
 
     console.log(gameState.npcCarMapFromuseGameview)
-}
-
-//logic from game view, nneds to be encapsulated in npc obj
-function calcCoordinateX(n: number) {
-    let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj x: ${x}`)
-    return x
-}
-
-function calcCoordinateZ(n: number) {
-    let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj z: ${z}`)
-    return z
-}
-
-function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-    let originX = xCoordCenter - fieldSize / 2
-    let x = originX + xCoordAsset * fieldSize
-
-    return x
-}
-
-function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-    let originZ = zCoordCenter - fieldSize / 2
-    let z = originZ + yCoordAsset * fieldSize
-
-    return z
 }

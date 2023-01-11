@@ -154,10 +154,8 @@
                     fpsCamera.update()
 
                     npcEles.value.forEach((ele, index) => {
-                        npcEles.value.get(index)!.positions.npcPosX += 0.001
+                        npcEles.value.get(index)!.update()
                     })
-                    //npcEles.value.get(0)!.positions.npcPosX += 0.001
-                    //npcEles.value.get(0)!.checkMapEleLimit()
                 })
             })
 

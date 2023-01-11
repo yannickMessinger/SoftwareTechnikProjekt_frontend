@@ -5,63 +5,86 @@ export class NpcCar {
     public npc: any
     public positions: any
     public curMapObjCenterCoords: any
-    public curMapObjCords: any
+    public curMapObj: IMapObject
     public gridSizeX: any
     public gridSizeY: any
     public fieldSize: any
     public mapLimit: any
-
-    //public currentMapObj: IMapObject
+    public gameAssetX: any
+    public gameAssetZ: any
 
     constructor(
-        posX: any,
+        gameAssetX: any,
         posY: any,
-        posZ: any,
+        gameAssetZ: any,
         npcRotation: any,
         gridSizeX: any,
         gridSizeY: any,
         fieldSize: any,
-        mapObjCoordX: any,
-        mapObjCoordY: any
+        curMapObj: IMapObject
     ) {
         this.npc = ref()
-        this.positions = reactive({ npcPosX: posX, npcPosY: posY, npcPosZ: posZ, npcRotation: npcRotation })
+        this.curMapObj = curMapObj
+        this.positions = reactive({ npcPosX: 0, npcPosY: posY, npcPosZ: 0, npcRotation: npcRotation })
         this.curMapObjCenterCoords = reactive({ centerX: 0, centerZ: 0 })
-        this.curMapObjCords = reactive({ mapObjCoordX: mapObjCoordX, mapObjCoordY: mapObjCoordY, mapObjRot: 0 })
+        this.curMapObj = reactive({
+            objectTypeId: curMapObj.objectTypeId,
+            x: curMapObj.x,
+            y: curMapObj.y,
+            rotation: curMapObj.rotation,
+            game_assets: curMapObj.game_assets,
+        })
         this.gridSizeX = gridSizeX
         this.gridSizeY = gridSizeY
         this.fieldSize = fieldSize
         this.mapLimit = 0
+        this.gameAssetX = gameAssetX
+        this.gameAssetZ = gameAssetZ
 
-        this.calcCenter(this.curMapObjCords.mapObjCoordX, this.curMapObjCords.mapObjCoordY)
+        this.calcMapEleCenter()
+        this.calcPixelPosNpc()
         this.calcNpcMapLimit(
             this.curMapObjCenterCoords.centerX,
             this.curMapObjCenterCoords.centerZ,
             this.positions.npcRotation
         )
-        //this.currentMapObj = {objectTypeId:0, x:0, y:0, rotation:0, game_assets:[]}
     }
 
-    /*Calculates X coordinates position of loaded Model */
-    calcCoordinateX(n: number) {
-        let x = this.gridSizeX * -0.5 + n * this.fieldSize + this.fieldSize / 2
-        //console.log(`GameObj x: ${x}`)
-        return x
+    update() {
+        const velocity = 0.005
+
+        if (this.positions.npcRotation === 0) {
+            this.positions.npcPosZ -= velocity
+        } else if (this.positions.npcRotation === 1) {
+            this.positions.npcPosX += velocity
+        } else if (this.positions.npcRotation === 2) {
+            this.positions.npcPosZ += velocity
+        } else if (this.positions.npcRotation === 3) {
+            this.positions.npcPosX -= velocity
+        }
     }
 
-    /*Calculates Z coordinates position of loaded Model */
-    calcCoordinateZ(n: number) {
-        let z = this.gridSizeY * -0.5 + n * this.fieldSize + this.fieldSize / 2
-        //console.log(`GameObj z: ${z}`)
-        return z
+    calcMapEleCenter() {
+        console.log(this.curMapObj)
+
+        let mapEleCenterX = this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
+        let mapEleCenterZ = this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
+
+        this.curMapObjCenterCoords.centerX = mapEleCenterX
+        this.curMapObjCenterCoords.centerZ = mapEleCenterZ
+
+        console.log(`center Npc: x:${mapEleCenterX}, z: ${mapEleCenterZ}`)
     }
 
-    calcCenter(mapObjX: number, mapObjY: number) {
-        let x = this.gridSizeX * -0.5 + mapObjX * this.fieldSize + this.fieldSize / 2
-        let z = this.gridSizeY * -0.5 + mapObjY * this.fieldSize + this.fieldSize / 2
+    calcPixelPosNpc() {
+        let originX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+        let x = originX + this.gameAssetX * this.fieldSize
 
-        this.curMapObjCenterCoords.centerX = x
-        this.curMapObjCenterCoords.centerZ = z
+        let originZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+        let z = originZ + this.gameAssetZ * this.fieldSize
+
+        this.positions.npcPosX = x
+        this.positions.npcPosZ = z
     }
 
     calcNpcMapLimit(centerX: number, centerZ: number, npcRot: number) {
@@ -77,16 +100,7 @@ export class NpcCar {
             limit = centerZ - this.fieldSize / 2
         }
 
-        console.log(
-            `MapEle x: ${this.curMapObjCords.mapObjCoordX} MapEle y: ${this.curMapObjCords.mapObjCoordY} center: x: ${this.curMapObjCenterCoords.centerX} center: z: ${this.curMapObjCenterCoords.centerZ} limit: ${limit}`
-        )
-        console.log(`Npc Car pos: x ${this.positions.npcPosX} z: ${this.positions.npcPosZ}`)
         this.mapLimit = limit
-    }
-
-    setCurMapObjCords(x: number, y: number) {
-        this.curMapObjCords.mapObjCoordX = x
-        this.curMapObjCords.mapObjCoordY = y
     }
 
     //map ele rotation and driving direction need to be taken into account
