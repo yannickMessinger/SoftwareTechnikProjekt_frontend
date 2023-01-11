@@ -22,10 +22,7 @@
             "doubleSided": true,
             "name": "Street",
             "pbrMetallicRoughness": {
-                "baseColorFactor": [
-                    0.05780218169093132, 0.05780218169093132,
-                    0.05780218169093132, 1
-                ],
+                "baseColorFactor": [0.05780218169093132, 0.05780218169093132, 0.05780218169093132, 1],
                 "metallicFactor": 0,
                 "roughnessFactor": 0.9145077466964722
             }
@@ -34,10 +31,7 @@
             "doubleSided": true,
             "name": "sidewalk",
             "pbrMetallicRoughness": {
-                "baseColorFactor": [
-                    0.25979799032211304, 0.25979799032211304,
-                    0.25979799032211304, 1
-                ],
+                "baseColorFactor": [0.25979799032211304, 0.25979799032211304, 0.25979799032211304, 1],
                 "metallicFactor": 0,
                 "roughnessFactor": 0.6709844470024109
             }
@@ -46,10 +40,7 @@
             "doubleSided": true,
             "name": "WhiteStripes",
             "pbrMetallicRoughness": {
-                "baseColorFactor": [
-                    0.6500046849250793, 0.6500046849250793, 0.6500046849250793,
-                    1
-                ],
+                "baseColorFactor": [0.6500046849250793, 0.6500046849250793, 0.6500046849250793, 1],
                 "metallicFactor": 0,
                 "roughnessFactor": 0.7227979302406311
             }

@@ -28,52 +28,52 @@
 </template>
 
 <script setup lang="ts">
-    import router from "../router/router"
-    import BasicButton from "./Buttons/BasicButton.vue"
-    import useUser from "../services/UserStore"
+import router from "../router/router"
+import BasicButton from "./Buttons/BasicButton.vue"
+import useUser from "../services/UserStore"
 
-    const { logout, logindata } = useUser()
+const { logout, logindata } = useUser()
 
-    const props = defineProps({
-        text: {
-            type: String,
-            required: false,
-            default: "Header Text Field",
-        },
-        displayHomebutton: {
-            type: Boolean,
-            required: false,
-            default: true,
-        },
-    })
+const props = defineProps({
+    text: {
+        type: String,
+        required: false,
+        default: "Header Text Field",
+    },
+    displayHomebutton: {
+        type: Boolean,
+        required: false,
+        default: true,
+    },
+})
 </script>
 
 <style scoped>
-    .header {
-        display: flex;
-        background-color: var(--woe-blue-80);
-        justify-content: space-between;
-        align-items: center;
-        height: 5em;
-    }
-    .header .right {
-        display: flex;
-        align-items: center;
-        margin: 2em;
-    }
-    span {
-        color: var(--woe-white-almost);
-        font-size: 1.5em;
-        margin: 2em;
-    }
-    #home {
-        margin: 2em;
-        width: 4em;
-        height: 4em;
-        border-radius: 50%;
-        background-color: var(--woe-white-almost);
-        background-size: cover;
-        background-position: center;
-        background-image: url("../assets/Icons/Home.svg");
-    }
+.header {
+    display: flex;
+    background-color: var(--woe-blue-80);
+    justify-content: space-between;
+    align-items: center;
+    height: 5em;
+}
+.header .right {
+    display: flex;
+    align-items: center;
+    margin: 2em;
+}
+span {
+    color: var(--woe-white-almost);
+    font-size: 1.5em;
+    margin: 2em;
+}
+#home {
+    margin: 2em;
+    width: 4em;
+    height: 4em;
+    border-radius: 50%;
+    background-color: var(--woe-white-almost);
+    background-size: cover;
+    background-position: center;
+    background-image: url("../assets/Icons/Home.svg");
+}
 </style>

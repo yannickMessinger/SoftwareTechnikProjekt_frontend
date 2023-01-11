@@ -84,11 +84,7 @@ export async function updateLobby(id: number) {
 }
 
 //adds new lobby and sends it to backend, then update of lobbylist
-export async function createNewLobby(
-    addLobbyName: string,
-    addNumOfPlayers: number,
-    addLobbyMode: E_LobbyMode
-) {
+export async function createNewLobby(addLobbyName: string, addNumOfPlayers: number, addLobbyMode: E_LobbyMode) {
     console.log(`User ID from useLobbyList  ${userId.value}`)
     const url = "/api/lobby"
 
