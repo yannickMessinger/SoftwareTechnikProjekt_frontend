@@ -153,8 +153,11 @@
                 renderer.value.onBeforeRender(() => {
                     fpsCamera.update()
 
-                    npcEles.value.get(0)!.positions.npcPosX += 0.001
-                    npcEles.value.get(0)!.checkMapEleLimit()
+                    npcEles.value.forEach((ele, index) => {
+                        npcEles.value.get(index)!.positions.npcPosX += 0.001
+                    })
+                    //npcEles.value.get(0)!.positions.npcPosX += 0.001
+                    //npcEles.value.get(0)!.checkMapEleLimit()
                 })
             })
 
@@ -211,6 +214,7 @@
 
             <div v-for="(asset, index) in npcEles">
                 <GltfModel
+                    v-bind:ref="npcEles.get(index)!.npc"
                     v-bind:src="buildingIDMap.get(22)"
                     :position="{
                             x: npcEles.get(index)!.positions.npcPosX,
