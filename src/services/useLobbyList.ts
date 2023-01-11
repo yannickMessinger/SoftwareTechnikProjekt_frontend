@@ -4,7 +4,6 @@
 
 import { reactive, readonly } from "vue"
 import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO"
-import { ILobby } from "../typings/ILobby"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { ILobbyListState } from "../typings/ILobbyListState"
 import useUser from "./UserStore"
