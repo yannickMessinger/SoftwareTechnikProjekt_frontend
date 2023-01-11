@@ -143,6 +143,13 @@ function updateActiveLobbyPlayerList(players: IUser[]) {
     console.log(state.activeLobby.playerList)
 }
 
+async function postActiveLobby(lobby: ILobby) {
+    const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
+        method: "POST",
+    })
+    console.log("setActiveLobby() -> post player to lobby - response", response)
+}
+
 export default function useUser() {
     if (!state.loggedIn && !reloginTried) {
         reloginTried = true

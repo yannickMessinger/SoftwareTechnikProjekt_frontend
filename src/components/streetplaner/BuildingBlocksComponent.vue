@@ -73,6 +73,17 @@ watch(
         }
     }
 )
+/** sets buttons to clickable if create tool is selected, or not clickable if its not */
+watch(
+    () => bus.value.get("tool-select-event"),
+    (val) => {
+        if (val == ToolEnum.CREATE) {
+            isCreateTool.value = true
+        } else {
+            isCreateTool.value = false
+        }
+    }
+)
 </script>
 
 <template>
