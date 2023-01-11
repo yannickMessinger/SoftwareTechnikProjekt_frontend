@@ -90,6 +90,9 @@
         display: block;
         border: solid 2px var(--woe-blue-50);
         margin-bottom: var(--margin-bottom);
+        background: none;
+        background-size: cover;
+        background-position: center;
     }
 
     p {

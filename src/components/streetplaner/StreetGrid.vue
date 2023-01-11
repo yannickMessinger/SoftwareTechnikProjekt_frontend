@@ -4,6 +4,8 @@
     import type { IGridElement } from "../../services/streetplaner/IGridElement"
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
+    import { useGridSize } from "../../services/useGridSize"
+
     import {
         useBlockList,
         updateBlockList,
@@ -27,6 +29,7 @@
         block: { id: -1, rotation: 0, texture: "" },
     })
     const lobbyState = useUser().activeLobby
+    const { gridSize } = useGridSize()
 
     const {
         editorState,
@@ -75,9 +78,9 @@
     fillGridEmpty()
 
     // initialize gridSize
-    const gridSize = ref(40)
+    //const gridSize = ref(40)
     // initialize gridSizePx used in css
-    const gridSizePx = computed(() => gridSize.value.toString() + "px")
+    const gridSizePx = computed(() => gridSize.size.toString() + "px")
     // declare blockList
     var blockList: Array<IBlockElement>
     watch(
@@ -205,7 +208,6 @@
     // load StreetGrid from backend dto
     function loadStreetGrid(dto: StreetGridDTO) {
         fillGridEmpty()
-        console.log(dto.mapObjects)
         for (let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = {
                 id: ele.objectTypeId,
@@ -246,6 +248,7 @@
     <div v-for="row in streetGrid" class="row no-drag">
         <div
             v-for="ele in row"
+            :id="`cell_${ele.posX}_${ele.posY}`"
             class="grid-item grid-size col no-drag"
             @click="onClick(ele)"
             @mousemove="onMouseMove(ele, $event)"
