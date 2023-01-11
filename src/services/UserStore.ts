@@ -28,10 +28,7 @@ async function retrieveUserFromLocalStorage() {
     if (userString) {
         const data = JSON.parse(userString)
         const loginResponse = await login(data.username, data.password)
-        if (
-            loginResponse?.hasOwnProperty("userId") &&
-            loginResponse?.hasOwnProperty("userName")
-        ) {
+        if (loginResponse?.hasOwnProperty("userId") && loginResponse?.hasOwnProperty("userName")) {
             router.push("/")
         }
     }
@@ -85,10 +82,7 @@ async function register(username: string, password: string): Promise<any> {
         .catch((err) => console.log(err))
 }
 
-async function login(
-    username: string,
-    password: string
-): Promise<{ userId: number; userName: string } | null> {
+async function login(username: string, password: string): Promise<{ userId: number; userName: string } | null> {
     return fetch("/api/player/login", {
         method: "POST",
         headers: {
@@ -102,10 +96,7 @@ async function login(
     })
         .then((response) => {
             if (response.status === 200) {
-                localStorage.setItem(
-                    "user-e-mobility",
-                    JSON.stringify({ username, password })
-                )
+                localStorage.setItem("user-e-mobility", JSON.stringify({ username, password }))
                 return response.json()
             }
             if (response.status === 400) {

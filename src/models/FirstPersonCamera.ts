@@ -44,11 +44,7 @@ export class FirstPersonCamera {
         const yh = this.input.current.mouseYDelta / window.innerHeight
 
         this.phi += -xh * this.phiSpeed
-        this.theta = this.clamp(
-            this.theta + -yh * this.thetaSpeed,
-            -Math.PI / 3,
-            Math.PI / 3
-        )
+        this.theta = this.clamp(this.theta + -yh * this.thetaSpeed, -Math.PI / 3, Math.PI / 3)
 
         const qx = new THREE.Quaternion()
         qx.setFromAxisAngle(new THREE.Vector3(0, 1, 0), this.phi)
@@ -65,8 +61,7 @@ export class FirstPersonCamera {
     updateCamera() {
         this.camera.value.camera.quaternion.copy(this.rotation)
         this.camera.value.camera.position.copy(this.translation)
-        this.camera.value.camera.position.y +=
-            Math.sin(this.headBobTimer * 10) * 1.5
+        this.camera.value.camera.position.y += Math.sin(this.headBobTimer * 10) * 1.5
 
         const forward = new THREE.Vector3(0, 0, -1)
         forward.applyQuaternion(this.rotation)
@@ -83,12 +78,8 @@ export class FirstPersonCamera {
     }
 
     updateTranslation(velocity: number) {
-        const forwardVelocity =
-            (this.input.key(this.KEYS.w) ? 1 : 0) +
-            (this.input.key(this.KEYS.s) ? -1 : 0)
-        const strafeVelocity =
-            (this.input.key(this.KEYS.a) ? 1 : 0) +
-            (this.input.key(this.KEYS.d) ? -1 : 0)
+        const forwardVelocity = (this.input.key(this.KEYS.w) ? 1 : 0) + (this.input.key(this.KEYS.s) ? -1 : 0)
+        const strafeVelocity = (this.input.key(this.KEYS.a) ? 1 : 0) + (this.input.key(this.KEYS.d) ? -1 : 0)
 
         const qx = new THREE.Quaternion()
         qx.setFromAxisAngle(new THREE.Vector3(0, 1, 0), this.phi)

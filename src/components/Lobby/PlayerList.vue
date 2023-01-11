@@ -8,67 +8,64 @@
     <div class="playerList">
         <table>
             <tbody>
-                <PlayerListItem
-                    :player="ele"
-                    v-for="ele in liste"
-                ></PlayerListItem>
+                <PlayerListItem :player="ele" v-for="ele in liste"></PlayerListItem>
             </tbody>
         </table>
     </div>
 </template>
 
 <script setup lang="ts">
-    import PlayerListItem from "./PlayerListItem.vue"
-    import IUser from "../../typings/IUser"
-    import { usePlayerList } from "../../services/usePlayerList"
-    import { onMounted } from "vue"
-    import { useLobbyList } from "../../services/useLobbyList"
+import PlayerListItem from "./PlayerListItem.vue"
+import IUser from "../../typings/IUser"
+import { usePlayerList } from "../../services/usePlayerList"
+import { onMounted } from "vue"
+import { useLobbyList } from "../../services/useLobbyList"
 
-    //PlayerList passed from backend
-    const props = defineProps<{
-        liste: Readonly<IUser[]>
-    }>()
+//PlayerList passed from backend
+const props = defineProps<{
+    liste: Readonly<IUser[]>
+}>()
 
-    const { playerListState } = usePlayerList()
+const { playerListState } = usePlayerList()
 
-    onMounted(async () => {})
+onMounted(async () => {})
 </script>
 
 <style scoped>
-    th,
-    td {
-        padding: 1px;
-        text-align: left;
-    }
+th,
+td {
+    padding: 1px;
+    text-align: left;
+}
 
-    table {
-        width: 100%;
-    }
-    .playerList {
-        height: 300px;
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
-        padding-right: 30px;
-    }
+table {
+    width: 100%;
+}
+.playerList {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    padding-right: 30px;
+}
 
-    .alignRight {
-        text-align: right;
-        font-weight: normal;
-    }
+.alignRight {
+    text-align: right;
+    font-weight: normal;
+}
 
-    .head {
-        display: flex;
-        justify-content: space-between;
-        border: 1px solid black;
-    }
+.head {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+}
 
-    .headline {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 10px;
-        margin-left: 30px;
-        margin-right: 30px;
-        margin-bottom: 10px;
-    }
+.headline {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-bottom: 10px;
+}
 </style>
