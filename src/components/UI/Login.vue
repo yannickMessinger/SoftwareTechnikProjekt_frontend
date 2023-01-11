@@ -89,7 +89,7 @@
             responseBody?.hasOwnProperty("userId") &&
             responseBody?.hasOwnProperty("userName")
         ) {
-            router.push("/")
+            router.push("/lobby")
         } else {
             usernameError.value =
                 "Username und Passwort Kombination gibt es nicht"

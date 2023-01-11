@@ -15,6 +15,7 @@
     import { onMounted } from "vue"
     import Header from "../components/Header.vue"
     import PlayerList from "../components/Lobby/PlayerList.vue"
+    import ActiveLobby from "../components/Lobby/ActiveLobby.vue"
     import { usePlayerList } from "../services/usePlayerList"
 
     const { playerListState, playerList, fetchPlayerList } = usePlayerList()

@@ -9,8 +9,12 @@
         </div>
         <div class="LobbyClose">
             <!-- für Host lobby schließen für Client lobby verlassen anzeigen-->
-            <button class="red">Lobby Schließen</button>
-            <button class="red">Lobby verlassen</button>
+            <div v-if="isHost">
+                <button class="red">Lobby Schließen</button>
+            </div>
+            <div v-else>
+                <button class="red">Lobby verlassen</button>
+            </div>
         </div>
         <div class="KartenName">
             <!-- korrekten Kartennamen anzeigen-->
@@ -18,20 +22,46 @@
         </div>
         <div class="PlayMode">
             <!-- auf den Switch Button reagieren und korrekten Modus anzeigen-->
-            <p><b>Modus:</b> Fahrmodus</p>
+            <p v-if="!buildMode" @click="goBuild()"><b>Modus:</b> Fahrmodus</p>
+            <p v-if="buildMode" @click="goDrive()"><b>Modus:</b> Baumodus</p>
         </div>
         <div class="SwitchMode">
-            <button>Wechseln</button>
+            <button v-if="isHost" @click="changeGamemode()">Wechseln</button>
         </div>
         <div class="Button2">
             <!-- boolean einbauen entweder Bauansicht oder Fahransicht anzeigen je nach Lobbymodus-->
-            <button class="green">zur Bauansicht</button>
-            <button class="green">zur Fahransicht</button>
+            <button class="green" v-if="buildMode" @click="">zur Bauansicht</button>
+            <button class="green" v-if="!buildMode">zur Fahransicht</button>
         </div>
     </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+    import { ref } from 'vue';
+    import router from "../../router/router"
+
+    const isHost = ref(true)
+    const buildMode = ref(false)
+    let gameId = ref(20) //TODO: gameId must refers to the id in the backend
+
+    function changeGamemode(){
+        if(buildMode.value){
+            buildMode.value = false
+        } else {
+            buildMode.value = true
+        }
+    }
+
+    function goBuild(){
+        const url = "/edit/" + {gameId}
+        router.push(url)
+    }
+
+    function goDrive(){
+        const url = "/game/" + {gameId}
+        router.push(url)
+    }
+</script>
 
 <style scoped>
     * {
