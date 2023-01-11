@@ -110,10 +110,10 @@
         console.log(`x:${cell.posX} y:${cell.posY}`)
         let payload: IMapObject
         if (toolState.tool === ToolEnum.CREATE && toolState.block.objectTypeId !== -1) {
-            // Todo, cars only placeable on roads
+            // if toolState block = asset
             if (toolState.block.groupId === 2) {
-                // if block = asset
-                if (currCellContent.objectTypeId !== -1) {
+                // only place asset if it's placed on a road
+                if (currCellContent.groupId === 0) {
                     let rect = e.target.getBoundingClientRect()
                     let x = (e.clientX - rect.left) / gridSize.value
                     let y = (e.clientY - rect.top) / gridSize.value
@@ -247,6 +247,7 @@
         for (let ele of dto.mapObjects) {
             streetGrid[ele.x][ele.y] = {
                 objectTypeId: ele.objectTypeId,
+                groupId: blockList[ele.objectTypeId].groupId,
                 posX: ele.x,
                 posY: ele.y,
                 rotation: ele.rotation,
@@ -262,6 +263,7 @@
             for (let col = 0; col < streetGrid[0].length; col++) {
                 streetGrid[row][col] = {
                     objectTypeId: -1,
+                    groupId: -1,
                     posX: row,
                     posY: col,
                     rotation: 0,
