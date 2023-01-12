@@ -149,7 +149,7 @@
                     `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
                 )
                 updateMapObjsFromGameState()
-
+                console.log(npcEles)
                 renderer.value.onBeforeRender(() => {
                     fpsCamera.update()
 

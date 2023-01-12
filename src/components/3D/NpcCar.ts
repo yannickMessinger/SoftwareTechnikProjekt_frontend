@@ -7,10 +7,12 @@ const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/npc"
 const UPDATE_POS_MSG = "/app/npc.updatepos"
 
+//maybe MapId is necessary to identify current map for backend purposes
+
 interface NpcInfo {
     npcId: number
-    posX: number
-    posZ: number
+    npcPosX: number
+    npcPosZ: number
     npcRotation: number
 }
 
@@ -32,6 +34,7 @@ export class NpcCar {
     public gameAssetX: any
     public gameAssetZ: any
     public stompClient: Client
+    public driving: any
 
     constructor(
         npcId: any,
@@ -63,6 +66,7 @@ export class NpcCar {
         this.mapLimit = 0
         this.gameAssetX = gameAssetX
         this.gameAssetZ = gameAssetZ
+        this.driving = true
 
         this.calcMapEleCenter()
         this.calcPixelPosNpc()
@@ -73,25 +77,28 @@ export class NpcCar {
         )
     }
 
+    //driving
     update() {
         const velocity = 0.005
 
-        if (this.positions.npcRotation === 0) {
-            this.positions.npcPosZ -= velocity
-        } else if (this.positions.npcRotation === 1) {
-            this.positions.npcPosX += velocity
-        } else if (this.positions.npcRotation === 2) {
-            this.positions.npcPosZ += velocity
-        } else if (this.positions.npcRotation === 3) {
-            this.positions.npcPosX -= velocity
-        }
+        if (this.driving) {
+            if (this.positions.npcRotation === 0) {
+                this.positions.npcPosZ -= velocity
+            } else if (this.positions.npcRotation === 1) {
+                this.positions.npcPosX += velocity
+            } else if (this.positions.npcRotation === 2) {
+                this.positions.npcPosZ += velocity
+            } else if (this.positions.npcRotation === 3) {
+                this.positions.npcPosX -= velocity
+            }
 
-        this.checkMapEleLimit()
+            this.checkMapEleLimit()
+        } else {
+            console.log("not moving at the moment")
+        }
     }
 
     calcMapEleCenter() {
-        console.log(this.curMapObj)
-
         let mapEleCenterX = this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
         let mapEleCenterZ = this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
 
@@ -116,26 +123,53 @@ export class NpcCar {
         let limit = 0
 
         if (npcRot === 0) {
-            limit = centerX - this.fieldSize / 2
-        } else if (npcRot === 1) {
-            limit = centerZ + this.fieldSize / 2
-        } else if (npcRot === 2) {
-            limit = centerX + this.fieldSize / 2
-        } else if (npcRot === 3) {
             limit = centerZ - this.fieldSize / 2
+        } else if (npcRot === 1) {
+            limit = centerX + this.fieldSize / 2
+        } else if (npcRot === 2) {
+            limit = centerZ + this.fieldSize / 2
+        } else if (npcRot === 3) {
+            limit = centerX - this.fieldSize / 2
         }
 
         this.mapLimit = limit
+        console.log(this.mapLimit)
     }
 
     //map ele rotation and driving direction need to be taken into account
     checkMapEleLimit() {
-        if (this.positions.npcPosX < this.mapLimit) {
-            console.log("in map Ele")
-        } else {
-            //method callto backend to get calculated coords of next map ele from script??
-            console.log("left map ele")
-            //this.updatePosMessage()
+        if (this.positions.npcRotation === 0) {
+            if (this.positions.npcPosZ > this.mapLimit) {
+                console.log(`npcCar id: ${this.npcId} in mapEle!`)
+            } else {
+                console.log(`npcCar id: ${this.npcId} left mapEle!`)
+                this.driving = false
+                this.updatePosMessage()
+            }
+        } else if (this.positions.npcRotation === 1) {
+            if (this.positions.npcPosX < this.mapLimit) {
+                console.log(`npcCar id: ${this.npcId} in mapEle!`)
+            } else {
+                console.log(`npcCar id: ${this.npcId} left mapEle!`)
+                this.driving = false
+                this.updatePosMessage()
+            }
+        } else if (this.positions.npcRotation === 2) {
+            if (this.positions.npcPosZ < this.mapLimit) {
+                console.log(`npcCar id: ${this.npcId} in mapEle!`)
+            } else {
+                console.log(`npcCar id: ${this.npcId} left mapEle!`)
+                this.driving = false
+                this.updatePosMessage()
+            }
+        } else if (this.positions.npcRotation === 3) {
+            if (this.positions.npcPosX > this.mapLimit) {
+                console.log(`npcCar id: ${this.npcId} in mapEle!`)
+            } else {
+                console.log(`npcCar id: ${this.npcId} left mapEle!`)
+                this.driving = false
+                this.updatePosMessage()
+            }
         }
     }
 
@@ -144,8 +178,8 @@ export class NpcCar {
             const updatePosMsg: IStompMessage = {
                 npcContent: {
                     npcId: this.npcId,
-                    posX: this.positions.npcPosX,
-                    posZ: this.positions.npcPosX,
+                    npcPosX: this.curMapObj.x,
+                    npcPosZ: this.curMapObj.y,
                     npcRotation: this.positions.npcRotation,
                 },
                 type: "POSITION_UPDATE",
@@ -159,9 +193,6 @@ export class NpcCar {
         }
     }
 
-    /*function to activate Websockets on specific destination in backend. 
-    Also for errorhandling if connection could not successfully be established.
-    If new message is arriving it is passed to onMessageReceived function*/
     receiveNpcUpdates(): Client {
         const stompClient = new Client({
             brokerURL: ws_url,
@@ -174,10 +205,10 @@ export class NpcCar {
         }
 
         stompClient.onConnect = (frame) => {
-            console.log("npc sucessfully connected ws")
+            console.log(`npc id: ${this.npcId} sucessfully connected ws`)
             stompClient.subscribe(DEST, (message) => {
-                const lobbyUpdate: IStompMessage = JSON.parse(message.body)
-                this.onMessageReceived(lobbyUpdate)
+                const npcUpdate: IStompMessage = JSON.parse(message.body)
+                this.onMessageReceived(npcUpdate)
             })
         }
 
@@ -190,12 +221,6 @@ export class NpcCar {
         return stompClient
     }
 
-    /*function that is called if new message is arriving on websocket, looks for message type and
-    is performing specific actions depending on message type.
-    
-    If message tpye if of type "JOIN", the playerlist of this current lobby is updated with the payload for all players that joined the lobby.
-    If message is of type "SWITCH_MODE", the lobbymode is changed to the payload content of the message for all players of the lobby.
-    */
     async onMessageReceived(payload: IStompMessage) {
         console.log(`Npc mit ${this.npcId} hat neue Update Message erhalten ${payload}`)
     }
