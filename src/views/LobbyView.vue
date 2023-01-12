@@ -12,12 +12,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue"
+import { onMounted, reactive } from "vue"
 import Header from "../components/Header.vue"
 import PlayerList from "../components/Lobby/PlayerList.vue"
 import { usePlayerList } from "../services/usePlayerList"
+import ActiveLobby from "../components/Lobby/ActiveLobby.vue"
+import useUser from "../services/UserStore"
 
-const { playerListState, playerList, fetchPlayerList } = usePlayerList()
+const { playerList, fetchPlayerList } = usePlayerList()
+const { activeLobby } = useUser()
+
+const players = reactive({ value: activeLobby.value.playerList })
 
 onMounted(async () => {
     await fetchPlayerList()

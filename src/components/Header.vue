@@ -1,5 +1,9 @@
 <template>
     <div class="header">
+        <span>AktUser: {{ logindata.userName }}</span>
+        <span>ActiveLobby: {{ logindata.activeLobby.lobbyName }}</span>
+        <span>AktMap: {{ logindata.activeLobby.mapId }}</span>
+        <span>AktLobbyM: {{ logindata.activeLobby.lobbyModeEnum }}</span>
         <span>{{ text }}</span>
         <div class="right">
             <BasicButton

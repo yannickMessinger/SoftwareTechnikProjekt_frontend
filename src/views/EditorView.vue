@@ -44,6 +44,7 @@ import router from "../router/router"
 import BuildingBlocksComponent from "../components/streetplaner/BuildingBlocksComponent.vue"
 import ListToolsComponent from "../components/streetplaner/ListToolsComponent.vue"
 import ListBlocksComponent from "../components/streetplaner/ListBlocksComponent.vue"
+import ListAssetsComponent from "../components/streetplaner/ListAssetsComponent.vue"
 import SelectedBlockComponent from "../components/streetplaner/SelectedBlockComponent.vue"
 import StreetGrid from "../components/streetplaner/StreetGrid.vue"
 import { createConfirmDialog } from "vuejs-confirm-dialog"
@@ -51,6 +52,7 @@ import SimpleDialog from "../components/SimpleDialog.vue"
 import Header from "../components/Header.vue"
 import Chat from "../components/UI/Chat.vue"
 import BasicButton from "../components/Buttons/BasicButton.vue"
+import useUser from "../services/UserStore"
 import { useGridSize } from "../services/useGridSize"
 import Slider from "../components/Slider.vue"
 
@@ -59,6 +61,7 @@ const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, {
 })
 const { emit, bus } = useEventBus()
 const disableResetButton = ref(false)
+const disableStreetGrid = ref(false)
 const { gridSize } = useGridSize()
 const headerText_tool = "Werkzeuge"
 const headerText_elements = "Elemente"
@@ -75,6 +78,7 @@ onCancel(() => {
 
 function switchMode() {
     elementBarVisible.value = !elementBarVisible.value
+    header.value === headerText_elements ? (header.value = headerText_tool) : undefined
 }
 
 watch(
@@ -82,8 +86,8 @@ watch(
     (val) => {
         elementBarVisible.value = !elementBarVisible.value
         header.value == headerText_tool ? (header.value = headerText_elements) : undefined
-        console.log(elementBarVisible.value)
-        console.log(val)
+        //console.log(elementBarVisible.value)
+        //console.log(val)
     }
 )
 </script>
@@ -128,6 +132,7 @@ span {
     overflow: hidden;
     position: fixed;
     background-color: var(--woe-white);
+    z-index: 2;
 }
 
 .reset-btn {
@@ -156,6 +161,7 @@ span {
     overflow-y: scroll;
     background-color: var(--woe-white);
     position: fixed;
+    z-index: 2;
 }
 
 .tools-back-btn {

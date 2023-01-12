@@ -11,12 +11,12 @@ const pathRotateButton = pathToPictures + "tool-icons/rotate.png"
 /**currently selected object, default value is no object selected */
 var defaultBlock: IBlockElement = {
     groupId: -1,
-    group: "no data",
-    id: -1,
+    objectTypeId: -1,
     type: "no data",
     name: "no Block selected",
     rotation: 0,
     texture: pathToPictures + "no-data.png",
+    model3d: "",
 }
 /** bus event */
 const { emit, bus } = useEventBus()
@@ -28,7 +28,7 @@ watch(
     () => bus.value.get("block-select-event"),
     (val) => {
         selectedBlock.block = val[0]
-        if (selectedBlock.block.id == defaultBlock.id) {
+        if (selectedBlock.block.objectTypeId == defaultBlock.objectTypeId) {
             isDefault.value = true
         } else {
             isDefault.value = false
@@ -49,30 +49,32 @@ function onRotateClick() {
 </script>
 
 <template>
-    <p>
-        <span id="header">Zelle</span>
-        <BasicButton display="Drehen" :btn_click="onRotateClick" />
-    </p>
-    <img
-        v-if="selectedBlock != null"
-        :src="selectedBlock.block.texture"
-        class="selectedBlockImg"
-        :style="{
-            transform: 'rotate(' + selectedBlock.block.rotation * 90 + 'deg)',
-        }"
-    />
-    <p>
-        <span>ID</span>
-        <span>{{ selectedBlock.block.id }}</span>
-    </p>
-    <p>
-        <span>Name</span>
-        <span>{{ selectedBlock.block.name }}</span>
-    </p>
-    <p>
-        <span>Type</span>
-        <span>{{ selectedBlock.block.type }}</span>
-    </p>
+    <div class="background-white">
+        <p>
+            <span id="header">Zelle</span>
+            <BasicButton display="Drehen" :btn_click="onRotateClick" />
+        </p>
+        <img
+            v-if="selectedBlock != null"
+            :src="selectedBlock.block.texture"
+            class="selectedBlockImg"
+            :style="{
+                transform: 'rotate(' + selectedBlock.block.rotation * 90 + 'deg)',
+            }"
+        />
+        <p>
+            <span>ID</span>
+            <span>{{ selectedBlock.block.objectTypeId }}</span>
+        </p>
+        <p>
+            <span>Name</span>
+            <span>{{ selectedBlock.block.name }}</span>
+        </p>
+        <p>
+            <span>Type</span>
+            <span>{{ selectedBlock.block.type }}</span>
+        </p>
+    </div>
 </template>
 
 <style scoped>

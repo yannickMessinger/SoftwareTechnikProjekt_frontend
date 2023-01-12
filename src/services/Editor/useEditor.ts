@@ -35,7 +35,7 @@ const editorState = reactive<IEditorState>({
 
 export function useEditor(mapId: number) {
     editorState.mapId = mapId
-    console.log(mapId)
+    //console.log(mapId)
     return {
         editorState: editorState,
         createMessage,
@@ -84,7 +84,7 @@ function receiveEditorUpdates() {
     }
 
     stompClient.onConnect = (frame) => {
-        console.log("connected")
+        //console.log("connected")
         stompClient.subscribe(DEST, (message) => {
             const editorUpdate: IStompMessage = JSON.parse(message.body)
             onMessageReceived(editorUpdate)
@@ -148,7 +148,13 @@ function updateMessage(message: IMapObject) {
 }
 
 function resetMessage() {
-    const message: IMapObject = { objectTypeId: -1, x: 0, y: 0, rotation: 0 }
+    const message: IMapObject = {
+        objectTypeId: -1,
+        x: 0,
+        y: 0,
+        rotation: 0,
+        game_assets: [],
+    }
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
             id: editorState.mapId,

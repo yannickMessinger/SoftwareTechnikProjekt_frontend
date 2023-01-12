@@ -4,31 +4,30 @@
 -->
 <script setup lang="ts">
 /**Imports: */
-import { reactive, ref, watch } from "vue"
+import { onMounted, reactive, ref, watch } from "vue"
 import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
 import useEventBus from "../../services/eventBus"
 import ToolEnum from "../../services/streetplaner/ToolEnum"
-import BigBuilding from "../../assets/2D_Models/Buildings/BigBuilding.png"
-import Building from "../../assets/2D_Models/Buildings/Building.png"
-import Supermarkt from "../../assets/2D_Models/Buildings/Supermarkt.png"
-import Stadium from "../../assets/2D_Models/Buildings/Stadium.png"
+import { useBlockList, IBlockListState } from "../../services/streetplaner/useBlockList"
+import { computed } from "@vue/reactivity"
 
 /**Variables: */
 const pathToPictures = "/img/streetplaner/"
-var totalBlockNumber = 3 /** number of blocks in blocklist*/
-var totalBuildinigNumber = 4
-var blockList: IBlockElement[] = Array(totalBlockNumber).fill([]) /** List of all blocks placable in street editor*/
-var buildingList: IBlockElement[] = Array(totalBuildinigNumber).fill([])
+const { blockListState, updateBlockList } = useBlockList()
+var allBlockList = reactive(Array<IBlockElement>()) /** List of all blocks placable in street editor*/
+const blockList = computed(() => allBlockList.filter((ele) => ele.groupId === 0))
+const buildingList = computed(() => allBlockList.filter((ele) => ele.groupId === 1))
+const assetList = computed(() => allBlockList.filter((ele) => ele.groupId === 2))
 
 /*default block element*/
 var defaultBlock: IBlockElement = {
     groupId: -1,
-    group: "no data",
-    id: -1,
+    objectTypeId: -1,
     type: "no data",
     name: "no Object selected",
     rotation: 0,
     texture: pathToPictures + "no-data.png",
+    model3d: "",
 }
 /**  currently selected block */
 const selectedBlock = reactive({ block: defaultBlock })
@@ -36,77 +35,32 @@ const selectedBlock = reactive({ block: defaultBlock })
 const { emit, bus } = useEventBus()
 /** boolean value that controls weather blocks are clicable or not */
 const isCreateTool = ref(false)
-/**entrys in blocklist */
-blockList[0] = {
-    groupId: 0,
-    group: "Testobject1",
-    id: 0,
-    type: "Straße",
-    name: "Gerade",
-    rotation: 0,
-    texture: pathToPictures + "object-icons/Road_straight.svg",
-}
-blockList[1] = {
-    groupId: 0,
-    group: "Testobject1",
-    id: 1,
-    type: "Straße",
-    name: "Kurve",
-    rotation: 0,
-    texture: pathToPictures + "object-icons/Road_curve.svg",
-}
-blockList[2] = {
-    groupId: 1,
-    group: "Testobject2",
-    id: 2,
-    type: "Straße",
-    name: "Kreuzung",
-    rotation: 0,
-    texture: pathToPictures + "object-icons/Road_cross.svg",
+
+onMounted(() => {
+    updateBlockList()
+    getBlockList(blockListState)
+})
+
+function getBlockList(blockListState: IBlockListState) {
+    for (let ele of blockListState.list) {
+        allBlockList.push({
+            groupId: ele.groupId,
+            objectTypeId: ele.objectTypeId,
+            type: ele.type,
+            name: ele.name,
+            rotation: ele.rotation,
+            texture: ele.texture,
+            model3d: ele.model3d,
+        })
+    }
 }
 
-buildingList[0] = {
-    groupId: 0,
-    group: "Testobject1",
-    id: 3,
-    type: "Gebäude",
-    name: "Gebäude gr.",
-    rotation: 0,
-    texture: BigBuilding,
-}
-buildingList[1] = {
-    groupId: 1,
-    group: "Testobject2",
-    id: 4,
-    type: "Gebäude",
-    name: "Gebäude",
-    rotation: 0,
-    texture: Building,
-}
-buildingList[2] = {
-    groupId: 2,
-    group: "Testobject3",
-    id: 5,
-    type: "Gebäude",
-    name: "Markt",
-    rotation: 0,
-    texture: Supermarkt,
-}
-buildingList[3] = {
-    groupId: 3,
-    group: "Testobject4",
-    id: 6,
-    type: "Gebäude",
-    name: "Stadion",
-    rotation: 0,
-    texture: Stadium,
-}
 /**function activated by clicking on an block */
 function onBlockClicked(clickedBlock: any) {
     /** if the selected block is the clicked block, it gets deselected by restoring the default block
      * otherwhise the clicked block is now the selected block.
      */
-    if (selectedBlock.block.id == clickedBlock.id) {
+    if (selectedBlock.block.objectTypeId == clickedBlock.objectTypeId) {
         selectedBlock.block = defaultBlock
     } else {
         selectedBlock.block = clickedBlock
@@ -132,28 +86,47 @@ watch(
     <span>Elemente</span>
     <div
         v-for="element in blockList"
-        :key="element.id"
-        id="editor-tool"
-        :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
-        @click="onBlockClicked(element)"
-    >
-        <button class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }" />
-        <p v-if="element != null">{{ element.name }}</p>
-    </div>
-    <span>Gebäude</span>
-    <div
-        v-for="element in buildingList"
-        :key="element.id"
+        :key="element.objectTypeId"
         id="editor-tool"
         :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
         @click="onBlockClicked(element)"
     >
         <button
-            v-if="element != null"
+            v-if="element.groupId === 0"
             class="editor-tool-btn"
             :style="{ backgroundImage: `url(${element.texture})` }"
         />
-        <p v-if="element != null">{{ element.name }}</p>
+        <p v-if="element != null && element.groupId === 0">{{ element.name }}</p>
+    </div>
+    <span>Gebäude</span>
+    <div
+        v-for="element in buildingList"
+        :key="element.objectTypeId"
+        id="editor-tool"
+        :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
+        @click="onBlockClicked(element)"
+    >
+        <button
+            v-if="element.groupId === 1"
+            class="editor-tool-btn"
+            :style="{ backgroundImage: `url(${element.texture})` }"
+        />
+        <p v-if="element != null && element.groupId === 1">{{ element.name }}</p>
+    </div>
+    <span>Fahrzeuge</span>
+    <div
+        v-for="element in assetList"
+        :key="element.objectTypeId"
+        id="editor-tool"
+        :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'"
+        @click="onBlockClicked(element)"
+    >
+        <button
+            v-if="element.groupId === 2"
+            class="editor-tool-btn"
+            :style="{ backgroundImage: `url(${element.texture})` }"
+        />
+        <p v-if="element != null && element.groupId === 2">{{ element.name }}</p>
     </div>
 </template>
 
