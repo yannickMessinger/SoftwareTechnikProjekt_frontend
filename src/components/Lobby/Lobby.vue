@@ -15,34 +15,32 @@
 </template>
 
 <script setup lang="ts">
-
-    import { ILobby } from "../../typings/ILobby";
-    import BasicButton from "../Buttons/BasicButton.vue";
-    import useUser from "../../services/UserStore";
-    import router from "../../router/router";
-    import { useLobbyList } from "../../services/useLobbyList";
-    import { onMounted } from "vue";
+    import { ILobby } from "../../typings/ILobby"
+    import BasicButton from "../Buttons/BasicButton.vue"
+    import useUser from "../../services/UserStore"
+    import router from "../../router/router"
+    import { useLobbyList } from "../../services/useLobbyList"
+    import { onMounted } from "vue"
 
     const props = defineProps<{
         lobby: ILobby
     }>()
 
     const { setActiveLobby } = useUser()
-    const {receiveLobbyUpdates, joinMessage} = useLobbyList()
+    const { receiveLobbyUpdates, joinMessage } = useLobbyList()
 
     //for later purposes to link to selected lobby via Vue Router
-    async function selectLobby(){
-        await setActiveLobby(props.lobby);
+    async function selectLobby() {
+        await setActiveLobby(props.lobby)
         joinMessage()
         router.push({
-            path: '/lobbyview'
+            path: "/lobbyview",
         })
     }
 
     onMounted(() => {
-        receiveLobbyUpdates();
+        receiveLobbyUpdates()
     })
-
 </script>
 
 <style scoped>

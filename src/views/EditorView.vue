@@ -1,6 +1,9 @@
 <template>
     <Header text="World of eMobility" :displayHomebutton="true"></Header>
-    <button class="reset-button" @click="emit('grid-save-event', true)">Save</button> <!-- Remove before merge with dev -->
+    <button class="reset-button" @click="emit('grid-save-event', true)">
+        Save
+    </button>
+    <!-- Remove before merge with dev -->
     <DialogsWrapper />
     <div class="selected-block">
         <SelectedBlockComponent />
@@ -25,43 +28,42 @@
                     :btn_click="switchMode"
                 />
             </p>
-            <span>{{header}}</span>
+            <span>{{ header }}</span>
             <ListToolsComponent v-if="!elementBarVisible" />
-            <ListBlocksComponent v-if="elementBarVisible"/>
+            <ListBlocksComponent v-if="elementBarVisible" />
             <span v-if="elementBarVisible">Gebäude</span>
-            <BuildingBlocksComponent v-if="elementBarVisible"/>
+            <BuildingBlocksComponent v-if="elementBarVisible" />
         </div>
     </div>
 
     <div class="grid">
         <StreetGrid />
     </div>
-    <Chat/>
+    <Chat />
     <div class="container-slider">
         <div class="border-slider">
-            <Slider class="slider"/>
+            <Slider class="slider" />
         </div>
     </div>
-
 </template>
 
 <script setup lang="ts">
-    import { ref, watch} from 'vue'
-    import useEventBus from '../services/eventBus'
-    import router from '../router/router'
-    import BuildingBlocksComponent from '../components/streetplaner/BuildingBlocksComponent.vue'
-    import ListToolsComponent from '../components/streetplaner/ListToolsComponent.vue'
-    import ListBlocksComponent from '../components/streetplaner/ListBlocksComponent.vue'
-    import SelectedBlockComponent from '../components/streetplaner/SelectedBlockComponent.vue'
-    import StreetGrid from '../components/streetplaner/StreetGrid.vue'
-    import { createConfirmDialog } from 'vuejs-confirm-dialog'
-    import SimpleDialog from '../components/SimpleDialog.vue'
-    import Header from '../components/Header.vue'
-    import Chat from '../components/UI/Chat.vue'
-    import BasicButton from '../components/Buttons/BasicButton.vue'
-    import useUser from '../services/UserStore';
-    import { useGridSize } from '../services/useGridSize'
-    import Slider from '../components/Slider.vue'
+    import { ref, watch } from "vue"
+    import useEventBus from "../services/eventBus"
+    import router from "../router/router"
+    import BuildingBlocksComponent from "../components/streetplaner/BuildingBlocksComponent.vue"
+    import ListToolsComponent from "../components/streetplaner/ListToolsComponent.vue"
+    import ListBlocksComponent from "../components/streetplaner/ListBlocksComponent.vue"
+    import SelectedBlockComponent from "../components/streetplaner/SelectedBlockComponent.vue"
+    import StreetGrid from "../components/streetplaner/StreetGrid.vue"
+    import { createConfirmDialog } from "vuejs-confirm-dialog"
+    import SimpleDialog from "../components/SimpleDialog.vue"
+    import Header from "../components/Header.vue"
+    import Chat from "../components/UI/Chat.vue"
+    import BasicButton from "../components/Buttons/BasicButton.vue"
+    import useUser from "../services/UserStore"
+    import { useGridSize } from "../services/useGridSize"
+    import Slider from "../components/Slider.vue"
 
     const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, {
         question:
@@ -69,8 +71,8 @@
     })
     const { emit, bus } = useEventBus()
     const disableResetButton = ref(false)
-    const { gridSize } = useGridSize();
-    const disableStreetGrid = ref(false);
+    const { gridSize } = useGridSize()
+    const disableStreetGrid = ref(false)
 
     const headerText_tool = "Werkzeuge"
     const headerText_elements = "Elemente"
@@ -87,7 +89,9 @@
 
     function switchMode() {
         elementBarVisible.value = !elementBarVisible.value
-        header.value === headerText_elements ? header.value = headerText_tool : undefined
+        header.value === headerText_elements
+            ? (header.value = headerText_tool)
+            : undefined
     }
 
     watch(
@@ -184,7 +188,7 @@
         background-image: url(../assets/Icons/back.svg);
     }
 
-    .container-slider{
+    .container-slider {
         display: flex;
         flex-flow: row-reverse;
         bottom: 0;
@@ -192,7 +196,7 @@
         width: 100%;
     }
 
-    .border-slider{
+    .border-slider {
         display: flex;
         justify-content: center;
         padding: 2em 1em 2em 1em;
@@ -205,15 +209,14 @@
         background-color: var(--woe-white);
         width: 25%;
     }
-    .slider{
+    .slider {
         width: 25%;
         outline: none;
-        transition: opacity .2s;
+        transition: opacity 0.2s;
         position: fixed;
     }
 
     .slider:hover {
         opacity: 1;
     }
-
 </style>

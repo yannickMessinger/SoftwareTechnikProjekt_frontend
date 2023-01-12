@@ -53,7 +53,6 @@
     import { ref } from "vue"
     import useUser from "../../services/UserStore"
     import BasicButton from "../Buttons/BasicButton.vue"
-   
 
     interface IMessage {
         name: string

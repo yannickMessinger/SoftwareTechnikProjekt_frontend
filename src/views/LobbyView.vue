@@ -16,8 +16,8 @@
     import Header from "../components/Header.vue"
     import PlayerList from "../components/Lobby/PlayerList.vue"
     import { usePlayerList } from "../services/usePlayerList"
-    import ActiveLobby from '../components/Lobby/ActiveLobby.vue'
-    import useUser from '../services/UserStore';
+    import ActiveLobby from "../components/Lobby/ActiveLobby.vue"
+    import useUser from "../services/UserStore"
 
     const { playerList, fetchPlayerList } = usePlayerList()
 

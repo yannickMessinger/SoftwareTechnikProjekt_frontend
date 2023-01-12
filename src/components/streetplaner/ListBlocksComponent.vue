@@ -8,16 +8,18 @@
     import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
     import useEventBus from "../../services/eventBus"
     import ToolEnum from "../../services/streetplaner/ToolEnum"
-    import BigBuilding from "../../assets/2D_Models/Buildings/BigBuilding.png";
-    import Building from "../../assets/2D_Models/Buildings/Building.png";
-    import Supermarkt from "../../assets/2D_Models/Buildings/Supermarkt.png";
-    import Stadium from "../../assets/2D_Models/Buildings/Stadium.png";
+    import BigBuilding from "../../assets/2D_Models/Buildings/BigBuilding.png"
+    import Building from "../../assets/2D_Models/Buildings/Building.png"
+    import Supermarkt from "../../assets/2D_Models/Buildings/Supermarkt.png"
+    import Stadium from "../../assets/2D_Models/Buildings/Stadium.png"
 
     /**Variables: */
-    const pathToPictures = "/img/streetplaner/";
-    var totalBlockNumber = 3; /** number of blocks in blocklist*/
-    var totalBuildinigNumber = 4;
-    var blockList: IBlockElement[] = Array(totalBlockNumber).fill([]); /** List of all blocks placable in street editor*/
+    const pathToPictures = "/img/streetplaner/"
+    var totalBlockNumber = 3 /** number of blocks in blocklist*/
+    var totalBuildinigNumber = 4
+    var blockList: IBlockElement[] = Array(totalBlockNumber).fill(
+        []
+    ) /** List of all blocks placable in street editor*/
     var buildingList: IBlockElement[] = Array(totalBuildinigNumber).fill([])
 
     /*default block element*/
@@ -37,14 +39,70 @@
     /** boolean value that controls weather blocks are clicable or not */
     const isCreateTool = ref(false)
     /**entrys in blocklist */
-    blockList[0] = {groupId: 0, group: "Testobject1", id: 0, type: "Straße", name: "Gerade", rotation: 0, texture: pathToPictures + "object-icons/Road_straight.svg"}
-    blockList[1] = {groupId: 0, group: "Testobject1", id: 1, type: "Straße", name: "Kurve", rotation: 0, texture: pathToPictures + "object-icons/Road_curve.svg"}
-    blockList[2] = {groupId: 1, group: "Testobject2", id: 2, type: "Straße", name: "Kreuzung", rotation: 0, texture: pathToPictures + "object-icons/Road_cross.svg"}
+    blockList[0] = {
+        groupId: 0,
+        group: "Testobject1",
+        id: 0,
+        type: "Straße",
+        name: "Gerade",
+        rotation: 0,
+        texture: pathToPictures + "object-icons/Road_straight.svg",
+    }
+    blockList[1] = {
+        groupId: 0,
+        group: "Testobject1",
+        id: 1,
+        type: "Straße",
+        name: "Kurve",
+        rotation: 0,
+        texture: pathToPictures + "object-icons/Road_curve.svg",
+    }
+    blockList[2] = {
+        groupId: 1,
+        group: "Testobject2",
+        id: 2,
+        type: "Straße",
+        name: "Kreuzung",
+        rotation: 0,
+        texture: pathToPictures + "object-icons/Road_cross.svg",
+    }
 
-    buildingList[0] = {groupId: 0, group: "Testobject1", id: 3, type: "Gebäude", name: "Gebäude gr.", rotation: 0, texture: BigBuilding};
-    buildingList[1] = {groupId: 1, group: "Testobject2", id: 4, type: "Gebäude", name: "Gebäude", rotation: 0, texture: Building};
-    buildingList[2] = {groupId: 2, group: "Testobject3", id: 5, type: "Gebäude", name: "Markt", rotation: 0, texture: Supermarkt};
-    buildingList[3] = {groupId: 3, group: "Testobject4", id: 6, type: "Gebäude", name: "Stadion", rotation: 0, texture: Stadium};
+    buildingList[0] = {
+        groupId: 0,
+        group: "Testobject1",
+        id: 3,
+        type: "Gebäude",
+        name: "Gebäude gr.",
+        rotation: 0,
+        texture: BigBuilding,
+    }
+    buildingList[1] = {
+        groupId: 1,
+        group: "Testobject2",
+        id: 4,
+        type: "Gebäude",
+        name: "Gebäude",
+        rotation: 0,
+        texture: Building,
+    }
+    buildingList[2] = {
+        groupId: 2,
+        group: "Testobject3",
+        id: 5,
+        type: "Gebäude",
+        name: "Markt",
+        rotation: 0,
+        texture: Supermarkt,
+    }
+    buildingList[3] = {
+        groupId: 3,
+        group: "Testobject4",
+        id: 6,
+        type: "Gebäude",
+        name: "Stadion",
+        rotation: 0,
+        texture: Stadium,
+    }
     /**function activated by clicking on an block */
     function onBlockClicked(clickedBlock: any) {
         /** if the selected block is the clicked block, it gets deselected by restoring the default block
@@ -74,14 +132,41 @@
 
 <template>
     <span>Elemente</span>
-    <div v-for="element in blockList" :key="element.id" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClicked(element)">
-        <button class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
-        <p v-if="element != null">{{element.name}}</p>
+    <div
+        v-for="element in blockList"
+        :key="element.id"
+        id="editor-tool"
+        :class="
+            element.name === selectedBlock.block.name
+                ? 'editor-tool-active'
+                : 'editor-tool-not-active'
+        "
+        @click="onBlockClicked(element)"
+    >
+        <button
+            class="editor-tool-btn"
+            :style="{ backgroundImage: `url(${element.texture})` }"
+        />
+        <p v-if="element != null">{{ element.name }}</p>
     </div>
     <span>Gebäude</span>
-        <div v-for="element in buildingList" :key="element.id" id="editor-tool" :class="element.name === selectedBlock.block.name ? 'editor-tool-active' : 'editor-tool-not-active'" @click="onBlockClicked(element)">
-        <button v-if="element != null" class="editor-tool-btn" :style="{ backgroundImage: `url(${element.texture})` }"/>
-        <p v-if="element != null">{{element.name}}</p>
+    <div
+        v-for="element in buildingList"
+        :key="element.id"
+        id="editor-tool"
+        :class="
+            element.name === selectedBlock.block.name
+                ? 'editor-tool-active'
+                : 'editor-tool-not-active'
+        "
+        @click="onBlockClicked(element)"
+    >
+        <button
+            v-if="element != null"
+            class="editor-tool-btn"
+            :style="{ backgroundImage: `url(${element.texture})` }"
+        />
+        <p v-if="element != null">{{ element.name }}</p>
     </div>
 </template>
 
@@ -91,12 +176,11 @@
         font-size: 1em;
     }
 
-    span{
+    span {
         margin: 0;
         font-size: 1em;
         color: var(--woe-black);
         font-weight: bold;
         margin-bottom: 8px;
-
     }
 </style>

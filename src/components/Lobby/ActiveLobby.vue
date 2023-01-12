@@ -1,72 +1,75 @@
 <template>
-  <div class="headline">
-    <h2>Aktive Lobby</h2>
-  </div>
-  <div class="container">
-    <div class="LobbyName">
-      <p>
-        <b>{{ activeLobby.lobbyName }}</b>
-      </p>
+    <div class="headline">
+        <h2>Aktive Lobby</h2>
     </div>
-    <div class="LobbyClose">
-      <div v-if="userId === activeLobby.hostId">
-        <button class="red">Lobby Schließen</button>
-      </div>
+    <div class="container">
+        <div class="LobbyName">
+            <p>
+                <b>{{ activeLobby.lobbyName }}</b>
+            </p>
+        </div>
+        <div class="LobbyClose">
+            <div v-if="userId === activeLobby.hostId">
+                <button class="red">Lobby Schließen</button>
+            </div>
+        </div>
+        <div class="PlayMode">
+            <p><b>Modus:</b> {{ activeLobby.lobbyModeEnum }}</p>
+        </div>
+        <div class="SwitchMode">
+            <div v-if="userId === activeLobby.hostId">
+                <button @click="setActiveLobbyToBuildMode">
+                    Planungs-Modus
+                </button>
+            </div>
+        </div>
+        <div class="Button1">
+            <button>Weitermachen</button>
+        </div>
+        <div class="Button2">
+            <div v-if="userId === activeLobby.hostId">
+                <button class="green" @click="setActiveLobbyToPlayMode">
+                    Fahren
+                </button>
+            </div>
+            <div v-else>
+                <button class="green">Fahren</button>
+            </div>
+        </div>
+        <div class="Button3">
+            <button class="grey">Lobby verlassen</button>
+        </div>
     </div>
-    <div class="PlayMode">
-      <p><b>Modus:</b> {{ activeLobby.lobbyModeEnum }}</p>
-    </div>
-    <div class="SwitchMode">
-      <div v-if="userId === activeLobby.hostId">
-        <button @click=" setActiveLobbyToBuildMode">Planungs-Modus</button>
-      </div>
-    </div>
-    <div class="Button1">
-      <button>Weitermachen</button>
-    </div>
-    <div class="Button2">
-      <div v-if="userId === activeLobby.hostId">
-        <button class="green" @click="setActiveLobbyToPlayMode">Fahren</button>
-      </div>
-      <div v-else>
-        <button class="green">Fahren</button>
-      </div>
-
-    </div>
-    <div class="Button3">
-      <button class="grey">Lobby verlassen</button>
-    </div>
-  </div>
 </template>
 
 <script setup lang="ts">
-import useUser from "../../services/UserStore";
-import { E_LobbyMode } from "../../typings/E_LobbyMode";
-import { useLobbyList } from "../../services/useLobbyList";
-const { user, userId, hostId, activeLobby, setActiveLobby } = useUser();
+    import useUser from "../../services/UserStore"
+    import { E_LobbyMode } from "../../typings/E_LobbyMode"
+    import { useLobbyList } from "../../services/useLobbyList"
+    const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
 
-function switchActiveLobbyMode() {
-  if (activeLobby.value.lobbyModeEnum === E_LobbyMode.BUILD_MODE) {
-    console.log("set to PLAYMODE!");
-    activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE;
-    useLobbyList().changeLobbyModeMessage();
-  } else if (activeLobby.value.lobbyModeEnum === E_LobbyMode.PLAY_MODE) {
-    console.log("set to BUILDMODE");
-    activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE;
-    useLobbyList().changeLobbyModeMessage();
-  }
-  //Todo: Lobby im backend updaten!
-}
+    function switchActiveLobbyMode() {
+        if (activeLobby.value.lobbyModeEnum === E_LobbyMode.BUILD_MODE) {
+            console.log("set to PLAYMODE!")
+            activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE
+            useLobbyList().changeLobbyModeMessage()
+        } else if (activeLobby.value.lobbyModeEnum === E_LobbyMode.PLAY_MODE) {
+            console.log("set to BUILDMODE")
+            activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE
+            useLobbyList().changeLobbyModeMessage()
+        }
+        //Todo: Lobby im backend updaten!
+    }
 
-function setActiveLobbyToBuildMode(){
-  activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE;
-    useLobbyList().changeLobbyModeMessage();
-}
+    function setActiveLobbyToBuildMode() {
+        activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE
+        useLobbyList().changeLobbyModeMessage()
+    }
 
-function setActiveLobbyToPlayMode(){
-  activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE;
-    useLobbyList().changeLobbyModeMessage();
-}
+    function setActiveLobbyToPlayMode() {
+        activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE
+        useLobbyList().changeLobbyModeMessage()
+    }
 </script>
 
 <style scoped>

@@ -2,31 +2,31 @@
  *Data class to fetch and update the List of existing Lobbys
  */
 
-import { reactive, readonly } from "vue";
-import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO";
-import { ILobby } from "../typings/ILobby";
-import { E_LobbyMode } from "../typings/E_LobbyMode";
-import { ILobbyListState } from "../typings/ILobbyListState";
-import useUser from "./UserStore";
-import { ILobbyDTO } from "../typings/ILobbyDTO";
-import { Client } from "@stomp/stompjs";
-import { useEditor } from "./Editor/useEditor";
-import { fetchPlayerList } from "./usePlayerList";
-import IUser from "../typings/IUser";
+import { reactive, readonly } from "vue"
+import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO"
+import { ILobby } from "../typings/ILobby"
+import { E_LobbyMode } from "../typings/E_LobbyMode"
+import { ILobbyListState } from "../typings/ILobbyListState"
+import useUser from "./UserStore"
+import { ILobbyDTO } from "../typings/ILobbyDTO"
+import { Client } from "@stomp/stompjs"
+import { useEditor } from "./Editor/useEditor"
+import { fetchPlayerList } from "./usePlayerList"
+import IUser from "../typings/IUser"
 
-const ws_url = `ws://${window.location.host}/stomp`;
-const DEST = "/topic/public";
-const SEND_MSG = "/app/lobby.sendMessage";
-const JOIN_MSG = "/app/lobby.join";
-const SWITCHMODE_MSG = "/app/lobby.switchMode";
+const ws_url = `ws://${window.location.host}/stomp`
+const DEST = "/topic/public"
+const SEND_MSG = "/app/lobby.sendMessage"
+const JOIN_MSG = "/app/lobby.join"
+const SWITCHMODE_MSG = "/app/lobby.switchMode"
 
-let stompClient: Client;
-const { logindata, userId, activeLobby, setActiveLobby } = useUser();
+let stompClient: Client
+const { logindata, userId, activeLobby, setActiveLobby } = useUser()
 
 interface IStompMessage {
-    playerContent: IUser;
-    lobbyContent: ILobby;
-    type: string;
+    playerContent: IUser
+    lobbyContent: ILobby
+    type: string
 }
 
 const lobbyState = reactive<ILobbyListState>({
@@ -35,24 +35,24 @@ const lobbyState = reactive<ILobbyListState>({
 })
 
 const activeLobbyState = reactive<ILobbyDTO>({
-  lobbyId: -1,
-  hostId: -1,
-  mapId: -1,
-  lobbyName: "",
-  numOfPlayers: -1,
-  lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+    lobbyId: -1,
+    hostId: -1,
+    mapId: -1,
+    lobbyName: "",
+    numOfPlayers: -1,
+    lobbyModeEnum: E_LobbyMode.BUILD_MODE,
 })
 
 export function useLobbyList() {
-  return {
-    lobbyList: lobbyState,
-    updateLobbyList,
-    receiveLobbyUpdates,
-    joinMessage,
-    changeLobbyModeMessage,
-    updateLobby,
-    activeLobbyState: activeLobbyState,
-  };
+    return {
+        lobbyList: lobbyState,
+        updateLobbyList,
+        receiveLobbyUpdates,
+        joinMessage,
+        changeLobbyModeMessage,
+        updateLobby,
+        activeLobbyState: activeLobbyState,
+    }
 }
 
 //functions to fetch and update List of available lobbys from backend
@@ -138,119 +138,119 @@ export async function createNewLobby(
 }
 
 function joinMessage() {
-  if (
-    stompClient &&
-    userId.value !== undefined &&
-    activeLobby.value.lobbyId !== -1
-  ) {
-    const lobbyMessage: IStompMessage = {
-      playerContent: {
-        userId: logindata.userId,
-        userName: logindata.userName,
-        activeLobby: {
-          lobbyId: logindata.activeLobby.lobbyId,
-          mapId: logindata.activeLobby.mapId,
-          lobbyName: logindata.activeLobby.lobbyName,
-          numOfPlayers: logindata.activeLobby.numOfPlayers,
-          lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
-        },
-      },
-      lobbyContent: {
-        lobbyId: logindata.activeLobby.lobbyId,
-        hostId: logindata.activeLobby.hostId,
-        mapId: logindata.activeLobby.mapId,
-        lobbyName: logindata.activeLobby.lobbyName,
-        numOfPlayers: logindata.activeLobby.numOfPlayers,
-        lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
-      },
-      type: "JOIN",
-    };
-    console.log(lobbyMessage.lobbyContent);
-    stompClient.publish({
-      destination: JOIN_MSG,
-      headers: {},
-      body: JSON.stringify(lobbyMessage),
-    });
-  }
+    if (
+        stompClient &&
+        userId.value !== undefined &&
+        activeLobby.value.lobbyId !== -1
+    ) {
+        const lobbyMessage: IStompMessage = {
+            playerContent: {
+                userId: logindata.userId,
+                userName: logindata.userName,
+                activeLobby: {
+                    lobbyId: logindata.activeLobby.lobbyId,
+                    mapId: logindata.activeLobby.mapId,
+                    lobbyName: logindata.activeLobby.lobbyName,
+                    numOfPlayers: logindata.activeLobby.numOfPlayers,
+                    lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
+                },
+            },
+            lobbyContent: {
+                lobbyId: logindata.activeLobby.lobbyId,
+                hostId: logindata.activeLobby.hostId,
+                mapId: logindata.activeLobby.mapId,
+                lobbyName: logindata.activeLobby.lobbyName,
+                numOfPlayers: logindata.activeLobby.numOfPlayers,
+                lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
+            },
+            type: "JOIN",
+        }
+        console.log(lobbyMessage.lobbyContent)
+        stompClient.publish({
+            destination: JOIN_MSG,
+            headers: {},
+            body: JSON.stringify(lobbyMessage),
+        })
+    }
 }
 
 function changeLobbyModeMessage() {
-  if (
-    stompClient &&
-    userId.value !== undefined &&
-    activeLobby.value.lobbyId !== -1
-  ) {
-  }
-  const switchModeMessage: IStompMessage = {
-    playerContent: {
-      userId: logindata.userId,
-      userName: logindata.userName,
-      activeLobby: {
-        lobbyId: logindata.activeLobby.lobbyId,
-        mapId: logindata.activeLobby.mapId,
-        lobbyName: logindata.activeLobby.lobbyName,
-        numOfPlayers: logindata.activeLobby.numOfPlayers,
-        lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
-      },
-    },
-    lobbyContent: {
-      lobbyId: logindata.activeLobby.lobbyId,
-      hostId: logindata.activeLobby.hostId,
-      mapId: logindata.activeLobby.mapId,
-      lobbyName: logindata.activeLobby.lobbyName,
-      numOfPlayers: logindata.activeLobby.numOfPlayers,
-      lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
-    },
-    type: "SWITCH_MODE",
-  };
+    if (
+        stompClient &&
+        userId.value !== undefined &&
+        activeLobby.value.lobbyId !== -1
+    ) {
+    }
+    const switchModeMessage: IStompMessage = {
+        playerContent: {
+            userId: logindata.userId,
+            userName: logindata.userName,
+            activeLobby: {
+                lobbyId: logindata.activeLobby.lobbyId,
+                mapId: logindata.activeLobby.mapId,
+                lobbyName: logindata.activeLobby.lobbyName,
+                numOfPlayers: logindata.activeLobby.numOfPlayers,
+                lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
+            },
+        },
+        lobbyContent: {
+            lobbyId: logindata.activeLobby.lobbyId,
+            hostId: logindata.activeLobby.hostId,
+            mapId: logindata.activeLobby.mapId,
+            lobbyName: logindata.activeLobby.lobbyName,
+            numOfPlayers: logindata.activeLobby.numOfPlayers,
+            lobbyModeEnum: logindata.activeLobby.lobbyModeEnum,
+        },
+        type: "SWITCH_MODE",
+    }
 
-  stompClient.publish({
-    destination: SWITCHMODE_MSG,
-    headers: {},
-    body: JSON.stringify(switchModeMessage),
-  });
+    stompClient.publish({
+        destination: SWITCHMODE_MSG,
+        headers: {},
+        body: JSON.stringify(switchModeMessage),
+    })
 }
 
 function receiveLobbyUpdates() {
-  stompClient = new Client({
-    brokerURL: ws_url,
-  });
-  stompClient.onWebSocketError = (error) => {
-    console.log("error", error.message);
-  };
-  stompClient.onStompError = (frame) => {
-    console.log("error", frame.body);
-  };
+    stompClient = new Client({
+        brokerURL: ws_url,
+    })
+    stompClient.onWebSocketError = (error) => {
+        console.log("error", error.message)
+    }
+    stompClient.onStompError = (frame) => {
+        console.log("error", frame.body)
+    }
 
-  stompClient.onConnect = (frame) => {
-    console.log("lobby ws connected");
-    stompClient.subscribe(DEST, (message) => {
-      const lobbyUpdate: IStompMessage = JSON.parse(message.body);
-      onMessageReceived(lobbyUpdate);
-    });
-  };
+    stompClient.onConnect = (frame) => {
+        console.log("lobby ws connected")
+        stompClient.subscribe(DEST, (message) => {
+            const lobbyUpdate: IStompMessage = JSON.parse(message.body)
+            onMessageReceived(lobbyUpdate)
+        })
+    }
 
-  stompClient.onDisconnect = () => {
-    console.log("lobby ws disconnected");
-  };
+    stompClient.onDisconnect = () => {
+        console.log("lobby ws disconnected")
+    }
 
-  stompClient.activate();
+    stompClient.activate()
 }
 
 async function onMessageReceived(payload: IStompMessage) {
-  if (payload.lobbyContent.lobbyId === activeLobby.value.lobbyId) {
-    if (payload.type === "JOIN") {
-      console.log("received message JOIN");
-      await fetchPlayerList();
-      activeLobby.value.playerList?.push({
-        userId: payload.playerContent.userId,
-        userName: payload.playerContent.userName,
-        activeLobby: payload.lobbyContent,
-      });
+    if (payload.lobbyContent.lobbyId === activeLobby.value.lobbyId) {
+        if (payload.type === "JOIN") {
+            console.log("received message JOIN")
+            await fetchPlayerList()
+            activeLobby.value.playerList?.push({
+                userId: payload.playerContent.userId,
+                userName: payload.playerContent.userName,
+                activeLobby: payload.lobbyContent,
+            })
+        }
+        if (payload.type === "SWITCH_MODE") {
+            console.log("switch mode nachricht vom backend erhalten!!")
+            activeLobby.value.lobbyModeEnum = payload.lobbyContent.lobbyModeEnum
+        }
     }
-    if(payload.type === "SWITCH_MODE"){
-      console.log("switch mode nachricht vom backend erhalten!!");
-      activeLobby.value.lobbyModeEnum = payload.lobbyContent.lobbyModeEnum
-    }
-  }
 }
