@@ -1,3 +1,4 @@
+import { assert } from "console"
 import { reactive, ref } from "vue"
 import { NpcCar } from "../../components/3D/NpcCar"
 import { IMapObject } from "../streetplaner/IMapObject"
@@ -159,10 +160,39 @@ export function fillGameState(): void {
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
         if (mapObj.game_assets.length > 0) {
             mapObj.game_assets.forEach((gameAsset) => {
-                gameState.npcCarMapFromuseGameview.set(
-                    npcMapIndex,
-                    new NpcCar(gameAsset.x, 0, gameAsset.y, gameAsset.rotation, gridSizeX, gridSizeY, fieldSize, mapObj)
-                )
+                if (gameAsset.assetId === null) {
+                    let tempId = -1
+                    gameState.npcCarMapFromuseGameview.set(
+                        npcMapIndex,
+                        new NpcCar(
+                            tempId,
+                            gameAsset.x,
+                            0,
+                            gameAsset.y,
+                            gameAsset.rotation,
+                            gridSizeX,
+                            gridSizeY,
+                            fieldSize,
+                            mapObj
+                        )
+                    )
+                } else {
+                    gameState.npcCarMapFromuseGameview.set(
+                        npcMapIndex,
+                        new NpcCar(
+                            gameAsset.assetId,
+                            gameAsset.x,
+                            0,
+                            gameAsset.y,
+                            gameAsset.rotation,
+                            gridSizeX,
+                            gridSizeY,
+                            fieldSize,
+                            mapObj
+                        )
+                    )
+                }
+
                 npcMapIndex++
             })
         }

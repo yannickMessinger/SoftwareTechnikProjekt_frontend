@@ -1,7 +1,26 @@
 import { reactive, ref } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
+import { Client } from "@stomp/stompjs"
+import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
+
+const ws_url = `ws://${window.location.host}/stomp`
+const DEST = "/topic/npc"
+const UPDATE_POS_MSG = "/app/npc.updatepos"
+
+interface NpcInfo {
+    npcId: number
+    posX: number
+    posZ: number
+    npcRotation: number
+}
+
+interface IStompMessage {
+    npcContent: NpcInfo
+    type: string
+}
 
 export class NpcCar {
+    public npcId: any
     public npc: any
     public positions: any
     public curMapObjCenterCoords: any
@@ -12,8 +31,10 @@ export class NpcCar {
     public mapLimit: any
     public gameAssetX: any
     public gameAssetZ: any
+    public stompClient: Client
 
     constructor(
+        npcId: any,
         gameAssetX: any,
         posY: any,
         gameAssetZ: any,
@@ -23,6 +44,8 @@ export class NpcCar {
         fieldSize: any,
         curMapObj: IMapObject
     ) {
+        this.stompClient = this.receiveNpcUpdates()
+        this.npcId = npcId
         this.npc = ref()
         this.curMapObj = curMapObj
         this.positions = reactive({ npcPosX: 0, npcPosY: posY, npcPosZ: 0, npcRotation: npcRotation })
@@ -62,6 +85,8 @@ export class NpcCar {
         } else if (this.positions.npcRotation === 3) {
             this.positions.npcPosX -= velocity
         }
+
+        this.checkMapEleLimit()
     }
 
     calcMapEleCenter() {
@@ -110,6 +135,68 @@ export class NpcCar {
         } else {
             //method callto backend to get calculated coords of next map ele from script??
             console.log("left map ele")
+            //this.updatePosMessage()
         }
+    }
+
+    updatePosMessage() {
+        if (this.stompClient) {
+            const updatePosMsg: IStompMessage = {
+                npcContent: {
+                    npcId: this.npcId,
+                    posX: this.positions.npcPosX,
+                    posZ: this.positions.npcPosX,
+                    npcRotation: this.positions.npcRotation,
+                },
+                type: "POSITION_UPDATE",
+            }
+
+            this.stompClient.publish({
+                destination: UPDATE_POS_MSG,
+                headers: {},
+                body: JSON.stringify(updatePosMsg),
+            })
+        }
+    }
+
+    /*function to activate Websockets on specific destination in backend. 
+    Also for errorhandling if connection could not successfully be established.
+    If new message is arriving it is passed to onMessageReceived function*/
+    receiveNpcUpdates(): Client {
+        const stompClient = new Client({
+            brokerURL: ws_url,
+        })
+        stompClient.onWebSocketError = (error) => {
+            console.log("error", error.message)
+        }
+        stompClient.onStompError = (frame) => {
+            console.log("error", frame.body)
+        }
+
+        stompClient.onConnect = (frame) => {
+            console.log("npc sucessfully connected ws")
+            stompClient.subscribe(DEST, (message) => {
+                const lobbyUpdate: IStompMessage = JSON.parse(message.body)
+                this.onMessageReceived(lobbyUpdate)
+            })
+        }
+
+        stompClient.onDisconnect = () => {
+            console.log("npc ws disconnected")
+        }
+
+        stompClient.activate()
+
+        return stompClient
+    }
+
+    /*function that is called if new message is arriving on websocket, looks for message type and
+    is performing specific actions depending on message type.
+    
+    If message tpye if of type "JOIN", the playerlist of this current lobby is updated with the payload for all players that joined the lobby.
+    If message is of type "SWITCH_MODE", the lobbymode is changed to the payload content of the message for all players of the lobby.
+    */
+    async onMessageReceived(payload: IStompMessage) {
+        console.log(`Npc mit ${this.npcId} hat neue Update Message erhalten ${payload}`)
     }
 }
