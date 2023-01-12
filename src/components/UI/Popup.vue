@@ -38,5 +38,6 @@ export default {
 }
 .popup-close {
   margin-top: 20px;
+  color: black;
 }
 </style>

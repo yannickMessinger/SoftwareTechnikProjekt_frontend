@@ -171,6 +171,7 @@
         overflow-y: scroll;
         background-color: var(--woe-white);
         position: fixed;
+        z-index: 2;
     }
 
     .tools-back-btn {

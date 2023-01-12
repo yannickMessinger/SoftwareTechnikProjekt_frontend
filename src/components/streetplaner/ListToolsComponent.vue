@@ -6,6 +6,7 @@
     import ToolEnum from '../../services/streetplaner/ToolEnum'
     import Popup from '../UI/Popup.vue';
     import useUser from "../../services/UserStore";
+    import { useEditor } from '../../services/Editor/useEditor';
     
     /**Variables: */
     const pathToPictures = "/img/streetplaner/"
@@ -23,7 +24,7 @@
     /** currently selected tool */
     const selectedTool = reactive({tool: defaultTool});
     const {emit}=useEventBus();
-    const pedestriansAmount = ref(0);
+    let pedestriansAmount = ref(0);
     const popupTrigger = ref(false);
 
     /**entrys in toollist */
@@ -51,7 +52,12 @@
       name: "Drehen",
       texture: pathToPictures + "tool-icons/rotate.svg",
     }
-    const pedestrianInput = { tool: ToolEnum.PEDESTRIAN, id: 4, name: "Fußgänger", texture: (pathToPictures+"tool-icons/pedestrian.svg")};
+    const pedestrianInput = {
+      tool: ToolEnum.PEDESTRIAN,
+      id: 4,
+      name: "Fußgänger",
+      texture: pathToPictures+"tool-icons/pedestrian.svg",
+    };
 
     function onToolClick(clickedTool: any) {
         /** if the selected tool is the clicked tool, it gets deselected by restoring the default tool
@@ -73,12 +79,16 @@
         emit("tool-select-component-event", selectedTool.tool)
     }
 
-    function togglePopup() {
+    async function togglePopup() {
       popupTrigger.value = !popupTrigger.value;
+      const {activeLobby} = useUser();
+      const {postPedestrians} = useEditor(activeLobby.value.mapId);
+      await postPedestrians(activeLobby.value.mapId, pedestriansAmount.value);
     }
 
-    function sendPedestrian(e: { target: { value: number; }; }) {
-      pedestriansAmount.value = e.target.value
+    function updatePedestrians(e: Event) {
+      pedestriansAmount.value = Number((<HTMLInputElement>e.target).value);
+      console.log(pedestriansAmount);
     }
 
 </script>
@@ -94,7 +104,7 @@
     </div>
     <Popup v-if="popupTrigger" :ClosePopup="() => togglePopup()">
       <p>Wie viele Fussgänger sollen zufällig in der Spielwelt positioniert werden?</p>
-      <input type="number" min="0" :value="pedestriansAmount" @change="e => sendPedestrian(e)" />
+      <input type="number" min="0" :value="pedestriansAmount" @change="e => updatePedestrians(e)" />
     </Popup>
 </template>
 
