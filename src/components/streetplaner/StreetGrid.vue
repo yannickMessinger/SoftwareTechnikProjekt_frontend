@@ -60,10 +60,16 @@ watch(
 )
 watch(
     () => bus.value.get("grid-save-event"),
-    (val) => {
+    () => {
         saveStreetGrid()
     }
 )
+watch(
+    () => bus.value.get("random-asset-event"),
+    (val) => {
+        console.log(val[0].car)
+    }
+) // Todo, handle random assets
 
 // create and initialize streetGrid
 const streetGrid: IGridElement[][] = reactive(
