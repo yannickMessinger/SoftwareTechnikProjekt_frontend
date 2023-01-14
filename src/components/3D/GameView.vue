@@ -34,11 +34,18 @@
             const box = ref()
             const camera = ref()
             const fpsCamera = new FirstPersonCamera(camera, box)
-            const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } =
-                useGameView()
+            const {
+                gameState,
+                setMapWidthAndMapHeight,
+                resetGameMapObjects,
+                updateMapObjsFromGameState,
+                updatePosMessage,
+                receiveNpcUpdates,
+            } = useGameView()
             console.log(
                 `Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
             )
+            receiveNpcUpdates()
             console.log(gameState.sizeX * gameState.fieldSize)
             console.log(gameState.sizeY * gameState.fieldSize)
 
@@ -101,6 +108,9 @@
             const mapElements = computed(() => gameState.gameMapObjects)
             const npcEles = computed(() => gameState.npcCarMapFromuseGameview)
 
+            //const iterator = npcEles.value.entries()
+            //console.log(iterator.next())
+
             /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
       On the 3d Game View the coordinates x:0, z:0 describes the center of our Grid. The upper left corner would be x:-50, z:-50.
@@ -149,12 +159,17 @@
                     `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
                 )
                 updateMapObjsFromGameState()
-                console.log(npcEles)
+                //console.log(npcEles)
                 renderer.value.onBeforeRender(() => {
                     fpsCamera.update()
 
                     npcEles.value.forEach((ele, index) => {
-                        npcEles.value.get(index)!.update()
+                        //npcEles.value.get(index)!.update()
+                        ele.update()
+
+                        if (!ele.driving) {
+                            updatePosMessage(ele.npcId)
+                        }
                     })
                 })
             })
@@ -210,22 +225,21 @@
                 />
             </div>
 
-            <div v-for="(asset, index) in npcEles">
+            <div v-for="asset in npcEles">
                 <GltfModel
-                    v-bind:ref="npcEles.get(index)!.npc"
+                    v-bind:ref="asset[1].npc"
                     v-bind:src="buildingIDMap.get(22)"
                     :position="{
-                            x: npcEles.get(index)!.positions.npcPosX,
-                            y: 0.75,
-                            z: npcEles.get(index)!.positions.npcPosZ,
-                           
-                        }"
+                        x: asset[1].positions.npcPosX,
+                        y: 0.75,
+                        z: asset[1].positions.npcPosZ,
+                    }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{
-                            x: 0,
-                            y: assetRotationMap.get(npcEles.get(index)!.positions.npcRotation),
-                            z: 0,
-                        }"
+                        x: 0,
+                        y: assetRotationMap.get(asset[1].positions.npcRotation),
+                        z: 0,
+                    }"
                 />
             </div>
         </Scene>

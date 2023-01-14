@@ -1,8 +1,14 @@
-import { assert } from "console"
 import { reactive, ref } from "vue"
 import { NpcCar } from "../../components/3D/NpcCar"
 import { IMapObject } from "../streetplaner/IMapObject"
 import useUser from "../UserStore"
+import { Client } from "@stomp/stompjs"
+
+const ws_url = `ws://${window.location.host}/stomp`
+const DEST = "/topic/npc"
+const UPDATE_POS_MSG = "/app/npc.updatepos"
+
+let stompClient: Client
 
 const { activeLobby } = useUser()
 
@@ -45,6 +51,26 @@ const gameState = reactive<IGameState>({
     mapId: -1,
 })
 
+interface NpcInfo {
+    npcId: number
+    npcPosX: number
+    npcPosZ: number
+    npcRotation: number
+}
+
+interface NpcInfoResponseDTO {
+    nextMapEleobjectTypeId: number
+    nextMapEleX: number
+    nextMapEleY: number
+    nextMapElerotation: number
+    newGameAssetRotation: number
+}
+
+interface IStompMessage {
+    npcContent: NpcInfo
+    type: string
+}
+
 export function useGameView() {
     return {
         gameState,
@@ -55,6 +81,8 @@ export function useGameView() {
         setMapWidthAndMapHeight,
         setGameStateSizes,
         setGameStateMapId,
+        updatePosMessage,
+        receiveNpcUpdates,
     }
 }
 
@@ -156,14 +184,15 @@ export function fillGameState(): void {
         }
     }
     gameState.npcCarMapFromuseGameview.clear()
-    let npcMapIndex = 0
+
+    //adds NpcCar instances to Map for each gameasset from backend
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
         if (mapObj.game_assets.length > 0) {
             mapObj.game_assets.forEach((gameAsset) => {
                 if (gameAsset.assetId === null) {
                     let tempId = -1
                     gameState.npcCarMapFromuseGameview.set(
-                        npcMapIndex,
+                        tempId,
                         new NpcCar(
                             tempId,
                             gameAsset.x,
@@ -178,7 +207,7 @@ export function fillGameState(): void {
                     )
                 } else {
                     gameState.npcCarMapFromuseGameview.set(
-                        npcMapIndex,
+                        gameAsset.assetId!,
                         new NpcCar(
                             gameAsset.assetId,
                             gameAsset.x,
@@ -192,12 +221,84 @@ export function fillGameState(): void {
                         )
                     )
                 }
-
-                npcMapIndex++
             })
         }
         gameState.gameMapObjects[mapObj.x * 10 + mapObj.y] = mapObj
     })
 
     console.log(gameState.npcCarMapFromuseGameview)
+}
+
+//emits event to backend with current information, so that next map element can be calculated.
+function updatePosMessage(npcId: number) {
+    if (stompClient) {
+        let tempCar = gameState.npcCarMapFromuseGameview.get(npcId)!
+        const updatePosMsg: IStompMessage = {
+            npcContent: {
+                npcId: tempCar!.npcId,
+                npcPosX: tempCar!.curMapObj.x,
+                npcPosZ: tempCar!.curMapObj.y,
+                npcRotation: tempCar!.positions.npcRotation,
+            },
+            type: "POSITION_UPDATE",
+        }
+
+        stompClient.publish({
+            destination: UPDATE_POS_MSG,
+            headers: {},
+            body: JSON.stringify(updatePosMsg),
+        })
+    }
+}
+
+//activates Websocket for backend communication
+function receiveNpcUpdates() {
+    stompClient = new Client({
+        brokerURL: ws_url,
+    })
+    stompClient.onWebSocketError = (error) => {
+        console.log("error", error.message)
+    }
+    stompClient.onStompError = (frame) => {
+        console.log("error", frame.body)
+    }
+
+    stompClient.onConnect = (frame) => {
+        console.log(`use gameview client sucessfully connected ws`)
+        stompClient.subscribe(DEST, (message) => {
+            const npcUpdate: any = JSON.parse(message.body)
+            onMessageReceived(npcUpdate)
+        })
+    }
+
+    stompClient.onDisconnect = () => {
+        console.log("npc ws disconnected")
+    }
+
+    stompClient.activate()
+}
+
+//on update from backend set new values of current mapobj and updated position for corresponding npc car
+async function onMessageReceived(payload: any) {
+    //console.log(`Npc mit ${this.npcId} hat neue Update Message erhalten`)
+    console.log(payload)
+
+    /*
+        this.curMapObj.objectTypeId = payload.nextMapEleInfo.nextMapEleobjectTypeId;
+        this.curMapObj.x = payload.nextMapEleInfo.nextMapEleX;
+        this.curMapObj.y = payload.nextMapEleInfo.nextMapEleY;
+        this.curMapObj.rotation = payload.nextMapEleInfo.nextMapElerotation
+        this.positions.npcRotation = payload.nextMapEleInfo.newGameAssetRotation
+
+
+        
+        this.calcMapEleCenter()
+        this.calcPixelPosNpc()
+        this.calcNpcMapLimit(
+            this.curMapObjCenterCoords.centerX,
+            this.curMapObjCenterCoords.centerZ,
+            this.positions.npcRotation
+        )*/
+
+    //this.driving = true;
 }

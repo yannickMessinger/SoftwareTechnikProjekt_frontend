@@ -1,11 +1,7 @@
 import { reactive, ref } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
-import { Client } from "@stomp/stompjs"
-import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
 
-const ws_url = `ws://${window.location.host}/stomp`
-const DEST = "/topic/npc"
-const UPDATE_POS_MSG = "/app/npc.updatepos"
+import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
 
 //maybe MapId is necessary to identify current map for backend purposes
 
@@ -16,25 +12,32 @@ interface NpcInfo {
     npcRotation: number
 }
 
+interface NpcInfoResponseDTO {
+    nextMapEleobjectTypeId: number
+    nextMapEleX: number
+    nextMapEleY: number
+    nextMapElerotation: number
+    newGameAssetRotation: number
+}
+
 interface IStompMessage {
     npcContent: NpcInfo
     type: string
 }
 
 export class NpcCar {
-    public npcId: any
+    public npcId: number
     public npc: any
     public positions: any
     public curMapObjCenterCoords: any
     public curMapObj: IMapObject
-    public gridSizeX: any
-    public gridSizeY: any
-    public fieldSize: any
-    public mapLimit: any
-    public gameAssetX: any
-    public gameAssetZ: any
-    public stompClient: Client
-    public driving: any
+    public gridSizeX: number
+    public gridSizeY: number
+    public fieldSize: number
+    public mapLimit: number
+    public gameAssetX: number
+    public gameAssetZ: number
+    public driving: boolean
 
     constructor(
         npcId: any,
@@ -47,7 +50,6 @@ export class NpcCar {
         fieldSize: any,
         curMapObj: IMapObject
     ) {
-        this.stompClient = this.receiveNpcUpdates()
         this.npcId = npcId
         this.npc = ref()
         this.curMapObj = curMapObj
@@ -94,7 +96,7 @@ export class NpcCar {
 
             this.checkMapEleLimit()
         } else {
-            console.log("not moving at the moment")
+            //console.log("not moving at the moment")
         }
     }
 
@@ -140,88 +142,36 @@ export class NpcCar {
     checkMapEleLimit() {
         if (this.positions.npcRotation === 0) {
             if (this.positions.npcPosZ > this.mapLimit) {
-                console.log(`npcCar id: ${this.npcId} in mapEle!`)
+                //console.log(`npcCar id: ${this.npcId} in mapEle!`)
             } else {
-                console.log(`npcCar id: ${this.npcId} left mapEle!`)
+                //console.log(`npcCar id: ${this.npcId} left mapEle!`)
                 this.driving = false
-                this.updatePosMessage()
+                //this.updatePosMessage()
             }
         } else if (this.positions.npcRotation === 1) {
             if (this.positions.npcPosX < this.mapLimit) {
-                console.log(`npcCar id: ${this.npcId} in mapEle!`)
+                //console.log(`npcCar id: ${this.npcId} in mapEle!`)
             } else {
-                console.log(`npcCar id: ${this.npcId} left mapEle!`)
+                //console.log(`npcCar id: ${this.npcId} left mapEle!`)
                 this.driving = false
-                this.updatePosMessage()
+                //this.updatePosMessage()
             }
         } else if (this.positions.npcRotation === 2) {
             if (this.positions.npcPosZ < this.mapLimit) {
-                console.log(`npcCar id: ${this.npcId} in mapEle!`)
+                //console.log(`npcCar id: ${this.npcId} in mapEle!`)
             } else {
-                console.log(`npcCar id: ${this.npcId} left mapEle!`)
+                //console.log(`npcCar id: ${this.npcId} left mapEle!`)
                 this.driving = false
-                this.updatePosMessage()
+                //this.updatePosMessage()
             }
         } else if (this.positions.npcRotation === 3) {
             if (this.positions.npcPosX > this.mapLimit) {
-                console.log(`npcCar id: ${this.npcId} in mapEle!`)
+                //console.log(`npcCar id: ${this.npcId} in mapEle!`)
             } else {
-                console.log(`npcCar id: ${this.npcId} left mapEle!`)
+                //console.log(`npcCar id: ${this.npcId} left mapEle!`)
                 this.driving = false
-                this.updatePosMessage()
+                //this.updatePosMessage()
             }
         }
-    }
-
-    updatePosMessage() {
-        if (this.stompClient) {
-            const updatePosMsg: IStompMessage = {
-                npcContent: {
-                    npcId: this.npcId,
-                    npcPosX: this.curMapObj.x,
-                    npcPosZ: this.curMapObj.y,
-                    npcRotation: this.positions.npcRotation,
-                },
-                type: "POSITION_UPDATE",
-            }
-
-            this.stompClient.publish({
-                destination: UPDATE_POS_MSG,
-                headers: {},
-                body: JSON.stringify(updatePosMsg),
-            })
-        }
-    }
-
-    receiveNpcUpdates(): Client {
-        const stompClient = new Client({
-            brokerURL: ws_url,
-        })
-        stompClient.onWebSocketError = (error) => {
-            console.log("error", error.message)
-        }
-        stompClient.onStompError = (frame) => {
-            console.log("error", frame.body)
-        }
-
-        stompClient.onConnect = (frame) => {
-            console.log(`npc id: ${this.npcId} sucessfully connected ws`)
-            stompClient.subscribe(DEST, (message) => {
-                const npcUpdate: IStompMessage = JSON.parse(message.body)
-                this.onMessageReceived(npcUpdate)
-            })
-        }
-
-        stompClient.onDisconnect = () => {
-            console.log("npc ws disconnected")
-        }
-
-        stompClient.activate()
-
-        return stompClient
-    }
-
-    async onMessageReceived(payload: IStompMessage) {
-        console.log(`Npc mit ${this.npcId} hat neue Update Message erhalten ${payload}`)
     }
 }
