@@ -14,6 +14,7 @@ import { StreetGridDTO } from "../../services/streetplaner/StreetGridDTO"
 import useUser from "../../services/UserStore"
 import { useEditor } from "../../services/Editor/useEditor"
 import { useGameView } from "../../services/3DGameView/useGameView"
+import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
 const { bus } = useEventBus()
 const { setGameStateSizes, setGameStateMapId } = useGameView()
 const { blockListState, updateBlockList } = useBlockList()
@@ -67,9 +68,9 @@ watch(
 watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
-        console.log(val[0].car)
+        placeAllRandomCars(val[0].car)
     }
-) // Todo, handle random assets
+)
 
 // create and initialize streetGrid
 const streetGrid: IGridElement[][] = reactive(
@@ -108,6 +109,104 @@ onMounted(() => {
     setGameStateMapId(lobbyState.value.mapId)
     updateMap()
 })
+
+function placeAllRandomCars(amountCars: number) {
+    let counter = 0
+    let errorCounter = 0
+    let changedElements: Array<IMapObject> = []
+    while (counter !== amountCars && errorCounter < 10) {
+        let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
+        let randomElement = editorState.mapObjects[randomIndex]
+        if (placeRandomCarOnElement(randomElement, 7)) {
+            if (changedElements.includes(randomElement)) {
+                delete changedElements[changedElements.indexOf(randomElement)]
+            }
+            changedElements.push(editorState.mapObjects[randomIndex])
+            counter++
+        } else {
+            errorCounter++
+        }
+    }
+    for (let ele of changedElements) {
+        console.log(ele)
+        updateMessage(ele)
+    }
+}
+
+function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
+    debugger
+    let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
+    // Todo, check if car is already placed where new car should be placed
+    if (element.objectTypeId === 0) {
+        // element = straight
+        if (element.game_assets.length === 4) {
+            return false
+        }
+        // 4 = 4 Random Spots for Cars on a straight
+        if (element.rotation % 2 === 0) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.37, y: 0.25, rotation: 2 },
+                    { x: 0.37, y: 0.75, rotation: 2 },
+                    { x: 0.62, y: 0.75, rotation: 0 },
+                    { x: 0.62, y: 0.25, rotation: 0 },
+                ]
+            )
+        } else if (element.rotation % 2 === 1) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.25, y: 0.37, rotation: 3 },
+                    { x: 0.75, y: 0.37, rotation: 3 },
+                    { x: 0.75, y: 0.62, rotation: 1 },
+                    { x: 0.25, y: 0.62, rotation: 1 },
+                ]
+            )
+        }
+    }
+
+    let randomPos = Math.floor(Math.random() * randomPosElements.length)
+    if (checkAssetPlacedNearElement(element, randomPosElements[randomPos])) {
+        randomPos = 0
+        while (randomPos < randomPosElements.length) {
+            if (checkAssetPlacedNearElement(element, randomPosElements[randomPos])) {
+                randomPos++
+            } else {
+                streetGrid[element.x][element.y].game_assets.push({
+                    objectTypeId: assetObjectTypeId,
+                    x: randomPosElements[randomPos].x,
+                    y: randomPosElements[randomPos].y,
+                    rotation: randomPosElements[randomPos].rotation,
+                    texture: blockList[assetObjectTypeId].texture,
+                })
+                return true
+            }
+        }
+    } else {
+        streetGrid[element.x][element.y].game_assets.push({
+            objectTypeId: assetObjectTypeId,
+            x: randomPosElements[randomPos].x,
+            y: randomPosElements[randomPos].y,
+            rotation: randomPosElements[randomPos].rotation,
+            texture: blockList[assetObjectTypeId].texture,
+        })
+        return true
+    }
+
+    return false
+}
+
+function checkAssetPlacedNearElement(element: IMapObject, pos: { x: number; y: number }): boolean {
+    if (
+        element.game_assets.filter(
+            (obj: IGameAsset2D) =>
+                obj.x >= pos.x - 0.1 && obj.x <= pos.x + 0.1 && obj.y >= pos.y - 0.1 && obj.y <= pos.y + 0.1
+        ).length > 0
+    ) {
+        return true
+    } else {
+        return false
+    }
+}
 
 // onClick handles click on specific cell
 function onClick(cell: any, e: any) {
