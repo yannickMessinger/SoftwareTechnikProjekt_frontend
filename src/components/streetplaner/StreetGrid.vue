@@ -134,15 +134,9 @@ function placeAllRandomCars(amountCars: number) {
 }
 
 function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
-    debugger
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
-    // Todo, check if car is already placed where new car should be placed
     if (element.objectTypeId === 0) {
         // element = straight
-        if (element.game_assets.length === 4) {
-            return false
-        }
-        // 4 = 4 Random Spots for Cars on a straight
         if (element.rotation % 2 === 0) {
             randomPosElements.push(
                 ...[
@@ -162,6 +156,63 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
                 ]
             )
         }
+    } else if (element.objectTypeId === 1) {
+        // element = curve
+        if (element.rotation === 0) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.38, y: 0.88, rotation: 2 },
+                    { x: 0.64, y: 0.88, rotation: 0 },
+                    { x: 0.88, y: 0.38, rotation: 3 },
+                    { x: 0.88, y: 0.64, rotation: 1 },
+                ]
+            )
+        } else if (element.rotation === 1) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.36, y: 0.88, rotation: 2 },
+                    { x: 0.62, y: 0.88, rotation: 0 },
+                    { x: 0.12, y: 0.38, rotation: 3 },
+                    { x: 0.12, y: 0.65, rotation: 1 },
+                ]
+            )
+        } else if (element.rotation === 2) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.12, y: 0.34, rotation: 3 },
+                    { x: 0.12, y: 0.62, rotation: 1 },
+                    { x: 0.62, y: 0.12, rotation: 0 },
+                    { x: 0.34, y: 0.12, rotation: 2 },
+                ]
+            )
+        } else if (element.rotation === 3) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.64, y: 0.12, rotation: 0 },
+                    { x: 0.38, y: 0.12, rotation: 2 },
+                    { x: 0.88, y: 0.34, rotation: 3 },
+                    { x: 0.88, y: 0.64, rotation: 1 },
+                ]
+            )
+        }
+    } else if (element.objectTypeId === 2) {
+        // element = intersection
+        randomPosElements.push(
+            ...[
+                { x: 0.37, y: 0.12, rotation: 2 },
+                { x: 0.37, y: 0.88, rotation: 2 },
+                { x: 0.62, y: 0.88, rotation: 0 },
+                { x: 0.62, y: 0.12, rotation: 0 },
+                { x: 0.12, y: 0.37, rotation: 3 },
+                { x: 0.88, y: 0.37, rotation: 3 },
+                { x: 0.88, y: 0.62, rotation: 1 },
+                { x: 0.12, y: 0.62, rotation: 1 },
+            ]
+        )
+    }
+
+    if (element.game_assets.length === randomPosElements.length) {
+        return false
     }
 
     let randomPos = Math.floor(Math.random() * randomPosElements.length)
@@ -387,7 +438,7 @@ function calcCoordAssetX(id: string, relativeX: number) {
         // elemRect.left - bodyRect.left calculates the top left corner of the grid cell
         // + gridSize.value * relativeX calculates where in the grid the asset is placed
         // - assetSize.value / 3 moves the asset so the mid point is in the middle, usually one should use 2 here, but somehow 3 works
-        posX = elemRect.left - bodyRect.left + gridSize.size * relativeX - assetSize.value / 3
+        posX = elemRect.left - bodyRect.left + gridSize.size * relativeX - assetSize.value / 2
     }
     console.log(assetSizePx.value)
     console.log(`x: ${posX}`)
@@ -403,7 +454,7 @@ function calcCoordAssetY(id: string, relativeY: number) {
         // elemRect.left - bodyRect.left calculates the top left corner of the grid cell
         // + gridSize.value * relativeY calculates where in the grid the asset is placed
         // - assetSize.value / 3 moves the asset so the mid point is in the middle, usually one should use 2 here, but somehow 3 works
-        posY = elemRect.top - bodyRect.top + gridSize.size * relativeY - assetSize.value / 3
+        posY = elemRect.top - bodyRect.top + gridSize.size * relativeY - assetSize.value / 2
     }
     console.log(`y: ${posY}`)
     return posY
