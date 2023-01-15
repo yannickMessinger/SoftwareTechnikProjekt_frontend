@@ -14,10 +14,12 @@ const state = reactive<IUser>({
     loggedIn: false,
     activeLobby: {
         lobbyId: -1,
+        hostId: -1,
         mapId: -1,
         lobbyName: "",
         numOfPlayers: 0,
         lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+        playerList: [],
     },
 })
 
@@ -26,10 +28,7 @@ async function retrieveUserFromLocalStorage() {
     if (userString) {
         const data = JSON.parse(userString)
         const loginResponse = await login(data.username, data.password)
-        if (
-            loginResponse?.hasOwnProperty("userId") &&
-            loginResponse?.hasOwnProperty("userName")
-        ) {
+        if (loginResponse?.hasOwnProperty("userId") && loginResponse?.hasOwnProperty("userName")) {
             router.push("/")
         }
     }
@@ -54,10 +53,8 @@ async function sendName(): Promise<void> {
         }),
     })
 
-    console.log("sendName():", response)
     const jsondata = await response.json()
     setId(Number(jsondata))
-    console.log("state.userId", state.userId)
 }
 
 async function register(username: string, password: string): Promise<any> {
@@ -85,10 +82,7 @@ async function register(username: string, password: string): Promise<any> {
         .catch((err) => console.log(err))
 }
 
-async function login(
-    username: string,
-    password: string
-): Promise<{ userId: number; userName: string } | null> {
+async function login(username: string, password: string): Promise<{ userId: number; userName: string } | null> {
     return fetch("/api/player/login", {
         method: "POST",
         headers: {
@@ -102,10 +96,7 @@ async function login(
     })
         .then((response) => {
             if (response.status === 200) {
-                localStorage.setItem(
-                    "user-e-mobility",
-                    JSON.stringify({ username, password })
-                )
+                localStorage.setItem("user-e-mobility", JSON.stringify({ username, password }))
                 return response.json()
             }
             if (response.status === 400) {
@@ -140,18 +131,22 @@ function logout() {
     setName("")
 }
 
+//sets active Lobby property of the current User
 async function setActiveLobby(lobby: ILobby): Promise<void> {
     state.activeLobby = lobby
-    await postActiveLobby(lobby)
+}
+
+function updateActiveLobbyPlayerList(players: IUser[]) {
+    for (let p of players) {
+        state.activeLobby.playerList?.push(p)
+    }
+    console.log(state.activeLobby.playerList)
 }
 
 async function postActiveLobby(lobby: ILobby) {
-    const response = await fetch(
-        `/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`,
-        {
-            method: "POST",
-        }
-    )
+    const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
+        method: "POST",
+    })
     console.log("setActiveLobby() -> post player to lobby - response", response)
 }
 
@@ -164,7 +159,9 @@ export default function useUser() {
         logindata: readonly(state),
         name: computed(() => state.userName),
         userId: computed(() => state.userId),
+        hostId: computed(() => state.activeLobby.hostId),
         activeLobby: computed(() => state.activeLobby),
+        user: readonly<IUser>(state),
         setName,
         setId,
         sendName,
@@ -172,5 +169,6 @@ export default function useUser() {
         login,
         register,
         logout,
+        updateActiveLobbyPlayerList,
     }
 }

@@ -32,9 +32,7 @@
                     placeholder="Passwort"
                     required
                 />
-                <label v-if="registrationMode" class="error">{{
-                    passwordError
-                }}</label>
+                <label v-if="registrationMode" class="error">{{ passwordError }}</label>
                 <hr />
                 <BasicButton
                     v-if="!registrationMode"
@@ -45,9 +43,7 @@
                 <BasicButton
                     v-if="!registrationMode"
                     class="ter btn grey"
-                    :display="
-                        registrationMode ? 'Zurück zum Login' : 'Registrieren'
-                    "
+                    :display="registrationMode ? 'Zurück zum Login' : 'Registrieren'"
                     :btn_click="toggleMode"
                 />
                 <BasicButton
@@ -68,129 +64,123 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from "vue"
-    import useUser from "../../services/UserStore"
-    import router from "../../router/router"
-    import BasicButton from "../Buttons/BasicButton.vue"
-    const { login, register, logindata } = useUser()
+import { ref } from "vue"
+import useUser from "../../services/UserStore"
+import router from "../../router/router"
+import BasicButton from "../Buttons/BasicButton.vue"
+const { login, register, logindata } = useUser()
 
-    const username = ref("")
-    const password = ref("")
-    const passwordRepeat = ref("")
-    const registrationMode = ref(false)
-    const headline = ref("Login")
-    const usernameError = ref("")
-    const passwordError = ref("")
+const username = ref("")
+const password = ref("")
+const passwordRepeat = ref("")
+const registrationMode = ref(false)
+const headline = ref("Login")
+const usernameError = ref("")
+const passwordError = ref("")
 
-    async function loginCheck() {
-        let responseBody = await login(username.value, password.value)
+async function loginCheck() {
+    let responseBody = await login(username.value, password.value)
 
-        if (
-            responseBody?.hasOwnProperty("userId") &&
-            responseBody?.hasOwnProperty("userName")
-        ) {
-            router.push("/lobby")
-        } else {
-            usernameError.value =
-                "Username und Passwort Kombination gibt es nicht"
-            console.log("Status 400")
-            console.log(logindata.errormessage)
-        }
+    if (responseBody?.hasOwnProperty("userId") && responseBody?.hasOwnProperty("userName")) {
+        router.push("/lobby")
+    } else {
+        usernameError.value = "Username und Passwort Kombination gibt es nicht"
+        console.log("Status 400")
+        console.log(logindata.errormessage)
     }
+}
 
-    async function registrationCheck() {
-        usernameError.value = ""
+async function registrationCheck() {
+    usernameError.value = ""
+    passwordError.value = ""
+    if (password.value == passwordRepeat.value) {
+        let responseBody = await register(username.value, password.value)
         passwordError.value = ""
-        if (password.value == passwordRepeat.value) {
-            let responseBody = await register(username.value, password.value)
-            passwordError.value = ""
-            switch (responseBody) {
-                case -1:
-                    usernameError.value = "Ungültige Eingabe"
-                    passwordError.value = "Ungültige Eingabe"
-                    break
-                case -2:
-                    usernameError.value = "Username bereits vergeben"
-                    break
-                case null:
-                    break
-                default:
-                    toggleMode()
-            }
-        } else {
-            passwordError.value = "Passwort stimmt nicht überein"
+        switch (responseBody) {
+            case -1:
+                usernameError.value = "Ungültige Eingabe"
+                passwordError.value = "Ungültige Eingabe"
+                break
+            case -2:
+                usernameError.value = "Username bereits vergeben"
+                break
+            case null:
+                break
+            default:
+                toggleMode()
         }
+    } else {
+        passwordError.value = "Passwort stimmt nicht überein"
     }
+}
 
-    function toggleMode() {
-        registrationMode.value = !registrationMode.value
-        registrationMode.value == true
-            ? (headline.value = "Registrieren")
-            : (headline.value = "Login")
-        username.value = ""
-        password.value = ""
-        passwordRepeat.value = ""
+function toggleMode() {
+    registrationMode.value = !registrationMode.value
+    registrationMode.value == true ? (headline.value = "Registrieren") : (headline.value = "Login")
+    username.value = ""
+    password.value = ""
+    passwordRepeat.value = ""
 
-        usernameError.value = ""
-    }
+    usernameError.value = ""
+}
 </script>
 
 <style scoped>
-    * {
-        box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    h2 {
-        margin-top: 0.83em;
-        margin-bottom: 0.83em;
-    }
+h2 {
+    margin-top: 0.83em;
+    margin-bottom: 0.83em;
+}
 
-    .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-    }
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
 
-    .content {
-        margin-top: 50px;
-        padding: 24px;
-        width: 500px;
-        background-color: var(--woe-gray-30);
-        border-radius: 8px;
-    }
+.content {
+    margin-top: 50px;
+    padding: 24px;
+    width: 500px;
+    background-color: var(--woe-gray-30);
+    border-radius: 8px;
+}
 
-    .headline {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 32px;
-        position: relative;
-    }
+.headline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 32px;
+    position: relative;
+}
 
-    .content-form {
-        display: flex;
-        flex-direction: column;
-        align-content: space-between;
-        gap: 10px;
-    }
+.content-form {
+    display: flex;
+    flex-direction: column;
+    align-content: space-between;
+    gap: 10px;
+}
 
-    input {
-        width: auto;
-        height: 40px;
-        padding: 8px 12px;
-        border: 1px solid var(--woe-gray-40);
-        border-radius: 5px;
-    }
+input {
+    width: auto;
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--woe-gray-40);
+    border-radius: 5px;
+}
 
-    hr {
-        height: 1px;
-        width: 100%;
-        margin: 20px 0;
-    }
+hr {
+    height: 1px;
+    width: 100%;
+    margin: 20px 0;
+}
 
-    .error {
-        color: red;
-    }
+.error {
+    color: red;
+}
 </style>
