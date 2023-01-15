@@ -7,7 +7,9 @@ import LoginView from "../views/LoginView.vue"
 import CreateLobbyView from "../views/CreateLobbyView.vue"
 import LobbySelect from "../views/LobbySelect.vue"
 import LobbyView from "../views/LobbyView.vue"
+import useUser from "../services/UserStore"
 
+const { logindata } = useUser()
 const history = createWebHistory()
 const router = createRouter({
     history,
@@ -48,6 +50,14 @@ const router = createRouter({
             name: "CreateLobby",
         },
     ],
+})
+
+router.beforeEach((to, from, next) => {
+    if (!logindata.loggedIn && to.path !== "/login") {
+        next("/login")
+    } else {
+        next()
+    }
 })
 
 export default router

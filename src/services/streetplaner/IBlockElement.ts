@@ -13,11 +13,11 @@
  */
 
 export interface IBlockElement {
+    objectTypeId: number
     groupId: number
-    group: string
-    id: number
     type: string
-    name: string
     rotation: number
+    name: string
     texture: string
+    model3d: string
 }

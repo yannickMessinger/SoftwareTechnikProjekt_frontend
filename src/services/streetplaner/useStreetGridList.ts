@@ -8,6 +8,7 @@ export function useStreetGridList() {
     return {
         streetGridDTO: streetGridDTO,
         updateStreetGridList,
+        resetMapEles,
     }
 }
 
@@ -49,4 +50,8 @@ export async function postStreetGrid(mapId: number, dto: StreetGridDTO) {
     } catch (error) {
         console.log(error)
     }
+}
+
+export function resetMapEles() {
+    streetGridDTO.mapObjects.splice(0, streetGridDTO.mapObjects.length)
 }

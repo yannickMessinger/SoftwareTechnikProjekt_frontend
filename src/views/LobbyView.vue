@@ -12,30 +12,35 @@
 </template>
 
 <script setup lang="ts">
-    import { onMounted } from "vue"
-    import Header from "../components/Header.vue"
-    import PlayerList from "../components/Lobby/PlayerList.vue"
-    import { usePlayerList } from "../services/usePlayerList"
+import { onMounted, reactive } from "vue"
+import Header from "../components/Header.vue"
+import PlayerList from "../components/Lobby/PlayerList.vue"
+import { usePlayerList } from "../services/usePlayerList"
+import ActiveLobby from "../components/Lobby/ActiveLobby.vue"
+import useUser from "../services/UserStore"
 
-    const { playerListState, playerList, fetchPlayerList } = usePlayerList()
+const { playerList, fetchPlayerList } = usePlayerList()
+const { activeLobby } = useUser()
 
-    onMounted(async () => {
-        await fetchPlayerList()
-    })
+const players = reactive({ value: activeLobby.value.playerList })
+
+onMounted(async () => {
+    await fetchPlayerList()
+})
 </script>
 
 <style scoped>
-    .container {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        gap: 20px;
-        margin-top: 20vh;
-    }
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20vh;
+}
 
-    .content {
-        width: 35%;
-        border-radius: 8px;
-        background-color: var(--woe-gray-30);
-    }
+.content {
+    width: 35%;
+    border-radius: 8px;
+    background-color: var(--woe-gray-30);
+}
 </style>

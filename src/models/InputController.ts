@@ -22,31 +22,11 @@ export class InputController {
         this.previous = null
         this.keys = {}
         this.previousKeys = {}
-        this.target.addEventListener(
-            "mousedown",
-            (e: MouseEvent) => this.onMouseDown(e),
-            false
-        )
-        this.target.addEventListener(
-            "mousemove",
-            (e: MouseEvent) => this.onMouseMove(e),
-            false
-        )
-        this.target.addEventListener(
-            "mouseup",
-            (e: MouseEvent) => this.onMouseUp(e),
-            false
-        )
-        this.target.addEventListener(
-            "keydown",
-            (e: KeyboardEvent) => this.onKeyDown(e),
-            false
-        )
-        this.target.addEventListener(
-            "keyup",
-            (e: KeyboardEvent) => this.onKeyUp(e),
-            false
-        )
+        this.target.addEventListener("mousedown", (e: MouseEvent) => this.onMouseDown(e), false)
+        this.target.addEventListener("mousemove", (e: MouseEvent) => this.onMouseMove(e), false)
+        this.target.addEventListener("mouseup", (e: MouseEvent) => this.onMouseUp(e), false)
+        this.target.addEventListener("keydown", (e: KeyboardEvent) => this.onKeyDown(e), false)
+        this.target.addEventListener("keyup", (e: KeyboardEvent) => this.onKeyUp(e), false)
     }
 
     onMouseMove(e: MouseEvent) {
@@ -105,10 +85,8 @@ export class InputController {
 
     update() {
         if (this.previous !== null) {
-            this.current.mouseXDelta =
-                this.current.mouseX - this.previous.mouseX
-            this.current.mouseYDelta =
-                this.current.mouseY - this.previous.mouseY
+            this.current.mouseXDelta = this.current.mouseX - this.previous.mouseX
+            this.current.mouseYDelta = this.current.mouseY - this.previous.mouseY
 
             this.previous = { ...this.current }
         }

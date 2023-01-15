@@ -1,34 +1,34 @@
-import {CompatClient, Stomp} from "@stomp/stompjs";
-import {reactive, readonly} from "vue";
+import { CompatClient, Stomp } from "@stomp/stompjs"
+import { reactive, readonly } from "vue"
 
-const ws_url = 'ws://localhost:8080/stomp'
-const DEST = '/topic/public'
-const ADD_MSG = '/app/chat.addUser'
-const SEND_MSG = '/app/chat.sendMessage'
+const ws_url = "ws://localhost:8080/stomp"
+const DEST = "/topic/public"
+const ADD_MSG = "/app/chat.addUser"
+const SEND_MSG = "/app/chat.sendMessage"
 
 let stompClient: CompatClient
 
 interface IChatMessage {
-    message: string,
+    message: string
     author: string
 }
 
 interface IChatState {
-    chatList: IChatMessage[],
-    errormessage: string,
+    chatList: IChatMessage[]
+    errormessage: string
     userName: string
 }
 
 interface IStompMessage {
-    author: string,
-    content: string,
+    author: string
+    content: string
     type: string
 }
 
 const chatState = reactive<IChatState>({
     chatList: Array<IChatMessage>(),
-    errormessage: '',
-    userName: ''
+    errormessage: "",
+    userName: "",
 })
 
 export function useChat(username: string) {
@@ -37,7 +37,7 @@ export function useChat(username: string) {
     return {
         chat: readonly(chatState),
         sendMessage,
-        connect
+        connect,
     }
 }
 
@@ -51,10 +51,7 @@ function connect(event: Event) {
 function onConnected() {
     stompClient.subscribe(DEST, onMessageReceived)
 
-    stompClient.send(
-        ADD_MSG,
-        {},
-        JSON.stringify({ author: chatState.userName, type: 'JOIN' }))
+    stompClient.send(ADD_MSG, {}, JSON.stringify({ author: chatState.userName, type: "JOIN" }))
 }
 
 function onError(error: Error) {
@@ -66,13 +63,10 @@ function sendMessage(event: Event, message: string) {
         const chatMessage: IStompMessage = {
             author: chatState.userName,
             content: message,
-            type: 'CHAT'
+            type: "CHAT",
         }
 
-        stompClient.send(
-            SEND_MSG,
-            {},
-            JSON.stringify(chatMessage))
+        stompClient.send(SEND_MSG, {}, JSON.stringify(chatMessage))
     }
 
     event.preventDefault()
@@ -81,10 +75,10 @@ function sendMessage(event: Event, message: string) {
 function onMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
 
-    if (message.type === 'JOIN') {
-        chatState.chatList.push({ message: message.author + ' joined', author: message.author })
-    } else if (message.type === 'LEAVE') {
-        chatState.chatList.push({ message: message.author + ' left', author: message.author })
+    if (message.type === "JOIN") {
+        chatState.chatList.push({ message: message.author + " joined", author: message.author })
+    } else if (message.type === "LEAVE") {
+        chatState.chatList.push({ message: message.author + " left", author: message.author })
     } else {
         chatState.chatList.push({ message: message.content, author: message.author })
     }
