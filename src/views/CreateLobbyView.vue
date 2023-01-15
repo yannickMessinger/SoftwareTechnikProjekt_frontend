@@ -20,7 +20,7 @@
                         />
                     </div>
 
-                    <div class="field-wrap">
+                    <!--div class="field-wrap">
                         <label for="lobby_mode"> <b>Lobby-Mode</b></label>
                         <select v-model="lobbyModeSelect" @change="switchSelect()">
                             <option disabled value="Lobby Modus auswaehlen">Lobby Modus auswaehlen</option>
@@ -44,7 +44,7 @@
                         <label for="add_map"><b>+ Karte</b></label>
                         <input type="text" name="add_map" v-model="addNewMapInput" placeholder="Kartenname" />
                         <button @click="addMap()">+</button>
-                    </div>
+                    </div-->
 
                     <div class="field-wrap">
                         <label for="last_name"><b>Passwort</b></label>
@@ -76,7 +76,7 @@
                                 display="Abbrechen"
                                 :btn_click="
                                     () => {
-                                        router.push('/')
+                                        router.push('/lobby')
                                     }
                                 "
                             />
