@@ -13,49 +13,38 @@
     <div class="container">
         <div class="LobbyName">
             <p>
-                <b>{{ activeLobby.lobbyName }}</b>
+                <b>Lobbyname: {{ activeLobby.lobbyName }}</b>
             </p>
+            <p><b>Kartenname: Rüdigers Karte</b></p>
+            <div v-if="userId === activeLobby.hostId">
+                <p><b>Status: Host</b></p>
+            </div>
+            <div v-else>
+                <p><b>Status: Spieler</b></p>
+            </div>
         </div>
         <div class="LobbyClose">
             <div v-if="userId === activeLobby.hostId">
                 <!-- für Host lobby schließen für Client lobby verlassen anzeigen-->
-                <button class="red">Lobby Schließen</button>
+                <button class="red" @click="closeLobbyClicked()">Lobby Schließen</button>
             </div>
             <div v-else>
-                <button class="red">Lobby verlassen</button>
+                <button class="red" @click="leaveLobbyClicked()">Lobby verlassen</button>
             </div>
         </div>
-        <div class="KartenName">
-            <!-- korrekten Kartennamen anzeigen-->
-            <p><b>Rüdigers Karte</b></p>
-        </div>
         <div class="PlayMode">
-            <!-- auf den Switch Button reagieren und korrekten Modus anzeigen-->
-            <p v-if="!buildMode" @click="goBuild()"><b>Modus:</b> {{ activeLobby.lobbyModeEnum }}</p>
-            <p v-if="buildMode" @click="goDrive()"><b>Modus:</b> Baumodus</p>
+            <p v-if="!buildMode"><b>Modus:</b> Fahrmodus</p>
+            <p v-if="buildMode"><b>Modus:</b> Baumodus</p>
         </div>
         <div class="SwitchMode">
             <div v-if="userId === activeLobby.hostId">
-                <button @click="setActiveLobbyToBuildMode">Planungs-Modus</button>
-                <!--button v-if="isHost" @click="changeGamemode()">Wechseln</button-->
+                <button v-if="isHost" @click="changeGamemode()">Wechseln</button>
             </div>
-        </div>
-        <div class="Button1">
-            <button>Weitermachen</button>
         </div>
         <div class="Button2">
-            <!-- boolean einbauen entweder Bauansicht oder Fahransicht anzeigen je nach Lobbymodus-->
-            <button class="green" v-if="buildMode" @click="">zur Bauansicht</button>
-            <button class="green" v-if="!buildMode">zur Fahransicht</button>
+            <button class="green" v-if="buildMode" @click="goBuild()">zur Bauansicht</button>
+            <button class="green" v-if="!buildMode" @click="goDrive()">zur Fahransicht</button>
         </div>
-        <!--div class="Button2"></div>
-            <div v-if="userId === activeLobby.hostId">
-                <button class="green" @click="setActiveLobbyToPlayMode">Fahren</button>
-            </div>
-            <div v-else>
-                <button class="green">Fahren</button>
-            </div>
-        </div-->
     </div>
 </template>
 
@@ -68,7 +57,7 @@ import router from "../../router/router"
 
 const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
 const isHost = ref(true)
-const buildMode = ref(false)
+const buildMode = ref(true)
 
 //Methods to switch Lobbymode
 function setActiveLobbyToBuildMode() {
@@ -86,8 +75,10 @@ let gameId = ref(20) //TODO: gameId must refers to the id in the backend
 function changeGamemode() {
     if (buildMode.value) {
         buildMode.value = false
+        setActiveLobbyToPlayMode()
     } else {
         buildMode.value = true
+        setActiveLobbyToBuildMode()
     }
 }
 
@@ -99,6 +90,16 @@ function goBuild() {
 function goDrive() {
     const url = "/game/" + { gameId }
     router.push(url)
+}
+
+function closeLobbyClicked() {
+    //TODO: Messaage to Backend that Host Closed the lobby (delete lobby, all lobbyuser return to lobby overview)
+    router.push("/lobby")
+}
+
+function leaveLobbyClicked() {
+    //TODO: Message to Backend that player left the Lobby
+    router.push("/lobby")
 }
 </script>
 
@@ -121,6 +122,7 @@ function goDrive() {
     gap: 0px 0px;
     grid-template-areas:
         "LobbyName LobbyName LobbyClose"
+        "KartenName KartenName KartenName"
         "PlayMode PlayMode SwitchMode"
         "Button1 Button2 Button3";
     width: 90%;
