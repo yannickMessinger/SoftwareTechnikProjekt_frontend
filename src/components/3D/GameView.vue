@@ -146,7 +146,18 @@ export default defineComponent({
             renderer.value.onBeforeRender(() => {
                 fpsCamera.update()
             })
+
+            initAmbientSound()
         })
+
+        function initAmbientSound() {
+            var audio = new Audio("/../../../src/sound/ambient_city_sound.mp3")
+            audio.volume = 0.4
+            audio.play()
+            audio.addEventListener("ended", (e) => {
+                audio.play()
+            })
+        }
 
         return {
             renderer,
@@ -181,8 +192,8 @@ export default defineComponent({
                 :position="{ x: 0, y: 0, z: 0 }"
                 receive-shadow
             >
-                <PhongMaterial color="#999999" :props="{ depthWrite: false }"
-            /></Plane>
+                <PhongMaterial color="#999999" :props="{ depthWrite: false }" />
+            </Plane>
 
             <!--  <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>-->
 
