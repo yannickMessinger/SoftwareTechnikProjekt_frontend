@@ -27,7 +27,7 @@
                         <h6 class="headline">Erstelldatum</h6>
                     </th>
                     <th>
-                        <h6 class="headline">Karte starten</h6>
+                        <h6 class="headline">Lobby starten</h6>
                     </th>
                     <th>
                         <h6 class="headline">Karte loeschen</h6>
@@ -58,7 +58,7 @@
                             id="startLobbyButton"
                             @click="cardClickedLobbyAction(card)"
                         >
-                            Lobby erstellen
+                            Lobby starten
                         </button>
                         <button
                             :disabled="!isHost"
@@ -99,12 +99,10 @@
                 </tr>
                 <tr>
                     <td>
-                        <button
-                            id="startLobbyButton"
-                            @click="addNewCardClickAction()"
-                        >
-                            Karte hinzufuegen
-                        </button>
+                        <button @click="TogglePopup">Karte hinzufügen</button>
+                        <AddMapPopup v-if="buttonTrigger">
+                            <h2>Karte hinzufügen</h2>
+                        </AddMapPopup>
                     </td>
                 </tr>
             </table>
@@ -116,12 +114,13 @@
     //import { IMyMapsListItem } from "../../typings/IMyMapsListitem"
     //import { useMyMaps } from "../../services/useMyMaps"
 
+    import AddMapPopup from "./AddMapPopup.vue"
     /** Imports: */
-    import { reactive, watch, ref } from "vue"
+    import { reactive, watch, ref, defineEmits} from "vue"
     import type { ICardElement } from "../../services/Lobby/ICardElement"
     import useEventBus from "../../services/eventBus"
     import router from "../../router/router"
-
+    
     /** Variablen: */
     /** bus event */
     var backendOfflineDebugMode = true
@@ -139,6 +138,16 @@
     const cardList: ICardElement[] = reactive(
         Array(numberOfOwnedCards.value).fill(null)
     )
+
+    const buttonTrigger = ref(false);
+
+    function TogglePopup() {
+        if(buttonTrigger.value){
+            buttonTrigger.value = false
+        }else {
+            buttonTrigger.value = true
+        }
+    }
 
     /**Card List Data Import from Backend or load default list */
     if (backendOfflineDebugMode) {

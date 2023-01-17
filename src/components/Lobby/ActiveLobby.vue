@@ -10,10 +10,10 @@
         <div class="LobbyClose">
             <!-- für Host lobby schließen für Client lobby verlassen anzeigen-->
             <div v-if="isHost">
-                <button class="red">Lobby Schließen</button>
+                <button class="red" @click="leaveLobby()">Lobby schließen</button>
             </div>
             <div v-else>
-                <button class="red">Lobby verlassen</button>
+                <button class="red" @click="leaveLobby()">Lobby verlassen</button>
             </div>
         </div>
         <div class="KartenName">
@@ -60,6 +60,10 @@
     function goDrive(){
         const url = "/game/" + {gameId}
         router.push(url)
+    }
+
+    function leaveLobby(){
+        router.push("/lobby")
     }
 </script>
 
