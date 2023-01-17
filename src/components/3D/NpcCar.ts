@@ -31,6 +31,7 @@ export class NpcCar {
     public positions: any
     public curMapObjCenterCoords: any
     public curMapObj: IMapObject
+    public nextMapObj: IMapObject
     public gridSizeX: number
     public gridSizeY: number
     public fieldSize: number
@@ -52,7 +53,7 @@ export class NpcCar {
     ) {
         this.npcId = npcId
         this.npc = ref()
-        this.curMapObj = curMapObj
+        this.curMapObj = curMapObj //wozu?
         this.positions = reactive({ npcPosX: 0, npcPosY: posY, npcPosZ: 0, npcRotation: npcRotation })
         this.curMapObjCenterCoords = reactive({ centerX: 0, centerZ: 0 })
         this.curMapObj = reactive({
@@ -61,6 +62,13 @@ export class NpcCar {
             y: curMapObj.y,
             rotation: curMapObj.rotation,
             game_assets: curMapObj.game_assets,
+        })
+        this.nextMapObj = reactive({
+            objectTypeId: -1,
+            x: -1,
+            y: -1,
+            rotation: -1,
+            game_assets: [],
         })
         this.gridSizeX = gridSizeX
         this.gridSizeY = gridSizeY
@@ -81,22 +89,16 @@ export class NpcCar {
 
     //driving
     drive() {
-        const velocity = 0.005
+        const velocity = 0.03
 
-        if (!this.reachedMapEleLimit()) {
-            if (this.positions.npcRotation === 0) {
-                this.positions.npcPosZ -= velocity
-            } else if (this.positions.npcRotation === 1) {
-                this.positions.npcPosX += velocity
-            } else if (this.positions.npcRotation === 2) {
-                this.positions.npcPosZ += velocity
-            } else if (this.positions.npcRotation === 3) {
-                this.positions.npcPosX -= velocity
-            }
-
-            // this.reachedMapEleLimit()
-        } else {
-            //console.log("not moving at the moment")
+        if (this.positions.npcRotation === 0) {
+            this.positions.npcPosZ -= velocity
+        } else if (this.positions.npcRotation === 1) {
+            this.positions.npcPosX += velocity
+        } else if (this.positions.npcRotation === 2) {
+            this.positions.npcPosZ += velocity
+        } else if (this.positions.npcRotation === 3) {
+            this.positions.npcPosX -= velocity
         }
     }
 
@@ -134,7 +136,7 @@ export class NpcCar {
             limit = centerX - this.fieldSize / 2
         }
 
-        this.mapLimit = limit
+        this.mapLimit = limit + 3
         console.log(this.mapLimit)
     }
 

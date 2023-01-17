@@ -161,14 +161,15 @@ export default defineComponent({
             renderer.value.onBeforeRender(() => {
                 fpsCamera.update()
 
-                npcEles.value.forEach((ele, index) => {
-                    if (ele.reachedMapEleLimit()) {
-                        //updatePosMessage(ele.npcId)
-                        ele.drive()
-                    } else {
-                        ele.drive()
-                    }
-                })
+                    npcEles.value.forEach((ele, index) => {
+                        if (ele.reachedMapEleLimit()) {
+                            updatePosMessage(ele.npcId)
+                            // ele.drive()
+                        } else {
+                            ele.drive()
+                        }
+                    })
+                
             })
         })
 

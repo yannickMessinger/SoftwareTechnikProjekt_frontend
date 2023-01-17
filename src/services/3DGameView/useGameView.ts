@@ -20,6 +20,7 @@ let gridSizeX = 300
 let gridSizeY = 200
 const fieldSize = 10
 
+let messageSent = false;
 /**
  * Gamestate obj with two lists containing necessary MapObjects
  * @param gameMapObjects : complete List of mapobjects, that is passed to Gameview to be rendered.
@@ -53,17 +54,15 @@ const gameState = reactive<IGameState>({
 
 interface NpcInfo {
     npcId: number
-    npcPosX: number
-    npcPosZ: number
     npcRotation: number
+    currentMapObject: IMapObject
+    nextUpperMapObject: IMapObject
 }
 
 interface NpcInfoResponseDTO {
-    nextMapEleobjectTypeId: number
-    nextMapEleX: number
-    nextMapEleY: number
-    nextMapElerotation: number
-    newGameAssetRotation: number
+    newGameAssetRotation: number,
+    currentMapObject: IMapObject,
+    nextUpperMapObject: IMapObject
 }
 
 interface IStompMessage {
@@ -241,24 +240,28 @@ gameState.npcCarMapFromuseGameview.forEach((ele) => {
 
 //emits event to backend with current information, so that next map element can be calculated.
 function updatePosMessage(npcId: number) {
-    console.log("sende Update pos anfrage an backend")
-    if (stompClient) {
-        let tempCar = gameState.npcCarMapFromuseGameview.get(npcId)!
-        const updatePosMsg: IStompMessage = {
-            npcContent: {
-                npcId: tempCar!.npcId,
-                npcPosX: tempCar!.curMapObj.x,
-                npcPosZ: tempCar!.curMapObj.y,
-                npcRotation: tempCar!.positions.npcRotation,
-            },
-            type: "POSITION_UPDATE",
+    if (!messageSent) {
+        console.log("sende Update pos anfrage an backend")
+        if (stompClient) {
+            let tempCar = gameState.npcCarMapFromuseGameview.get(npcId)!
+            const updatePosMsg: IStompMessage = {
+                npcContent: {
+                    npcId: tempCar!.npcId,
+                    npcRotation: tempCar!.positions.npcRotation,
+                    currentMapObject: tempCar!.curMapObj,
+                    nextUpperMapObject: tempCar!.nextMapObj
+                },
+                type: "POSITION_UPDATE",
+            }
+    
+            stompClient.publish({
+                destination: UPDATE_POS_MSG,
+                headers: {},
+                body: JSON.stringify(updatePosMsg),
+            })
+            console.log(updatePosMsg)
+            messageSent = true;
         }
-
-        stompClient.publish({
-            destination: UPDATE_POS_MSG,
-            headers: {},
-            body: JSON.stringify(updatePosMsg),
-        })
     }
 }
 
@@ -292,8 +295,13 @@ function receiveNpcUpdates() {
 //on update from backend set new values of current mapobj and updated position for corresponding npc car
 async function onMessageReceived(payload: any) {
     //console.log(`Npc mit ${this.npcId} hat neue Update Message erhalten`)
-    console.log(payload)
-
+    if (payload.type === "NEW_POSITION_RECEIVED") {
+        console.log(payload.nextMapEleInfo)
+        const updateNpcCar = gameState.npcCarMapFromuseGameview.get(payload.npcContent.npcId)
+        updateNpcCar!.curMapObj = payload.nextMapEleInfo.currentMapObject
+        updateNpcCar!.nextMapObj = payload.nextMapEleInfo.nextUpperMapObject
+        updateNpcCar!.driving = true;
+    }
     /*
         this.curMapObj.objectTypeId = payload.nextMapEleInfo.nextMapEleobjectTypeId;
         this.curMapObj.x = payload.nextMapEleInfo.nextMapEleX;
