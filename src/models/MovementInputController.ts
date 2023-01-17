@@ -59,16 +59,10 @@ export class MovmentInputController {
             }
         }
         if (this.keyboard.pressed("D")) {
-            this.objects.value.mesh.rotateOnAxis(
-                new THREE.Vector3(0, 1, 0),
-                -rotateAngle
-            )
+            this.objects.value.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotateAngle)
         }
         if (this.keyboard.pressed("A")) {
-            this.objects.value.mesh.rotateOnAxis(
-                new THREE.Vector3(0, 1, 0),
-                rotateAngle
-            )
+            this.objects.value.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotateAngle)
         }
         if (this.keyboard.pressed("Q")) {
             this.objects.value.mesh.translateY(movespeed)
@@ -86,15 +80,11 @@ export class MovmentInputController {
     }
     updateCamera() {
         let relativeCameraOffset = new THREE.Vector3(0, 0.5, 2)
-        let cameraOffset = relativeCameraOffset.applyMatrix4(
-            this.objects.value.mesh.matrixWorld
-        )
+        let cameraOffset = relativeCameraOffset.applyMatrix4(this.objects.value.mesh.matrixWorld)
 
         this.camera.value.camera.position.x = this.objects.value.mesh.position.x
         this.camera.value.camera.position.y = this.objects.value.mesh.position.y
         this.camera.value.camera.position.z = this.objects.value.mesh.position.z
-        this.camera.value.camera.setRotationFromEuler(
-            this.objects.value.mesh.rotation
-        )
+        this.camera.value.camera.setRotationFromEuler(this.objects.value.mesh.rotation)
     }
 }

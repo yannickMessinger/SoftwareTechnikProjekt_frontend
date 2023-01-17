@@ -1,4 +1,4 @@
-import { IMapObject } from "./IMapObject";
+import { IMapObject } from "./IMapObject"
 
 export interface StreetGridDTO {
     mapObjects: Array<IMapObject>

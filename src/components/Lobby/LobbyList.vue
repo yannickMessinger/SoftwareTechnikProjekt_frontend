@@ -2,8 +2,6 @@
 <template>
     <div class="headline">
         <h2>Lobbys</h2>
-
-      
     </div>
 
     <div class="content">
@@ -13,56 +11,56 @@
 </template>
 
 <script setup lang="ts">
-    import Lobby from "./Lobby.vue"
-    import { ILobby } from "../../typings/ILobby"
-    import BasicButton from "../Buttons/BasicButton.vue"
-    import router from "../../router/router"
+import Lobby from "./Lobby.vue"
+import { ILobby } from "../../typings/ILobby"
+import BasicButton from "../Buttons/BasicButton.vue"
+import router from "../../router/router"
 
-    //Lobbylist passed from backend
-    const props = defineProps<{
-        liste: Readonly<ILobby[]>
-    }>()
+//Lobbylist passed from backend
+const props = defineProps<{
+    liste: Readonly<ILobby[]>
+}>()
 </script>
 
 <style scoped>
-    table {
-        /*border: 4px solid black;*/
-        width: 100%;
-        color: black;
-    }
+table {
+    /*border: 4px solid black;*/
+    width: 100%;
+    color: black;
+}
 
-    th {
-        height: 20px;
-        text-align: left;
-        background-color: white;
-        display: fixed;
-    }
+th {
+    height: 20px;
+    text-align: left;
+    background-color: white;
+    display: fixed;
+}
 
-    .headline {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 10px;
-        margin-left: 30px;
-        margin-bottom: 10px;
-    }
+.headline {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-left: 30px;
+    margin-bottom: 10px;
+}
 
-    .lobbyList {
-        height: 300px;
-        display: flex;
-        flex-direction: column;
-        overflow: auto;
-    }
+.lobbyList {
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
 
-    button {
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        padding: 10px 20px;
-        margin-right: 34px;
-        background-color: var(--woe-blue-60);
-        color: white;
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
+button {
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 10px 20px;
+    margin-right: 34px;
+    background-color: var(--woe-blue-60);
+    color: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
 </style>

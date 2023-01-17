@@ -43,17 +43,17 @@
 </template>
 
 <script setup lang="ts">
-    import { ref } from "vue"
-    import BasicButton from "../components/Buttons/BasicButton.vue"
-    import Header from "../components/Header.vue"
-    import router from "../router/router"
-    import Chat from "../components/UI/Chat.vue"
+import { ref } from "vue"
+import BasicButton from "../components/Buttons/BasicButton.vue"
+import Header from "../components/Header.vue"
+import router from "../router/router"
+import Chat from "../components/UI/Chat.vue"
 
-    let gameId = ref(20) //TODO: gameId must refers to the id in the backend
+let gameId = ref(20) //TODO: gameId must refers to the id in the backend
 </script>
 
 <style scoped>
-    .container {
-        height: 100vh;
-    }
+.container {
+    height: 100vh;
+}
 </style>
