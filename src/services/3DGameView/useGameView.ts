@@ -16,8 +16,8 @@ const mapWidth = ref()
 const mapHeight = ref()
 
 /*hardcoded values from GameView need modifying*/
-let gridSizeX = 100
-let gridSizeY = 100
+let gridSizeX = 300
+let gridSizeY = 200
 const fieldSize = 10
 
 /**
@@ -166,7 +166,7 @@ function randomNumer(min: number, max: number) {
 }
 /**
  * first fills gameMapObjects list with dummy environment elements with random rotation, each ele is initially equipped with an empty game assets array
- * then for each element of the mapObject from backend, the corresponding index in the gameMapObject list is calculated and the element
+ * then for each element of the mapObject from backend, the corresponding index in the gameMapObject list is calculated and the elementwwwww
  * on this index gets replaced with the object from backend.
  */
 export function fillGameState(): void {
@@ -223,10 +223,15 @@ export function fillGameState(): void {
                 }
             })
         }
-        gameState.gameMapObjects[mapObj.x * 10 + mapObj.y] = mapObj
+        gameState.gameMapObjects[mapObj.x * 30 + mapObj.y] = mapObj
     })
 
-    console.log(gameState.npcCarMapFromuseGameview)
+    //console.log(gameState.npcCarMapFromuseGameview)
+    console.log(
+        gameState.gameMapObjects.filter((mabobj) => {
+            return mabobj.objectTypeId < 17
+        })
+    )
 }
 
 gameState.npcCarMapFromuseGameview.forEach((ele) => {

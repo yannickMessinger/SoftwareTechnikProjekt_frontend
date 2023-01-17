@@ -11,9 +11,11 @@ import {
     Plane,
     PhongMaterial,
 } from "troisjs"
+
 import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { useGameView } from "../../services/3DGameView/useGameView"
+import { NpcCar } from "./NpcCar"
 
 export default defineComponent({
     components: {
@@ -25,62 +27,38 @@ export default defineComponent({
         AmbientLight,
         Plane,
         PhongMaterial,
-    } from "troisjs"
-    import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
-    import { FirstPersonCamera } from "../../models/FirstPersonCamera"
-    import { useGameView } from "../../services/3DGameView/useGameView"
-    import { NpcCar } from "./NpcCar"
+    },
 
-    export default defineComponent({
-        components: {
-            Box,
-            Camera,
-            Renderer,
-            Scene,
-            GltfModel,
-            AmbientLight,
-            Plane,
-            PhongMaterial,
-            LambertMaterial,
-        },
+    setup() {
+        const renderer = ref()
+        const box = ref()
+        const camera = ref()
+        const fpsCamera = new FirstPersonCamera(camera, box)
+        const {
+            gameState,
+            setMapWidthAndMapHeight,
+            resetGameMapObjects,
+            updateMapObjsFromGameState,
+            updatePosMessage,
+            receiveNpcUpdates,
+        } = useGameView()
+        console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
+        receiveNpcUpdates()
+        console.log(gameState.sizeX * gameState.fieldSize)
+        console.log(gameState.sizeY * gameState.fieldSize)
 
-        setup() {
-            const renderer = ref()
-            const box = ref()
-            const camera = ref()
-            const fpsCamera = new FirstPersonCamera(camera, box)
-            const {
-                gameState,
-                setMapWidthAndMapHeight,
-                resetGameMapObjects,
-                updateMapObjsFromGameState,
-                updatePosMessage,
-                receiveNpcUpdates,
-            } = useGameView()
-            console.log(
-                `Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
-            )
-            receiveNpcUpdates()
-            console.log(gameState.sizeX * gameState.fieldSize)
-            console.log(gameState.sizeY * gameState.fieldSize)
-
-            /*Defines the Grid Size in length by the number ob fields*/
-            let gridSizeX = 100
-            /*Defines the Grid Size in height by the number ob fields*/
-            let gridSizeY = 100
+        /*Defines the Grid Size in length by the number ob fields*/
+        let gridSizeX = 300
+        /*Defines the Grid Size in height by the number ob fields*/
+        let gridSizeY = 200
 
         //counter variables for loops to prefill map with dummy data
+        const fieldSize = 10
         let mapWidth = 30
         let mapHeight = 20
 
         setMapWidthAndMapHeight(mapWidth, mapHeight)
 
-        const fieldSize = 10
-
-        /*Defines the Grid Size in length by the number ob fields*/
-        let gridSizeX = fieldSize * 30
-        /*Defines the Grid Size in height by the number ob fields*/
-        let gridSizeY = fieldSize * 20
         /*Map of 3d-model paths*/
         const buildingIDMap = new Map()
         buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
@@ -121,15 +99,15 @@ export default defineComponent({
         /*270 degree rotation*/
         assetRotationMap.set(3, (3 * Math.PI) / 2)
 
-            resetGameMapObjects()
-            gameState.npcCarMapFromuseGameview.clear()
+        resetGameMapObjects()
+        gameState.npcCarMapFromuseGameview.clear()
 
-            /*Array of Buildings and Streets passed from 2D Planner*/
-            const mapElements = computed(() => gameState.gameMapObjects)
-            const npcEles = computed(() => gameState.npcCarMapFromuseGameview)
+        /*Array of Buildings and Streets passed from 2D Planner*/
+        const mapElements = computed(() => gameState.gameMapObjects)
+        const npcEles = computed(() => gameState.npcCarMapFromuseGameview)
 
-            //const iterator = npcEles.value.entries()
-            //console.log(iterator.next())
+        //const iterator = npcEles.value.entries()
+        //console.log(iterator.next())
 
         /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
@@ -180,40 +158,40 @@ export default defineComponent({
             )
             updateMapObjsFromGameState()
 
-                renderer.value.onBeforeRender(() => {
-                    fpsCamera.update()
+            renderer.value.onBeforeRender(() => {
+                fpsCamera.update()
 
-                    npcEles.value.forEach((ele, index) => {
-                        if (ele.reachedMapEleLimit()) {
-                            updatePosMessage(ele.npcId)
-                            ele.drive()
-                        } else {
-                            ele.drive()
-                        }
-                    })
+                npcEles.value.forEach((ele, index) => {
+                    if (ele.reachedMapEleLimit()) {
+                        //updatePosMessage(ele.npcId)
+                        ele.drive()
+                    } else {
+                        ele.drive()
+                    }
                 })
             })
+        })
 
-            return {
-                npcEles,
-                renderer,
-                camera,
-                box,
-                fpsCamera,
-                calcCoordinateX,
-                calcCoordinateZ,
-                calcAssetCoordinateX,
-                calcAssetCoordinateZ,
-                buildingIDMap,
-                mapElements,
-                rotationMap,
-                assetRotationMap,
-                gridSizeX,
-                gridSizeY,
-                fieldSize,
-            }
-        },
-    })
+        return {
+            npcEles,
+            renderer,
+            camera,
+            box,
+            fpsCamera,
+            calcCoordinateX,
+            calcCoordinateZ,
+            calcAssetCoordinateX,
+            calcAssetCoordinateZ,
+            buildingIDMap,
+            mapElements,
+            rotationMap,
+            assetRotationMap,
+            gridSizeX,
+            gridSizeY,
+            fieldSize,
+        }
+    },
+})
 </script>
 
 <template>
