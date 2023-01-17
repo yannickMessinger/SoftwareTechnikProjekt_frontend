@@ -1,11 +1,26 @@
 <script lang="ts">
-    import {
-        PointLight,
+import {
+    PointLight,
+    Box,
+    Camera,
+    Renderer,
+    Scene,
+    LambertMaterial,
+    GltfModel,
+    AmbientLight,
+    Plane,
+    PhongMaterial,
+} from "troisjs"
+import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
+import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+import { useGameView } from "../../services/3DGameView/useGameView"
+
+export default defineComponent({
+    components: {
         Box,
         Camera,
         Renderer,
         Scene,
-        LambertMaterial,
         GltfModel,
         AmbientLight,
         Plane,
@@ -54,52 +69,57 @@
             /*Defines the Grid Size in height by the number ob fields*/
             let gridSizeY = 100
 
-            //counter variables for loops to prefill map with dummy data
-            let mapWidth = 10
-            let mapHeight = 10
-            const fieldSize = 10
+        //counter variables for loops to prefill map with dummy data
+        let mapWidth = 30
+        let mapHeight = 20
 
-            setMapWidthAndMapHeight(mapWidth, mapHeight)
+        setMapWidthAndMapHeight(mapWidth, mapHeight)
 
-            /*Map of 3d-model paths*/
-            const buildingIDMap = new Map()
-            buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
-            buildingIDMap.set(1, "/../../../src/assets/3D_Models/Streets/curved_road.gltf")
-            buildingIDMap.set(2, "/../../../src/assets/3D_Models/Streets/intersection_road.gltf")
-            buildingIDMap.set(3, "/../../../src/assets/3D_Models/Building/house_high.gltf")
-            buildingIDMap.set(4, "/../../../src/assets/3D_Models/Building/house.gltf")
-            buildingIDMap.set(5, "/../../../src/assets/3D_Models/Building/shop.gltf")
-            buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
-            buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
-            buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
-            buildingIDMap.set(20, "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf")
+        const fieldSize = 10
 
-            buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
+        /*Defines the Grid Size in length by the number ob fields*/
+        let gridSizeX = fieldSize * 30
+        /*Defines the Grid Size in height by the number ob fields*/
+        let gridSizeY = fieldSize * 20
+        /*Map of 3d-model paths*/
+        const buildingIDMap = new Map()
+        buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
+        buildingIDMap.set(1, "/../../../src/assets/3D_Models/Streets/curved_road.gltf")
+        buildingIDMap.set(2, "/../../../src/assets/3D_Models/Streets/intersection_road.gltf")
+        buildingIDMap.set(3, "/../../../src/assets/3D_Models/Building/house_high.gltf")
+        buildingIDMap.set(4, "/../../../src/assets/3D_Models/Building/house.gltf")
+        buildingIDMap.set(5, "/../../../src/assets/3D_Models/Building/shop.gltf")
+        buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
+        buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
+        buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
+        buildingIDMap.set(20, "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf")
 
-            buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
+        buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
 
-            /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
-            const rotationMap = new Map()
-            /*No rotation*/
-            rotationMap.set(0, 0)
-            /*90 degree rotation*/
-            rotationMap.set(1, (3 * Math.PI) / 2)
-            /*180 degree rotation*/
-            rotationMap.set(2, Math.PI)
-            /*270 degree rotation*/
-            rotationMap.set(3, Math.PI / 2)
+        buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
 
-            /*Riadians is used to rotate game assets. The following map set the radians for the passed rotation value from backend*/
-            const assetRotationMap = new Map()
+        /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
+        const rotationMap = new Map()
+        /*No rotation*/
+        rotationMap.set(0, 0)
+        /*90 degree rotation*/
+        rotationMap.set(1, (3 * Math.PI) / 2)
+        /*180 degree rotation*/
+        rotationMap.set(2, Math.PI)
+        /*270 degree rotation*/
+        rotationMap.set(3, Math.PI / 2)
 
-            /*No rotation*/
-            assetRotationMap.set(0, Math.PI)
-            /*90 degree rotation*/
-            assetRotationMap.set(1, Math.PI / 2)
-            /*180 degree rotation*/
-            assetRotationMap.set(2, 0)
-            /*270 degree rotation*/
-            assetRotationMap.set(3, (3 * Math.PI) / 2)
+        /*Riadians is used to rotate game assets. The following map set the radians for the passed rotation value from backend*/
+        const assetRotationMap = new Map()
+
+        /*No rotation*/
+        assetRotationMap.set(0, Math.PI)
+        /*90 degree rotation*/
+        assetRotationMap.set(1, Math.PI / 2)
+        /*180 degree rotation*/
+        assetRotationMap.set(2, 0)
+        /*270 degree rotation*/
+        assetRotationMap.set(3, (3 * Math.PI) / 2)
 
             resetGameMapObjects()
             gameState.npcCarMapFromuseGameview.clear()
@@ -111,54 +131,54 @@
             //const iterator = npcEles.value.entries()
             //console.log(iterator.next())
 
-            /*Models position are saved from the Backend counting from 0 upwards.
+        /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
       On the 3d Game View the coordinates x:0, z:0 describes the center of our Grid. The upper left corner would be x:-50, z:-50.
       The following two methods calculate the Models position bades on the backend memory structure and adapts it to the frontend structure.*/
 
-            /*Calculates X coordinates position of loaded Model */
-            function calcCoordinateX(n: number) {
-                let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-                //console.log(`GameObj x: ${x}`)
-                return x
-            }
+        /*Calculates X coordinates position of loaded Model */
+        function calcCoordinateX(n: number) {
+            let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
+            //console.log(`GameObj x: ${x}`)
+            return x
+        }
 
-            /*Calculates Z coordinates position of loaded Model */
-            function calcCoordinateZ(n: number) {
-                let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-                //console.log(`GameObj z: ${z}`)
-                return z
-            }
+        /*Calculates Z coordinates position of loaded Model */
+        function calcCoordinateZ(n: number) {
+            let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
+            //console.log(`GameObj z: ${z}`)
+            return z
+        }
 
-            /**
-             * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-             * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
-             * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
-             */
-            function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-                let originX = xCoordCenter - fieldSize / 2
-                let x = originX + xCoordAsset * fieldSize
+        /**
+         * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
+         * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
+         * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
+         */
+        function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
+            let originX = xCoordCenter - fieldSize / 2
+            let x = originX + xCoordAsset * fieldSize
 
-                return x
-            }
+            return x
+        }
 
-            /**
-             * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-             * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
-             * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
-             */
-            function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-                let originZ = zCoordCenter - fieldSize / 2
-                let z = originZ + yCoordAsset * fieldSize
+        /**
+         * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
+         * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
+         * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
+         */
+        function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
+            let originZ = zCoordCenter - fieldSize / 2
+            let z = originZ + yCoordAsset * fieldSize
 
-                return z
-            }
+            return z
+        }
 
-            onMounted(() => {
-                console.log(
-                    `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
-                )
-                updateMapObjsFromGameState()
+        onMounted(() => {
+            console.log(
+                `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
+            )
+            updateMapObjsFromGameState()
 
                 renderer.value.onBeforeRender(() => {
                     fpsCamera.update()

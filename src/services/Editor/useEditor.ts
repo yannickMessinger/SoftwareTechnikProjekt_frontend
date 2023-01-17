@@ -175,19 +175,16 @@ function onMessageReceived(payload: IStompMessage) {
     if (editorState.mapId === payload.id) {
         if (payload.type === "CREATE") {
             editorState.mapObjects = editorState.mapObjects.filter(
-                (obj) =>
-                    obj.x !== payload.content.x || obj.y !== payload.content.y
+                (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y
             )
             editorState.mapObjects.push(payload.content)
         } else if (payload.type === "DELETE") {
             editorState.mapObjects = editorState.mapObjects.filter(
-                (obj) =>
-                    obj.x !== payload.content.x || obj.y !== payload.content.y
+                (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y
             )
         } else if (payload.type === "UPDATE") {
             editorState.mapObjects = editorState.mapObjects.filter(
-                (obj) =>
-                    obj.x !== payload.content.x || obj.y !== payload.content.y
+                (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y
             )
             editorState.mapObjects.push(payload.content)
         } else if (payload.type === "RESET") {
