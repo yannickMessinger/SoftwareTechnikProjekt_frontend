@@ -14,6 +14,7 @@ import {
 import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { useGameView } from "../../services/3DGameView/useGameView"
+import { MovementInputController } from "../../models/MovementInputController"
 
 export default defineComponent({
     components: {
@@ -31,7 +32,8 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-        const fpsCamera = new FirstPersonCamera(camera, box)
+        const scene = ref()
+        const fpsCamera = new MovementInputController(box, camera)
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
         console.log(gameState.sizeX * gameState.fieldSize)
@@ -145,12 +147,14 @@ export default defineComponent({
 
             renderer.value.onBeforeRender(() => {
                 fpsCamera.update()
+                console.log(scene.value.scene)
             })
         })
 
         return {
             renderer,
             camera,
+            scene,
             box,
             fpsCamera,
             calcCoordinateX,
@@ -171,8 +175,8 @@ export default defineComponent({
 
 <template>
     <Renderer resize="window" ref="renderer">
-        <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
-        <Scene background="#87CEEB">
+        <Camera ref="camera" :position="{ x: -130, y: 1, z: -80 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
+        <Scene ref="scene" background="#87CEEB">
             <AmbientLight></AmbientLight>
             <Plane
                 :width="gridSizeX"
@@ -183,7 +187,9 @@ export default defineComponent({
             >
                 <PhongMaterial color="#999999" :props="{ depthWrite: false }"
             /></Plane>
-
+            <Box ref="box" :position="{ x: -130, y: 1, z: -80 }">
+                <LambertMaterial />
+            </Box>
             <!--  <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>-->
 
             <!--<div v-for="ele in enviroment">
@@ -201,6 +207,7 @@ export default defineComponent({
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
+                    :props="{ name: ele.objectTypeId }"
                 />
                 <!-- places all game assets of the current element-->
                 <div v-for="asset in ele.game_assets">

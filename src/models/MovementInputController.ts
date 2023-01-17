@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import { KeyboardState } from "./KeyboardState"
 
-export class MovmentInputController {
+export class MovementInputController {
     public camera: any
     public KEYS: any
     public previousKeys: any
