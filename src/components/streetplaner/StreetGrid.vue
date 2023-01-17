@@ -110,13 +110,16 @@ onMounted(() => {
     updateMap()
 })
 
+// function places 'amountCars' random cars until no spawnpoints are available
 function placeAllRandomCars(amountCars: number) {
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
-    while (counter !== amountCars && errorCounter < 10) {
+    while (counter !== amountCars) {
+        // pick random element to place car on
         let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
         let randomElement = editorState.mapObjects[randomIndex]
+        // try to place car on random element
         if (placeRandomCarOnElement(randomElement, 7)) {
             if (changedElements.includes(randomElement)) {
                 delete changedElements[changedElements.indexOf(randomElement)]
@@ -126,13 +129,32 @@ function placeAllRandomCars(amountCars: number) {
         } else {
             errorCounter++
         }
+        // if car wasn't placeable on the last 3 elements, try to place it on any element
+        if (errorCounter >= 3) {
+            for (let ele of editorState.mapObjects) {
+                // if car is placeable reset errorCounter and continue
+                if (placeRandomCarOnElement(ele, 7)) {
+                    if (changedElements.includes(randomElement)) {
+                        delete changedElements[changedElements.indexOf(randomElement)]
+                    }
+                    changedElements.push(editorState.mapObjects[randomIndex])
+                    counter++
+                    errorCounter = 0
+                }
+            }
+            // if car isn't placeable, then there are no more spawnpoints available
+            if (errorCounter > 0) {
+                break
+            }
+        }
     }
+    // send all changed elements via stomp broker to backend and other clients
     for (let ele of changedElements) {
-        console.log(ele)
         updateMessage(ele)
     }
 }
 
+// tries to place random car on an elment, returns true if car was placed, else false
 function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
     if (element.objectTypeId === 0) {
@@ -210,16 +232,19 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
             ]
         )
     }
-
+    // check if the max capacity is reached
     if (element.game_assets.length === randomPosElements.length) {
         return false
     }
 
+    // pick random spawnpoint
     let randomPos = Math.floor(Math.random() * randomPosElements.length)
-    if (checkAssetPlacedNearElement(element, randomPosElements[randomPos])) {
+    // check if spawnpoint is taken
+    if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
         randomPos = 0
+        // spawnpoint is taken so try to place car on the other spawnpoints
         while (randomPos < randomPosElements.length) {
-            if (checkAssetPlacedNearElement(element, randomPosElements[randomPos])) {
+            if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
                 randomPos++
             } else {
                 streetGrid[element.x][element.y].game_assets.push({
@@ -233,6 +258,7 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
             }
         }
     } else {
+        // spawnpoint is free, so place car there
         streetGrid[element.x][element.y].game_assets.push({
             objectTypeId: assetObjectTypeId,
             x: randomPosElements[randomPos].x,
@@ -246,11 +272,26 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
     return false
 }
 
-function checkAssetPlacedNearElement(element: IMapObject, pos: { x: number; y: number }): boolean {
+// checks if car is placed on or too near to other asset
+function checkAssetPlacedNearElement(
+    game_assets: IGameAsset2D[],
+    pos: { x: number; y: number; rotation: number }
+): boolean {
+    let deltaX: number
+    let deltaY: number
+    // set distance to other car/asset via rotation
+    if (pos.rotation % 2 == 1) {
+        deltaX = 0.21
+        deltaY = 0.1
+    } else {
+        deltaY = 0.21
+        deltaX = 0.1
+    }
+    // check if asset would be placed inside the perimeter
     if (
-        element.game_assets.filter(
+        game_assets.filter(
             (obj: IGameAsset2D) =>
-                obj.x >= pos.x - 0.1 && obj.x <= pos.x + 0.1 && obj.y >= pos.y - 0.1 && obj.y <= pos.y + 0.1
+                obj.x >= pos.x - deltaX && obj.x <= pos.x + deltaX && obj.y >= pos.y - deltaY && obj.y <= pos.y + deltaY
         ).length > 0
     ) {
         return true
@@ -262,17 +303,27 @@ function checkAssetPlacedNearElement(element: IMapObject, pos: { x: number; y: n
 // onClick handles click on specific cell
 function onClick(cell: any, e: any) {
     let currCellContent = streetGrid[cell.posX][cell.posY]
-    console.log(`x:${cell.posX} y:${cell.posY}`)
     let payload: IMapObject
     if (toolState.tool === ToolEnum.CREATE && toolState.block.objectTypeId !== -1) {
         // if toolState block = asset
         if (toolState.block.groupId === 2) {
+            if (e.target.classList.contains("asset-img")) {
+                return
+            }
             // only place asset if it's placed on a road
             if (currCellContent.groupId === 0) {
                 let rect = e.target.getBoundingClientRect()
                 let x = (e.clientX - rect.left) / gridSize.size
                 let y = (e.clientY - rect.top) / gridSize.size
-                console.log(`x:${x} y:${y}`)
+                if (
+                    checkAssetPlacedNearElement(currCellContent.game_assets, {
+                        x: x,
+                        y: y,
+                        rotation: toolState.block.rotation,
+                    })
+                ) {
+                    return
+                }
                 streetGrid[cell.posX][cell.posY].game_assets.push({
                     objectTypeId: toolState.block.objectTypeId,
                     x: x,
@@ -398,7 +449,6 @@ function saveStreetGrid() {
 // load StreetGrid from backend dto
 function loadStreetGrid(dto: StreetGridDTO) {
     fillGridEmpty()
-    console.log(dto.mapObjects)
     for (let ele of dto.mapObjects) {
         streetGrid[ele.x][ele.y] = {
             objectTypeId: ele.objectTypeId,
@@ -440,8 +490,6 @@ function calcCoordAssetX(id: string, relativeX: number) {
         // - assetSize.value / 3 moves the asset so the mid point is in the middle, usually one should use 2 here, but somehow 3 works
         posX = elemRect.left - bodyRect.left + gridSize.size * relativeX - assetSize.value / 2
     }
-    console.log(assetSizePx.value)
-    console.log(`x: ${posX}`)
     return posX
 }
 
@@ -456,7 +504,6 @@ function calcCoordAssetY(id: string, relativeY: number) {
         // - assetSize.value / 3 moves the asset so the mid point is in the middle, usually one should use 2 here, but somehow 3 works
         posY = elemRect.top - bodyRect.top + gridSize.size * relativeY - assetSize.value / 2
     }
-    console.log(`y: ${posY}`)
     return posY
 }
 
