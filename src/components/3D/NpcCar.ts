@@ -80,10 +80,10 @@ export class NpcCar {
     }
 
     //driving
-    update() {
+    drive() {
         const velocity = 0.005
 
-        if (this.driving) {
+        if (!this.reachedMapEleLimit()) {
             if (this.positions.npcRotation === 0) {
                 this.positions.npcPosZ -= velocity
             } else if (this.positions.npcRotation === 1) {
@@ -94,7 +94,7 @@ export class NpcCar {
                 this.positions.npcPosX -= velocity
             }
 
-            this.checkMapEleLimit()
+            // this.reachedMapEleLimit()
         } else {
             //console.log("not moving at the moment")
         }
@@ -139,38 +139,46 @@ export class NpcCar {
     }
 
     //map ele rotation and driving direction need to be taken into account
-    checkMapEleLimit() {
+    reachedMapEleLimit() {
         if (this.positions.npcRotation === 0) {
             if (this.positions.npcPosZ > this.mapLimit) {
                 //console.log(`npcCar id: ${this.npcId} in mapEle!`)
+                return false
             } else {
                 //console.log(`npcCar id: ${this.npcId} left mapEle!`)
                 this.driving = false
                 //this.updatePosMessage()
+                return true
             }
         } else if (this.positions.npcRotation === 1) {
             if (this.positions.npcPosX < this.mapLimit) {
                 //console.log(`npcCar id: ${this.npcId} in mapEle!`)
+                return false
             } else {
                 //console.log(`npcCar id: ${this.npcId} left mapEle!`)
                 this.driving = false
                 //this.updatePosMessage()
+                return true
             }
         } else if (this.positions.npcRotation === 2) {
             if (this.positions.npcPosZ < this.mapLimit) {
                 //console.log(`npcCar id: ${this.npcId} in mapEle!`)
+                return false
             } else {
                 //console.log(`npcCar id: ${this.npcId} left mapEle!`)
                 this.driving = false
                 //this.updatePosMessage()
+                return true
             }
         } else if (this.positions.npcRotation === 3) {
             if (this.positions.npcPosX > this.mapLimit) {
                 //console.log(`npcCar id: ${this.npcId} in mapEle!`)
+                return false
             } else {
                 //console.log(`npcCar id: ${this.npcId} left mapEle!`)
                 this.driving = false
                 //this.updatePosMessage()
+                return true
             }
         }
     }

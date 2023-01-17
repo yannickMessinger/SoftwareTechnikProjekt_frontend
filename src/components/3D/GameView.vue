@@ -159,16 +159,16 @@
                     `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
                 )
                 updateMapObjsFromGameState()
-                //console.log(npcEles)
+
                 renderer.value.onBeforeRender(() => {
                     fpsCamera.update()
 
                     npcEles.value.forEach((ele, index) => {
-                        //npcEles.value.get(index)!.update()
-                        ele.update()
-
-                        if (!ele.driving) {
+                        if (ele.reachedMapEleLimit()) {
                             updatePosMessage(ele.npcId)
+                            ele.drive()
+                        } else {
+                            ele.drive()
                         }
                     })
                 })

@@ -229,8 +229,14 @@ export function fillGameState(): void {
     console.log(gameState.npcCarMapFromuseGameview)
 }
 
+gameState.npcCarMapFromuseGameview.forEach((ele) => {
+    console.log("UDATE POS MAN")
+    updatePosMessage(ele.npcId)
+})
+
 //emits event to backend with current information, so that next map element can be calculated.
 function updatePosMessage(npcId: number) {
+    console.log("sende Update pos anfrage an backend")
     if (stompClient) {
         let tempCar = gameState.npcCarMapFromuseGameview.get(npcId)!
         const updatePosMsg: IStompMessage = {
