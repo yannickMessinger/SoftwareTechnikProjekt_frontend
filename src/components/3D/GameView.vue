@@ -13,7 +13,9 @@ import {
 } from "troisjs"
 import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+import { MovmentInputController } from "../../models/MovementInputController"
 import { useGameView } from "../../services/3DGameView/useGameView"
+import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 
 export default defineComponent({
     components: {
@@ -31,7 +33,8 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-        const fpsCamera = new FirstPersonCamera(camera, box)
+        const movableObject = new MovmentInputController(Box, camera)
+        //const fpsCamera = new FirstPersonCamera(camera, box)
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
         console.log(gameState.sizeX * gameState.fieldSize)
@@ -144,7 +147,8 @@ export default defineComponent({
             updateMapObjsFromGameState()
 
             renderer.value.onBeforeRender(() => {
-                fpsCamera.update()
+                //fpsCamera.update()
+                movableObject.update()
             })
         })
 
@@ -152,7 +156,8 @@ export default defineComponent({
             renderer,
             camera,
             box,
-            fpsCamera,
+            //fpsCamera,
+            movableObject,
             calcCoordinateX,
             calcCoordinateZ,
             calcAssetCoordinateX,
