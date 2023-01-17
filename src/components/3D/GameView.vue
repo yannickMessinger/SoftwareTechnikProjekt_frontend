@@ -42,10 +42,8 @@ export default defineComponent({
             updatePosMessage,
             receiveNpcUpdates,
         } = useGameView()
-        console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
+
         receiveNpcUpdates()
-        console.log(gameState.sizeX * gameState.fieldSize)
-        console.log(gameState.sizeY * gameState.fieldSize)
 
         /*Defines the Grid Size in length by the number ob fields*/
         let gridSizeX = 300
@@ -153,24 +151,27 @@ export default defineComponent({
         }
 
         onMounted(() => {
-            console.log(
-                `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
-            )
             updateMapObjsFromGameState()
 
             renderer.value.onBeforeRender(() => {
                 fpsCamera.update()
 
-                    npcEles.value.forEach((ele, index) => {
-                        if (ele.reachedMapEleLimit()) {
-                            updatePosMessage(ele.npcId)
-                            // ele.drive()
-                        } else {
-                            ele.drive()
-                        }
-                    })
-                
+                npcEles.value.forEach((ele) => {
+                    if (ele.drive) {
+                        ele.drive()
+                        //console.log(`pixelpos nach in GAMEVIEW npc: x:${ ele.positions.npcPosX} z:${ ele.positions.npcPosZ}`)
+                    }
+                })
             })
+
+            setInterval(() => {
+                npcEles.value.forEach((ele) => {
+                    if (ele.reachedMapEleLimit()) {
+                        console.log(`ele mit ${ele.npcId} braucht POS Update!`)
+                        updatePosMessage(ele.npcId)
+                    }
+                })
+            }, 2000)
         })
 
         return {

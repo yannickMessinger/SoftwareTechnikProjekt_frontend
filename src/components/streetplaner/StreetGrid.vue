@@ -116,7 +116,6 @@ function onClick(cell: any, e: any) {
                 let rect = e.target.getBoundingClientRect()
                 let x = (e.clientX - rect.left) / gridSize.size
                 let y = (e.clientY - rect.top) / gridSize.size
-                console.log(`x:${x} y:${y}`)
                 streetGrid[cell.posX][cell.posY].game_assets.push({
                     objectTypeId: toolState.block.objectTypeId,
                     x: x,
