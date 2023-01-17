@@ -2,34 +2,28 @@ import * as THREE from "three"
 
 export class CollisionService {
     public car: any
-    public objects: any
-    public shop: any
     public carBB: any
 
     //BB is Bounding Box
-    constructor(car: any, objects: any, shop: any) {
+    constructor(car: any) {
         this.car = car
-        this.objects = objects
-        this.shop = shop
         this.carBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
     }
 
     updateCarBoundingBox(car: any) {
-        this.carBB.setFromObject(this.car.value.mesh)
+        this.carBB.setFromObject(car.value.mesh)
     }
 
-    checkCollision(scene: any): boolean {
-        console.log(scene.value.scene)
-        let boxBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
-        boxBB.setFromObject(this.objects.value.mesh)
-
-        let shopBB = new THREE.Box3().setFromObject(this.shop.value.o3d)
-
-        if (this.carBB.intersectsBox(boxBB)) {
-            return true
-        } else if (this.carBB.intersectsBox(shopBB)) {
-            return true
+    checkCollision(objects: { id: number; box: THREE.Box3 }[]): boolean {
+        if (objects.length == 0) {
+            return false
         } else {
+            for (let i = 0; i < objects.length; i++) {
+                if (this.carBB.intersectsBox(objects[i].box)) {
+                    console.log("Collision detected with:", objects[i].id)
+                    return true
+                }
+            }
             return false
         }
     }

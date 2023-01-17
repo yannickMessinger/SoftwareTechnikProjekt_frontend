@@ -13,8 +13,10 @@ import {
 } from "troisjs"
 import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+import { BoundingBoxService } from "../../services/3D/BoundingBoxService"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { MovementInputController } from "../../models/MovementInputController"
+import { CollisionService } from "../../services/3D/CollisionService"
 
 export default defineComponent({
     components: {
@@ -29,10 +31,13 @@ export default defineComponent({
     },
 
     setup() {
+        let initScene = false
         const renderer = ref()
         const box = ref()
         const camera = ref()
         const scene = ref()
+        const bbService = new BoundingBoxService()
+        const collisionService = new CollisionService(box)
         const fpsCamera = new MovementInputController(box, camera)
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
@@ -147,8 +152,14 @@ export default defineComponent({
 
             renderer.value.onBeforeRender(() => {
                 fpsCamera.update()
-                console.log(scene.value.scene)
             })
+            setInterval(() => {
+                collisionService.updateCarBoundingBox(box)
+                collisionService.checkCollision(bbService.getBoundingBoxes())
+            }, 2500)
+            setTimeout(() => {
+                bbService.setObjects(scene)
+            }, 5000)
         })
 
         return {
@@ -187,7 +198,7 @@ export default defineComponent({
             >
                 <PhongMaterial color="#999999" :props="{ depthWrite: false }"
             /></Plane>
-            <Box ref="box" :position="{ x: -130, y: 1, z: -80 }">
+            <Box ref="box" :position="{ x: -77, y: 1, z: -80 }">
                 <LambertMaterial />
             </Box>
             <!--  <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>-->
@@ -224,6 +235,7 @@ export default defineComponent({
                             y: assetRotationMap.get(asset.rotation),
                             z: 0,
                         }"
+                        :props="{ name: 22 }"
                     />
                 </div>
             </div>
