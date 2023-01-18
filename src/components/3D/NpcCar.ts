@@ -182,4 +182,10 @@ export class NpcCar {
             }
         }
     }
+
+    driveCurve() {
+
+
+        /* */
+    }
 }
