@@ -283,7 +283,7 @@ async function onMessageReceived(payload: any) {
             `pixelpos nach UPDATE npc: x:${updateNpcCar!.positions.npcPosX} z:${updateNpcCar!.positions.npcPosZ}`
         )
 
-        updateNpcCar!.driving = true
+        updateNpcCar!.driving = false
         updateNpcCar!.needsMapEleUpdate = false
     }
 }

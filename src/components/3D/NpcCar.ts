@@ -90,7 +90,7 @@ export class NpcCar {
 
     //driving
     drive() {
-        const velocity = 0.03
+        const velocity = 0.1
 
         if (this.positions.npcRotation === 0) {
             this.positions.npcPosZ -= velocity
@@ -139,7 +139,7 @@ export class NpcCar {
             limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
         }
 
-        this.mapLimit = limit + 5
+        this.mapLimit = limit + 1.5
         console.log(this.mapLimit)
     }
 

@@ -16,6 +16,7 @@ import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, r
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { NpcCar } from "./NpcCar"
+import { MovmentInputController } from "../../models/MovementInputController"
 
 export default defineComponent({
     components: {
@@ -33,7 +34,8 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-        const fpsCamera = new FirstPersonCamera(camera, box)
+        //const fpsCamera = new FirstPersonCamera(camera, box)
+        const moveableObject = new MovmentInputController(box, camera)
         const {
             gameState,
             setMapWidthAndMapHeight,
@@ -154,10 +156,11 @@ export default defineComponent({
             updateMapObjsFromGameState()
 
             renderer.value.onBeforeRender(() => {
-                fpsCamera.update()
+                //fpsCamera.update()
+                moveableObject.update()
 
                 npcEles.value.forEach((ele) => {
-                    if (ele.drive) {
+                    if (ele.driving) {
                         ele.drive()
                         //console.log(`pixelpos nach in GAMEVIEW npc: x:${ ele.positions.npcPosX} z:${ ele.positions.npcPosZ}`)
                     }
@@ -171,7 +174,7 @@ export default defineComponent({
                         updatePosMessage(ele.npcId)
                     }
                 })
-            }, 2000)
+            }, 300)
         })
 
         return {
@@ -179,7 +182,8 @@ export default defineComponent({
             renderer,
             camera,
             box,
-            fpsCamera,
+            //fpsCamera,
+            moveableObject,
             calcCoordinateX,
             calcCoordinateZ,
             calcAssetCoordinateX,
@@ -199,6 +203,7 @@ export default defineComponent({
 <template>
     <Renderer resize="window" ref="renderer">
         <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
+        <Box ref="box" :position="{ x: 0, y: 5, z: 0 }"></Box>
         <Scene background="#87CEEB">
             <AmbientLight></AmbientLight>
             <Plane
