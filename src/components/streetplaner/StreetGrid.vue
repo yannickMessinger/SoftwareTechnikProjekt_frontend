@@ -68,7 +68,7 @@ watch(
 watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
-        placeAllRandomCars(val[0].car)
+        placeAllRandomAssets(val[0].car, 7)
     }
 )
 
@@ -111,7 +111,7 @@ onMounted(() => {
 })
 
 // function places 'amountCars' random cars until no spawnpoints are available
-function placeAllRandomCars(amountCars: number) {
+function placeAllRandomAssets(amountCars: number, assetObjectTypeId: number) {
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
@@ -120,7 +120,7 @@ function placeAllRandomCars(amountCars: number) {
         let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
         let randomElement = editorState.mapObjects[randomIndex]
         // try to place car on random element
-        if (placeRandomCarOnElement(randomElement, 7)) {
+        if (placeRandomAssetOnElement(randomElement, assetObjectTypeId)) {
             if (changedElements.includes(randomElement)) {
                 delete changedElements[changedElements.indexOf(randomElement)]
             }
@@ -133,7 +133,7 @@ function placeAllRandomCars(amountCars: number) {
         if (errorCounter >= 3) {
             for (let ele of editorState.mapObjects) {
                 // if car is placeable reset errorCounter and continue
-                if (placeRandomCarOnElement(ele, 7)) {
+                if (placeRandomAssetOnElement(ele, assetObjectTypeId)) {
                     if (changedElements.includes(randomElement)) {
                         delete changedElements[changedElements.indexOf(randomElement)]
                     }
@@ -154,8 +154,7 @@ function placeAllRandomCars(amountCars: number) {
     }
 }
 
-// tries to place random car on an elment, returns true if car was placed, else false
-function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
+function getRandomSpawnsCar(element: IMapObject) {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
     if (element.objectTypeId === 0) {
         // element = straight
@@ -232,6 +231,19 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
             ]
         )
     }
+    return randomPosElements
+}
+
+// tries to place random car on an elment, returns true if car was placed, else false
+function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
+    let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
+    
+    // if assetId = 7, then asset = car
+    if (assetObjectTypeId === 7) {
+        randomPosElements = getRandomSpawnsCar(element);
+    }
+    // Todo, add function for random spawnpoints for pedestrians
+
     // check if the max capacity is reached
     if (element.game_assets.length === randomPosElements.length) {
         return false
