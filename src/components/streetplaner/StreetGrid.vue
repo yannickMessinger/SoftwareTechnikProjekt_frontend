@@ -110,12 +110,12 @@ onMounted(() => {
     updateMap()
 })
 
-// function places 'amountCars' random cars until no spawnpoints are available
-function placeAllRandomAssets(amountCars: number, assetObjectTypeId: number) {
+// function places 'amountAssets' random cars until no spawnpoints are available
+function placeAllRandomAssets(amountAssets: number, assetObjectTypeId: number) {
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
-    while (counter !== amountCars) {
+    while (counter !== amountAssets) {
         // pick random element to place car on
         let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
         let randomElement = editorState.mapObjects[randomIndex]
