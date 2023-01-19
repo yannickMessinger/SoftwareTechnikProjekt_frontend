@@ -4,6 +4,7 @@ import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { ILobby } from "../typings/ILobby"
 import { ILoginStateDTO } from "../typings/ILoginStateDTO"
 import router from "../router/router"
+import { IPlayerPosition } from "../typings/IPlayerPosition"
 
 let reloginTried = false
 
@@ -20,6 +21,13 @@ const state = reactive<IUser>({
         numOfPlayers: 0,
         lobbyModeEnum: E_LobbyMode.BUILD_MODE,
         playerList: [],
+    },
+    playerPosition: {
+        positionId: -1,
+        posX: -1,
+        posY: -1,
+        posRotation: -1.0,
+        playerId: -1,
     },
 })
 
@@ -136,6 +144,10 @@ async function setActiveLobby(lobby: ILobby): Promise<void> {
     state.activeLobby = lobby
 }
 
+async function setPosition(position: IPlayerPosition) {
+    state.playerPosition = position
+}
+
 function updateActiveLobbyPlayerList(players: IUser[]) {
     for (let p of players) {
         state.activeLobby.playerList?.push(p)
@@ -170,5 +182,6 @@ export default function useUser() {
         register,
         logout,
         updateActiveLobbyPlayerList,
+        setPosition,
     }
 }
