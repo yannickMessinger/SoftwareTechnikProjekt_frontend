@@ -69,6 +69,7 @@ watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
         placeAllRandomAssets(val[0].car, 7)
+        placeRandomPedestrians(val[0].pedestrian)
     }
 )
 
@@ -154,6 +155,11 @@ function placeAllRandomAssets(amountAssets: number, assetObjectTypeId: number) {
     }
 }
 
+function placeRandomPedestrians(amount: number) {
+    let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
+
+}
+
 function getRandomSpawnsCar(element: IMapObject) {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
     if (element.objectTypeId === 0) {
@@ -234,15 +240,109 @@ function getRandomSpawnsCar(element: IMapObject) {
     return randomPosElements
 }
 
+function getRandomSpawnsPedestrian(element: IMapObject) {
+    let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
+    switch (element.objectTypeId) {
+        // case: straight street, intended to be walking on the right side of a sidewalk
+        case 0:
+            if (element.rotation % 2 === 0) {
+                for (let i = 0.125; i<1; i+=0.125) {
+                    // rotation 0
+                    let pedRotation = 0
+                    randomPosElements.push(...
+                    [
+                        { x: 0.2, y: i, rotation: pedRotation },
+                        { x: 0.9, y: i, rotation: pedRotation }
+                    ])
+                    // rotation 2
+                    pedRotation = 2
+                    randomPosElements.push(...
+                    [
+                        { x:0.1, y: i, rotation: pedRotation},
+                        { x:0.8, y: i, rotation: pedRotation}
+                    ])
+                }
+            } else if (element.rotation % 2 === 1) {
+                for (let i = 0.125; i<1; i+=0.125) {
+                    // rotation 1
+                    let pedRotation = 1
+                    randomPosElements.push(...
+                    [
+                        { x: i, y: 0.2, rotation: pedRotation },
+                        { x: i, y: 0.9, rotation: pedRotation }
+                    ])
+                    // rotation 3
+                    pedRotation = 3
+                    randomPosElements.push(...
+                    [
+                        { x:i, y: 0.1, rotation: pedRotation},
+                        { x:i, y: 0.8, rotation: pedRotation}
+                    ])
+                }
+            }
+            break;
+        // case: curve
+        case 1:
+            if (element.rotation % 4 === 0) {
+                randomPosElements.push(...
+                [
+                    {x: 0.9, y: 0.9, rotation: 1}
+                ]
+                )
+            } else if (element.rotation % 4 === 1) {
+                randomPosElements.push(...
+                [
+                    {x: 0.1, y: 0.9, rotation: 2}
+                ]
+                )
+            } else if (element.rotation % 4 === 2) {
+                randomPosElements.push(...
+                [
+                    {x: 0.1, y: 0.1, rotation: 3}
+                ]
+                )
+            } else if (element.rotation % 4 === 3) {
+                randomPosElements.push(...
+                [
+                    {x: 0.9, y: 0.1, rotation: 0}
+                ]
+                )
+            }
+            break;
+        // case: intersection
+        case 2:
+            randomPosElements.push(...
+                [
+                    {x:0.9, y: 0.1, rotation: 0},
+                    {x:0.9, y:0.9, rotation: 1},
+                    {x:0.1, y:0.9, rotation: 2},
+                    {x:0.1, y: 0.1, rotation: 3},
+
+                    {x:0.2, y: 0.2, rotation: 0},
+                    {x:0.8, y:0.2, rotation: 1},
+                    {x:0.8, y:0.8, rotation: 2},
+                    {x:0.2, y: 0.8, rotation: 3},
+                ]
+            )
+            break;
+    }
+
+    return randomPosElements;
+}
+
 // tries to place random car on an elment, returns true if car was placed, else false
 function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
-    
+
     // if assetId = 7, then asset = car
     if (assetObjectTypeId === 7) {
-        randomPosElements = getRandomSpawnsCar(element);
+        randomPosElements = getRandomSpawnsCar(element)
     }
     // Todo, add function for random spawnpoints for pedestrians
+    // if (7 < assetId < 18), then asset = pedestrian
+    else if (assetObjectTypeId > 7 && assetObjectTypeId < 18) {
+        randomPosElements = getRandomSpawnsPedestrian(element)
+    }
 
     // check if the max capacity is reached
     if (element.game_assets.length === randomPosElements.length) {
@@ -531,31 +631,16 @@ window.addEventListener(
 
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
-        <div
-            v-for="ele in row"
-            :id="`cell_${ele.posX}_${ele.posY}`"
-            class="grid-item grid-size col no-drag"
-            @click="onClick(ele, $event)"
-            @mousemove="onMouseMove(ele, $event)"
-        >
-            <img
-                v-if="ele.texture != ''"
-                :src="ele.texture"
-                class="no-drag grid-img"
-                draggable="false"
-                :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }"
-            />
+        <div v-for="ele in row" :id="`cell_${ele.posX}_${ele.posY}`" class="grid-item grid-size col no-drag"
+            @click="onClick(ele, $event)" @mousemove="onMouseMove(ele, $event)">
+            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false"
+                :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }" />
             <div v-for="asset in ele.game_assets">
-                <img
-                    :src="asset.texture"
-                    class="no-drag asset-img"
-                    draggable="false"
-                    :style="{
-                        transform: 'rotate(' + asset.rotation * 90 + 'deg)',
-                        left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
-                        top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
-                    }"
-                />
+                <img :src="asset.texture" class="no-drag asset-img" draggable="false" :style="{
+                    transform: 'rotate(' + asset.rotation * 90 + 'deg)',
+                    left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
+                    top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
+                }" />
             </div>
         </div>
     </div>
@@ -566,9 +651,11 @@ window.addEventListener(
     display: table;
     overflow: scroll;
 }
+
 .col {
     display: table-cell;
 }
+
 .grid-size {
     min-width: v-bind(gridSizePx);
     max-width: v-bind(gridSizePx);
@@ -577,20 +664,24 @@ window.addEventListener(
     width: v-bind(gridSizePx);
     height: v-bind(gridSizePx);
 }
+
 .grid-item {
     border: solid 1px black;
     z-index: 0;
 }
+
 .grid-img {
     width: 100%;
     height: 100%;
     display: block;
 }
+
 .asset-img {
     width: v-bind(assetSizePx);
     height: v-bind(assetSizePx);
     position: absolute;
 }
+
 .no-drag {
     user-select: none;
     -webkit-user-drag: none;

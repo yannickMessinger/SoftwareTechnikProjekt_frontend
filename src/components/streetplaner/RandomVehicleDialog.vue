@@ -4,6 +4,8 @@ import { defineProps, defineEmits, ref, computed } from "vue"
 const emit = defineEmits(["confirm", "cancel"])
 const amountCars = ref(0)
 const maxAmountCars = 100
+const amountPedestrians = ref(0)
+const maxAmountPedestrians = 100
 </script>
 
 <template>
@@ -11,9 +13,12 @@ const maxAmountCars = 100
         <div class="modal-body">
             <span class="modal-close" @click="emit('cancel')">🗙</span>
             <h2 class="question">Wie viele von welchen Fahrzeugen sollen platziert werden?</h2>
-            <p>Auto: <input type="number" :max="maxAmountCars" v-model="amountCars" /></p>
+            <p>Auto: <input type="number" :min="0" :max="maxAmountCars" v-model="amountCars" /></p>
+            <h2 class="question">Wie viele Fussgaenger sollen platziert werden?</h2>
+            <p>Fussgaengeranzahl: <input type="number" :min="0" :max="maxAmountPedestrians" v-model="amountPedestrians" /></p>
+            <br/>
             <div class="modal-action">
-                <button class="modal-button" @click="emit('confirm', { car: amountCars })">Confirm</button>
+                <button class="modal-button" @click="emit('confirm', { car: amountCars, pedestrian: amountPedestrians})">Confirm</button>
                 <button class="modal-button" @click="emit('cancel')">Cancel</button>
             </div>
         </div>
