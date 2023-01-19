@@ -15,6 +15,9 @@ import useUser from "../../services/UserStore"
 import { useEditor } from "../../services/Editor/useEditor"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
+import UserStore from "../../services/UserStore"
+
+const { userId } = UserStore()
 const { bus } = useEventBus()
 const { setGameStateSizes, setGameStateMapId } = useGameView()
 const { blockListState, updateBlockList } = useBlockList()
@@ -324,13 +327,40 @@ function onClick(cell: any, e: any) {
                 ) {
                     return
                 }
-                streetGrid[cell.posX][cell.posY].game_assets.push({
-                    objectTypeId: toolState.block.objectTypeId,
-                    x: x,
-                    y: y,
-                    rotation: toolState.block.rotation,
-                    texture: toolState.block.texture,
-                })
+                if (toolState.block.objectTypeId === 8) {
+                    // if asset is spawnpoint
+                    let oldSpawnCell = editorState.mapObjects.filter(
+                        (ele) => ele.game_assets.filter((asset) => asset.userId === userId.value).length
+                    )
+                    for (let oldCell of oldSpawnCell) {
+                        payload = {
+                            objectTypeId: oldCell.objectTypeId,
+                            x: oldCell.x,
+                            y: oldCell.y,
+                            rotation: oldCell.rotation,
+                            game_assets: oldCell.game_assets.filter((asset) => asset.userId !== userId.value),
+                        }
+
+                        updateMessage(payload)
+                    }
+                    streetGrid[cell.posX][cell.posY].game_assets.push({
+                        objectTypeId: toolState.block.objectTypeId,
+                        x: x,
+                        y: y,
+                        rotation: toolState.block.rotation,
+                        texture: toolState.block.texture,
+                        userId: userId.value,
+                    })
+                } else {
+                    streetGrid[cell.posX][cell.posY].game_assets.push({
+                        objectTypeId: toolState.block.objectTypeId,
+                        x: x,
+                        y: y,
+                        rotation: toolState.block.rotation,
+                        texture: toolState.block.texture,
+                    })
+                }
+
                 payload = {
                     objectTypeId: currCellContent.objectTypeId,
                     x: cell.posX,
@@ -378,6 +408,7 @@ function onClick(cell: any, e: any) {
         streetGrid[cell.posX][cell.posY].texture = ""
         deleteMessage(payload)
     }
+    console.log(streetGrid)
 }
 
 // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
@@ -534,8 +565,22 @@ window.addEventListener(
                 :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }"
             />
             <div v-for="asset in ele.game_assets">
+                <!-- if asset is npc (asset.userId not present or 0) or asset is our spawnpoint (asset.userId === our userId) use given asset.texture -->
                 <img
+                    v-if="!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()"
                     :src="asset.texture"
+                    class="no-drag asset-img"
+                    draggable="false"
+                    :style="{
+                        transform: 'rotate(' + asset.rotation * 90 + 'deg)',
+                        left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
+                        top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
+                    }"
+                />
+                <!-- else the asset is not our spawnpoint nor a npc car, so asset is another players car -->
+                <img
+                    v-else
+                    src="/img/streetplaner/object-icons/car-top-view-green.svg"
                     class="no-drag asset-img"
                     draggable="false"
                     :style="{
