@@ -40,16 +40,15 @@ export class NpcCar {
     public needsMapEleUpdate: boolean
     lastCarRotation: number
 
-
     constructor(
-        npcId: any,
-        gameAssetX: any,
-        posY: any,
-        gameAssetZ: any,
-        npcRotation: any,
-        gridSizeX: any,
-        gridSizeY: any,
-        fieldSize: any,
+        npcId: number,
+        gameAssetX: number,
+        posY: number,
+        gameAssetZ: number,
+        npcRotation: number,
+        gridSizeX: number,
+        gridSizeY: number,
+        fieldSize: number,
         curMapObj: IMapObject
     ) {
         this.npcId = npcId
@@ -79,7 +78,6 @@ export class NpcCar {
         this.driving = true
         this.needsMapEleUpdate = false
         this.lastCarRotation = this.positions.npcRotation
-
 
         this.calcMapEleCenter()
         this.calcPixelPosNpc()
@@ -188,77 +186,72 @@ export class NpcCar {
     }
 
     driveCurve() {
-
-
         /* abbruchbedingung*/
 
-        let curveCenterX = -1;
-        let curveCenterZ = -1;
-        let radius = -1;
-        if(this.nextMapObj.rotation === 0){
+        let curveCenterX = -1
+        let curveCenterZ = -1
+        let radius = -1
+        if (this.nextMapObj.rotation === 0) {
             /*Innenpunkt der Kurve berechnen*/
-            curveCenterX = this.nextMapObj.x + (this.fieldSize / 2);
-            curveCenterZ = this.nextMapObj.y + (this.fieldSize / 2)
-            if(this.lastCarRotation === 0){
+            curveCenterX = this.nextMapObj.x + this.fieldSize / 2
+            curveCenterZ = this.nextMapObj.y + this.fieldSize / 2
+            if (this.lastCarRotation === 0) {
                 /*Rechtskurve*/
                 /*Radius der Kurve berechnen*/
                 radius = this.calculateRadius(curveCenterX, this.positions.npcPosX)
-            }else if(this.lastCarRotation === 3){
+            } else if (this.lastCarRotation === 3) {
                 /*Linkskurve*/
                 radius = this.calculateRadius(curveCenterZ, this.positions.npcPosZ)
-            }else {
-                console.log("Fehler bei driveCurve 0");
+            } else {
+                console.log("Fehler bei driveCurve 0")
             }
-
-        }else if(this.nextMapObj.rotation === 1){
-            curveCenterX = this.nextMapObj.x - (this.fieldSize / 2);
-            curveCenterZ = this.nextMapObj.y + (this.fieldSize / 2)
-            if(this.lastCarRotation === 1){
+        } else if (this.nextMapObj.rotation === 1) {
+            curveCenterX = this.nextMapObj.x - this.fieldSize / 2
+            curveCenterZ = this.nextMapObj.y + this.fieldSize / 2
+            if (this.lastCarRotation === 1) {
                 /*Rechtskurve*/
                 radius = this.calculateRadius(curveCenterZ, this.positions.npcPosZ)
-            }else if(this.lastCarRotation === 0){
+            } else if (this.lastCarRotation === 0) {
                 /*Linkskurve*/
                 radius = this.calculateRadius(curveCenterX, this.positions.npcPosX)
-            }else{
-                console.log("Fehler bei driveCurve 1");
+            } else {
+                console.log("Fehler bei driveCurve 1")
             }
-
-        }else if(this.nextMapObj.rotation === 2){
-            curveCenterX = this.nextMapObj.x - (this.fieldSize / 2);
-            curveCenterZ = this.nextMapObj.y - (this.fieldSize / 2)
-            if(this.lastCarRotation === 2){
+        } else if (this.nextMapObj.rotation === 2) {
+            curveCenterX = this.nextMapObj.x - this.fieldSize / 2
+            curveCenterZ = this.nextMapObj.y - this.fieldSize / 2
+            if (this.lastCarRotation === 2) {
                 /*Rechtskurve*/
                 radius = this.calculateRadius(curveCenterX, this.positions.npcPosX)
-            }else if(this.lastCarRotation === 1){
+            } else if (this.lastCarRotation === 1) {
                 /*Linkskurve*/
                 radius = this.calculateRadius(curveCenterZ, this.positions.npcPosZ)
-            }else{
-                console.log("Fehler bei driveCurve 2");
+            } else {
+                console.log("Fehler bei driveCurve 2")
             }
+        } else if (this.nextMapObj.rotation === 3) {
+            curveCenterX = this.nextMapObj.x + this.fieldSize / 2
+            curveCenterZ = this.nextMapObj.y - this.fieldSize / 2
 
-        }else if(this.nextMapObj.rotation === 3){
-            curveCenterX = this.nextMapObj.x + (this.fieldSize / 2);
-            curveCenterZ = this.nextMapObj.y - (this.fieldSize / 2)
-
-            if(this.lastCarRotation === 3){
+            if (this.lastCarRotation === 3) {
                 /*Linkskurve*/
                 radius = this.calculateRadius(curveCenterZ, this.positions.npcPosZ)
-            }else if(this.lastCarRotation === 2){
+            } else if (this.lastCarRotation === 2) {
                 /*Rechtskurve*/
                 radius = this.calculateRadius(curveCenterX, this.positions.npcPosX)
-            }else{
-                console.log("Fehler bei driveCurve 3");
+            } else {
+                console.log("Fehler bei driveCurve 3")
             }
-        }else{
+        } else {
             console.log("Fehler bei driveCurve 111")
         }
     }
 
-    calculateRadius(centerPos : number, carPos : number){
-        return (centerPos - carPos < 0 ? (centerPos - carPos) * - 1 : centerPos - carPos)
+    calculateRadius(centerPos: number, carPos: number): number {
+        return centerPos - carPos < 0 ? (centerPos - carPos) * -1 : centerPos - carPos
     }
 
-    calculateCurvePosition(radius : number, curveCenterPosX : number, curveCenterPosZ : number, angle : number) {
-
+    calculateCurvePosition(radius: number, curveCenterPosX: number, curveCenterPosZ: number, angle: number) {
+        return 0
     }
 }

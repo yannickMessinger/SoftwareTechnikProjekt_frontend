@@ -197,7 +197,7 @@ export function fillGameState(): void {
                     gameState.npcCarMapFromuseGameview.set(
                         gameAsset.assetId!,
                         new NpcCar(
-                            gameAsset.assetId,
+                            gameAsset.assetId!,
                             gameAsset.x,
                             0,
                             gameAsset.y,
@@ -285,5 +285,7 @@ async function onMessageReceived(payload: any) {
 
         updateNpcCar!.driving = false
         updateNpcCar!.needsMapEleUpdate = false
+    } else if (payload.type === "INIT_NEXT_POS") {
+        console.log(`initiales setzen des naechsten Map Eles für npc mit id:${payload.npcContent.npcId}`)
     }
 }
