@@ -161,6 +161,7 @@ export default defineComponent({
 
                 npcEles.value.forEach((ele) => {
                     if (ele.driving) {
+                        // ele.positions.npcRotation +=0.001
                         ele.drive()
                         //console.log(`pixelpos nach in GAMEVIEW npc: x:${ ele.positions.npcPosX} z:${ ele.positions.npcPosZ}`)
                     }
