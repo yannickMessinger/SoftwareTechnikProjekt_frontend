@@ -137,6 +137,7 @@ export function fillGameState(): void {
     for (let i = 0; i < mapHeight.value; i++) {
         for (let j = 0; j < mapWidth.value; j++) {
             gameState.gameMapObjects[counter] = {
+                objectId: -1,
                 objectTypeId: randomNumer(17, 20),
                 x: i,
                 y: j,
