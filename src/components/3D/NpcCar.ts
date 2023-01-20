@@ -102,7 +102,8 @@ export class NpcCar {
 
         if (this.curMapObj.objectTypeId === 1) {
             console.log("Kurve, muss Paramter berechnen")
-            this.driveCurveCalc()
+            //this.driveCurveCalc()
+            this.calculateCurve()
         }
     }
 
@@ -129,14 +130,15 @@ export class NpcCar {
             }
         } else if (this.curMapObj.objectTypeId === 1) {
             //Curve
-            if (this.driveCurveRight && this.currCurveAngle < 90) {
-                this.positions.npcPosX = this.curveCenterX + Math.cos(this.currCurveAngle) * this.curveRadius
-                this.positions.npcPosZ = this.curveCenterZ + Math.sin(this.currCurveAngle) * this.curveRadius
+            //driving right curve but the way is intended for curve rotation === 2
+            if (this.driveCurveRight && this.currCurveAngle > 90) {
+                this.positions.npcPosX = this.curveCenterX + Math.cos(this.currCurveAngle * Math.PI/180) * this.curveRadius
+                this.positions.npcPosZ = this.curveCenterZ - Math.sin(this.currCurveAngle * Math.PI/180) * this.curveRadius
                 this.currCurveAngle += this.curveAngleInc
-                console.log(`angle: ${this.currCurveAngle}`)
+                // console.log(`angle: ${this.currCurveAngle}`)
             } else if (!this.driveCurveRight && this.currCurveAngle < 90) {
-                this.positions.npcPosX = this.curveCenterX - Math.cos(this.currCurveAngle) * this.curveRadius
-                this.positions.npcPosZ = this.curveCenterZ - Math.sin(this.currCurveAngle) * this.curveRadius
+                this.positions.npcPosX = this.curveCenterX - Math.cos(this.currCurveAngle * Math.PI/180) * this.curveRadius
+                this.positions.npcPosZ = this.curveCenterZ - Math.sin(this.currCurveAngle * Math.PI/180) * this.curveRadius
                 this.currCurveAngle += this.curveAngleInc
                 console.log(`angle: ${this.currCurveAngle}`)
             }
@@ -152,7 +154,7 @@ export class NpcCar {
         this.curMapObjCenterCoords.centerX = mapEleCenterX
         this.curMapObjCenterCoords.centerZ = mapEleCenterZ
 
-        console.log(`center Npc: x:${mapEleCenterX}, z: ${mapEleCenterZ}`)
+        console.log(`map ele center Npc: x:${mapEleCenterX}, z: ${mapEleCenterZ}`)
     }
 
     calcPixelPosNpc() {
@@ -225,13 +227,34 @@ export class NpcCar {
         }
     }
 
+    calculateCurve() {
+        if (this.curMapObj.rotation === 0) {
+            this.curveCenterX = this.curMapObj.y + (this.fieldSize*0.1);
+            this.curveCenterZ = this.curMapObj.x + (this.fieldSize*0.1);
+            console.log("______ x:", this.curveCenterX, "z:", this.curveCenterZ)
+            console.log("npc pos:", this.positions.npcPosX, this.positions.npcPosZ)
+            if (this.lastCarRotation === 0) {
+                this.driveCurveRight = true
+                this.curveRadius = this.curveCenterX - this.positions.npcPosX
+                this.currCurveAngle = 180;
+                this.curveAngleInc = -0.5;
+                console.log("___radius", this.curveRadius)
+            } else if (this.lastCarRotation === 3) {
+                this.driveCurveRight = false
+                this.curveRadius = this.curveCenterZ - this.positions.npcPosZ
+            } else {
+                console.log("Fehler bei driveCurve 0")
+            }
+        }
+    }
+
     driveCurveCalc() {
         /* radius, CurveCenter, Richtung der Kurve>*/
         console.log("drive curve aufgerufen")
         if (this.curMapObj.rotation === 0) {
             /*Innenpunkt der Kurve berechnen*/
-            this.curveCenterX = (this.trans2Dto3DcoordZ(this.nextMapObj.y) + this.fieldSize / 2) / 10
-            this.curveCenterZ = (this.trans2Dto3DcoordX(this.nextMapObj.y) + this.fieldSize / 2) / 10
+            this.curveCenterZ = (this.trans2Dto3DcoordZ(this.nextMapObj.y) + this.fieldSize / 2) / 10
+            this.curveCenterX = (this.trans2Dto3DcoordX(this.nextMapObj.y) + this.fieldSize / 2) / 10
             if (this.lastCarRotation === 0) {
                 /*Rechtskurve*/
                 this.driveCurveRight = true
@@ -308,7 +331,9 @@ export class NpcCar {
     }
 
     calculateCurvePosition(radius: number, curveCenterPosX: number, curveCenterPosZ: number, angle: number) {
-        return 0
+        const x = curveCenterPosX + Math.cos(angle * Math.PI/180) * radius
+        const z = curveCenterPosZ + Math.sin(angle * Math.PI/180) * radius
+        return {x, z}
     }
 
     trans2Dto3DcoordX(coord2dX: number) {

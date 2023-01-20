@@ -282,7 +282,8 @@ async function onMessageReceived(payload: any) {
         updateNpcCar!.calcMapEleCenter()
         updateNpcCar!.calcNpcMapLimit()
         if (payload.nextMapEleInfo.nextUpperMapObject.objectTypeId === 1) {
-            updateNpcCar!.driveCurveCalc()
+            // updateNpcCar!.driveCurveCalc()
+            updateNpcCar!.calculateCurve()
         }
         //updateNpcCar!.calcPixelPosNpc();
         console.log(
