@@ -4,9 +4,9 @@
 
 import { reactive } from "vue"
 import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO"
-import { ILobby } from "../typings/ILobby"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { ILobbyListState } from "../typings/ILobbyListState"
+import { ILobby } from "../typings/ILobby"
 import useUser from "./UserStore"
 import { ILobbyDTO } from "../typings/ILobbyDTO"
 import { Client } from "@stomp/stompjs"
@@ -68,11 +68,7 @@ export async function updateLobbyList(): Promise<void> {
 }
 
 //adds new lobby and sends it to backend, then update of lobbylist
-export async function createNewLobby(
-    addLobbyName: string,
-    addNumOfPlayers: number,
-    addLobbyMode: E_LobbyMode
-) {
+export async function createNewLobby(addLobbyName: string, addNumOfPlayers: number, addLobbyMode: E_LobbyMode) {
     const url = "/api/lobby"
 
     const addLobby: IAddLobbyRequestDTO = {
@@ -100,11 +96,7 @@ export async function createNewLobby(
 purpose to update playerlist of active lobby for all players that joined that particullar lobby.
 */
 function joinMessage() {
-    if (
-        stompClient &&
-        userId.value !== undefined &&
-        activeLobby.value.lobbyId !== -1
-    ) {
+    if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
         const lobbyMessage: IStompMessage = {
             playerContent: {
                 userId: user.userId,
@@ -139,11 +131,7 @@ function joinMessage() {
 /*method that fires a "SWITCH_MODE" message to path /app/lobby.switchMode in backend via Websocket connetction.
 Purpose to update Lobbymode of current active Lobby for all players who joined that lobby. */
 function changeLobbyModeMessage() {
-    if (
-        stompClient &&
-        userId.value !== undefined &&
-        activeLobby.value.lobbyId !== -1
-    ) {
+    if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
     }
     const switchModeMessage: IStompMessage = {
         playerContent: {
