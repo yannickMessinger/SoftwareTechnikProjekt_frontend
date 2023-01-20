@@ -243,7 +243,7 @@ export default defineComponent({
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{
                         x: 0,
-                        y: assetRotationMap.get(asset[1].positions.npcRotation),
+                        y: asset[1].viewRotation,
                         z: 0,
                     }"
                 />

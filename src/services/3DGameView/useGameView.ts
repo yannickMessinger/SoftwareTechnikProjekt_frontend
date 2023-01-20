@@ -171,7 +171,7 @@ export function fillGameState(): void {
             counter += 1
         }
     }
-    6
+
     gameState.npcCarMapFromuseGameview.clear()
 
     //adds NpcCar instances to Map for each gameasset from backend
@@ -212,10 +212,9 @@ export function fillGameState(): void {
                 }
             })
         }
-        console.log(`Indexberechnung:  ${mapObj.x * 30 + mapObj.y} | ${mapObj.rotation}`)
+
         gameState.gameMapObjects[mapObj.x * 30 + mapObj.y] = mapObj
     })
-    console.log(gameState.gameMapObjects)
 }
 
 //emits event to backend with current information, so that next map element can be calculated.
@@ -276,22 +275,25 @@ async function onMessageReceived(payload: any) {
     if (payload.type === "NEW_POSITION_RECEIVED") {
         console.log(payload.nextMapEleInfo)
         const updateNpcCar = gameState.npcCarMapFromuseGameview.get(payload.npcContent.npcId)
-        updateNpcCar!.curMapObj = payload.nextMapEleInfo.nextUpperMapObject
-        //updateNpcCar!.nextMapObj = payload.nextMapEleInfo.nextUpperMapObject
-        updateNpcCar!.positions.npcRotation = payload.nextMapEleInfo.newGameAssetRotation
+        updateNpcCar!.curMapObj = payload.nextMapEleInfo.currentMapObject
+        updateNpcCar!.nextMapObj = payload.nextMapEleInfo.nextUpperMapObject
+
         updateNpcCar!.calcMapEleCenter()
-        updateNpcCar!.calcNpcMapLimit()
-        if (payload.nextMapEleInfo.nextUpperMapObject.objectTypeId === 1) {
-            // updateNpcCar!.driveCurveCalc()
+
+        if (payload.nextMapEleInfo.currentMapObject.objectTypeId === 1) {
             updateNpcCar!.calculateCurve()
         }
-        //updateNpcCar!.calcPixelPosNpc();
+        updateNpcCar!.positions.npcRotation = payload.nextMapEleInfo.newGameAssetRotation
+        //updateNpcCar!.calcNpcMapLimit()
         console.log(
             `pixelpos nach UPDATE npc: x:${updateNpcCar!.positions.npcPosX} z:${updateNpcCar!.positions.npcPosZ}`
         )
 
+        console.log(updateNpcCar!.curMapObj)
+        console.log(updateNpcCar!.reachedMapEleLimit())
         updateNpcCar!.driving = true
-        updateNpcCar!.needsMapEleUpdate = false
+
+        //updateNpcCar!.needsMapEleUpdate = false
     } else if (payload.type === "INIT_NEXT_POS") {
         console.log(`initiales setzen des naechsten Map Eles für npc mit id:${payload.npcContent.npcId}`)
     }

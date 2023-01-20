@@ -40,6 +40,8 @@ export class NpcCar {
     public needsMapEleUpdate: boolean
     public lastCarRotation: number
     public curveStepSize: number
+    public viewRotation: number
+    public rotationMap: Map<number, number>
 
     public curveRadius: number
     public curveCenterX: number
@@ -61,6 +63,12 @@ export class NpcCar {
     ) {
         this.npcId = npcId
         this.npc = ref()
+        this.rotationMap = new Map([
+            [0, Math.PI],
+            [1, Math.PI / 2],
+            [2, 0],
+            [3, (3 * Math.PI) / 2],
+        ])
         this.positions = reactive({ npcPosX: 0, npcPosY: posY, npcPosZ: 0, npcRotation: npcRotation })
         this.curMapObjCenterCoords = reactive({ centerX: 0, centerZ: 0 })
         this.curMapObj = reactive({
@@ -86,6 +94,8 @@ export class NpcCar {
         this.driving = true
         this.needsMapEleUpdate = false
         this.lastCarRotation = this.positions.npcRotation
+
+        this.viewRotation = this.rotationMap.get(this.positions.npcRotation) || 0
 
         this.curveStepSize = 1.5
 
@@ -129,28 +139,35 @@ export class NpcCar {
                 this.positions.npcPosX -= velocity
             }
         } else if (this.curMapObj.objectTypeId === 1) {
-            if (!(this.currCurveAngle === 0 || this.currCurveAngle === 90 || this.currCurveAngle === 180 || this.currCurveAngle  === 270 || this.currCurveAngle === 360)) {
-                this.calculateCurvePoints();
+            if (
+                !(
+                    this.currCurveAngle === 0 ||
+                    this.currCurveAngle === 90 ||
+                    this.currCurveAngle === 180 ||
+                    this.currCurveAngle === 270 ||
+                    this.currCurveAngle === 360
+                )
+            ) {
+                this.calculateCurvePoints()
+            } else {
+                console.log(this.reachedMapEleLimit())
             }
-            // if (this.currCurveAngle === 45 || this.currCurveAngle === 135 || this.currCurveAngle === 225 || this.currCurveAngle  === 315 || this.currCurveAngle === 360) {
-            //     this.positions.npcRotation += 1
-            // }
         } else if (this.curMapObj.objectTypeId === 2) {
             //Intersection
         }
     }
 
     calculateCurvePoints() {
-            this.positions.npcPosX = this.curveCenterX + Math.cos(this.currCurveAngle * Math.PI/180) * this.curveRadius
-            this.positions.npcPosZ = this.curveCenterZ - Math.sin(this.currCurveAngle * Math.PI/180) * this.curveRadius
-            this.currCurveAngle += this.curveAngleInc
-            console.log("___npcRotation", this.positions.npcRotation)
-            //this.positions.npcRotation += 1/180;
-            // if (this.driveCurveRight) {
-            //     this.positions.npcRotation += 1/180;
-            // } else {
-            //     this.positions.npcRotation -= 1/180;
-            // }
+        this.positions.npcPosX = this.curveCenterX + Math.cos((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
+        this.positions.npcPosZ = this.curveCenterZ - Math.sin((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
+        this.currCurveAngle += this.curveAngleInc
+        console.log("___npcRotation", this.positions.npcRotation)
+
+        if (this.driveCurveRight) {
+            this.viewRotation -= 0.5 * (Math.PI / 180)
+        } else {
+            this.viewRotation += 0.5 * (Math.PI / 180)
+        }
     }
 
     calcMapEleCenter() {
@@ -160,7 +177,7 @@ export class NpcCar {
         this.curMapObjCenterCoords.centerX = mapEleCenterX
         this.curMapObjCenterCoords.centerZ = mapEleCenterZ
 
-        console.log(`map ele center Npc: x:${mapEleCenterX}, z: ${mapEleCenterZ}`)
+        //console.log(`map ele center Npc: x:${mapEleCenterX}, z: ${mapEleCenterZ}`)
     }
 
     calcPixelPosNpc() {
@@ -173,19 +190,23 @@ export class NpcCar {
         this.positions.npcPosX = x
         this.positions.npcPosZ = z
 
-        console.log(`pixelpos npc: x:${this.positions.npcPosX} z:${this.positions.npcPosZ}`)
+        //console.log(`pixelpos npc: x:${this.positions.npcPosX} z:${this.positions.npcPosZ}`)
     }
 
     calcNpcMapLimit() {
         let limit = 0
 
         if (this.positions.npcRotation === 0) {
+            console.log("____limitOrientation: 0")
             limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
         } else if (this.positions.npcRotation === 1) {
+            console.log("____limitOrientation: 1")
             limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
         } else if (this.positions.npcRotation === 2) {
+            console.log("____limitOrientation: 2")
             limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
         } else if (this.positions.npcRotation === 3) {
+            console.log("____limitOrientation: 3")
             limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
         }
 
@@ -200,7 +221,7 @@ export class NpcCar {
             } else {
                 this.driving = false
                 this.needsMapEleUpdate = true
-                console.log("fahre nicht")
+                console.log("fahre nicht 0")
                 return true
             }
         } else if (this.positions.npcRotation === 1) {
@@ -209,7 +230,7 @@ export class NpcCar {
             } else {
                 this.driving = false
                 this.needsMapEleUpdate = true
-                console.log("fahre nicht")
+                console.log("fahre nicht 1")
                 return true
             }
         } else if (this.positions.npcRotation === 2) {
@@ -218,7 +239,7 @@ export class NpcCar {
             } else {
                 this.driving = false
                 this.needsMapEleUpdate = true
-                console.log("fahre nicht")
+                console.log("fahre nicht 2")
                 return true
             }
         } else if (this.positions.npcRotation === 3) {
@@ -227,7 +248,7 @@ export class NpcCar {
             } else {
                 this.driving = false
                 this.needsMapEleUpdate = true
-                console.log("fahre nicht")
+                console.log("fahre nicht 3")
                 return true
             }
         }
@@ -236,36 +257,36 @@ export class NpcCar {
     calculateCurve() {
         this.calcMapEleCenter()
         if (this.curMapObj.rotation === 0) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize/2;
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize/2;
-            console.log("______ x:", this.curveCenterX, "z:", this.curveCenterZ)
-            console.log("npc pos:", this.positions.npcPosX, this.positions.npcPosZ)
+            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+            //console.log("______ x:", this.curveCenterX, "z:", this.curveCenterZ)
+            //console.log("npc pos:", this.positions.npcPosX, this.positions.npcPosZ)
             if (this.lastCarRotation === 0) {
                 this.driveCurveRight = true
                 this.curveRadius = this.curveCenterX - this.positions.npcPosX
-                this.currCurveAngle = 179.5;
-                this.curveAngleInc = -0.5;
-                console.log("___radius", this.curveRadius)
+                this.currCurveAngle = 179.5
+                this.curveAngleInc = -0.5
+                //console.log("___radius", this.curveRadius)
             } else if (this.lastCarRotation === 3) {
-                console.log("___carRotation 3")
+                //console.log("___carRotation 3")
                 this.driveCurveRight = false
                 this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
                 this.currCurveAngle = 90.5
                 this.curveAngleInc = 0.5
-                console.log("___radius", this.curveRadius)
+                //console.log("___radius", this.curveRadius)
             } else {
                 console.log("Fehler bei driveCurve 0")
             }
         } else if (this.curMapObj.rotation === 1) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize/2;
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize/2;
+            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
             if (this.lastCarRotation === 1) {
                 this.driveCurveRight = true
                 this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
                 this.currCurveAngle = 89.5
                 this.curveAngleInc = -0.5
             } else if (this.lastCarRotation === 0) {
-                console.log("___car rotation 0?", this.lastCarRotation)
+                //console.log("___car rotation 0?", this.lastCarRotation)
                 this.driveCurveRight = false
                 this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
                 this.currCurveAngle = 0.5
@@ -274,8 +295,8 @@ export class NpcCar {
                 console.log("Fehler bei driveCurve 1")
             }
         } else if (this.curMapObj.rotation === 2) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize/2;
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize/2;
+            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
             if (this.lastCarRotation === 2) {
                 this.driveCurveRight = true
                 this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
@@ -290,8 +311,8 @@ export class NpcCar {
                 console.log("Fehler bei driveCurve 2")
             }
         } else if (this.curMapObj.rotation === 3) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize/2;
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize/2;
+            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
             if (this.lastCarRotation === 3) {
                 this.driveCurveRight = true
                 this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
@@ -303,7 +324,7 @@ export class NpcCar {
                 this.currCurveAngle = 180.5
                 this.curveAngleInc = 0.5
             } else {
-                console.log("Fehler bei driveCurve 2")
+                console.log("Fehler bei driveCurve 3")
             }
         }
     }
@@ -313,9 +334,9 @@ export class NpcCar {
     }
 
     calculateCurvePosition(radius: number, curveCenterPosX: number, curveCenterPosZ: number, angle: number) {
-        const x = curveCenterPosX + Math.cos(angle * Math.PI/180) * radius
-        const z = curveCenterPosZ + Math.sin(angle * Math.PI/180) * radius
-        return {x, z}
+        const x = curveCenterPosX + Math.cos((angle * Math.PI) / 180) * radius
+        const z = curveCenterPosZ + Math.sin((angle * Math.PI) / 180) * radius
+        return { x, z }
     }
 
     trans2Dto3DcoordX(coord2dX: number) {
