@@ -22,6 +22,9 @@ const { bus } = useEventBus()
 const { setGameStateSizes, setGameStateMapId } = useGameView()
 const { blockListState, updateBlockList } = useBlockList()
 
+const playerSpawnObjTypeId = 8
+const carObjTypeId = 7
+
 var gridSizeX = 20
 var gridSizeY = 30
 const toolState = reactive({
@@ -123,7 +126,7 @@ function placeAllRandomCars(amountCars: number) {
         let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
         let randomElement = editorState.mapObjects[randomIndex]
         // try to place car on random element
-        if (placeRandomCarOnElement(randomElement, 7)) {
+        if (placeRandomCarOnElement(randomElement, carObjTypeId)) {
             if (changedElements.includes(randomElement)) {
                 delete changedElements[changedElements.indexOf(randomElement)]
             }
@@ -136,7 +139,7 @@ function placeAllRandomCars(amountCars: number) {
         if (errorCounter >= 3) {
             for (let ele of editorState.mapObjects) {
                 // if car is placeable reset errorCounter and continue
-                if (placeRandomCarOnElement(ele, 7)) {
+                if (placeRandomCarOnElement(ele, carObjTypeId)) {
                     if (changedElements.includes(randomElement)) {
                         delete changedElements[changedElements.indexOf(randomElement)]
                     }
@@ -327,7 +330,7 @@ function onClick(cell: any, e: any) {
                 ) {
                     return
                 }
-                if (toolState.block.objectTypeId === 8) {
+                if (toolState.block.objectTypeId === playerSpawnObjTypeId) {
                     // if asset is spawnpoint
                     let oldSpawnCell = editorState.mapObjects.filter(
                         (ele) => ele.game_assets.filter((asset) => asset.userId === userId.value).length
