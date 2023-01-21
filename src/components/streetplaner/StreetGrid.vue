@@ -396,19 +396,34 @@ function onClick(cell: any, e: any) {
         updateMessage(payload)
     }
     if (toolState.tool === ToolEnum.DELETE) {
-        payload = {
-            objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
-            x: cell.posX,
-            y: cell.posY,
-            rotation: streetGrid[cell.posX][cell.posY].rotation,
-            game_assets: [],
+        if (e.target.classList.contains("asset-img")) {
+            let clickedAsset = currCellContent.game_assets[e.target.__vnode.key]
+            if (clickedAsset.userId === userId.value || clickedAsset.userId === 0) {
+                let newGameAssets = streetGrid[cell.posX][cell.posY].game_assets
+                newGameAssets.splice(e.target.__vnode.key, 1)
+                payload = {
+                    objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: streetGrid[cell.posX][cell.posY].rotation,
+                    game_assets: newGameAssets,
+                }
+                updateMessage(payload)
+            }
+        } else {
+            payload = {
+                objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
+                x: cell.posX,
+                y: cell.posY,
+                rotation: streetGrid[cell.posX][cell.posY].rotation,
+                game_assets: [],
+            }
+            streetGrid[cell.posX][cell.posY].objectTypeId = -1
+            streetGrid[cell.posX][cell.posY].rotation = 0
+            streetGrid[cell.posX][cell.posY].texture = ""
+            deleteMessage(payload)
         }
-        streetGrid[cell.posX][cell.posY].objectTypeId = -1
-        streetGrid[cell.posX][cell.posY].rotation = 0
-        streetGrid[cell.posX][cell.posY].texture = ""
-        deleteMessage(payload)
     }
-    console.log(streetGrid)
 }
 
 // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
@@ -564,11 +579,12 @@ window.addEventListener(
                 draggable="false"
                 :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }"
             />
-            <div v-for="asset in ele.game_assets">
+            <div v-for="(asset, index) in ele.game_assets">
                 <!-- if asset is npc (asset.userId not present or 0) or asset is our spawnpoint (asset.userId === our userId) use given asset.texture -->
                 <img
                     v-if="!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()"
                     :src="asset.texture"
+                    :key="index"
                     class="no-drag asset-img"
                     draggable="false"
                     :style="{
