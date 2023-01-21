@@ -49,17 +49,25 @@ interface NpcInfo {
     npcId: number
     npcRotation: number
     currentMapObject: IMapObject
-    nextUpperMapObject: IMapObject
+    //nextUpperMapObject: IMapObject
 }
 
 interface NpcInfoResponseDTO {
+    npcId: number
     newGameAssetRotation: number
-    currentMapObject: IMapObject
+    //currentMapObject: IMapObject
     nextUpperMapObject: IMapObject
 }
 
+interface NpcInfoRequestDTO {
+    npcId: number
+    npcRotation: number
+    currentMapObject: IMapObject
+}
+
 interface IStompMessage {
-    npcContent: NpcInfo
+    npcInfoRequestDTO: NpcInfoRequestDTO
+    npcInfoResponseDTO?: NpcInfoResponseDTO
     type: string
 }
 
@@ -223,12 +231,13 @@ function updatePosMessage(npcId: number) {
     if (stompClient) {
         let tempCar = gameState.npcCarMapFromuseGameview.get(npcId)!
         const updatePosMsg: IStompMessage = {
-            npcContent: {
+            npcInfoRequestDTO: {
                 npcId: tempCar!.npcId,
                 npcRotation: tempCar!.positions.npcRotation,
                 currentMapObject: tempCar!.curMapObj,
-                nextUpperMapObject: tempCar!.nextMapObj,
+                //nextUpperMapObject: tempCar!.nextMapObj,
             },
+
             type: "POSITION_UPDATE",
         }
 
@@ -237,7 +246,7 @@ function updatePosMessage(npcId: number) {
             headers: {},
             body: JSON.stringify(updatePosMsg),
         })
-        gameState.npcCarMapFromuseGameview.get(npcId)!.needsMapEleUpdate = false
+        //gameState.npcCarMapFromuseGameview.get(npcId)!.needsMapEleUpdate = false
         console.log(updatePosMsg)
     }
 }
@@ -257,8 +266,10 @@ function receiveNpcUpdates() {
     stompClient.onConnect = (frame) => {
         console.log(`use gameview client sucessfully connected ws`)
         stompClient.subscribe(DEST, (message) => {
-            const npcUpdate: any = JSON.parse(message.body)
-            onMessageReceived(npcUpdate)
+            const npcUpdate: IStompMessage = JSON.parse(message.body)
+            if (gameState.npcCarMapFromuseGameview.get(npcUpdate.npcInfoResponseDTO!.npcId)!.needsMapEleUpdate) {
+                onMessageReceived(npcUpdate)
+            }
         })
     }
 
@@ -270,31 +281,36 @@ function receiveNpcUpdates() {
 }
 
 //on update from backend set new values of current mapobj and updated position for corresponding npc car
-async function onMessageReceived(payload: any) {
-    //console.log(`Npc mit ${this.npcId} hat neue Update Message erhalten`)
+async function onMessageReceived(payload: IStompMessage) {
+    console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
+
     if (payload.type === "NEW_POSITION_RECEIVED") {
-        console.log(payload.nextMapEleInfo)
-        const updateNpcCar = gameState.npcCarMapFromuseGameview.get(payload.npcContent.npcId)
-        updateNpcCar!.curMapObj = payload.nextMapEleInfo.currentMapObject
-        updateNpcCar!.nextMapObj = payload.nextMapEleInfo.nextUpperMapObject
+        console.log(payload)
+
+        const updateNpcCar = gameState.npcCarMapFromuseGameview.get(payload.npcInfoResponseDTO!.npcId)
+        updateNpcCar!.lastCarRotation = updateNpcCar!.positions.npcRotation
+        updateNpcCar!.curMapObj = payload.npcInfoResponseDTO!.nextUpperMapObject
+        //updateNpcCar!.nextMapObj = payload.nextMapEleInfo.nextUpperMapObject
 
         updateNpcCar!.calcMapEleCenter()
+        updateNpcCar!.calcNpcMapLimit()
 
-        if (payload.nextMapEleInfo.currentMapObject.objectTypeId === 1) {
+        if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 1) {
             updateNpcCar!.calculateCurve()
         }
-        updateNpcCar!.positions.npcRotation = payload.nextMapEleInfo.newGameAssetRotation
-        //updateNpcCar!.calcNpcMapLimit()
+
+        updateNpcCar!.positions.npcRotation = payload.npcInfoResponseDTO!.newGameAssetRotation
+
         console.log(
             `pixelpos nach UPDATE npc: x:${updateNpcCar!.positions.npcPosX} z:${updateNpcCar!.positions.npcPosZ}`
         )
 
-        console.log(updateNpcCar!.curMapObj)
-        console.log(updateNpcCar!.reachedMapEleLimit())
-        updateNpcCar!.driving = true
+        //console.log(updateNpcCar!.curMapObj)
 
-        //updateNpcCar!.needsMapEleUpdate = false
+        //updateNpcCar!.reachedMapEleLimit()
+        updateNpcCar!.driving = true
+        updateNpcCar!.needsMapEleUpdate = false
     } else if (payload.type === "INIT_NEXT_POS") {
-        console.log(`initiales setzen des naechsten Map Eles für npc mit id:${payload.npcContent.npcId}`)
+        console.log(`initiales setzen des naechsten Map Eles für npc mit id:${payload.npcInfoResponseDTO!.npcId}`)
     }
 }

@@ -156,20 +156,18 @@ export default defineComponent({
             updateMapObjsFromGameState()
 
             renderer.value.onBeforeRender(() => {
-                //fpsCamera.update()
                 moveableObject.update()
 
                 npcEles.value.forEach((ele) => {
                     if (ele.driving) {
-                        // ele.positions.npcRotation +=0.001
                         ele.drive()
-                        //console.log(`pixelpos nach in GAMEVIEW npc: x:${ ele.positions.npcPosX} z:${ ele.positions.npcPosZ}`)
                     }
                 })
             })
 
             setInterval(() => {
                 npcEles.value.forEach((ele) => {
+                    console.log(ele.reachedMapEleLimit())
                     if (ele.reachedMapEleLimit()) {
                         console.log(`ele mit ${ele.npcId} braucht POS Update!`)
                         updatePosMessage(ele.npcId)

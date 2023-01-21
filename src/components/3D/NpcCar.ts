@@ -125,7 +125,7 @@ export class NpcCar {
 
     //driving
     drive() {
-        const velocity = 0.05
+        const velocity = 0.15
 
         if (this.curMapObj.objectTypeId === 0) {
             //Straight
@@ -150,7 +150,7 @@ export class NpcCar {
             ) {
                 this.calculateCurvePoints()
             } else {
-                console.log(this.reachedMapEleLimit())
+                //this.reachedMapEleLimit()
             }
         } else if (this.curMapObj.objectTypeId === 2) {
             //Intersection
@@ -162,6 +162,7 @@ export class NpcCar {
         this.positions.npcPosZ = this.curveCenterZ - Math.sin((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
         this.currCurveAngle += this.curveAngleInc
         console.log("___npcRotation", this.positions.npcRotation)
+        console.log(`npcPosX: ${this.positions.npcPosX} z: ${this.positions.npcPosZ}`)
 
         if (this.driveCurveRight) {
             this.viewRotation -= 0.5 * (Math.PI / 180)
@@ -177,7 +178,7 @@ export class NpcCar {
         this.curMapObjCenterCoords.centerX = mapEleCenterX
         this.curMapObjCenterCoords.centerZ = mapEleCenterZ
 
-        //console.log(`map ele center Npc: x:${mapEleCenterX}, z: ${mapEleCenterZ}`)
+        console.log(`map ele center Npc: x:${mapEleCenterX}, z: ${mapEleCenterZ}`)
     }
 
     calcPixelPosNpc() {
@@ -190,24 +191,58 @@ export class NpcCar {
         this.positions.npcPosX = x
         this.positions.npcPosZ = z
 
-        //console.log(`pixelpos npc: x:${this.positions.npcPosX} z:${this.positions.npcPosZ}`)
+        console.log(`pixelpos npc: x:${this.positions.npcPosX} z:${this.positions.npcPosZ}`)
     }
 
     calcNpcMapLimit() {
         let limit = 0
 
-        if (this.positions.npcRotation === 0) {
-            console.log("____limitOrientation: 0")
-            limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-        } else if (this.positions.npcRotation === 1) {
-            console.log("____limitOrientation: 1")
-            limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-        } else if (this.positions.npcRotation === 2) {
-            console.log("____limitOrientation: 2")
-            limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
-        } else if (this.positions.npcRotation === 3) {
-            console.log("____limitOrientation: 3")
-            limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+        if (this.curMapObj.objectTypeId === 0) {
+            console.log("BERECHNE GERADEN LIMIT")
+            if (this.positions.npcRotation === 0) {
+                limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+                console.log(`____limitOrientation: 0 limit: ${limit}`)
+            } else if (this.positions.npcRotation === 1) {
+                limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+                console.log(`____limitOrientation: 1 limit: ${limit}`)
+            } else if (this.positions.npcRotation === 2) {
+                limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+                console.log(`____limitOrientation: 2 limit: ${limit}`)
+            } else if (this.positions.npcRotation === 3) {
+                limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+                console.log(`____limitOrientation: 3 limit: ${limit}`)
+            }
+        } else if (this.curMapObj.objectTypeId === 1) {
+            console.log("BERECHNE KURVEN LIMIT")
+            if (this.curMapObj.rotation === 0) {
+                console.log("berechne limit kurve rot 0")
+                if (this.positions.npcRotation === 0) {
+                    limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+                } else if (this.positions.npcRotation === 3) {
+                    limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+                }
+            } else if (this.curMapObj.rotation === 1) {
+                console.log("berechne limit kurve rot 1")
+                if (this.positions.npcRotation === 1) {
+                    limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+                } else if (this.positions.npcRotation === 0) {
+                    limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+                }
+            } else if (this.curMapObj.rotation === 2) {
+                console.log("berechne limit kurve rot 2")
+                if (this.positions.npcRotation === 1) {
+                    limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+                } else if (this.positions.npcRotation === 2) {
+                    limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+                }
+            } else if (this.curMapObj.rotation === 3) {
+                console.log("berechne limit kurve rot 3")
+                if (this.positions.npcRotation === 2) {
+                    limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+                } else if (this.positions.npcRotation === 3) {
+                    limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+                }
+            }
         }
 
         this.mapLimit = limit
@@ -215,6 +250,7 @@ export class NpcCar {
     }
 
     reachedMapEleLimit() {
+        //console.log("reachedMapEleLimit")
         if (this.positions.npcRotation === 0) {
             if (this.positions.npcPosZ > this.mapLimit) {
                 return false
@@ -251,6 +287,8 @@ export class NpcCar {
                 console.log("fahre nicht 3")
                 return true
             }
+        } else {
+            console.log("fehler reachedMapEle limit")
         }
     }
 
