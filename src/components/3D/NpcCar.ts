@@ -128,16 +128,7 @@ export class NpcCar {
         const velocity = 0.15
 
         if (this.curMapObj.objectTypeId === 0) {
-            //Straight
-            if (this.positions.npcRotation === 0) {
-                this.positions.npcPosZ -= velocity
-            } else if (this.positions.npcRotation === 1) {
-                this.positions.npcPosX += velocity
-            } else if (this.positions.npcRotation === 2) {
-                this.positions.npcPosZ += velocity
-            } else if (this.positions.npcRotation === 3) {
-                this.positions.npcPosX -= velocity
-            }
+            this.driveStraight(velocity)
         } else if (this.curMapObj.objectTypeId === 1) {
             if (
                 !(
@@ -150,10 +141,23 @@ export class NpcCar {
             ) {
                 this.calculateCurvePoints()
             } else {
-                //this.reachedMapEleLimit()
+                console.log("DRIVE STRAIGHT!!!")
+                this.driveStraight(0.025)
             }
         } else if (this.curMapObj.objectTypeId === 2) {
             //Intersection
+        }
+    }
+
+    driveStraight(velocity: number) {
+        if (this.positions.npcRotation === 0) {
+            this.positions.npcPosZ -= velocity
+        } else if (this.positions.npcRotation === 1) {
+            this.positions.npcPosX += velocity
+        } else if (this.positions.npcRotation === 2) {
+            this.positions.npcPosZ += velocity
+        } else if (this.positions.npcRotation === 3) {
+            this.positions.npcPosX -= velocity
         }
     }
 
