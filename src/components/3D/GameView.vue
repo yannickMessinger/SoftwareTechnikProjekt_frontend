@@ -61,6 +61,7 @@ export default defineComponent({
         buildingIDMap.set(8, "/../../../src/assets/3D_Models/Streets/streetCrossing.gltf")
         buildingIDMap.set(9, "/../../../src/assets/3D_Models/Railroad/straight_rail.gltf")
         buildingIDMap.set(10, "/../../../src/assets/3D_Models/Railroad/curved_rail.gltf")
+        buildingIDMap.set(10, "/../../../src/assets/3D_Models/Railroad/trainstation.gltf")
 
         buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
         buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
