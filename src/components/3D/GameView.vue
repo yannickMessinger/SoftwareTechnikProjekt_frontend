@@ -47,13 +47,19 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-        const divs = ref([])
 
         const movableObject = new MovmentInputController(box, camera)
         //const fpsCamera = new FirstPersonCamera(camera, box)
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
-        const { createMessage, deleteMessage, updateMessage, initCarUpdateWebsocket, positionState } =
-            useCarMultiplayer()
+        const {
+            createMessage,
+            deleteMessage,
+            updateMessage,
+            initCarUpdateWebsocket,
+            positionState,
+            fillPlayerCarState,
+            playerCarState,
+        } = useCarMultiplayer()
         const { user, userId, activeLobby, setActiveLobby } = useUser()
         const { playerListState, playerList, fetchPlayerList } = usePlayerList()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
@@ -124,6 +130,8 @@ export default defineComponent({
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
 
+        const playerCarList = computed(() => playerCarState.playerCarMap)
+
         /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
       On the 3d Game View the coordinates x:0, z:0 describes the center of our Grid. The upper left corner would be x:-50, z:-50.
@@ -176,15 +184,6 @@ export default defineComponent({
             }
         }
 
-        function moveOtherCar() {
-            positionState.mapObjects.forEach((position) => {
-                refPlayerList.forEach((player: any) => {
-                    if (player.userId !== uid) {
-                    }
-                })
-            })
-        }
-
         function enrichPlayerWithRef() {
             const list: any = []
             rawPlayerList.forEach((ele) => {
@@ -206,11 +205,11 @@ export default defineComponent({
             )
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
+            fillPlayerCarState()
 
             renderer.value.onBeforeRender(() => {
                 //fpsCamera.update()
                 movableObject.update()
-                moveOtherCar()
 
                 //console.log(otherPlayerCar.value)
             })
@@ -242,9 +241,8 @@ export default defineComponent({
             gridSizeX,
             gridSizeY,
             fieldSize,
-            refPlayerList,
+            playerCarList,
             uid,
-            divs,
         }
     },
 })
@@ -302,15 +300,20 @@ export default defineComponent({
                     />
                 </div>
             </div>
-            <div v-for="(player, index) in refPlayerList">
-                <div v-if="player.userId != uid">
+            <div v-for="player in playerCarList">
+                <div v-if="player[1].playerCarId !== uid">
                     <GltfModel
-                        :key="player.userName"
                         v-bind:src="buildingIDMap.get(21)"
                         :position="{
+                            x: player[1].playerCarX,
+                            y: 0.75,
+                            z: player[1].playerCarZ,
+                        }"
+                        :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
+                        :rotation="{
                             x: 0,
-                            y: 3,
-                            z: 2,
+                            y: 0,
+                            z: 0,
                         }"
                     />
                 </div>

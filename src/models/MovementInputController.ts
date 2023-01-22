@@ -47,7 +47,7 @@ export class MovmentInputController {
         if (this.keyboard.pressed("W")) {
             if (this.moveVelocity < 0.2) {
                 this.moveVelocity += movespeed / 20
-                //console.log("w velocity" + this.moveVelocity)
+                console.log("w velocity" + this.moveVelocity)
             }
             this.objects.value.mesh.translateZ(-this.moveVelocity)
         }
