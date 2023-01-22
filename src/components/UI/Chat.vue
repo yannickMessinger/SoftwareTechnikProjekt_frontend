@@ -2,6 +2,12 @@
     <footer>
         <header class="msg-header">
             <p>Chat</p>
+            <div class="msg-drowdown">
+                <select v-model="chatMode">
+                    <option value="global">Globaler Chat</option>
+                    <option v-if="chat.activeLobbyId !== -1" value="lobby">Lobby: {{ activeLobby.lobbyName }}</option>
+                </select>
+            </div>
             <BasicButton
                 class="msg-close-btn"
                 id="msg-close-btn-not-visible"
@@ -17,16 +23,38 @@
                 :btn_click="hideChat"
             />
         </header>
-        <transition name="slide">
-            <div id="msg-chat" v-bind="chatRef" v-if="visible">
+        <div id="msg-chat" v-bind="chatRef" v-if="visible">
+            <div v-if="chatMode === 'global'">
                 <div id="msg-message" v-for="(item, index) in chat.chatList" :key="index">
-                    <p class="">
-                        <strong>{{ item.author }}</strong
-                        >:{{ item.message }}
-                    </p>
+                    <div v-if="item.type === 'CHAT'">
+                        <p class="">
+                            <strong style="color: blue">{{ item.author }}</strong
+                            >: {{ item.message }}
+                        </p>
+                    </div>
+                    <div v-else>
+                        <p style="color: green">
+                            {{ item.message }}
+                        </p>
+                    </div>
                 </div>
             </div>
-        </transition>
+            <div v-else-if="chatMode === 'lobby'">
+                <div id="msg-message" v-for="(item, index) in chat.chatList_lobby" :key="index">
+                    <div v-if="item.type === 'CHAT'">
+                        <p class="">
+                            <strong style="color: blue">{{ item.author }}</strong
+                            >: {{ item.message }}
+                        </p>
+                    </div>
+                    <div v-else>
+                        <p style="color: green">
+                            {{ item.message }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <transition name="slide">
             <div id="msg-inputarea" v-if="visible" @keyup.enter="appendMessage">
                 <input class="msg-input" type="text" placeholder="Gebe deine Nachricht ein..." v-model="input" />
@@ -37,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
+import { computed, nextTick, onBeforeMount, onBeforeUpdate, onMounted, onUpdated, ref, watch } from "vue"
 import BasicButton from "../Buttons/BasicButton.vue"
 import { useChat } from "../../services/Chat/useChat"
 import useUser from "../../services/UserStore"
@@ -52,19 +80,22 @@ let input = ref("")
 let chatRef = ref()
 let visible = ref(false)
 const { name, setName, setId, activeLobby } = useUser()
-const { chat, sendMessage, connect, sendLobbyMessage } = useChat(name.value)
+const { chat, sendMessage, connect, sendLobbyMessage, disconnectLobby } = useChat(name.value, activeLobby.value)
+const chatMode = ref("global")
+connect()
 
-onMounted(() => {
-    connect()
-    console.log(`chat lobby id ${chat.activeLobbyId}`)
+onUpdated(() => {
+    let a = document.getElementById("msg-chat")
+    if (a) {
+        a.scrollTo(a.scrollHeight, a.scrollHeight)
+    }
 })
 
 function appendMessage() {
+    console.log(activeLobby.value.lobbyName)
     let a = document.getElementById("msg-chat")
     if (input.value && a) {
-        //chatHistory.value.push({ name: "user001: ", text: input.value }) // TODO: Username hier setzen
-        //chat.chatList.push({ message: input.value, author: name.value })
-        if (chat.activeLobbyId !== -1) {
+        if (chatMode.value === "lobby") {
             sendLobbyMessage(input.value)
         } else {
             sendMessage(input.value)
@@ -72,7 +103,6 @@ function appendMessage() {
 
         chatHistory.value.length > chatLength ? chatHistory.value.shift() : undefined
         input.value = ""
-        a.scrollTop = a.scrollHeight
     }
 }
 function hideChat() {
@@ -162,6 +192,11 @@ footer {
     background: none;
     background-size: cover;
     background-position: center;
+}
+
+.msg-drowdown {
+    position: relative;
+    font-family: Arial;
 }
 
 #msg-close-btn-visible {

@@ -1,24 +1,27 @@
-import { CompatClient, Stomp } from "@stomp/stompjs"
+import { CompatClient, Stomp, StompSubscription } from "@stomp/stompjs"
+import { watch } from "fs"
 import { reactive, readonly } from "vue"
+import { ILobby } from "../../typings/ILobby"
 
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/chat"
-const ADD_MSG = "/app/chat.addUser"
 const SEND_MSG = "/app/chat.sendMessage"
 const LOBBY_MSG = "/app/chat.lobbyChat/"
-const message_notification = new Audio(
-    "src/assets/audio/chat/message_notification/msn.mp3"
-)
+const message_notification = new Audio("src/assets/audio/chat/message_notification/msn.mp3")
 
 let stompClient: CompatClient
+let globalSubscription: StompSubscription
+let lobbySubscription: StompSubscription
 
 interface IChatMessage {
     message: string
     author: string
+    type: string
 }
 
 interface IChatState {
     chatList: IChatMessage[]
+    chatList_lobby: IChatMessage[]
     errormessage: string
     userName: string
     activeLobbyId: number
@@ -33,47 +36,39 @@ interface IStompMessage {
 
 const chatState = reactive<IChatState>({
     chatList: Array<IChatMessage>(),
+    chatList_lobby: Array<IChatMessage>(),
     errormessage: "",
     userName: "",
     activeLobbyId: -1,
 })
 
-//update of active lobby for ws connectivity
-function updateActiveChatLobbyId(id: number) {
-    if (chatState.activeLobbyId === -1) {
-        console.log("invalid active lobby")
-    }
-    chatState.activeLobbyId = id
-    connectLobbyWs()
-}
-
-export function useChat(username: string) {
+export function useChat(username: string, lobby: ILobby) {
     chatState.userName = username
+    chatState.activeLobbyId = lobby.lobbyId
 
     return {
         chat: readonly(chatState),
         sendMessage,
         sendLobbyMessage,
         connect,
-        updateActiveChatLobbyId,
+        connectLobbyWs,
+        disconnectLobby,
     }
 }
 
-function connect(/*event: Event*/) {
+function connect() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
     stompClient.connect({}, onConnected, onError)
-    //event.preventDefault()
 }
 
 function onConnected() {
-    stompClient.subscribe(DEST, onMessageReceived)
+    if (globalSubscription !== undefined) {
+        globalSubscription.unsubscribe()
+    }
 
-    stompClient.send(
-        ADD_MSG,
-        {},
-        JSON.stringify({ author: chatState.userName, type: "JOIN" })
-    )
+    globalSubscription = stompClient.subscribe(DEST, onMessageReceived)
+    stompClient.send(SEND_MSG, {}, JSON.stringify({ author: chatState.userName, type: "JOIN" }))
 }
 
 function onError(error: Error) {
@@ -89,10 +84,24 @@ function connectLobbyWs() {
 
 //subscribes ws to lobby specific path
 function onConnectedLobbyWs() {
-    stompClient.subscribe(
+    if (lobbySubscription !== undefined) {
+        chatState.chatList_lobby = []
+        lobbySubscription.unsubscribe()
+    }
+
+    lobbySubscription = lobbySubscription = stompClient.subscribe(
         `/topic/chat/lobby/${chatState.activeLobbyId}`,
         onLobbyMessageReceived
     )
+    stompClient.send(
+        LOBBY_MSG + chatState.activeLobbyId,
+        {},
+        JSON.stringify({ author: chatState.userName, type: "JOIN" })
+    )
+}
+
+function disconnectLobby(oldValue: number) {
+    stompClient.send(LOBBY_MSG + oldValue, {}, JSON.stringify({ author: chatState.userName, type: "LEAVE" }))
 }
 
 function onErrorLobbyWs(error: Error) {
@@ -124,41 +133,44 @@ function sendLobbyMessage(/*event: Event,*/ message: string) {
             lobbyId: chatState.activeLobbyId,
         }
 
-        stompClient.send(
-            LOBBY_MSG + chatMessage.lobbyId,
-            {},
-            JSON.stringify(chatMessage)
-        )
+        stompClient.send(LOBBY_MSG + chatMessage.lobbyId, {}, JSON.stringify(chatMessage))
     }
 }
 
 function onMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
-
-    if (message.type === "JOIN") {
-        chatState.chatList.push({
-            message: message.author + " joined",
-            author: message.author,
-        })
-    } else if (message.type === "LEAVE") {
-        chatState.chatList.push({
-            message: message.author + " left",
-            author: message.author,
-        })
-    } else {
-        message_notification.play()
+    if (message.type === "CHAT") {
+        const message = JSON.parse(payload.body)
         chatState.chatList.push({
             message: message.content,
             author: message.author,
+            type: "CHAT",
         })
+        message_notification.play()
     }
 }
 
 function onLobbyMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
 
-    chatState.chatList.push({
-        message: message.content,
-        author: message.author,
-    })
+    if (message.type === "JOIN") {
+        chatState.chatList_lobby.push({
+            message: message.author + " ist dem Chat beigetreten",
+            author: message.author,
+            type: "JOIN",
+        })
+    } else if (message.type === "LEAVE") {
+        chatState.chatList_lobby.push({
+            message: message.author + " hat den Chat verlassen",
+            author: message.author,
+            type: "LEAVE",
+        })
+    } else {
+        chatState.chatList_lobby.push({
+            message: message.content,
+            author: message.author,
+            type: "CHAT",
+        })
+        message_notification.play()
+    }
 }

@@ -54,15 +54,22 @@ import Chat from "../UI/Chat.vue"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
 import { useChat } from "../../services/Chat/useChat"
-import { onMounted } from "vue"
+import { onBeforeMount, onBeforeUpdate, onMounted, ref, watch } from "vue"
 
 const { name, user, userId, hostId, activeLobby, setActiveLobby } = useUser()
-const { updateActiveChatLobbyId } = useChat(name.value)
+const { connectLobbyWs, disconnectLobby } = useChat(name.value, activeLobby.value)
+const lobbyIdRef = ref(activeLobby.value.lobbyId)
 
 onMounted(() => {
     //activate websockets connection to listen for incoming updates
-    //updates lobbyid for  local lobbychat
-    updateActiveChatLobbyId(activeLobby.value.lobbyId)
+    //connectLobbyWs for lobby chat
+
+    connectLobbyWs()
+})
+
+watch(lobbyIdRef, (newValue, oldValue) => {
+    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+    disconnectLobby(oldValue)
 })
 
 //Methods to switch Lobbymode
