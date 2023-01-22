@@ -3,10 +3,10 @@ import { reactive, readonly } from "vue"
 import { IPosition } from "../../typings/IPosition"
 
 const ws_url = `ws://${window.location.host}/stomp`
-const DEST = "/topic/editor" // ändern zur richtigen DEST fuer position
-const CREATE_MSG = "/app/editor.create"
-const DELETE_MSG = "/app/editor.delete"
-const UPDATE_MSG = "/app/editor.update"
+const DEST = "/topic/position"
+const CREATE_MSG = "/app/position.create"
+const DELETE_MSG = "/app/position.delete"
+const UPDATE_MSG = "/app/position.update"
 
 let stompClient: Client
 
@@ -32,7 +32,7 @@ interface IStompMessage {
 }
 export function useCarMultiplayer() {
     return {
-        positionState: readonly<IPositionState>,
+        positionState,
         initCarUpdateWebsocket,
         createMessage,
         deleteMessage,
@@ -42,6 +42,7 @@ export function useCarMultiplayer() {
 
 function initCarUpdateWebsocket() {
     stompClient = new Client({ brokerURL: ws_url })
+    console.log("BIN DRINNEN")
 
     stompClient.onWebSocketError = (error) => {
         positionState.errormessage = error.message
@@ -51,9 +52,12 @@ function initCarUpdateWebsocket() {
     }
 
     stompClient.onConnect = (frame) => {
-        //console.log("connected")
+        console.log("connected")
         stompClient.subscribe(DEST, (message) => {
+            console.log("onConnect message", message)
             const payload: IStompMessage = JSON.parse(message.body)
+            console.log("MEssage.Body", message.body)
+            console.log(payload)
             if (payload) {
                 onMessageReceived(payload)
             }
@@ -67,6 +71,7 @@ function initCarUpdateWebsocket() {
 }
 
 function createMessage(message: IPosition) {
+    console.log("stompclien <<<", stompClient)
     if (message && stompClient) {
         const carMessage: IStompMessage = {
             id: positionState.mapId, // MappID
@@ -74,6 +79,8 @@ function createMessage(message: IPosition) {
             author: positionState.userName,
             content: message, //information des autos
         }
+        console.log("message des autos in create message", message)
+        console.log("CARMESSAGE", carMessage)
         stompClient.publish({
             destination: CREATE_MSG,
             headers: {},
@@ -101,17 +108,18 @@ function deleteMessage(message: IPosition) {
 
 function updateMessage(message: IPosition) {
     if (message && stompClient) {
-        const carPosition: IStompMessage = {
+        const carMessage: IStompMessage = {
             id: positionState.mapId,
             type: "UPDATE",
             author: positionState.userName,
             content: message,
         }
-
+        console.log("message des autos in update message", message)
+        console.log("CARMESSAGE", carMessage)
         stompClient.publish({
             destination: UPDATE_MSG,
             headers: {},
-            body: JSON.stringify(carPosition),
+            body: JSON.stringify(carMessage),
         })
     }
 }
@@ -121,6 +129,7 @@ function updateMessage(message: IPosition) {
  * @param payload message as IStompMessage containing type and content (object position)
  */
 function onMessageReceived(payload: IStompMessage) {
+    console.log("messagereived: ", payload.content)
     if (positionState.mapId === payload.id) {
         const index = positionState.mapObjects.indexOf(payload.content)
         if (payload.type === "CREATE") {

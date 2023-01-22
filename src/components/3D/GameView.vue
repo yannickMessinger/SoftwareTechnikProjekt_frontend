@@ -11,11 +11,25 @@ import {
     Plane,
     PhongMaterial,
 } from "troisjs"
-import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
+import {
+    computed,
+    defineComponent,
+    onBeforeMount,
+    onBeforeUnmount,
+    onMounted,
+    reactive,
+    ref,
+    toRaw,
+    getCurrentInstance,
+} from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { MovmentInputController } from "../../models/MovementInputController"
+import { usePlayerList } from "../../services/usePlayerList"
+import useUser from "../../services/UserStore"
+import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
+import { IPosition } from "../../typings/IPosition"
 
 export default defineComponent({
     components: {
@@ -33,13 +47,26 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-        const movableObject = new MovmentInputController(Box, camera)
+        const divs = ref([])
+
+        const movableObject = new MovmentInputController(box, camera)
         //const fpsCamera = new FirstPersonCamera(camera, box)
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
+        const { createMessage, deleteMessage, updateMessage, initCarUpdateWebsocket, positionState } =
+            useCarMultiplayer()
+        const { user, userId, activeLobby, setActiveLobby } = useUser()
+        const { playerListState, playerList, fetchPlayerList } = usePlayerList()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
         console.log(gameState.sizeX * gameState.fieldSize)
         console.log(gameState.sizeY * gameState.fieldSize)
+        //initCarUpdateWebsocket()
 
+        let payload: IPosition = { id: 0, x: 0, z: 0, rotation: 0 }
+        let otherPlayerCar: any
+        let otherPlayerCarList: any
+        const rawPlayerList = toRaw(playerList.value)
+        const refPlayerList = enrichPlayerWithRef()
+        const uid = userId.value
         //counter variables for loops to prefill map with dummy data
         let mapWidth = 30
         let mapHeight = 20
@@ -140,16 +167,62 @@ export default defineComponent({
             return z
         }
 
+        function fillPayload() {
+            if (userId.value !== undefined) {
+                payload.id = userId.value
+                payload.rotation = movableObject.getRotation().y
+                payload.x = movableObject.getPositionX()
+                payload.z = movableObject.getPositionZ()
+            }
+        }
+
+        function moveOtherCar() {
+            positionState.mapObjects.forEach((position) => {
+                refPlayerList.forEach((player: any) => {
+                    if (player.userId !== uid) {
+                    }
+                })
+            })
+        }
+
+        function enrichPlayerWithRef() {
+            const list: any = []
+            rawPlayerList.forEach((ele) => {
+                list.push({
+                    userId: ele.userId,
+                    userName: ele.userName,
+                    activeLobby: ele.activeLobby,
+                    errormessage: ele.errormessage,
+                    playerRef: ref(),
+                })
+            })
+            return list
+        }
+
+        // playerlistcopy.forEach((player)=>{ if(player.userId !== uid){otherPlayerCar = ref(String(player.userId))}})
         onMounted(() => {
             console.log(
                 `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
             )
             updateMapObjsFromGameState()
+            initCarUpdateWebsocket()
 
             renderer.value.onBeforeRender(() => {
                 //fpsCamera.update()
                 movableObject.update()
+                moveOtherCar()
+
+                //console.log(otherPlayerCar.value)
             })
+            //setInterval(()=> console.log("WICHTIG LESEN",divs.value[0]),2400)
+            setInterval(() => fillPayload(), 400)
+            setInterval(() => updateMessage(payload), 10000)
+            setTimeout(() => createMessage(payload), 5000)
+            //setTimeout(()=> console.log("Playerlist: >>>",playerlistcopy),7000)
+            let instance = getCurrentInstance()
+            if (instance !== null) {
+                console.log("instance ---->>>>>", instance.vnode)
+            }
         })
 
         return {
@@ -169,6 +242,9 @@ export default defineComponent({
             gridSizeX,
             gridSizeY,
             fieldSize,
+            refPlayerList,
+            uid,
+            divs,
         }
     },
 })
@@ -177,6 +253,7 @@ export default defineComponent({
 <template>
     <Renderer resize="window" ref="renderer">
         <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
+        <Box ref="box" :position="{ x: 0, y: 0, z: 0 }"></Box>
         <Scene background="#87CEEB">
             <AmbientLight></AmbientLight>
             <Plane
@@ -221,6 +298,19 @@ export default defineComponent({
                             x: 0,
                             y: assetRotationMap.get(asset.rotation),
                             z: 0,
+                        }"
+                    />
+                </div>
+            </div>
+            <div v-for="(player, index) in refPlayerList">
+                <div v-if="player.userId != uid">
+                    <GltfModel
+                        :key="player.userName"
+                        v-bind:src="buildingIDMap.get(21)"
+                        :position="{
+                            x: 0,
+                            y: 3,
+                            z: 2,
                         }"
                     />
                 </div>

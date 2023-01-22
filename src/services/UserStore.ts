@@ -8,7 +8,7 @@ import router from "../router/router"
 let reloginTried = false
 
 const state = reactive<IUser>({
-    userId: undefined,
+    userId: 0,
     userName: "",
     errormessage: "",
     loggedIn: false,
