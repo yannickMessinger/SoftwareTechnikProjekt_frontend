@@ -303,6 +303,7 @@ function checkAssetPlacedNearElement(
 // onClick handles click on specific cell
 function onClick(cell: any, e: any) {
     let currCellContent = streetGrid[cell.posX][cell.posY]
+    console.log(`x: ${cell.posX} y:${cell.posY}`)
     let payload: IMapObject
     if (toolState.tool === ToolEnum.CREATE && toolState.block.objectTypeId !== -1) {
         // if toolState block = asset

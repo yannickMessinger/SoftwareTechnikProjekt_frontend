@@ -117,12 +117,6 @@ export class NpcCar {
         }
     }
 
-    update() {
-        if (this.driving) {
-            this.drive()
-        }
-    }
-
     //driving
     drive() {
         const velocity = 0.15
@@ -130,22 +124,13 @@ export class NpcCar {
         if (this.curMapObj.objectTypeId === 0) {
             this.driveStraight(velocity)
         } else if (this.curMapObj.objectTypeId === 1) {
-            if (
-                !(
-                    this.currCurveAngle === 0 ||
-                    this.currCurveAngle === 90 ||
-                    this.currCurveAngle === 180 ||
-                    this.currCurveAngle === 270 ||
-                    this.currCurveAngle === 360
-                )
-            ) {
-                this.calculateCurvePoints()
-            } else {
-                console.log("DRIVE STRAIGHT!!!")
-                this.driveStraight(0.025)
-            }
+            this.driveCurve(0.025)
         } else if (this.curMapObj.objectTypeId === 2) {
-            //Intersection
+            if (this.lastCarRotation === this.positions.npcRotation) {
+                this.driveStraight(velocity)
+            } else {
+                this.driveCurve(0.025)
+            }
         }
     }
 
@@ -161,12 +146,28 @@ export class NpcCar {
         }
     }
 
+    driveCurve(velocity: number) {
+        if (
+            !(
+                this.currCurveAngle === 0 ||
+                this.currCurveAngle === 90 ||
+                this.currCurveAngle === 180 ||
+                this.currCurveAngle === 270 ||
+                this.currCurveAngle === 360
+            )
+        ) {
+            this.calculateCurvePoints()
+        } else {
+            this.driveStraight(velocity)
+        }
+    }
+
     calculateCurvePoints() {
         this.positions.npcPosX = this.curveCenterX + Math.cos((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
         this.positions.npcPosZ = this.curveCenterZ - Math.sin((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
         this.currCurveAngle += this.curveAngleInc
-        console.log("___npcRotation", this.positions.npcRotation)
-        console.log(`npcPosX: ${this.positions.npcPosX} z: ${this.positions.npcPosZ}`)
+        //console.log("___npcRotation", this.positions.npcRotation)
+        //console.log(`npcPosX: ${this.positions.npcPosX} z: ${this.positions.npcPosZ}`)
 
         if (this.driveCurveRight) {
             this.viewRotation -= 0.5 * (Math.PI / 180)
@@ -201,52 +202,19 @@ export class NpcCar {
     calcNpcMapLimit() {
         let limit = 0
 
-        if (this.curMapObj.objectTypeId === 0) {
-            console.log("BERECHNE GERADEN LIMIT")
-            if (this.positions.npcRotation === 0) {
-                limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-                console.log(`____limitOrientation: 0 limit: ${limit}`)
-            } else if (this.positions.npcRotation === 1) {
-                limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-                console.log(`____limitOrientation: 1 limit: ${limit}`)
-            } else if (this.positions.npcRotation === 2) {
-                limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
-                console.log(`____limitOrientation: 2 limit: ${limit}`)
-            } else if (this.positions.npcRotation === 3) {
-                limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-                console.log(`____limitOrientation: 3 limit: ${limit}`)
-            }
-        } else if (this.curMapObj.objectTypeId === 1) {
-            console.log("BERECHNE KURVEN LIMIT")
-            if (this.curMapObj.rotation === 0) {
-                console.log("berechne limit kurve rot 0")
-                if (this.positions.npcRotation === 0) {
-                    limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-                } else if (this.positions.npcRotation === 3) {
-                    limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
-                }
-            } else if (this.curMapObj.rotation === 1) {
-                console.log("berechne limit kurve rot 1")
-                if (this.positions.npcRotation === 1) {
-                    limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
-                } else if (this.positions.npcRotation === 0) {
-                    limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-                }
-            } else if (this.curMapObj.rotation === 2) {
-                console.log("berechne limit kurve rot 2")
-                if (this.positions.npcRotation === 1) {
-                    limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-                } else if (this.positions.npcRotation === 2) {
-                    limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-                }
-            } else if (this.curMapObj.rotation === 3) {
-                console.log("berechne limit kurve rot 3")
-                if (this.positions.npcRotation === 2) {
-                    limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-                } else if (this.positions.npcRotation === 3) {
-                    limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-                }
-            }
+        console.log("BERECHNE GERADEN LIMIT")
+        if (this.positions.npcRotation === 0) {
+            limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+            console.log(`____limitOrientation: 0 limit: ${limit}`)
+        } else if (this.positions.npcRotation === 1) {
+            limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+            console.log(`____limitOrientation: 1 limit: ${limit}`)
+        } else if (this.positions.npcRotation === 2) {
+            limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+            console.log(`____limitOrientation: 2 limit: ${limit}`)
+        } else if (this.positions.npcRotation === 3) {
+            limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+            console.log(`____limitOrientation: 3 limit: ${limit}`)
         }
 
         this.mapLimit = limit
@@ -293,6 +261,86 @@ export class NpcCar {
             }
         } else {
             console.log("fehler reachedMapEle limit")
+        }
+    }
+
+    calculateIntersection() {
+        console.log("calc intersection sikerim")
+        //this.calcMapEleCenter()
+        if (
+            (this.lastCarRotation === 0 && this.positions.npcRotation === 1) ||
+            (this.lastCarRotation === 3 && this.positions.npcRotation === 2)
+        ) {
+            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+
+            if (this.lastCarRotation === 0) {
+                this.driveCurveRight = true
+                this.curveRadius = this.curveCenterX - this.positions.npcPosX
+                this.currCurveAngle = 179.5
+                this.curveAngleInc = -0.5
+            } else {
+                this.driveCurveRight = false
+                this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
+                this.currCurveAngle = 90.5
+                this.curveAngleInc = 0.5
+            }
+        } else if (
+            (this.lastCarRotation === 0 && this.positions.npcRotation === 3) ||
+            (this.lastCarRotation === 1 && this.positions.npcRotation === 2)
+        ) {
+            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+
+            if (this.lastCarRotation === 0) {
+                this.driveCurveRight = false
+                this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
+                this.currCurveAngle = 0.5
+                this.curveAngleInc = 0.5
+            } else {
+                this.driveCurveRight = true
+                this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
+                this.currCurveAngle = 89.5
+                this.curveAngleInc = -0.5
+            }
+        } else if (
+            (this.lastCarRotation === 1 && this.positions.npcRotation === 0) ||
+            (this.lastCarRotation === 2 && this.positions.npcRotation === 3)
+        ) {
+            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+
+            if (this.lastCarRotation === 2) {
+                this.driveCurveRight = true
+                this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
+                this.currCurveAngle = 359.5
+                this.curveAngleInc = -0.5
+            } else {
+                this.driveCurveRight = false
+                this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
+                this.currCurveAngle = 270.5
+                this.curveAngleInc = 0.5
+            }
+        } else if (
+            (this.lastCarRotation === 2 && this.positions.npcRotation === 1) ||
+            (this.lastCarRotation === 3 && this.positions.npcRotation === 0)
+        ) {
+            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+
+            if (this.lastCarRotation === 3) {
+                this.driveCurveRight = true
+                this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
+                this.currCurveAngle = 269.5
+                this.curveAngleInc = -0.5
+            } else {
+                this.driveCurveRight = false
+                this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
+                this.currCurveAngle = 180.5
+                this.curveAngleInc = 0.5
+            }
+        } else if (this.lastCarRotation === this.positions.npcRotation) {
+            this.driveStraight(0.025)
         }
     }
 
