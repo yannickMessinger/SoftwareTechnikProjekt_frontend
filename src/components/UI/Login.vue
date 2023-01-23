@@ -68,7 +68,9 @@ import { ref } from "vue"
 import useUser from "../../services/UserStore"
 import router from "../../router/router"
 import BasicButton from "../Buttons/BasicButton.vue"
-const { login, register, logindata } = useUser()
+import { useChat } from "../../services/Chat/useChat"
+const { login, register, logindata, activeLobby, name } = useUser()
+const { connect } = useChat(name.value, activeLobby.value)
 
 const username = ref("")
 const password = ref("")
@@ -77,6 +79,7 @@ const registrationMode = ref(false)
 const headline = ref("Login")
 const usernameError = ref("")
 const passwordError = ref("")
+connect()
 
 async function loginCheck() {
     let responseBody = await login(username.value, password.value)

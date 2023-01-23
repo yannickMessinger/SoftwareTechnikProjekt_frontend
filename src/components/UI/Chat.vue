@@ -26,17 +26,10 @@
         <div id="msg-chat" v-bind="chatRef" v-if="visible">
             <div v-if="chatMode === 'global'">
                 <div id="msg-message" v-for="(item, index) in chat.chatList" :key="index">
-                    <div v-if="item.type === 'CHAT'">
-                        <p class="msg-message">
-                            <strong style="color: blue">{{ item.author }}</strong
-                            >: {{ item.message }}
-                        </p>
-                    </div>
-                    <div v-else>
-                        <p style="color: green">
-                            {{ item.message }}
-                        </p>
-                    </div>
+                    <p class="msg-message">
+                        <strong style="color: blue">{{ item.author }}</strong
+                        >: {{ item.message }}
+                    </p>
                 </div>
             </div>
             <div v-else-if="chatMode === 'lobby'">
@@ -47,8 +40,13 @@
                             >: {{ item.message }}
                         </p>
                     </div>
-                    <div v-else>
+                    <div v-else-if="item.type === 'JOIN'">
                         <p style="color: green">
+                            {{ item.message }}
+                        </p>
+                    </div>
+                    <div v-else-if="item.type === 'LEAVE'">
+                        <p style="color: red">
                             {{ item.message }}
                         </p>
                     </div>
@@ -65,7 +63,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeMount, onBeforeUpdate, onMounted, onUpdated, ref, watch } from "vue"
+import {
+    computed,
+    nextTick,
+    onBeforeMount,
+    onBeforeUpdate,
+    onMounted,
+    onUpdated,
+    reactive,
+    ref,
+    toRef,
+    unref,
+    watch,
+} from "vue"
 import BasicButton from "../Buttons/BasicButton.vue"
 import { useChat } from "../../services/Chat/useChat"
 import useUser from "../../services/UserStore"
@@ -79,10 +89,13 @@ const chatLength = 20
 let input = ref("")
 let chatRef = ref()
 let visible = ref(false)
-const { name, setName, setId, activeLobby } = useUser()
-const { chat, sendMessage, connect, sendLobbyMessage, disconnectLobby } = useChat(name.value, activeLobby.value)
+const { name, activeLobby } = useUser()
+const { chat, sendMessage, sendLobbyMessage } = useChat(name.value, activeLobby.value)
 const chatMode = ref("global")
-connect()
+
+let test = unref(activeLobby)
+const test2 = reactive(test)
+const test3 = toRef(test2, "lobbyId")
 
 onUpdated(() => {
     let a = document.getElementById("msg-chat")
@@ -91,15 +104,7 @@ onUpdated(() => {
     }
 })
 
-watch(
-    () => activeLobby.value.lobbyId,
-    (first, second) => {
-        console.log("Watch called," + first, second)
-    }
-)
-
 function appendMessage() {
-    console.log(activeLobby.value.lobbyName)
     let a = document.getElementById("msg-chat")
     if (input.value && a) {
         if (chatMode.value === "lobby") {

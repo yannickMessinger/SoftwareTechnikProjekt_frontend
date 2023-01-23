@@ -4,6 +4,7 @@ import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { ILobby } from "../typings/ILobby"
 import { ILoginStateDTO } from "../typings/ILoginStateDTO"
 import router from "../router/router"
+import { stat } from "fs"
 
 let reloginTried = false
 

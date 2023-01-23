@@ -1,6 +1,6 @@
 import { CompatClient, Stomp, StompSubscription } from "@stomp/stompjs"
 import { watch } from "fs"
-import { reactive, readonly } from "vue"
+import { reactive, readonly, ref } from "vue"
 import { ILobby } from "../../typings/ILobby"
 
 const ws_url = "ws://localhost:8080/stomp"
@@ -12,6 +12,7 @@ const message_notification = new Audio("src/assets/audio/chat/message_notificati
 let stompClient: CompatClient
 let globalSubscription: StompSubscription
 let lobbySubscription: StompSubscription
+let activeLobbyID = ref(-1)
 
 interface IChatMessage {
     message: string
@@ -53,6 +54,7 @@ export function useChat(username: string, lobby: ILobby) {
         connect,
         connectLobbyWs,
         disconnectLobby,
+        activeLobbyID,
     }
 }
 
@@ -84,11 +86,6 @@ function connectLobbyWs() {
 
 //subscribes ws to lobby specific path
 function onConnectedLobbyWs() {
-    if (lobbySubscription !== undefined) {
-        chatState.chatList_lobby = []
-        lobbySubscription.unsubscribe()
-    }
-
     lobbySubscription = lobbySubscription = stompClient.subscribe(
         `/topic/chat/lobby/${chatState.activeLobbyId}`,
         onLobbyMessageReceived
@@ -102,6 +99,8 @@ function onConnectedLobbyWs() {
 
 function disconnectLobby(oldValue: number) {
     stompClient.send(LOBBY_MSG + oldValue, {}, JSON.stringify({ author: chatState.userName, type: "LEAVE" }))
+    chatState.chatList_lobby = []
+    lobbySubscription.unsubscribe()
 }
 
 function onErrorLobbyWs(error: Error) {
@@ -123,8 +122,7 @@ function sendMessage(message: string) {
 }
 
 //sends lobby inter message to specific endpoint
-function sendLobbyMessage(/*event: Event,*/ message: string) {
-    console.log(chatState.activeLobbyId)
+function sendLobbyMessage(message: string) {
     if (message && stompClient) {
         const chatMessage: IStompMessage = {
             author: chatState.userName,

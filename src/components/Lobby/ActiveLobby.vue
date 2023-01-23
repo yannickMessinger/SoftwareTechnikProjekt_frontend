@@ -54,16 +54,19 @@ import Chat from "../UI/Chat.vue"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
 import { useChat } from "../../services/Chat/useChat"
-import { onBeforeMount, onBeforeUpdate, onMounted, ref, watch } from "vue"
+import { onMounted, watch } from "vue"
 
-const { name, user, userId, hostId, activeLobby, setActiveLobby } = useUser()
-const { connectLobbyWs, disconnectLobby } = useChat(name.value, activeLobby.value)
-const lobbyIdRef = ref(activeLobby.value.lobbyId)
+const { name, userId, activeLobby } = useUser()
+const { connectLobbyWs, disconnectLobby, activeLobbyID } = useChat(name.value, activeLobby.value)
 
 onMounted(() => {
-    //activate websockets connection to listen for incoming updates
-    //connectLobbyWs for lobby chat
+    activeLobbyID.value = activeLobby.value.lobbyId
+})
 
+watch(activeLobbyID, (newValue, oldValue): void => {
+    if (oldValue !== -1) {
+        disconnectLobby(oldValue)
+    }
     connectLobbyWs()
 })
 
@@ -84,6 +87,7 @@ function setActiveLobbyToPlayMode() {
     font-family: Circular, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
     line-height: 20px;
 }
+
 .headline {
     display: flex;
     margin-top: 10px;
@@ -115,27 +119,33 @@ function setActiveLobbyToPlayMode() {
     justify-self: start;
     align-self: end;
 }
+
 .Button2 {
     grid-area: Button2;
     justify-self: center;
     align-self: end;
 }
+
 .Button3 {
     grid-area: Button3;
     justify-self: end;
     align-self: end;
 }
+
 .LobbyName {
     grid-area: LobbyName;
 }
+
 .LobbyClose {
     grid-area: LobbyClose;
     justify-self: end;
 }
+
 .PlayMode {
     grid-area: PlayMode;
     align-self: start;
 }
+
 .SwitchMode {
     grid-area: SwitchMode;
     justify-self: end;
