@@ -1,11 +1,21 @@
 <script setup lang="ts">
 import { defineProps, defineEmits, ref, computed } from "vue"
-
+import { useEditor } from "../../services/Editor/useEditor";
+import useUser from "../../services/UserStore";
+import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D";
 const emit = defineEmits(["confirm", "cancel"])
-const amountCars = ref(0)
+const {editorState} = useEditor(useUser().activeLobby.value.mapId)
 const maxAmountCars = 100
-const amountPedestrians = ref(0)
 const maxAmountPedestrians = 100
+const mapObjects = editorState.mapObjects
+const gameAssets = mapObjects.map(ele => ele.game_assets)
+const filledGameAssetArrays = gameAssets.filter(arr => arr.length > 0)
+const amountAssets = Array<IGameAsset2D>()
+filledGameAssetArrays.forEach(arr => amountAssets.push(...arr))
+const pedestrians = amountAssets.filter(ele  => ele.objectTypeId > 7 && ele.objectTypeId < 18).length
+const cars = amountAssets.filter(ele => ele.objectTypeId === 7).length
+const amountCars = ref(cars)
+const amountPedestrians = ref(pedestrians)
 </script>
 
 <template>

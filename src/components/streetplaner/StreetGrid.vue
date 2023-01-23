@@ -68,8 +68,9 @@ watch(
 watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
-        console.log("VAL WATCH RANDOM ASSET: ", val[0])
-        placeAllRandomAssets(val[0].car, val[0].pedestrian)
+        //Todo: liste leeren
+        
+        placeAllRandomAssets(val[0].car, 7)
         placeRandomPedestrians(val[0].pedestrian)
     }
 )
@@ -176,8 +177,10 @@ function placeAllRandomAssets(amountAssetsOfCars: number, amountAssetsOfPedestri
 
 function placeRandomPedestrians(amount: number) {
     let counter = 0;
+    const pedestrianAmount = 10;
+    const firstPedestrianId = 8
     while(counter < amount) {
-        let randomPedestrianObjectTypeId = Math.floor(Math.random() * 17 + 8) // different objectTypeIds due to different pedestrian models
+        let randomPedestrianObjectTypeId = Math.floor(Math.random() * pedestrianAmount + firstPedestrianId) // different objectTypeIds due to different pedestrian models
         placeAllRandomAssets(1, randomPedestrianObjectTypeId);
         counter++;
     }
