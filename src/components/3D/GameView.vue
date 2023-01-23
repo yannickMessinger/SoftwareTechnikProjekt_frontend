@@ -47,7 +47,7 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-
+        // allows the manipulation of object through key input and sets camera as first person
         const movableObject = new MovmentInputController(box, camera)
         //const fpsCamera = new FirstPersonCamera(camera, box)
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
@@ -65,13 +65,9 @@ export default defineComponent({
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
         console.log(gameState.sizeX * gameState.fieldSize)
         console.log(gameState.sizeY * gameState.fieldSize)
-        //initCarUpdateWebsocket()
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: 0 } // y is z change later when back end is adjusted
-        let otherPlayerCar: any
-        let otherPlayerCarList: any
-        const rawPlayerList = toRaw(playerList.value)
-        const refPlayerList = enrichPlayerWithRef()
+
         const uid = userId.value
         //counter variables for loops to prefill map with dummy data
         let mapWidth = 30
@@ -175,29 +171,24 @@ export default defineComponent({
             return z
         }
 
+        /**
+         * Fills the payload with userId and movableObject-data for x,z and takes the y element out of quaternion
+         * Is used for create and updating messages for the websocket
+         */
         function fillPayload() {
             if (userId.value !== undefined) {
                 payload.id = userId.value
                 payload.rotation = movableObject.getRotation().y
                 payload.x = movableObject.getPositionX()
-                payload.z = movableObject.getPositionZ() // y is z change later when backend is adjusted
+                payload.z = movableObject.getPositionZ()
             }
         }
 
-        function enrichPlayerWithRef() {
-            const list: any = []
-            rawPlayerList.forEach((ele) => {
-                list.push({
-                    userId: ele.userId,
-                    userName: ele.userName,
-                    activeLobby: ele.activeLobby,
-                    errormessage: ele.errormessage,
-                    playerRef: ref(),
-                })
-            })
-            return list
-        }
-
+        /**
+         * Used for moving other Playercars according to positionState Values which are set/changed in useCarMultiplayer
+         * iterates through ele of Map<playerid,car>  and list of Iposition in positionState for value
+         *
+         */
         function movePlayerCars() {
             playerCarList.value.forEach((ele) => {
                 positionState.mapObjects.forEach((positionEle) => {
@@ -210,7 +201,6 @@ export default defineComponent({
             })
         }
 
-        // playerlistcopy.forEach((player)=>{ if(player.userId !== uid){otherPlayerCar = ref(String(player.userId))}})
         onMounted(() => {
             console.log(
                 `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
@@ -224,8 +214,11 @@ export default defineComponent({
                 movePlayerCars()
             })
 
-            setInterval(() => fillPayload(), 400)
-            setTimeout(() => setInterval(() => updateMessage(payload), 17), 5000)
+            /**
+             * delayed: waiting for socket connection
+             */
+            setInterval(() => fillPayload(), 25)
+            setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
             setTimeout(() => createMessage(payload), 5000)
 
             let instance = getCurrentInstance()
@@ -238,7 +231,6 @@ export default defineComponent({
             renderer,
             camera,
             box,
-            //fpsCamera,
             movableObject,
             calcCoordinateX,
             calcCoordinateZ,
@@ -310,6 +302,7 @@ export default defineComponent({
                     />
                 </div>
             </div>
+            <!-- creates and sets taxi bassed on playerCarList sets car for each playerId !== userId-->
             <div v-for="player in playerCarList">
                 <div v-if="player[1].playerCarId !== uid">
                     <GltfModel

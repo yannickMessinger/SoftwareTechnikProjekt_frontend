@@ -64,7 +64,6 @@ export function useCarMultiplayer() {
 
 function initCarUpdateWebsocket() {
     stompClient = new Client({ brokerURL: ws_url })
-    console.log("BIN DRINNEN")
 
     stompClient.onWebSocketError = (error) => {
         positionState.errormessage = error.message
@@ -76,10 +75,7 @@ function initCarUpdateWebsocket() {
     stompClient.onConnect = (frame) => {
         console.log("connected")
         stompClient.subscribe(DEST, (message) => {
-            console.log("onConnect message", message)
             const payload: IStompMessage = JSON.parse(message.body)
-            console.log("MEssage.Body", message.body)
-            console.log(payload)
             if (payload) {
                 onMessageReceived(payload)
             }
@@ -93,7 +89,6 @@ function initCarUpdateWebsocket() {
 }
 
 function createMessage(message: IPosition) {
-    console.log("stompclien <<<", stompClient)
     if (message && stompClient) {
         const carMessage: IStompMessage = {
             id: positionState.mapId, // MappID
@@ -101,8 +96,7 @@ function createMessage(message: IPosition) {
             author: positionState.userName,
             content: message, //information des autos
         }
-        console.log("message des autos in create message", message)
-        console.log("CARMESSAGE", carMessage)
+
         stompClient.publish({
             destination: CREATE_MSG,
             headers: {},
@@ -136,8 +130,7 @@ function updateMessage(message: IPosition) {
             author: positionState.userName,
             content: message,
         }
-        console.log("message des autos in update message", message)
-        console.log("CARMESSAGE", carMessage)
+
         stompClient.publish({
             destination: UPDATE_MSG,
             headers: {},
@@ -151,7 +144,6 @@ function updateMessage(message: IPosition) {
  * @param payload message as IStompMessage containing type and content (object position)
  */
 function onMessageReceived(payload: IStompMessage) {
-    console.log("messagereived: ", payload.content)
     if (positionState.mapId === payload.id) {
         const index = positionState.mapObjects.indexOf(payload.content)
         if (payload.type === "CREATE") {
@@ -179,7 +171,6 @@ function onMessageReceived(payload: IStompMessage) {
 
 function fillPosition(payload: IStompMessage) {
     positionState.mapObjects.forEach((elePosObj) => {
-        console.log("ICH BIMMS", payload.content)
         if (elePosObj.id === payload.content.id) {
             elePosObj.x = payload.content.x
             elePosObj.z = payload.content.z
@@ -187,7 +178,9 @@ function fillPosition(payload: IStompMessage) {
         }
     })
 }
-
+/**
+ * fills the PlayerCarState from game state and creates a new Car object
+ */
 function fillPlayerCarState() {
     gameState.mapObjsFromBackEnd.forEach((mapObject) => {
         if (mapObject.game_assets.length > 0) {
