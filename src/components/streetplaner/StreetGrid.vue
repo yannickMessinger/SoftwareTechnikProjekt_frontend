@@ -115,16 +115,18 @@ function placeAllRandomCars(amountCars: number) {
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
+    // only place random npc cars on straight
+    let availableElements: IMapObject[] = editorState.mapObjects.filter((ele) => ele.objectTypeId === 0)
     while (counter !== amountCars) {
         // pick random element to place car on
-        let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
-        let randomElement = editorState.mapObjects[randomIndex]
+        let randomIndex = Math.floor(Math.random() * availableElements.length)
+        let randomElement = availableElements[randomIndex]
         // try to place car on random element
         if (placeRandomCarOnElement(randomElement, 7)) {
             if (changedElements.includes(randomElement)) {
                 delete changedElements[changedElements.indexOf(randomElement)]
             }
-            changedElements.push(editorState.mapObjects[randomIndex])
+            changedElements.push(availableElements[randomIndex])
             counter++
         } else {
             errorCounter++
@@ -178,7 +180,7 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
                 ]
             )
         }
-    } else if (element.objectTypeId === 1) {
+    } /*else if (element.objectTypeId === 1) {
         // element = curve
         if (element.rotation === 0) {
             randomPosElements.push(
@@ -231,7 +233,7 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
                 { x: 0.12, y: 0.62, rotation: 1 },
             ]
         )
-    }
+    }*/
     // check if the max capacity is reached
     if (element.game_assets.length === randomPosElements.length) {
         return false
