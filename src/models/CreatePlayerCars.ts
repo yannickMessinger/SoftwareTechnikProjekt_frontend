@@ -3,8 +3,6 @@ import { reactive, ref } from "vue"
 import { IPosition } from "../typings/IPosition"
 
 export class CreatePlayerCars {
-    public translation: any
-    public playerCar: any
     public playerCarId: number
     public playerCarX: number
     public playerCarZ: number
@@ -12,15 +10,14 @@ export class CreatePlayerCars {
     public positions: any
 
     constructor(position: IPosition) {
-        this.translation = new THREE.Vector3(0, 1, 0)
         this.playerCarId = position.id
         this.playerCarX = position.x
-        this.playerCarZ = position.z
+        this.playerCarZ = position.z // y is z change later when backend is adjusted
         this.playerCarRotation = position.rotation
         this.positions = reactive({
             playerCarId: position.id,
             playerCarX: position.x,
-            playerCarZ: position.z,
+            playerCarZ: position.z, // y is z change later when backend is adjusted
             playerCarRotation: position.rotation,
         })
         this.initilize()

@@ -67,7 +67,7 @@ export default defineComponent({
         console.log(gameState.sizeY * gameState.fieldSize)
         //initCarUpdateWebsocket()
 
-        let payload: IPosition = { id: 0, x: 0, z: 0, rotation: 0 }
+        let payload: IPosition = { id: 0, x: 0, z: 0, rotation: 0 } // y is z change later when back end is adjusted
         let otherPlayerCar: any
         let otherPlayerCarList: any
         const rawPlayerList = toRaw(playerList.value)
@@ -180,7 +180,7 @@ export default defineComponent({
                 payload.id = userId.value
                 payload.rotation = movableObject.getRotation().y
                 payload.x = movableObject.getPositionX()
-                payload.z = movableObject.getPositionZ()
+                payload.z = movableObject.getPositionZ() // y is z change later when backend is adjusted
             }
         }
 
@@ -198,6 +198,18 @@ export default defineComponent({
             return list
         }
 
+        function movePlayerCars() {
+            playerCarList.value.forEach((ele) => {
+                positionState.mapObjects.forEach((positionEle) => {
+                    if (ele.playerCarId != uid && positionEle.id == ele.playerCarId) {
+                        ele.playerCarX = positionEle.x
+                        ele.playerCarZ = positionEle.z
+                        ele.playerCarRotation = positionEle.rotation
+                    }
+                })
+            })
+        }
+
         // playerlistcopy.forEach((player)=>{ if(player.userId !== uid){otherPlayerCar = ref(String(player.userId))}})
         onMounted(() => {
             console.log(
@@ -208,16 +220,14 @@ export default defineComponent({
             fillPlayerCarState()
 
             renderer.value.onBeforeRender(() => {
-                //fpsCamera.update()
                 movableObject.update()
-
-                //console.log(otherPlayerCar.value)
+                movePlayerCars()
             })
-            //setInterval(()=> console.log("WICHTIG LESEN",divs.value[0]),2400)
+
             setInterval(() => fillPayload(), 400)
-            setInterval(() => updateMessage(payload), 10000)
+            setTimeout(() => setInterval(() => updateMessage(payload), 17), 5000)
             setTimeout(() => createMessage(payload), 5000)
-            //setTimeout(()=> console.log("Playerlist: >>>",playerlistcopy),7000)
+
             let instance = getCurrentInstance()
             if (instance !== null) {
                 console.log("instance ---->>>>>", instance.vnode)
@@ -312,7 +322,7 @@ export default defineComponent({
                         :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                         :rotation="{
                             x: 0,
-                            y: 0,
+                            y: player[1].playerCarRotation,
                             z: 0,
                         }"
                     />

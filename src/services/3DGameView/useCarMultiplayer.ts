@@ -168,11 +168,24 @@ function onMessageReceived(payload: IStompMessage) {
             // let tempcar = playerCarState.playerCarMap.get(payload.content.id)
             // tempcar?.playerCarPosUpdate(payload.content.x,payload.content.z,payload.content.rotation)
             //console.log("Playercarmap",playerCarState.playerCarMap)
+            fillPosition(payload)
+
             if (index > -1) {
                 positionState.mapObjects[index] = payload.content
             }
         }
     }
+}
+
+function fillPosition(payload: IStompMessage) {
+    positionState.mapObjects.forEach((elePosObj) => {
+        console.log("ICH BIMMS", payload.content)
+        if (elePosObj.id === payload.content.id) {
+            elePosObj.x = payload.content.x
+            elePosObj.z = payload.content.z
+            elePosObj.rotation = payload.content.rotation
+        }
+    })
 }
 
 function fillPlayerCarState() {
@@ -193,7 +206,7 @@ function fillPlayerCarState() {
             })
         }
     })
-    playerCarState.playerCarMap.set(1, new CreatePlayerCars({ id: 1, x: 0, z: 1, rotation: 0 })) // remove l8er :D
+    playerCarState.playerCarMap.set(1, new CreatePlayerCars({ id: 1, x: 0, z: 1, rotation: 0 })) // remove l8er :D will be later filled with data from set playercars in the editor
     playerCarState.playerCarMap.set(2, new CreatePlayerCars({ id: 2, x: 1, z: 1, rotation: 0 }))
 }
 
