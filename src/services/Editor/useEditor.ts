@@ -149,6 +149,7 @@ function updateMessage(message: IMapObject) {
 
 function resetMessage() {
     const message: IMapObject = {
+        objectId: -1,
         objectTypeId: -1,
         x: 0,
         y: 0,

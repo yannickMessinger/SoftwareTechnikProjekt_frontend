@@ -1,8 +1,19 @@
 <script lang="ts">
-import { Box, Camera, Renderer, Scene, LambertMaterial, GltfModel, AmbientLight, Plane, PhongMaterial } from "troisjs"
-
-import { computed, defineComponent, onMounted, ref } from "vue"
+import {
+    PointLight,
+    Box,
+    Camera,
+    Renderer,
+    Scene,
+    LambertMaterial,
+    GltfModel,
+    AmbientLight,
+    Plane,
+    PhongMaterial,
+} from "troisjs"
+import { computed, defineComponent, onBeforeMount, onBeforeUnmount, inject, onMounted, reactive, ref } from "vue"
 import { useGameView } from "../../services/3DGameView/useGameView"
+import useCrossroadData from "../../services/3DGameView/useCrossroadData"
 import { MovmentInputController } from "../../models/MovementInputController"
 
 export default defineComponent({
@@ -21,6 +32,8 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
+        const sceneRef = ref(Scene)
+
         const moveableObject = new MovmentInputController(box, camera)
         const {
             gameState,
@@ -28,8 +41,10 @@ export default defineComponent({
             resetGameMapObjects,
             updateMapObjsFromGameState,
             updatePosMessage,
+
             receiveNpcUpdates,
         } = useGameView()
+        const { loadTrafficLight } = useCrossroadData()
 
         receiveNpcUpdates()
 
@@ -61,6 +76,7 @@ export default defineComponent({
         buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
 
         buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
+        buildingIDMap.set(23, "/../../../src/assets/3D_Models/TrafficLight/Traffic_Light.gltf")
 
         /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()
@@ -128,9 +144,13 @@ export default defineComponent({
             renderer,
             camera,
             box,
+
+            sceneRef,
             moveableObject,
             calcCoordinateX,
             calcCoordinateZ,
+
+            loadTrafficLight,
             buildingIDMap,
             mapElements,
             rotationMap,
@@ -146,7 +166,7 @@ export default defineComponent({
     <Renderer resize="window" ref="renderer">
         <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
         <Box ref="box" :position="{ x: 0, y: 5, z: 0 }"></Box>
-        <Scene background="#87CEEB">
+        <Scene ref="sceneRef" background="#87CEEB">
             <AmbientLight></AmbientLight>
             <Plane
                 :width="gridSizeX"
@@ -159,7 +179,7 @@ export default defineComponent({
             /></Plane>
 
             <!-- All elements placed in the editor are read from the list and placed in the scene-->
-            <div v-for="ele in mapElements">
+            <div v-for="(ele, index) in mapElements" :key="index">
                 <GltfModel
                     v-bind:src="buildingIDMap.get(ele.objectTypeId)"
                     :position="{
@@ -169,10 +189,21 @@ export default defineComponent({
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
+                    v-on:load="
+                        ele.objectTypeId === 2
+                            ? loadTrafficLight(
+                                  ele,
+                                  sceneRef.scene,
+                                  calcCoordinateX(ele.y),
+                                  calcCoordinateZ(ele.x),
+                                  rotationMap
+                              )
+                            : null
+                    "
                 />
             </div>
 
-            <div v-for="asset in npcEles">
+            <div v-for="(asset, index) in npcEles" :key="index">
                 <GltfModel
                     v-bind:src="buildingIDMap.get(22)"
                     :position="{
