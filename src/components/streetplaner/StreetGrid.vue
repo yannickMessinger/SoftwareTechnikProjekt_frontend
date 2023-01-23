@@ -156,8 +156,12 @@ function placeAllRandomAssets(amountAssets: number, assetObjectTypeId: number) {
 }
 
 function placeRandomPedestrians(amount: number) {
-    let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
-
+    let counter = 0;
+    while(counter < amount) {
+        let randomPedestrianObjectTypeId = Math.floor(Math.random() * 17 + 8) // different objectTypeIds due to different pedestrian models
+        placeAllRandomAssets(1, randomPedestrianObjectTypeId);
+        counter++;
+    }
 }
 
 function getRandomSpawnsCar(element: IMapObject) {
