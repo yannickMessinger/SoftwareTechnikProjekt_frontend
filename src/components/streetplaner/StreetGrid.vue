@@ -22,8 +22,8 @@ const { bus } = useEventBus()
 const { setGameStateSizes, setGameStateMapId } = useGameView()
 const { blockListState, updateBlockList } = useBlockList()
 
-const playerSpawnObjTypeId = 8
-const carObjTypeId = 7
+const npcCarObjTypeId = 7
+const playerSpawnObjTypeId = 13
 
 var gridSizeX = 20
 var gridSizeY = 30
@@ -126,7 +126,7 @@ function placeAllRandomCars(amountCars: number) {
         let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
         let randomElement = editorState.mapObjects[randomIndex]
         // try to place car on random element
-        if (placeRandomCarOnElement(randomElement, carObjTypeId)) {
+        if (placeRandomCarOnElement(randomElement, npcCarObjTypeId)) {
             if (changedElements.includes(randomElement)) {
                 delete changedElements[changedElements.indexOf(randomElement)]
             }
@@ -139,7 +139,7 @@ function placeAllRandomCars(amountCars: number) {
         if (errorCounter >= 3) {
             for (let ele of editorState.mapObjects) {
                 // if car is placeable reset errorCounter and continue
-                if (placeRandomCarOnElement(ele, carObjTypeId)) {
+                if (placeRandomCarOnElement(ele, npcCarObjTypeId)) {
                     if (changedElements.includes(randomElement)) {
                         delete changedElements[changedElements.indexOf(randomElement)]
                     }
