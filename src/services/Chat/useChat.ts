@@ -5,9 +5,10 @@ import { ILobby } from "../../typings/ILobby"
 
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/chat"
-const SEND_MSG = "/app/chat.sendMessage"
+const SEND_MSG = "/app/chat.globalChat"
 const LOBBY_MSG = "/app/chat.lobbyChat/"
 const message_notification = new Audio("src/assets/audio/chat/message_notification/msn.mp3")
+message_notification.volume = 0.5
 
 let stompClient: CompatClient
 let globalSubscription: StompSubscription
@@ -51,24 +52,23 @@ export function useChat(username: string, lobby: ILobby) {
         chat: readonly(chatState),
         sendMessage,
         sendLobbyMessage,
-        connect,
+        connectGlobalWs,
         connectLobbyWs,
         disconnectLobby,
         activeLobbyID,
     }
 }
 
-function connect() {
+function connectGlobalWs() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
-    stompClient.connect({}, onConnected, onError)
+    stompClient.connect({}, onConnectedGlobalWs, onError)
 }
 
-function onConnected() {
+function onConnectedGlobalWs() {
     if (globalSubscription !== undefined) {
         globalSubscription.unsubscribe()
     }
-
     globalSubscription = stompClient.subscribe(DEST, onMessageReceived)
     stompClient.send(SEND_MSG, {}, JSON.stringify({ author: chatState.userName, type: "JOIN" }))
 }
@@ -81,7 +81,7 @@ function onError(error: Error) {
 function connectLobbyWs() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
-    stompClient.connect({}, onConnectedLobbyWs, onErrorLobbyWs)
+    stompClient.connect({}, onConnectedLobbyWs, onError)
 }
 
 //subscribes ws to lobby specific path
@@ -101,11 +101,6 @@ function disconnectLobby(oldValue: number) {
     stompClient.send(LOBBY_MSG + oldValue, {}, JSON.stringify({ author: chatState.userName, type: "LEAVE" }))
     chatState.chatList_lobby = []
     lobbySubscription.unsubscribe()
-}
-
-function onErrorLobbyWs(error: Error) {
-    console.log("ERROR CONNECT LOCAL LOBBY WS")
-    chatState.errormessage = error.message
 }
 
 function sendMessage(message: string) {
@@ -138,13 +133,13 @@ function sendLobbyMessage(message: string) {
 function onMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
     if (message.type === "CHAT") {
+        message_notification.play()
         const message = JSON.parse(payload.body)
         chatState.chatList.push({
             message: message.content,
             author: message.author,
             type: "CHAT",
         })
-        message_notification.play()
     }
 }
 

@@ -70,7 +70,7 @@ import router from "../../router/router"
 import BasicButton from "../Buttons/BasicButton.vue"
 import { useChat } from "../../services/Chat/useChat"
 const { login, register, logindata, activeLobby, name } = useUser()
-const { connect } = useChat(name.value, activeLobby.value)
+const { connectGlobalWs } = useChat(name.value, activeLobby.value)
 
 const username = ref("")
 const password = ref("")
@@ -79,7 +79,7 @@ const registrationMode = ref(false)
 const headline = ref("Login")
 const usernameError = ref("")
 const passwordError = ref("")
-connect()
+connectGlobalWs()
 
 async function loginCheck() {
     let responseBody = await login(username.value, password.value)
