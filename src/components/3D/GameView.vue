@@ -21,6 +21,7 @@ import {
     ref,
     toRaw,
     getCurrentInstance,
+    onUpdated,
 } from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { MovmentInputController } from "../../models/MovementInputController"
@@ -30,6 +31,8 @@ import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
+import { useSound } from "../../services/useSound"
+import { on } from "events"
 
 export default defineComponent({
     components: {
@@ -62,10 +65,13 @@ export default defineComponent({
         } = useCarMultiplayer()
         const { user, userId, activeLobby, setActiveLobby } = useUser()
         const { playerListState, playerList, fetchPlayerList } = usePlayerList()
+        const { playHorn, playEngine, stopEngine, playEngineFromOtherCar, pauseEngineFromOtherCar, connectSound } =
+            useSound()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
         console.log(gameState.sizeX * gameState.fieldSize)
         console.log(gameState.sizeY * gameState.fieldSize)
 
+        connectSound()
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: 0 } // y is z change later when back end is adjusted
 
         const uid = userId.value
@@ -196,10 +202,25 @@ export default defineComponent({
                         ele.playerCarX = positionEle.x
                         ele.playerCarZ = positionEle.z
                         ele.playerCarRotation = positionEle.rotation
+                        checkPlayerCarDistance(ele.playerCarX, ele.playerCarX, ele.playerCarId)
                     }
                 })
             })
         }
+
+        function checkPlayerCarDistance(posX: number, posY: number, carId: number) {
+            let distanceX = movableObject.getPositionX() - posX
+            console.log(distanceX)
+
+            if (distanceX < 10 && distanceX > -10) {
+                console.log("hier muss ich drin sein")
+                playEngineFromOtherCar(carId)
+            } else {
+                pauseEngineFromOtherCar(carId)
+            }
+        }
+
+        onUpdated(() => {})
 
         onMounted(() => {
             console.log(
@@ -212,6 +233,14 @@ export default defineComponent({
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
                 movePlayerCars()
+                if (movableObject.hornPlayed) {
+                    playHorn()
+                }
+                if (movableObject.enginePlayed) {
+                    playEngine()
+                } else {
+                    stopEngine()
+                }
             })
 
             initAmbientSound()
