@@ -61,10 +61,18 @@ export default defineComponent({
         buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
         buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
         buildingIDMap.set(20, "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf")
-
         buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
-
         buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
+        buildingIDMap.set(23, "/../../../src/assets/3D_Models/Pedestrians/Firefighter.gltf")
+        buildingIDMap.set(24, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeBlack.gltf")
+        buildingIDMap.set(25, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeBlue.gltf")
+        buildingIDMap.set(26, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrowneBlue.gltf")
+        buildingIDMap.set(27, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeRed.gltf")
+        buildingIDMap.set(28, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrownPink.gltf")
+        buildingIDMap.set(29, "/../../../src/assets/3D_Models/Pedestrians/pedestrianOrangeGreen.gltf")
+        buildingIDMap.set(30, "/../../../src/assets/3D_Models/Pedestrians/pedestrianOrangeWhite.gltf")
+        buildingIDMap.set(31, "/../../../src/assets/3D_Models/Pedestrians/pedestrianRed.gltf")
+        buildingIDMap.set(32, "/../../../src/assets/3D_Models/Pedestrians/PoliceOfficer.gltf")
 
         /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()
@@ -93,7 +101,7 @@ export default defineComponent({
 
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
-
+        console.log("MAP ASSETS: ", mapElements)
         /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
       On the 3d Game View the coordinates x:0, z:0 describes the center of our Grid. The upper left corner would be x:-50, z:-50.
@@ -184,7 +192,6 @@ export default defineComponent({
                 <PhongMaterial color="#999999" :props="{ depthWrite: false }"
             /></Plane>
 
-            <!--  <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>-->
 
             <!--<div v-for="ele in enviroment">
         <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{x:calcCoordinateX(ele.y), y:0, z: calcCoordinateZ(ele.x)}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:rotationMap.get(ele.rotation), z:0}"/>
@@ -207,7 +214,7 @@ export default defineComponent({
                     <GltfModel
                         v-bind:src="buildingIDMap.get(22)"
                         :position="{
-                            x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
+                            x: calcAssetyCoordinateX(calcCoordinateX(ele.y), asset.x),
                             y: 0.75,
                             z: calcAssetCoordinateZ(calcCoordinateZ(ele.x), asset.y),
                         }"

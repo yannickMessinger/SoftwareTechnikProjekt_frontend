@@ -68,7 +68,8 @@ watch(
 watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
-        placeAllRandomAssets(val[0].car, 7)
+        console.log("VAL WATCH RANDOM ASSET: ", val[0])
+        placeAllRandomAssets(val[0].car, val[0].pedestrian)
         placeRandomPedestrians(val[0].pedestrian)
     }
 )
@@ -111,17 +112,15 @@ onMounted(() => {
     updateMap()
 })
 
-// function places 'amountAssets' random cars until no spawnpoints are available
-function placeAllRandomAssets(amountAssets: number, assetObjectTypeId: number) {
+function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) {
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
     while (counter !== amountAssets) {
-        // pick random element to place car on
         let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
         let randomElement = editorState.mapObjects[randomIndex]
-        // try to place car on random element
-        if (placeRandomAssetOnElement(randomElement, assetObjectTypeId)) {
+        // try to place asset on random element
+        if (placeRandomAssetOnElement(randomElement, assetObjectId)) {
             if (changedElements.includes(randomElement)) {
                 delete changedElements[changedElements.indexOf(randomElement)]
             }
@@ -130,11 +129,11 @@ function placeAllRandomAssets(amountAssets: number, assetObjectTypeId: number) {
         } else {
             errorCounter++
         }
-        // if car wasn't placeable on the last 3 elements, try to place it on any element
+        // if asset wasn't placeable on the last 3 elements, try to place it on any element
         if (errorCounter >= 3) {
             for (let ele of editorState.mapObjects) {
-                // if car is placeable reset errorCounter and continue
-                if (placeRandomAssetOnElement(ele, assetObjectTypeId)) {
+                // if asset is placeable reset errorCounter and continue
+                if (placeRandomAssetOnElement(ele, assetObjectId)) {
                     if (changedElements.includes(randomElement)) {
                         delete changedElements[changedElements.indexOf(randomElement)]
                     }
@@ -143,10 +142,30 @@ function placeAllRandomAssets(amountAssets: number, assetObjectTypeId: number) {
                     errorCounter = 0
                 }
             }
-            // if car isn't placeable, then there are no more spawnpoints available
+            // if asset isn't placeable, then there are no more spawnpoints available
             if (errorCounter > 0) {
                 break
             }
+        }
+    }
+    return changedElements;
+}
+
+// function places 'amountAssets' random asset until no spawnpoints are available
+function placeAllRandomAssets(amountAssetsOfCars: number, amountAssetsOfPedestrians: number) {
+    let changedElements: Array<IMapObject> = []
+    let assetObjectId
+    if (amountAssetsOfCars > 0 || amountAssetsOfPedestrians > 0) {
+        // pick random element to place asset on
+        let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
+        let randomElement = editorState.mapObjects[randomIndex]
+        if (amountAssetsOfCars > 0) {
+            assetObjectId = 7
+            console.log("RANDOM CAR ASSET: ", placeAssetOnRandomElement(amountAssetsOfCars, assetObjectId))
+        }
+        if (amountAssetsOfPedestrians > 0) {
+            assetObjectId = 8
+            console.log("RANDOM PEDESTRIAN ASSET: ", placeAssetOnRandomElement(amountAssetsOfPedestrians, assetObjectId))
         }
     }
     // send all changed elements via stomp broker to backend and other clients
@@ -157,85 +176,87 @@ function placeAllRandomAssets(amountAssets: number, assetObjectTypeId: number) {
 
 function placeRandomPedestrians(amount: number) {
     let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
-
 }
 
 function getRandomSpawnsCar(element: IMapObject) {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
-    if (element.objectTypeId === 0) {
-        // element = straight
-        if (element.rotation % 2 === 0) {
+
+    if (element) {
+        if (element.objectTypeId === 0) {
+            // element = straight
+            if (element.rotation % 2 === 0) {
+                randomPosElements.push(
+                    ...[
+                        { x: 0.37, y: 0.25, rotation: 2 },
+                        { x: 0.37, y: 0.75, rotation: 2 },
+                        { x: 0.62, y: 0.75, rotation: 0 },
+                        { x: 0.62, y: 0.25, rotation: 0 },
+                    ]
+                )
+            } else if (element.rotation % 2 === 1) {
+                randomPosElements.push(
+                    ...[
+                        { x: 0.25, y: 0.37, rotation: 3 },
+                        { x: 0.75, y: 0.37, rotation: 3 },
+                        { x: 0.75, y: 0.62, rotation: 1 },
+                        { x: 0.25, y: 0.62, rotation: 1 },
+                    ]
+                )
+            }
+        } else if (element.objectTypeId === 1) {
+            // element = curve
+            if (element.rotation === 0) {
+                randomPosElements.push(
+                    ...[
+                        { x: 0.38, y: 0.88, rotation: 2 },
+                        { x: 0.64, y: 0.88, rotation: 0 },
+                        { x: 0.88, y: 0.38, rotation: 3 },
+                        { x: 0.88, y: 0.64, rotation: 1 },
+                    ]
+                )
+            } else if (element.rotation === 1) {
+                randomPosElements.push(
+                    ...[
+                        { x: 0.36, y: 0.88, rotation: 2 },
+                        { x: 0.62, y: 0.88, rotation: 0 },
+                        { x: 0.12, y: 0.38, rotation: 3 },
+                        { x: 0.12, y: 0.65, rotation: 1 },
+                    ]
+                )
+            } else if (element.rotation === 2) {
+                randomPosElements.push(
+                    ...[
+                        { x: 0.12, y: 0.34, rotation: 3 },
+                        { x: 0.12, y: 0.62, rotation: 1 },
+                        { x: 0.62, y: 0.12, rotation: 0 },
+                        { x: 0.34, y: 0.12, rotation: 2 },
+                    ]
+                )
+            } else if (element.rotation === 3) {
+                randomPosElements.push(
+                    ...[
+                        { x: 0.64, y: 0.12, rotation: 0 },
+                        { x: 0.38, y: 0.12, rotation: 2 },
+                        { x: 0.88, y: 0.34, rotation: 3 },
+                        { x: 0.88, y: 0.64, rotation: 1 },
+                    ]
+                )
+            }
+        } else if (element.objectTypeId === 2) {
+            // element = intersection
             randomPosElements.push(
                 ...[
-                    { x: 0.37, y: 0.25, rotation: 2 },
-                    { x: 0.37, y: 0.75, rotation: 2 },
-                    { x: 0.62, y: 0.75, rotation: 0 },
-                    { x: 0.62, y: 0.25, rotation: 0 },
-                ]
-            )
-        } else if (element.rotation % 2 === 1) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.25, y: 0.37, rotation: 3 },
-                    { x: 0.75, y: 0.37, rotation: 3 },
-                    { x: 0.75, y: 0.62, rotation: 1 },
-                    { x: 0.25, y: 0.62, rotation: 1 },
-                ]
-            )
-        }
-    } else if (element.objectTypeId === 1) {
-        // element = curve
-        if (element.rotation === 0) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.38, y: 0.88, rotation: 2 },
-                    { x: 0.64, y: 0.88, rotation: 0 },
-                    { x: 0.88, y: 0.38, rotation: 3 },
-                    { x: 0.88, y: 0.64, rotation: 1 },
-                ]
-            )
-        } else if (element.rotation === 1) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.36, y: 0.88, rotation: 2 },
+                    { x: 0.37, y: 0.12, rotation: 2 },
+                    { x: 0.37, y: 0.88, rotation: 2 },
                     { x: 0.62, y: 0.88, rotation: 0 },
-                    { x: 0.12, y: 0.38, rotation: 3 },
-                    { x: 0.12, y: 0.65, rotation: 1 },
-                ]
-            )
-        } else if (element.rotation === 2) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.12, y: 0.34, rotation: 3 },
-                    { x: 0.12, y: 0.62, rotation: 1 },
                     { x: 0.62, y: 0.12, rotation: 0 },
-                    { x: 0.34, y: 0.12, rotation: 2 },
-                ]
-            )
-        } else if (element.rotation === 3) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.64, y: 0.12, rotation: 0 },
-                    { x: 0.38, y: 0.12, rotation: 2 },
-                    { x: 0.88, y: 0.34, rotation: 3 },
-                    { x: 0.88, y: 0.64, rotation: 1 },
+                    { x: 0.12, y: 0.37, rotation: 3 },
+                    { x: 0.88, y: 0.37, rotation: 3 },
+                    { x: 0.88, y: 0.62, rotation: 1 },
+                    { x: 0.12, y: 0.62, rotation: 1 },
                 ]
             )
         }
-    } else if (element.objectTypeId === 2) {
-        // element = intersection
-        randomPosElements.push(
-            ...[
-                { x: 0.37, y: 0.12, rotation: 2 },
-                { x: 0.37, y: 0.88, rotation: 2 },
-                { x: 0.62, y: 0.88, rotation: 0 },
-                { x: 0.62, y: 0.12, rotation: 0 },
-                { x: 0.12, y: 0.37, rotation: 3 },
-                { x: 0.88, y: 0.37, rotation: 3 },
-                { x: 0.88, y: 0.62, rotation: 1 },
-                { x: 0.12, y: 0.62, rotation: 1 },
-            ]
-        )
     }
     return randomPosElements
 }
@@ -246,94 +267,82 @@ function getRandomSpawnsPedestrian(element: IMapObject) {
         // case: straight street, intended to be walking on the right side of a sidewalk
         case 0:
             if (element.rotation % 2 === 0) {
-                for (let i = 0.125; i<1; i+=0.125) {
+                for (let i = 0.125; i < 1; i += 0.125) {
                     // rotation 0
                     let pedRotation = 0
-                    randomPosElements.push(...
-                    [
-                        { x: 0.2, y: i, rotation: pedRotation },
-                        { x: 0.9, y: i, rotation: pedRotation }
-                    ])
+                    randomPosElements.push(
+                        ...[
+                            { x: 0.2, y: i, rotation: pedRotation },
+                            { x: 0.9, y: i, rotation: pedRotation },
+                        ]
+                    )
                     // rotation 2
                     pedRotation = 2
-                    randomPosElements.push(...
-                    [
-                        { x:0.1, y: i, rotation: pedRotation},
-                        { x:0.8, y: i, rotation: pedRotation}
-                    ])
+                    randomPosElements.push(
+                        ...[
+                            { x: 0.1, y: i, rotation: pedRotation },
+                            { x: 0.8, y: i, rotation: pedRotation },
+                        ]
+                    )
                 }
             } else if (element.rotation % 2 === 1) {
-                for (let i = 0.125; i<1; i+=0.125) {
+                for (let i = 0.125; i < 1; i += 0.125) {
                     // rotation 1
                     let pedRotation = 1
-                    randomPosElements.push(...
-                    [
-                        { x: i, y: 0.2, rotation: pedRotation },
-                        { x: i, y: 0.9, rotation: pedRotation }
-                    ])
+                    randomPosElements.push(
+                        ...[
+                            { x: i, y: 0.2, rotation: pedRotation },
+                            { x: i, y: 0.9, rotation: pedRotation },
+                        ]
+                    )
                     // rotation 3
                     pedRotation = 3
-                    randomPosElements.push(...
-                    [
-                        { x:i, y: 0.1, rotation: pedRotation},
-                        { x:i, y: 0.8, rotation: pedRotation}
-                    ])
+                    randomPosElements.push(
+                        ...[
+                            { x: i, y: 0.1, rotation: pedRotation },
+                            { x: i, y: 0.8, rotation: pedRotation },
+                        ]
+                    )
                 }
             }
-            break;
+            break
         // case: curve
         case 1:
             if (element.rotation % 4 === 0) {
-                randomPosElements.push(...
-                [
-                    {x: 0.9, y: 0.9, rotation: 1}
-                ]
-                )
+                randomPosElements.push(...[{ x: 0.9, y: 0.9, rotation: 1 }])
             } else if (element.rotation % 4 === 1) {
-                randomPosElements.push(...
-                [
-                    {x: 0.1, y: 0.9, rotation: 2}
-                ]
-                )
+                randomPosElements.push(...[{ x: 0.1, y: 0.9, rotation: 2 }])
             } else if (element.rotation % 4 === 2) {
-                randomPosElements.push(...
-                [
-                    {x: 0.1, y: 0.1, rotation: 3}
-                ]
-                )
+                randomPosElements.push(...[{ x: 0.1, y: 0.1, rotation: 3 }])
             } else if (element.rotation % 4 === 3) {
-                randomPosElements.push(...
-                [
-                    {x: 0.9, y: 0.1, rotation: 0}
-                ]
-                )
+                randomPosElements.push(...[{ x: 0.9, y: 0.1, rotation: 0 }])
             }
-            break;
+            break
         // case: intersection
         case 2:
-            randomPosElements.push(...
-                [
-                    {x:0.9, y: 0.1, rotation: 0},
-                    {x:0.9, y:0.9, rotation: 1},
-                    {x:0.1, y:0.9, rotation: 2},
-                    {x:0.1, y: 0.1, rotation: 3},
+            randomPosElements.push(
+                ...[
+                    { x: 0.9, y: 0.1, rotation: 0 },
+                    { x: 0.9, y: 0.9, rotation: 1 },
+                    { x: 0.1, y: 0.9, rotation: 2 },
+                    { x: 0.1, y: 0.1, rotation: 3 },
 
-                    {x:0.2, y: 0.2, rotation: 0},
-                    {x:0.8, y:0.2, rotation: 1},
-                    {x:0.8, y:0.8, rotation: 2},
-                    {x:0.2, y: 0.8, rotation: 3},
+                    { x: 0.2, y: 0.2, rotation: 0 },
+                    { x: 0.8, y: 0.2, rotation: 1 },
+                    { x: 0.8, y: 0.8, rotation: 2 },
+                    { x: 0.2, y: 0.8, rotation: 3 },
                 ]
             )
-            break;
+            break
     }
 
-    return randomPosElements;
+    return randomPosElements
 }
 
 // tries to place random car on an elment, returns true if car was placed, else false
 function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
-
+    console.log("RANDOM EVENT ASSET: ", assetObjectTypeId, element)
     // if assetId = 7, then asset = car
     if (assetObjectTypeId === 7) {
         randomPosElements = getRandomSpawnsCar(element)
@@ -371,6 +380,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         }
     } else {
         // spawnpoint is free, so place car there
+        console.log("TEXTURE ELEMENT: ", blockList, assetObjectTypeId);
         streetGrid[element.x][element.y].game_assets.push({
             objectTypeId: assetObjectTypeId,
             x: randomPosElements[randomPos].x,
@@ -631,16 +641,31 @@ window.addEventListener(
 
 <template>
     <div v-for="row in streetGrid" class="row no-drag">
-        <div v-for="ele in row" :id="`cell_${ele.posX}_${ele.posY}`" class="grid-item grid-size col no-drag"
-            @click="onClick(ele, $event)" @mousemove="onMouseMove(ele, $event)">
-            <img v-if="ele.texture != ''" :src="ele.texture" class="no-drag grid-img" draggable="false"
-                :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }" />
+        <div
+            v-for="ele in row"
+            :id="`cell_${ele.posX}_${ele.posY}`"
+            class="grid-item grid-size col no-drag"
+            @click="onClick(ele, $event)"
+            @mousemove="onMouseMove(ele, $event)"
+        >
+            <img
+                v-if="ele.texture != ''"
+                :src="ele.texture"
+                class="no-drag grid-img"
+                draggable="false"
+                :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }"
+            />
             <div v-for="asset in ele.game_assets">
-                <img :src="asset.texture" class="no-drag asset-img" draggable="false" :style="{
-                    transform: 'rotate(' + asset.rotation * 90 + 'deg)',
-                    left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
-                    top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
-                }" />
+                <img
+                    :src="asset.texture"
+                    class="no-drag asset-img"
+                    draggable="false"
+                    :style="{
+                        transform: 'rotate(' + asset.rotation * 90 + 'deg)',
+                        left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
+                        top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
+                    }"
+                />
             </div>
         </div>
     </div>
