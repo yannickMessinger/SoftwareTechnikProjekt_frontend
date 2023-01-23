@@ -1,35 +1,11 @@
 import { reactive, ref } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
 
-//maybe MapId is necessary to identify current map for backend purposes
-
-interface NpcInfo {
-    npcId: number
-    npcPosX: number
-    npcPosZ: number
-    npcRotation: number
-}
-
-interface NpcInfoResponseDTO {
-    nextMapEleobjectTypeId: number
-    nextMapEleX: number
-    nextMapEleY: number
-    nextMapElerotation: number
-    newGameAssetRotation: number
-}
-
-interface IStompMessage {
-    npcContent: NpcInfo
-    type: string
-}
-
 export class NpcCar {
     public npcId: number
-    public npc: any
     public positions: any
     public curMapObjCenterCoords: any
     public curMapObj: IMapObject
-    public nextMapObj: IMapObject
     public gridSizeX: number
     public gridSizeY: number
     public fieldSize: number
@@ -62,15 +38,17 @@ export class NpcCar {
         curMapObj: IMapObject
     ) {
         this.npcId = npcId
-        this.npc = ref()
+        /*Radians is used to rotate game assets. The following map set the radians for the passed rotation value from backend*/
         this.rotationMap = new Map([
             [0, Math.PI],
             [1, Math.PI / 2],
             [2, 0],
             [3, (3 * Math.PI) / 2],
         ])
+
         this.positions = reactive({ npcPosX: 0, npcPosY: posY, npcPosZ: 0, npcRotation: npcRotation })
         this.curMapObjCenterCoords = reactive({ centerX: 0, centerZ: 0 })
+
         this.curMapObj = reactive({
             objectTypeId: curMapObj.objectTypeId,
             x: curMapObj.x,
@@ -78,13 +56,7 @@ export class NpcCar {
             rotation: curMapObj.rotation,
             game_assets: curMapObj.game_assets,
         })
-        this.nextMapObj = reactive({
-            objectTypeId: -1,
-            x: -1,
-            y: -1,
-            rotation: -1,
-            game_assets: [],
-        })
+
         this.gridSizeX = gridSizeX
         this.gridSizeY = gridSizeY
         this.fieldSize = fieldSize
@@ -111,8 +83,6 @@ export class NpcCar {
         this.calcNpcMapLimit()
 
         if (this.curMapObj.objectTypeId === 1) {
-            console.log("Kurve, muss Paramter berechnen")
-            //this.driveCurveCalc()
             this.calculateCurve()
         }
     }
@@ -162,12 +132,10 @@ export class NpcCar {
         }
     }
 
-    calculateCurvePoints() {
+    calculateCurvePoints(): void {
         this.positions.npcPosX = this.curveCenterX + Math.cos((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
         this.positions.npcPosZ = this.curveCenterZ - Math.sin((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
         this.currCurveAngle += this.curveAngleInc
-        //console.log("___npcRotation", this.positions.npcRotation)
-        //console.log(`npcPosX: ${this.positions.npcPosX} z: ${this.positions.npcPosZ}`)
 
         if (this.driveCurveRight) {
             this.viewRotation -= 0.5 * (Math.PI / 180)
@@ -176,53 +144,34 @@ export class NpcCar {
         }
     }
 
-    calcMapEleCenter() {
-        let mapEleCenterX = this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
-        let mapEleCenterZ = this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
-
-        this.curMapObjCenterCoords.centerX = mapEleCenterX
-        this.curMapObjCenterCoords.centerZ = mapEleCenterZ
-
-        console.log(`map ele center Npc: x:${mapEleCenterX}, z: ${mapEleCenterZ}`)
+    calcMapEleCenter(): void {
+        this.curMapObjCenterCoords.centerX =
+            this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
+        this.curMapObjCenterCoords.centerZ =
+            this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
     }
 
-    calcPixelPosNpc() {
+    calcPixelPosNpc(): void {
         let originX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-        let x = originX + this.gameAssetX * this.fieldSize
+        this.positions.npcPosX = originX + this.gameAssetX * this.fieldSize
 
         let originZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-        let z = originZ + this.gameAssetZ * this.fieldSize
-
-        this.positions.npcPosX = x
-        this.positions.npcPosZ = z
-
-        console.log(`pixelpos npc: x:${this.positions.npcPosX} z:${this.positions.npcPosZ}`)
+        this.positions.npcPosZ = originZ + this.gameAssetZ * this.fieldSize
     }
 
-    calcNpcMapLimit() {
-        let limit = 0
-
-        console.log("BERECHNE GERADEN LIMIT")
+    calcNpcMapLimit(): void {
         if (this.positions.npcRotation === 0) {
-            limit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-            console.log(`____limitOrientation: 0 limit: ${limit}`)
+            this.mapLimit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
         } else if (this.positions.npcRotation === 1) {
-            limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-            console.log(`____limitOrientation: 1 limit: ${limit}`)
+            this.mapLimit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
         } else if (this.positions.npcRotation === 2) {
-            limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
-            console.log(`____limitOrientation: 2 limit: ${limit}`)
+            this.mapLimit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
         } else if (this.positions.npcRotation === 3) {
-            limit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-            console.log(`____limitOrientation: 3 limit: ${limit}`)
+            this.mapLimit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
         }
-
-        this.mapLimit = limit
-        console.log(this.mapLimit)
     }
 
-    reachedMapEleLimit() {
-        //console.log("reachedMapEleLimit")
+    reachedMapEleLimit(): boolean | undefined {
         if (this.positions.npcRotation === 0) {
             if (this.positions.npcPosZ > this.mapLimit) {
                 return false
@@ -264,9 +213,7 @@ export class NpcCar {
         }
     }
 
-    calculateIntersection() {
-        console.log("calc intersection sikerim")
-        //this.calcMapEleCenter()
+    calculateIntersection(): void {
         if (
             (this.lastCarRotation === 0 && this.positions.npcRotation === 1) ||
             (this.lastCarRotation === 3 && this.positions.npcRotation === 2)
@@ -344,26 +291,22 @@ export class NpcCar {
         }
     }
 
-    calculateCurve() {
+    calculateCurve(): void {
         this.calcMapEleCenter()
         if (this.curMapObj.rotation === 0) {
             this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
             this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
-            //console.log("______ x:", this.curveCenterX, "z:", this.curveCenterZ)
-            //console.log("npc pos:", this.positions.npcPosX, this.positions.npcPosZ)
+
             if (this.lastCarRotation === 0) {
                 this.driveCurveRight = true
                 this.curveRadius = this.curveCenterX - this.positions.npcPosX
                 this.currCurveAngle = 179.5
                 this.curveAngleInc = -0.5
-                //console.log("___radius", this.curveRadius)
             } else if (this.lastCarRotation === 3) {
-                //console.log("___carRotation 3")
                 this.driveCurveRight = false
                 this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
                 this.currCurveAngle = 90.5
                 this.curveAngleInc = 0.5
-                //console.log("___radius", this.curveRadius)
             } else {
                 console.log("Fehler bei driveCurve 0")
             }
@@ -376,7 +319,6 @@ export class NpcCar {
                 this.currCurveAngle = 89.5
                 this.curveAngleInc = -0.5
             } else if (this.lastCarRotation === 0) {
-                //console.log("___car rotation 0?", this.lastCarRotation)
                 this.driveCurveRight = false
                 this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
                 this.currCurveAngle = 0.5
@@ -417,23 +359,5 @@ export class NpcCar {
                 console.log("Fehler bei driveCurve 3")
             }
         }
-    }
-
-    calculateRadius(centerPos: number, carPos: number): number {
-        return centerPos - carPos < 0 ? (centerPos - carPos) * -1 : centerPos - carPos
-    }
-
-    calculateCurvePosition(radius: number, curveCenterPosX: number, curveCenterPosZ: number, angle: number) {
-        const x = curveCenterPosX + Math.cos((angle * Math.PI) / 180) * radius
-        const z = curveCenterPosZ + Math.sin((angle * Math.PI) / 180) * radius
-        return { x, z }
-    }
-
-    trans2Dto3DcoordX(coord2dX: number) {
-        return this.gridSizeX * -0.5 + coord2dX * this.fieldSize + this.fieldSize / 2
-    }
-
-    trans2Dto3DcoordZ(coord2dZ: number) {
-        return this.gridSizeY * -0.5 + coord2dZ * this.fieldSize + this.fieldSize / 2
     }
 }

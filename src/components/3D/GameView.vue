@@ -1,21 +1,8 @@
 <script lang="ts">
-import {
-    PointLight,
-    Box,
-    Camera,
-    Renderer,
-    Scene,
-    LambertMaterial,
-    GltfModel,
-    AmbientLight,
-    Plane,
-    PhongMaterial,
-} from "troisjs"
+import { Box, Camera, Renderer, Scene, LambertMaterial, GltfModel, AmbientLight, Plane, PhongMaterial } from "troisjs"
 
-import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
-import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+import { computed, defineComponent, onMounted, ref } from "vue"
 import { useGameView } from "../../services/3DGameView/useGameView"
-import { NpcCar } from "./NpcCar"
 import { MovmentInputController } from "../../models/MovementInputController"
 
 export default defineComponent({
@@ -34,7 +21,6 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-        //const fpsCamera = new FirstPersonCamera(camera, box)
         const moveableObject = new MovmentInputController(box, camera)
         const {
             gameState,
@@ -47,15 +33,15 @@ export default defineComponent({
 
         receiveNpcUpdates()
 
-        /*Defines the Grid Size in length by the number ob fields*/
-        let gridSizeX = 300
-        /*Defines the Grid Size in height by the number ob fields*/
-        let gridSizeY = 200
-
         //counter variables for loops to prefill map with dummy data
         const fieldSize = 10
         let mapWidth = 30
         let mapHeight = 20
+
+        /*Defines the Grid Size in length by the number ob fields*/
+        let gridSizeX = 300
+        /*Defines the Grid Size in height by the number ob fields*/
+        let gridSizeY = 200
 
         setMapWidthAndMapHeight(mapWidth, mapHeight)
 
@@ -87,27 +73,12 @@ export default defineComponent({
         /*270 degree rotation*/
         rotationMap.set(3, Math.PI / 2)
 
-        /*Riadians is used to rotate game assets. The following map set the radians for the passed rotation value from backend*/
-        const assetRotationMap = new Map()
-
-        /*No rotation*/
-        assetRotationMap.set(0, Math.PI)
-        /*90 degree rotation*/
-        assetRotationMap.set(1, Math.PI / 2)
-        /*180 degree rotation*/
-        assetRotationMap.set(2, 0)
-        /*270 degree rotation*/
-        assetRotationMap.set(3, (3 * Math.PI) / 2)
-
         resetGameMapObjects()
         gameState.npcCarMapFromuseGameview.clear()
 
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
         const npcEles = computed(() => gameState.npcCarMapFromuseGameview)
-
-        //const iterator = npcEles.value.entries()
-        //console.log(iterator.next())
 
         /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
@@ -125,30 +96,6 @@ export default defineComponent({
         function calcCoordinateZ(n: number) {
             let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
             //console.log(`GameObj z: ${z}`)
-            return z
-        }
-
-        /**
-         * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-            let originX = xCoordCenter - fieldSize / 2
-            let x = originX + xCoordAsset * fieldSize
-
-            return x
-        }
-
-        /**
-         * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-            let originZ = zCoordCenter - fieldSize / 2
-            let z = originZ + yCoordAsset * fieldSize
-
             return z
         }
 
@@ -181,16 +128,12 @@ export default defineComponent({
             renderer,
             camera,
             box,
-            //fpsCamera,
             moveableObject,
             calcCoordinateX,
             calcCoordinateZ,
-            calcAssetCoordinateX,
-            calcAssetCoordinateZ,
             buildingIDMap,
             mapElements,
             rotationMap,
-            assetRotationMap,
             gridSizeX,
             gridSizeY,
             fieldSize,
@@ -231,7 +174,6 @@ export default defineComponent({
 
             <div v-for="asset in npcEles">
                 <GltfModel
-                    v-bind:ref="asset[1].npc"
                     v-bind:src="buildingIDMap.get(22)"
                     :position="{
                         x: asset[1].positions.npcPosX,
