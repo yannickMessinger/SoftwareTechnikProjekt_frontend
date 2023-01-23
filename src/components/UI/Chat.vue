@@ -27,7 +27,7 @@
             <div v-if="chatMode === 'global'">
                 <div id="msg-message" v-for="(item, index) in chat.chatList" :key="index">
                     <div v-if="item.type === 'CHAT'">
-                        <p class="">
+                        <p class="msg-message">
                             <strong style="color: blue">{{ item.author }}</strong
                             >: {{ item.message }}
                         </p>
@@ -42,7 +42,7 @@
             <div v-else-if="chatMode === 'lobby'">
                 <div id="msg-message" v-for="(item, index) in chat.chatList_lobby" :key="index">
                     <div v-if="item.type === 'CHAT'">
-                        <p class="">
+                        <p class="msg-message">
                             <strong style="color: blue">{{ item.author }}</strong
                             >: {{ item.message }}
                         </p>
@@ -87,9 +87,16 @@ connect()
 onUpdated(() => {
     let a = document.getElementById("msg-chat")
     if (a) {
-        a.scrollTo(a.scrollHeight, a.scrollHeight)
+        a.scrollTop = a.scrollHeight
     }
 })
+
+watch(
+    () => activeLobby.value.lobbyId,
+    (first, second) => {
+        console.log("Watch called," + first, second)
+    }
+)
 
 function appendMessage() {
     console.log(activeLobby.value.lobbyName)
@@ -194,9 +201,15 @@ footer {
     background-position: center;
 }
 
-.msg-drowdown {
-    position: relative;
-    font-family: Arial;
+.msg-drowdown select {
+    background-color: transparent;
+    border: 4px;
+    padding: 0 1em 0 0;
+    margin: 0;
+    width: 100%;
+    font-family: inherit;
+    cursor: inherit;
+    line-height: inherit;
 }
 
 #msg-close-btn-visible {

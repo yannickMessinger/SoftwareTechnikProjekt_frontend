@@ -67,11 +67,6 @@ onMounted(() => {
     connectLobbyWs()
 })
 
-watch(lobbyIdRef, (newValue, oldValue) => {
-    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    disconnectLobby(oldValue)
-})
-
 //Methods to switch Lobbymode
 function setActiveLobbyToBuildMode() {
     activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE

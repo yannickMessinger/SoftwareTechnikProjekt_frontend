@@ -166,11 +166,11 @@ function onLobbyMessageReceived(payload: { body: string }) {
             type: "LEAVE",
         })
     } else {
+        message_notification.play()
         chatState.chatList_lobby.push({
             message: message.content,
             author: message.author,
             type: "CHAT",
         })
-        message_notification.play()
     }
 }
