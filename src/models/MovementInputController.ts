@@ -74,7 +74,7 @@ export class MovmentInputController {
             if (this.moveVelocity > 0) {
                 this.moveVelocity -= movespeed / 30
                 this.objects.value.mesh.translateZ(-this.moveVelocity)
-                console.log(this.moveVelocity)
+                //console.log(this.moveVelocity)
             }
         }
     }
@@ -86,5 +86,18 @@ export class MovmentInputController {
         this.camera.value.camera.position.y = this.objects.value.mesh.position.y
         this.camera.value.camera.position.z = this.objects.value.mesh.position.z
         this.camera.value.camera.setRotationFromEuler(this.objects.value.mesh.rotation)
+    }
+
+    getPositionX() {
+        return this.objects.value.mesh.position.x
+    }
+    getPositionY() {
+        return this.objects.value.mesh.position.y
+    }
+    getPositionZ() {
+        return this.objects.value.mesh.position.z
+    }
+    getRotation() {
+        return this.objects.value.mesh.quaternion
     }
 }

@@ -1,7 +1,7 @@
 import { ILobby } from "./ILobby"
 
 export default interface IUser {
-    userId: number | undefined
+    userId: number
     userName: string
     activeLobby: ILobby
     errormessage?: string
