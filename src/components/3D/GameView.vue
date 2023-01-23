@@ -11,9 +11,10 @@ import {
     Plane,
     PhongMaterial,
 } from "troisjs"
-import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
+import { computed, defineComponent, onBeforeMount, onBeforeUnmount,inject, onMounted, reactive, ref } from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { useGameView } from "../../services/3DGameView/useGameView"
+import useCrossroadData from "../../services/3DGameView/useCrossroadData"
 
 export default defineComponent({
     components: {
@@ -31,15 +32,20 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
+        const sceneRef = ref(Scene)
+
         const fpsCamera = new FirstPersonCamera(camera, box)
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
+        const { loadTrafficLight } = useCrossroadData()
         console.log(gameState.sizeX * gameState.fieldSize)
         console.log(gameState.sizeY * gameState.fieldSize)
 
         //counter variables for loops to prefill map with dummy data
         let mapWidth = 30
         let mapHeight = 20
+        
+        
 
         setMapWidthAndMapHeight(mapWidth, mapHeight)
 
@@ -65,6 +71,7 @@ export default defineComponent({
         buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
 
         buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
+        buildingIDMap.set(23, "/../../../src/assets/3D_Models/TrafficLight/Traffic_Light.gltf")
 
         /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()
@@ -88,7 +95,7 @@ export default defineComponent({
         assetRotationMap.set(2, 0)
         /*270 degree rotation*/
         assetRotationMap.set(3, (3 * Math.PI) / 2)
-
+        
         resetGameMapObjects()
 
         /*Array of Buildings and Streets passed from 2D Planner*/
@@ -121,7 +128,7 @@ export default defineComponent({
         function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
             let originX = xCoordCenter - fieldSize / 2
             let x = originX + xCoordAsset * fieldSize
-
+        
             return x
         }
 
@@ -142,21 +149,23 @@ export default defineComponent({
                 `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
             )
             updateMapObjsFromGameState()
-
+            
             renderer.value.onBeforeRender(() => {
                 fpsCamera.update()
             })
         })
-
+        
         return {
             renderer,
             camera,
             box,
             fpsCamera,
+            sceneRef,
             calcCoordinateX,
             calcCoordinateZ,
             calcAssetCoordinateX,
             calcAssetCoordinateZ,
+            loadTrafficLight,
             buildingIDMap,
             mapElements,
             rotationMap,
@@ -172,7 +181,7 @@ export default defineComponent({
 <template>
     <Renderer resize="window" ref="renderer">
         <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
-        <Scene background="#87CEEB">
+        <Scene ref="sceneRef" background="#87CEEB">
             <AmbientLight></AmbientLight>
             <Plane
                 :width="gridSizeX"
@@ -184,14 +193,8 @@ export default defineComponent({
                 <PhongMaterial color="#999999" :props="{ depthWrite: false }"
             /></Plane>
 
-            <!--  <GltfModel src='/../../../src/assets/3D_Models/Streets/straight_road_rotated.gltf' :position="{x:0, y:0, z:45}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:0, z:0}"/>-->
-
-            <!--<div v-for="ele in enviroment">
-        <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{x:calcCoordinateX(ele.y), y:0, z: calcCoordinateZ(ele.x)}" :scale="{x: 0.5, y:0.5, z:0.5}" :rotation="{x:0, y:rotationMap.get(ele.rotation), z:0}"/>
-       </div>-->
-
             <!-- All elements placed in the editor are read from the list and placed in the scene-->
-            <div v-for="ele in mapElements">
+            <div v-for="ele, index in mapElements" :key="index">
                 <GltfModel
                     v-bind:src="buildingIDMap.get(ele.objectTypeId)"
                     :position="{
@@ -201,9 +204,11 @@ export default defineComponent({
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
-                />
+                    v-on:load="ele.objectTypeId === 2 ? loadTrafficLight(ele, sceneRef.scene, calcCoordinateX(ele.y), calcCoordinateZ(ele.x), rotationMap) : null"
+                /> 
+                
                 <!-- places all game assets of the current element-->
-                <div v-for="asset in ele.game_assets">
+                <div v-for="asset, index in ele.game_assets" :key="index">
                     <GltfModel
                         v-bind:src="buildingIDMap.get(22)"
                         :position="{
