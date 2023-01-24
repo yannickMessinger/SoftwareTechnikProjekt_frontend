@@ -96,6 +96,13 @@ export default defineComponent({
         buildingIDMap.set(3, "/../../../src/assets/3D_Models/Building/house_high.gltf")
         buildingIDMap.set(4, "/../../../src/assets/3D_Models/Building/house.gltf")
         buildingIDMap.set(5, "/../../../src/assets/3D_Models/Building/shop.gltf")
+
+        buildingIDMap.set(8, "/../../../src/assets/3D_Models/Streets/streetCrossing.gltf")
+        buildingIDMap.set(9, "/../../../src/assets/3D_Models/Railroad/straight_rail.gltf")
+        buildingIDMap.set(10, "/../../../src/assets/3D_Models/Railroad/curved_rail.gltf")
+        buildingIDMap.set(11, "/../../../src/assets/3D_Models/Railroad/trainstation.gltf")
+        buildingIDMap.set(12, "/../../../src/assets/3D_Models/Railroad/road_train_crossing.gltf")
+
         buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
         buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
         buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
