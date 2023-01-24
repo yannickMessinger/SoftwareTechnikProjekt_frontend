@@ -4,6 +4,8 @@ import { reactive } from "vue"
 import type { IToolElement } from "../../services/streetplaner/IToolElement"
 import useEventBus from "../../services/eventBus"
 import ToolEnum from "../../services/streetplaner/ToolEnum"
+import RandomVehicleDialog from "./RandomVehicleDialog.vue"
+import { createConfirmDialog } from "vuejs-confirm-dialog"
 
 /**Variables: */
 const pathToPictures = "/img/streetplaner/"
@@ -19,6 +21,7 @@ var defaultTool: IToolElement = {
 /** currently selected tool */
 const selectedTool = reactive({ tool: defaultTool })
 const { emit } = useEventBus()
+const { reveal, onConfirm, onCancel } = createConfirmDialog(RandomVehicleDialog)
 
 /**entrys in toollist */
 toolList[0] = {
@@ -46,6 +49,10 @@ toolList[3] = {
     texture: pathToPictures + "tool-icons/rotate.svg",
 }
 
+onConfirm((data) => {
+    emit("random-asset-event", data)
+})
+
 function onToolClick(clickedTool: any) {
     /** if the selected tool is the clicked tool, it gets deselected by restoring the default tool
      * otherwhise the clicked tool is now the selected tool.
@@ -59,6 +66,9 @@ function onToolClick(clickedTool: any) {
 
     if (selectedTool.tool.tool == ToolEnum.CREATE) {
         emit("create-toggle-view", undefined)
+    }
+    if (selectedTool.tool.tool == ToolEnum.EDIT) {
+        reveal()
     }
     /** fire a tool select event to mark a tool change. Sends out the enum value of the selected tool*/
     emit("tool-select-event", selectedTool.tool.tool)

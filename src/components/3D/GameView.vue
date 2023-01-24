@@ -21,7 +21,7 @@ import {
     ref,
     toRaw,
     getCurrentInstance,
-    onUpdated,
+    watch,
 } from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { MovmentInputController } from "../../models/MovementInputController"
@@ -33,6 +33,8 @@ import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
 import { useSound } from "../../services/useSound"
 import { on } from "events"
+import * as THREE from "three"
+import { useCarMap } from "../../services/3DGameView/useCarMap"
 
 export default defineComponent({
     components: {
@@ -50,9 +52,11 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
+        const scene = ref()
         // allows the manipulation of object through key input and sets camera as first person
         const movableObject = new MovmentInputController(box, camera)
         //const fpsCamera = new FirstPersonCamera(camera, box)
+
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
         const {
             createMessage,
@@ -72,9 +76,11 @@ export default defineComponent({
         console.log(gameState.sizeY * gameState.fieldSize)
 
         connectSound()
-        let payload: IPosition = { id: 0, x: 0, z: 0, rotation: 0 } // y is z change later when back end is adjusted
+        let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
+        const scene3DobjectMap = new Map()
 
         const uid = userId.value
+        const rawPlayerList = toRaw(playerList.value)
         //counter variables for loops to prefill map with dummy data
         let mapWidth = 30
         let mapHeight = 20
@@ -95,6 +101,13 @@ export default defineComponent({
         buildingIDMap.set(3, "/../../../src/assets/3D_Models/Building/house_high.gltf")
         buildingIDMap.set(4, "/../../../src/assets/3D_Models/Building/house.gltf")
         buildingIDMap.set(5, "/../../../src/assets/3D_Models/Building/shop.gltf")
+
+        buildingIDMap.set(8, "/../../../src/assets/3D_Models/Streets/streetCrossing.gltf")
+        buildingIDMap.set(9, "/../../../src/assets/3D_Models/Railroad/straight_rail.gltf")
+        buildingIDMap.set(10, "/../../../src/assets/3D_Models/Railroad/curved_rail.gltf")
+        buildingIDMap.set(11, "/../../../src/assets/3D_Models/Railroad/trainstation.gltf")
+        buildingIDMap.set(12, "/../../../src/assets/3D_Models/Railroad/road_train_crossing.gltf")
+
         buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
         buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
         buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
@@ -184,7 +197,7 @@ export default defineComponent({
         function fillPayload() {
             if (userId.value !== undefined) {
                 payload.id = userId.value
-                payload.rotation = movableObject.getRotation().y
+                payload.rotation = movableObject.getRotation()
                 payload.x = movableObject.getPositionX()
                 payload.z = movableObject.getPositionZ()
             }
@@ -198,11 +211,51 @@ export default defineComponent({
         function movePlayerCars() {
             playerCarList.value.forEach((ele) => {
                 positionState.mapObjects.forEach((positionEle) => {
-                    if (ele.playerCarId != uid && positionEle.id == ele.playerCarId) {
+                    if (ele.playerCarId !== uid && positionEle.id === ele.playerCarId) {
+                        //let rotationValue = positionEle.rotation * Math.PI
                         ele.playerCarX = positionEle.x
                         ele.playerCarZ = positionEle.z
-                        ele.playerCarRotation = positionEle.rotation
+                        ele.playerCarRotation
+                        //scene3DobjectMap.get(positionEle.id).setRotationFromEuler(new THREE.Euler( positionEle.rotation ))
+                        let x = scene3DobjectMap.get(positionEle.id)
+                        //x.rotation = positionEle.rotation
                         checkPlayerCarDistance(ele.playerCarX, ele.playerCarX, ele.playerCarId)
+                        if (x != undefined) {
+                            x.setRotationFromEuler(
+                                new THREE.Euler(
+                                    positionEle.rotation._x,
+                                    positionEle.rotation._y,
+                                    positionEle.rotation._z,
+                                    positionEle.rotation.order
+                                )
+                            )
+                            //scene3DobjectMap.set(positionEle.id,x)
+                            //console.log("ele.playerCarRotation",ele.playerCarRotation)
+
+                            console.log(
+                                "positionEle.rotation",
+                                new THREE.Euler(
+                                    positionEle.rotation._x,
+                                    positionEle.rotation._y,
+                                    positionEle.rotation._z,
+                                    positionEle.rotation.order
+                                )
+                            )
+                            console.log("x", x)
+                        }
+                    }
+                })
+            })
+        }
+
+        function loadSceneChildrenWithKey(sceneObjChildren: Map<any, any>) {
+            console.log("anfangfunction", scene3DobjectMap)
+            sceneObjChildren.forEach((ele) => {
+                rawPlayerList.forEach((player) => {
+                    if (ele.name === 21) {
+                        if (!scene3DobjectMap.get(player.userId) && player.userId !== uid) {
+                            scene3DobjectMap.set(player.userId, ele)
+                        }
                     }
                 })
             })
@@ -220,7 +273,10 @@ export default defineComponent({
             }
         }
 
-        onUpdated(() => {})
+        watch(
+            () => gameState.mapObjsFromBackEnd,
+            () => fillPlayerCarState()
+        )
 
         onMounted(() => {
             console.log(
@@ -228,7 +284,6 @@ export default defineComponent({
             )
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
-            fillPlayerCarState()
 
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
@@ -251,11 +306,14 @@ export default defineComponent({
             setInterval(() => fillPayload(), 25)
             setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
             setTimeout(() => createMessage(payload), 5000)
-
-            let instance = getCurrentInstance()
-            if (instance !== null) {
-                console.log("instance ---->>>>>", instance.vnode)
-            }
+            setTimeout(() => console.log("scene:", scene.value.scene.children), 7500)
+            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 8000)
+            setTimeout(() => console.log("map:", scene3DobjectMap), 7500)
+            setInterval(() => {
+                scene3DobjectMap.forEach((player) => {
+                    //console.log(player.setRotationFromEuler(new THREE.Vector3(0, 1, 0),10))
+                })
+            })
         })
 
         function initAmbientSound() {
@@ -271,6 +329,7 @@ export default defineComponent({
             renderer,
             camera,
             box,
+            scene,
             movableObject,
             calcCoordinateX,
             calcCoordinateZ,
@@ -293,8 +352,11 @@ export default defineComponent({
 <template>
     <Renderer resize="window" ref="renderer">
         <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
-        <Box ref="box" :position="{ x: 0, y: 0, z: 0 }"></Box>
-        <Scene background="#87CEEB">
+        <Box
+            ref="box"
+            :position="{ x: playerCarList.get(uid)?.playerCarX, y: 0.75, z: playerCarList.get(uid)?.playerCarZ }"
+        ></Box>
+        <Scene background="#87CEEB" ref="scene">
             <AmbientLight></AmbientLight>
             <Plane
                 :width="gridSizeX"
@@ -323,10 +385,12 @@ export default defineComponent({
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
+                    :props="{ name: ele.objectTypeId }"
                 />
                 <!-- places all game assets of the current element-->
                 <div v-for="asset in ele.game_assets">
                     <GltfModel
+                        v-if="asset.userId === 0"
                         v-bind:src="buildingIDMap.get(22)"
                         :position="{
                             x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
@@ -339,6 +403,7 @@ export default defineComponent({
                             y: assetRotationMap.get(asset.rotation),
                             z: 0,
                         }"
+                        :props="{ name: 22 }"
                     />
                 </div>
             </div>
@@ -355,9 +420,10 @@ export default defineComponent({
                         :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                         :rotation="{
                             x: 0,
-                            y: player[1].playerCarRotation,
+                            y: 0, //player[1].playerCarRotation[1],
                             z: 0,
                         }"
+                        :props="{ name: 21 }"
                     />
                 </div>
             </div>

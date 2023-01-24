@@ -12,6 +12,8 @@ export class MovmentInputController {
     public pressedKey: any
     public clock: any
     public keyboard: KeyboardState
+    public rotation: number
+    public rotAngle: number
 
     public hornPlayed: boolean
     public enginePlayed: boolean
@@ -27,6 +29,8 @@ export class MovmentInputController {
         this.objects = objects
         this.camera = camera
         this.target = document
+        this.rotation = 0
+        this.rotAngle = 0
         this.clock = new THREE.Clock()
         this.translation = new THREE.Vector3(0, 1, 0)
         this.KEYS = { a: 65, s: 83, w: "w", d: 68 }
@@ -66,9 +70,17 @@ export class MovmentInputController {
         }
         if (this.keyboard.pressed("D")) {
             this.objects.value.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), -rotateAngle)
+            this.rotation -= rotateAngle
+            if (this.rotation < -1) {
+                this.rotation += 2
+            }
         }
         if (this.keyboard.pressed("A")) {
             this.objects.value.mesh.rotateOnAxis(new THREE.Vector3(0, 1, 0), rotateAngle)
+            this.rotation += rotateAngle
+            if (this.rotation > 1) {
+                this.rotation += -2
+            }
         }
         if (this.keyboard.pressed("Q")) {
             this.objects.value.mesh.translateY(movespeed)
@@ -87,7 +99,6 @@ export class MovmentInputController {
     updateCamera() {
         let relativeCameraOffset = new THREE.Vector3(0, 0.5, 2)
         let cameraOffset = relativeCameraOffset.applyMatrix4(this.objects.value.mesh.matrixWorld)
-
         this.camera.value.camera.position.x = this.objects.value.mesh.position.x
         this.camera.value.camera.position.y = this.objects.value.mesh.position.y
         this.camera.value.camera.position.z = this.objects.value.mesh.position.z
@@ -124,6 +135,7 @@ export class MovmentInputController {
         return this.objects.value.mesh.position.z
     }
     getRotation() {
-        return this.objects.value.mesh.quaternion
+        console.log("Rot:", this.objects.value.mesh.rotation)
+        return this.objects.value.mesh.rotation
     }
 }

@@ -144,6 +144,7 @@ function updateMessage(message: IPosition) {
  * @param payload message as IStompMessage containing type and content (object position)
  */
 function onMessageReceived(payload: IStompMessage) {
+    //console.log("payload",payload.content)
     if (positionState.mapId === payload.id) {
         const index = positionState.mapObjects.indexOf(payload.content)
         if (payload.type === "CREATE") {
@@ -192,15 +193,15 @@ function fillPlayerCarState() {
                             id: game_asset.userId!,
                             x: calcAssetCoordinateX(calcCoordinateX(mapObject.y), game_asset.x),
                             z: calcAssetCoordinateZ(calcCoordinateZ(mapObject.x), game_asset.y),
-                            rotation: game_asset.rotation,
+                            rotation: [0, 1, 0],
                         })
                     )
                 }
             })
         }
     })
-    playerCarState.playerCarMap.set(1, new CreatePlayerCars({ id: 1, x: 0, z: 1, rotation: 0 })) // remove l8er :D will be later filled with data from set playercars in the editor
-    playerCarState.playerCarMap.set(2, new CreatePlayerCars({ id: 2, x: 1, z: 1, rotation: 0 }))
+    //playerCarState.playerCarMap.set(1, new CreatePlayerCars({ id: 1, x: 0, z: 1, rotation: [0,1,0] })) // remove l8er :D will be later filled with data from set playercars in the editor
+    //playerCarState.playerCarMap.set(2, new CreatePlayerCars({ id: 2, x: 1, z: 1, rotation: [0,1,0] }))
 }
 
 function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
