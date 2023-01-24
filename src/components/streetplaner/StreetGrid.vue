@@ -335,6 +335,7 @@ function onClick(cell: any, e: any) {
                     texture: toolState.block.texture,
                 })
                 payload = {
+                    objectId: -1,
                     objectTypeId: currCellContent.objectTypeId,
                     x: cell.posX,
                     y: cell.posY,
@@ -348,6 +349,7 @@ function onClick(cell: any, e: any) {
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
             payload = {
+                objectId: -1,
                 objectTypeId: toolState.block.objectTypeId,
                 x: cell.posX,
                 y: cell.posY,
@@ -360,6 +362,7 @@ function onClick(cell: any, e: any) {
     if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].objectTypeId !== -1) {
         streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4
         payload = {
+            objectId: -1,
             objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
             x: cell.posX,
             y: cell.posY,
@@ -370,6 +373,7 @@ function onClick(cell: any, e: any) {
     }
     if (toolState.tool === ToolEnum.DELETE) {
         payload = {
+            objectId: -1,
             objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
             x: cell.posX,
             y: cell.posY,
@@ -403,6 +407,7 @@ function onMouseMove(cell: any, event: MouseEvent) {
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
             payload = {
+                objectId: -1,
                 objectTypeId: toolState.block.objectTypeId,
                 x: cell.posX,
                 y: cell.posY,
@@ -415,6 +420,7 @@ function onMouseMove(cell: any, event: MouseEvent) {
     if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
         if (currCellContent.objectTypeId !== -1) {
             payload = {
+                objectId: -1,
                 objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
                 x: cell.posX,
                 y: cell.posY,
@@ -437,6 +443,7 @@ function saveStreetGrid() {
             let ele = streetGrid[row][col]
             if (ele.objectTypeId !== -1) {
                 dto.mapObjects.push({
+                    objectId: -1,
                     objectTypeId: ele.objectTypeId,
                     x: ele.posX,
                     y: ele.posY,

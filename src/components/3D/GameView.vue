@@ -11,11 +11,9 @@ import {
     Plane,
     PhongMaterial,
 } from "troisjs"
-
-import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
-import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+import { computed, defineComponent, onBeforeMount, onBeforeUnmount, inject, onMounted, reactive, ref } from "vue"
 import { useGameView } from "../../services/3DGameView/useGameView"
-import { NpcCar } from "./NpcCar"
+import useCrossroadData from "../../services/3DGameView/useCrossroadData"
 import { MovmentInputController } from "../../models/MovementInputController"
 
 export default defineComponent({
@@ -34,7 +32,8 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-        //const fpsCamera = new FirstPersonCamera(camera, box)
+        const sceneRef = ref(Scene)
+
         const moveableObject = new MovmentInputController(box, camera)
         const {
             gameState,
@@ -44,18 +43,19 @@ export default defineComponent({
             updatePosMessage,
             receiveNpcUpdates,
         } = useGameView()
+        const { loadTrafficLight } = useCrossroadData()
 
         receiveNpcUpdates()
-
-        /*Defines the Grid Size in length by the number ob fields*/
-        let gridSizeX = 300
-        /*Defines the Grid Size in height by the number ob fields*/
-        let gridSizeY = 200
 
         //counter variables for loops to prefill map with dummy data
         const fieldSize = 10
         let mapWidth = 30
         let mapHeight = 20
+
+        /*Defines the Grid Size in length by the number ob fields*/
+        let gridSizeX = 300
+        /*Defines the Grid Size in height by the number ob fields*/
+        let gridSizeY = 200
 
         setMapWidthAndMapHeight(mapWidth, mapHeight)
 
@@ -75,6 +75,7 @@ export default defineComponent({
         buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
 
         buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
+        buildingIDMap.set(23, "/../../../src/assets/3D_Models/TrafficLight/Traffic_Light.gltf")
 
         /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()
@@ -87,27 +88,12 @@ export default defineComponent({
         /*270 degree rotation*/
         rotationMap.set(3, Math.PI / 2)
 
-        /*Riadians is used to rotate game assets. The following map set the radians for the passed rotation value from backend*/
-        const assetRotationMap = new Map()
-
-        /*No rotation*/
-        assetRotationMap.set(0, Math.PI)
-        /*90 degree rotation*/
-        assetRotationMap.set(1, Math.PI / 2)
-        /*180 degree rotation*/
-        assetRotationMap.set(2, 0)
-        /*270 degree rotation*/
-        assetRotationMap.set(3, (3 * Math.PI) / 2)
-
         resetGameMapObjects()
         gameState.npcCarMapFromuseGameview.clear()
 
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
         const npcEles = computed(() => gameState.npcCarMapFromuseGameview)
-
-        //const iterator = npcEles.value.entries()
-        //console.log(iterator.next())
 
         /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
@@ -128,31 +114,8 @@ export default defineComponent({
             return z
         }
 
-        /**
-         * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-            let originX = xCoordCenter - fieldSize / 2
-            let x = originX + xCoordAsset * fieldSize
-
-            return x
-        }
-
-        /**
-         * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-            let originZ = zCoordCenter - fieldSize / 2
-            let z = originZ + yCoordAsset * fieldSize
-
-            return z
-        }
-
         onMounted(() => {
+            console.log(`MapId aus GameView ${gameState.mapId}`)
             updateMapObjsFromGameState()
 
             renderer.value.onBeforeRender(() => {
@@ -173,7 +136,12 @@ export default defineComponent({
                         updatePosMessage(ele.npcId)
                     }
                 })
-            }, 300)
+            }, 500)
+
+            /*
+            setInterval(() => {
+                console.log(sceneRef.value.scene)
+            },1000)*/
         })
 
         return {
@@ -181,16 +149,14 @@ export default defineComponent({
             renderer,
             camera,
             box,
-            //fpsCamera,
+            sceneRef,
             moveableObject,
             calcCoordinateX,
             calcCoordinateZ,
-            calcAssetCoordinateX,
-            calcAssetCoordinateZ,
+            loadTrafficLight,
             buildingIDMap,
             mapElements,
             rotationMap,
-            assetRotationMap,
             gridSizeX,
             gridSizeY,
             fieldSize,
@@ -203,7 +169,7 @@ export default defineComponent({
     <Renderer resize="window" ref="renderer">
         <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
         <Box ref="box" :position="{ x: 0, y: 5, z: 0 }"></Box>
-        <Scene background="#87CEEB">
+        <Scene ref="sceneRef" background="#87CEEB">
             <AmbientLight></AmbientLight>
             <Plane
                 :width="gridSizeX"
@@ -216,7 +182,7 @@ export default defineComponent({
             /></Plane>
 
             <!-- All elements placed in the editor are read from the list and placed in the scene-->
-            <div v-for="ele in mapElements">
+            <div v-for="(ele, index) in mapElements" :key="index">
                 <GltfModel
                     v-bind:src="buildingIDMap.get(ele.objectTypeId)"
                     :position="{
@@ -226,12 +192,23 @@ export default defineComponent({
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
+                    :props="{ name: ele.objectId }"
+                    v-on:load="
+                        ele.objectTypeId === 2
+                            ? loadTrafficLight(
+                                  ele,
+                                  sceneRef.scene,
+                                  calcCoordinateX(ele.y),
+                                  calcCoordinateZ(ele.x),
+                                  rotationMap
+                              )
+                            : null
+                    "
                 />
             </div>
 
-            <div v-for="asset in npcEles">
+            <div v-for="(asset, index) in npcEles" :key="index">
                 <GltfModel
-                    v-bind:ref="asset[1].npc"
                     v-bind:src="buildingIDMap.get(22)"
                     :position="{
                         x: asset[1].positions.npcPosX,
@@ -244,6 +221,7 @@ export default defineComponent({
                         y: asset[1].viewRotation,
                         z: 0,
                     }"
+                    :props="{ name: 22 }"
                 />
             </div>
         </Scene>
