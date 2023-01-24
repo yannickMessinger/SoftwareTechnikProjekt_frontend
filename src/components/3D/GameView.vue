@@ -42,7 +42,6 @@ export default defineComponent({
             updateMapObjsFromGameState,
             updatePosMessage,
             receiveNpcUpdates,
-            initNpcNextMapEle,
         } = useGameView()
         const { loadTrafficLight } = useCrossroadData()
 
@@ -116,6 +115,7 @@ export default defineComponent({
         }
 
         onMounted(() => {
+            console.log(`MapId aus GameView ${gameState.mapId}`)
             updateMapObjsFromGameState()
 
             renderer.value.onBeforeRender(() => {

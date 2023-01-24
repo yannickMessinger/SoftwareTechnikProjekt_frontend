@@ -61,6 +61,7 @@ interface NpcInfoResponseDTO {
 }
 
 interface NpcInfoRequestDTO {
+    mapId: number
     npcId: number
     npcRotation: number
     currentMapObject: IMapObject
@@ -84,7 +85,6 @@ export function useGameView() {
         setGameStateMapId,
         updatePosMessage,
         receiveNpcUpdates,
-        initNpcNextMapEle,
     }
 }
 
@@ -104,6 +104,7 @@ function setGameStateSizes(sizeX: number, sizeY: number, fieldSize: number) {}
  */
 
 function setGameStateMapId(mapId: number) {
+    console.log(`setze gameState Mapid auf ${mapId}`)
     gameState.mapId = mapId
 }
 
@@ -236,6 +237,7 @@ function updatePosMessage(npcId: number) {
         console.log("vurUpdate", tempCar.nextMapObj)
         const updatePosMsg: IStompMessage = {
             npcInfoRequestDTO: {
+                mapId: gameState.mapId,
                 npcId: tempCar!.npcId,
                 npcRotation: tempCar!.positions.npcRotation,
                 currentMapObject: tempCar!.curMapObj,
@@ -251,28 +253,6 @@ function updatePosMessage(npcId: number) {
         })
         //gameState.npcCarMapFromuseGameview.get(npcId)!.needsMapEleUpdate = false
         console.log(updatePosMsg)
-    }
-}
-
-function initNpcNextMapEle(npcId: number) {
-    console.log("fordere initial nächstes map ele an")
-    if (stompClient) {
-        let tempCar = gameState.npcCarMapFromuseGameview.get(npcId)!
-        const initNpcNextEleMsg: IStompMessage = {
-            npcInfoRequestDTO: {
-                npcId: tempCar!.npcId,
-                npcRotation: tempCar!.positions.npcRotation,
-                currentMapObject: tempCar!.curMapObj,
-            },
-
-            type: "INIT_NEXT_MAP_ELE",
-        }
-
-        stompClient.publish({
-            destination: INIT_NEXT_MAP_ELE_MSG,
-            headers: {},
-            body: JSON.stringify(initNpcNextEleMsg),
-        })
     }
 }
 
