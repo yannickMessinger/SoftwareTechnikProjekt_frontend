@@ -38,7 +38,7 @@
         </div>
         <div class="SwitchMode">
             <div v-if="userId === activeLobby.hostId">
-                <button v-if="isHost" @click="changeGamemode()">Wechseln</button>
+                <button @click="changeGamemode()">Wechseln</button>
             </div>
         </div>
         <div class="Button2">
@@ -56,8 +56,10 @@ import { ref } from "vue"
 import router from "../../router/router"
 
 const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
-const isHost = ref(true)
 const buildMode = ref(true)
+
+console.log("Pl-List")
+console.log(activeLobby.value.playerList)
 
 //Methods to switch Lobbymode
 function setActiveLobbyToBuildMode() {

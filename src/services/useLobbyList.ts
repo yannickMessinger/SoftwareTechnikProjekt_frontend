@@ -12,6 +12,7 @@ import { ILobbyDTO } from "../typings/ILobbyDTO"
 import { Client } from "@stomp/stompjs"
 import { fetchPlayerList } from "./usePlayerList"
 import IUser from "../typings/IUser"
+import { resolve } from "path"
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/lobby"
@@ -19,7 +20,7 @@ const SWITCHMODE_MSG = "/app/lobby.switchMode"
 const JOIN_MSG = "/app/lobby.join"
 
 let stompClient: Client
-const { user, userId, activeLobby, setActiveLobby } = useUser()
+const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
 
 interface IStompMessage {
     playerContent: IUser
@@ -85,10 +86,21 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
             body: JSON.stringify(addLobby),
         })
         let id = await res.json()
-
         await updateLobbyList()
+        var number: number = id
+        var lobby: ILobby = {
+            lobbyId: number,
+            hostId: userId.value,
+            mapId: activeLobby.value.mapId,
+            lobbyName: addLobbyName,
+            numOfPlayers: 1,
+            lobbyModeEnum: addLobbyMode,
+        }
+        setActiveLobby(lobby)
+        postActiveLobby(lobby)
     } catch (error) {
         console.log(error)
+        return -1
     }
 }
 
