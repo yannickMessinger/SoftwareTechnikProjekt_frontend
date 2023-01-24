@@ -214,7 +214,7 @@ export default defineComponent({
                     <GltfModel
                         v-bind:src="buildingIDMap.get(22)"
                         :position="{
-                            x: calcAssetyCoordinateX(calcCoordinateX(ele.y), asset.x),
+                            x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
                             y: 0.75,
                             z: calcAssetCoordinateZ(calcCoordinateZ(ele.x), asset.y),
                         }"

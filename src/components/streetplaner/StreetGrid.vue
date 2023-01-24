@@ -69,8 +69,7 @@ watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
         //Todo: liste leeren
-        
-        placeAllRandomAssets(val[0].car, 7)
+        placeAssetOnRandomElement(val[0].car, 7)
         placeRandomPedestrians(val[0].pedestrian)
     }
 )
@@ -152,36 +151,13 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
     return changedElements;
 }
 
-// function places 'amountAssets' random asset until no spawnpoints are available
-function placeAllRandomAssets(amountAssetsOfCars: number, amountAssetsOfPedestrians: number) {
-    let changedElements: Array<IMapObject> = []
-    let assetObjectId
-    if (amountAssetsOfCars > 0 || amountAssetsOfPedestrians > 0) {
-        // pick random element to place asset on
-        let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
-        let randomElement = editorState.mapObjects[randomIndex]
-        if (amountAssetsOfCars > 0) {
-            assetObjectId = 7
-            console.log("RANDOM CAR ASSET: ", placeAssetOnRandomElement(amountAssetsOfCars, assetObjectId))
-        }
-        if (amountAssetsOfPedestrians > 0) {
-            assetObjectId = 8
-            console.log("RANDOM PEDESTRIAN ASSET: ", placeAssetOnRandomElement(amountAssetsOfPedestrians, assetObjectId))
-        }
-    }
-    // send all changed elements via stomp broker to backend and other clients
-    for (let ele of changedElements) {
-        updateMessage(ele)
-    }
-}
-
 function placeRandomPedestrians(amount: number) {
     let counter = 0;
     const pedestrianAmount = 10;
     const firstPedestrianId = 8
     while(counter < amount) {
         let randomPedestrianObjectTypeId = Math.floor(Math.random() * pedestrianAmount + firstPedestrianId) // different objectTypeIds due to different pedestrian models
-        placeAllRandomAssets(1, randomPedestrianObjectTypeId);
+        placeAssetOnRandomElement(1, randomPedestrianObjectTypeId);
         counter++;
     }
 }
@@ -355,7 +331,6 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
     if (assetObjectTypeId === 7) {
         randomPosElements = getRandomSpawnsCar(element)
     }
-    // Todo, add function for random spawnpoints for pedestrians
     // if (7 < assetId < 18), then asset = pedestrian
     else if (assetObjectTypeId > 7 && assetObjectTypeId < 18) {
         randomPosElements = getRandomSpawnsPedestrian(element)
