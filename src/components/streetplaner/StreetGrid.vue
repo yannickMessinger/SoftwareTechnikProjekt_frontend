@@ -313,8 +313,8 @@ function onClick(cell: any, e: any) {
             if (e.target.classList.contains("asset-img")) {
                 return
             }
-            // only place asset if it's placed on a road
-            if (currCellContent.groupId === 0) {
+            // only place asset if it's placed on a straight road
+            if (currCellContent.objectTypeId === 0) {
                 let rect = e.target.getBoundingClientRect()
                 let x = (e.clientX - rect.left) / gridSize.size
                 let y = (e.clientY - rect.top) / gridSize.size
