@@ -166,14 +166,14 @@ async function getActiveLobbyOfPlayerDB() {
         })
 
         if (!response.ok) {
-            console.log("error in fetching lobbylist")
+            console.log("error in getting active Lobby Id")
             throw new Error(response.statusText)
         }
 
         const jsondata: IGetPlayerWALResponseDTO = await response.json()
         activeLobbyId = jsondata.activeLobbyId
     } catch (error) {
-        console.log(" error in updateLobbyList")
+        console.log(" error in getting active Lobby ID")
     }
     if (activeLobbyId != -1) {
         const url2 = "/api/lobby/" + activeLobbyId
@@ -183,7 +183,7 @@ async function getActiveLobbyOfPlayerDB() {
             })
 
             if (!response.ok) {
-                console.log("error in fetching lobbylist")
+                console.log("error in getting Lobby Data with active Lobby ID")
                 throw new Error(response.statusText)
             }
 
@@ -198,7 +198,7 @@ async function getActiveLobbyOfPlayerDB() {
             }
             setActiveLobby(lobbydata)
         } catch (error) {
-            console.log(" error in updateLobbyList")
+            console.log(" error in getting Lobby Data with active Lobby ID")
         }
     }
 }
