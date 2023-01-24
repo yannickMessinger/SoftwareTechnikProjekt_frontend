@@ -52,7 +52,7 @@ export class NpcCar {
         this.curMapObjCenterCoords = reactive({ centerX: 0, centerZ: 0 })
 
         this.curMapObj = reactive({
-            objectId: -1,
+            objectId: curMapObj.objectId,
             objectTypeId: curMapObj.objectTypeId,
             x: curMapObj.x,
             y: curMapObj.y,

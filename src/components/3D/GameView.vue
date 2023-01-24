@@ -137,6 +137,11 @@ export default defineComponent({
                     }
                 })
             }, 500)
+
+            /*
+            setInterval(() => {
+                console.log(sceneRef.value.scene)
+            },1000)*/
         })
 
         return {

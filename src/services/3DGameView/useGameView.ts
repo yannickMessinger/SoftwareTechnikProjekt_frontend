@@ -3,6 +3,7 @@ import { NpcCar } from "../../components/3D/NpcCar"
 import { IMapObject } from "../streetplaner/IMapObject"
 import useUser from "../UserStore"
 import { Client } from "@stomp/stompjs"
+import useCrossroadData from "./useCrossroadData"
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/npc"
@@ -12,6 +13,7 @@ const INIT_NEXT_MAP_ELE_MSG = "/app/npc.initpos"
 let stompClient: Client
 
 const { activeLobby } = useUser()
+const { crossroadMap } = useCrossroadData()
 
 const mapWidth = ref()
 const mapHeight = ref()
@@ -308,6 +310,33 @@ async function onMessageReceived(payload: IStompMessage) {
             updateNpcCar!.calculateCurve()
         } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 2) {
             updateNpcCar!.calculateIntersection()
+            let rotationOfSearchedTrafficLight = -1
+            //check Traffic light statussssssss etwas zu knapp,
+            //besser bei nextMapObj abfrageN??
+            if (updateNpcCar!.lastCarRotation === 0) {
+                //get trafficlight with rotation 2
+                rotationOfSearchedTrafficLight = 2
+                //check trafficlight status
+            } else if (updateNpcCar!.lastCarRotation === 1) {
+                //get traffic light with rot 3
+                rotationOfSearchedTrafficLight = 3
+                //check trafficlight status
+            } else if (updateNpcCar!.lastCarRotation === 2) {
+                //get traffic light with rot 0
+                rotationOfSearchedTrafficLight = 0
+            } else if (updateNpcCar!.lastCarRotation === 3) {
+                //get traffic light with rot 1
+                rotationOfSearchedTrafficLight = 1
+            }
+            console.log("AMPEL")
+            console.log(`Ampel mit Rot: ${rotationOfSearchedTrafficLight} muss abgefragt werden`)
+            console.log(
+                Array.from(crossroadMap.get(updateNpcCar!.curMapObj.objectId)!.trafficLights.values())[
+                    rotationOfSearchedTrafficLight
+                ]
+            )
+
+            //check status of this traffic light!
         }
 
         updateNpcCar!.driving = true
