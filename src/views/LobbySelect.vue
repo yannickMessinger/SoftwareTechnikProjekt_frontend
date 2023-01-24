@@ -2,7 +2,7 @@
     <Header text="World of eMobility" :displayHomebutton="true"></Header>
     <div class="container">
         <div class="content">
-            <MyMaps :liste="mapsList.mapslist"></MyMaps>
+            <MyMaps :liste="mapsList.mapslist" v-bind:popupTrigger="false"></MyMaps>
         </div>
         <div class="content">
             <div>
@@ -22,7 +22,7 @@ import MyMaps from "../components/Lobby/MyMaps.vue"
 import { onMounted } from "vue"
 
 const { lobbyList, updateLobbyList } = useLobbyList()
-const { mapsList } = useMyMaps()
+const { mapsList, updateMapsList } = useMyMaps()
 
 onMounted(async () => {
     await updateLobbyList()

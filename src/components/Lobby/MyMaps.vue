@@ -98,12 +98,13 @@
     import type { ICardElement } from "../../services/Lobby/ICardElement"
     import useEventBus from "../../services/eventBus"
     import router from "../../router/router"
+    import { IMapDTO } from "../../typings/IMapDTO"
 
 
-    const props = defineProps({
+    const props = defineProps<{
+        liste: Readonly<IMapDTO[]>
         popupTrigger : Boolean
-
-    })
+    }>()
     
     
 
@@ -132,19 +133,6 @@
     const TogglePopup = () => {
     popupTrigger.value = !popupTrigger.value
     }
-
-    function togglePopup() {
-        if(popupTrigger.value){
-            popupTrigger.value = false
-        }else {
-            popupTrigger.value = true
-        }
-    }
-
-    function addNewCardClickAction() {
-    //TODO Add call popup here #282 und console.log entfernen
-    console.log("Karte hinzufuegen geklickt, popup fehlt noch")
-}
 
 /**Card List Data Import from Backend or load default list */
 if (backendOfflineDebugMode) {

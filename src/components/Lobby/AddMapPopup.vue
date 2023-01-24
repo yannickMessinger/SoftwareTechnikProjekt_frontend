@@ -15,7 +15,7 @@
                     display="Karte hinzufuegen"
                     :btn_click="
                         () => {
-                            createNewMap(1, 'NeueMap')
+                            createNewMap(1, 'NeueMap'), TogglePopup()
                         }"></BasicButton>
                     
                 <!--<BasicButton class="sec btn blue" display="SSchließen" :btn_click="TogglePopup()"></BasicButton>-->
