@@ -6,6 +6,7 @@ export class NpcCar {
     public positions: any
     public curMapObjCenterCoords: any
     public curMapObj: IMapObject
+    public nextMapObj: IMapObject
     public gridSizeX: number
     public gridSizeY: number
     public fieldSize: number
@@ -18,6 +19,7 @@ export class NpcCar {
     public curveStepSize: number
     public viewRotation: number
     public rotationMap: Map<number, number>
+    public velocity: number
 
     public curveRadius: number
     public curveCenterX: number
@@ -50,13 +52,23 @@ export class NpcCar {
         this.curMapObjCenterCoords = reactive({ centerX: 0, centerZ: 0 })
 
         this.curMapObj = reactive({
-            objectId: 0,
+            objectId: -1,
             objectTypeId: curMapObj.objectTypeId,
             x: curMapObj.x,
             y: curMapObj.y,
             rotation: curMapObj.rotation,
             game_assets: curMapObj.game_assets,
         })
+
+        this.nextMapObj = reactive({
+            objectId: -1,
+            objectTypeId: -1,
+            x: -1,
+            y: -1,
+            rotation: -1,
+            game_assets: [],
+        })
+        this.velocity = 0.05
 
         this.gridSizeX = gridSizeX
         this.gridSizeY = gridSizeY
@@ -65,7 +77,7 @@ export class NpcCar {
         this.gameAssetX = gameAssetX
         this.gameAssetZ = gameAssetZ
         this.driving = true
-        this.needsMapEleUpdate = false
+        this.needsMapEleUpdate = true
         this.lastCarRotation = this.positions.npcRotation
 
         this.viewRotation = this.rotationMap.get(this.positions.npcRotation) || 0
@@ -83,6 +95,15 @@ export class NpcCar {
         this.calcPixelPosNpc()
         this.calcNpcMapLimit()
 
+        /**
+         * WICHTIG: MAP ID IM BACKEND FÜR SCRIPT NOCH HARDCODED!!!
+         *
+         *
+         *
+         *
+         *
+         */
+
         /*
         if (this.curMapObj.objectTypeId === 1) {
             this.calculateCurve()
@@ -91,17 +112,15 @@ export class NpcCar {
 
     //driving
     drive() {
-        const velocity = 0.09
-
         if (this.curMapObj.objectTypeId === 0) {
-            this.driveStraight(velocity)
+            this.driveStraight(this.velocity)
         } else if (this.curMapObj.objectTypeId === 1) {
             this.driveCurve(0.025)
         } else if (this.curMapObj.objectTypeId === 2) {
             if (this.lastCarRotation === this.positions.npcRotation) {
-                this.driveStraight(velocity)
+                this.driveStraight(this.velocity)
             } else {
-                this.driveCurve(velocity)
+                this.driveCurve(this.velocity)
             }
         }
     }
@@ -151,14 +170,6 @@ export class NpcCar {
             this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
         this.curMapObjCenterCoords.centerZ =
             this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
-
-        /**
-         *  let mapEleCenterX = this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
-        let mapEleCenterZ = this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
-
-        this.curMapObjCenterCoords.centerX = mapEleCenterX
-        this.curMapObjCenterCoords.centerZ = mapEleCenterZ
-         */
     }
 
     calcPixelPosNpc(): void {
@@ -167,17 +178,6 @@ export class NpcCar {
 
         let originZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
         this.positions.npcPosZ = originZ + this.gameAssetZ * this.fieldSize
-
-        /**
-         *  let originX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-        let x = originX + this.gameAssetX * this.fieldSize
-
-        let originZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-        let z = originZ + this.gameAssetZ * this.fieldSize
-
-        this.positions.npcPosX = x
-        this.positions.npcPosZ = z
-         */
     }
 
     calcNpcMapLimit(): void {
@@ -190,21 +190,6 @@ export class NpcCar {
         } else if (this.positions.npcRotation === 3) {
             this.mapLimit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
         }
-
-        /*
-        let limit = 0
-
-        if (this.positions.npcRotation === 0) {
-            limit  = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-        } else if (this.positions.npcRotation === 1) {
-            limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-        } else if (this.positions.npcRotation === 2) {
-            limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
-        } else if (this.positions.npcRotation === 3) {
-            limit  = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-        }
-
-        this.mapLimit = limit*/
     }
 
     reachedMapEleLimit(): boolean | undefined {
@@ -212,36 +197,36 @@ export class NpcCar {
             if (this.positions.npcPosZ > this.mapLimit) {
                 return false
             } else {
-                this.driving = false
+                //this.driving = false
                 this.needsMapEleUpdate = true
-                console.log("fahre nicht 0")
+                //console.log("fahre nicht 0")
                 return true
             }
         } else if (this.positions.npcRotation === 1) {
             if (this.positions.npcPosX < this.mapLimit) {
                 return false
             } else {
-                this.driving = false
+                //this.driving = false
                 this.needsMapEleUpdate = true
-                console.log("fahre nicht 1")
+                //console.log("fahre nicht 1")
                 return true
             }
         } else if (this.positions.npcRotation === 2) {
             if (this.positions.npcPosZ < this.mapLimit) {
                 return false
             } else {
-                this.driving = false
+                //this.driving = false
                 this.needsMapEleUpdate = true
-                console.log("fahre nicht 2")
+                //console.log("fahre nicht 2")
                 return true
             }
         } else if (this.positions.npcRotation === 3) {
             if (this.positions.npcPosX > this.mapLimit) {
                 return false
             } else {
-                this.driving = false
+                //this.driving = false
                 this.needsMapEleUpdate = true
-                console.log("fahre nicht 3")
+                //console.log("fahre nicht 3")
                 return true
             }
         } else {

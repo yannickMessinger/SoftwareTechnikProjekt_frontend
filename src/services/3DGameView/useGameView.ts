@@ -7,6 +7,7 @@ import { Client } from "@stomp/stompjs"
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/npc"
 const UPDATE_POS_MSG = "/app/npc.updatepos"
+const INIT_NEXT_MAP_ELE_MSG = "/app/npc.initpos"
 
 let stompClient: Client
 
@@ -55,8 +56,8 @@ interface NpcInfo {
 interface NpcInfoResponseDTO {
     npcId: number
     newGameAssetRotation: number
-    //currentMapObject: IMapObject
     nextUpperMapObject: IMapObject
+    nextnextUpperMapObject: IMapObject
 }
 
 interface NpcInfoRequestDTO {
@@ -83,6 +84,7 @@ export function useGameView() {
         setGameStateMapId,
         updatePosMessage,
         receiveNpcUpdates,
+        initNpcNextMapEle,
     }
 }
 
@@ -231,12 +233,12 @@ function updatePosMessage(npcId: number) {
     console.log("sende Update pos anfrage an backend")
     if (stompClient) {
         let tempCar = gameState.npcCarMapFromuseGameview.get(npcId)!
+        console.log("vurUpdate", tempCar.nextMapObj)
         const updatePosMsg: IStompMessage = {
             npcInfoRequestDTO: {
                 npcId: tempCar!.npcId,
                 npcRotation: tempCar!.positions.npcRotation,
                 currentMapObject: tempCar!.curMapObj,
-                //nextUpperMapObject: tempCar!.nextMapObj,
             },
 
             type: "POSITION_UPDATE",
@@ -249,6 +251,28 @@ function updatePosMessage(npcId: number) {
         })
         //gameState.npcCarMapFromuseGameview.get(npcId)!.needsMapEleUpdate = false
         console.log(updatePosMsg)
+    }
+}
+
+function initNpcNextMapEle(npcId: number) {
+    console.log("fordere initial nächstes map ele an")
+    if (stompClient) {
+        let tempCar = gameState.npcCarMapFromuseGameview.get(npcId)!
+        const initNpcNextEleMsg: IStompMessage = {
+            npcInfoRequestDTO: {
+                npcId: tempCar!.npcId,
+                npcRotation: tempCar!.positions.npcRotation,
+                currentMapObject: tempCar!.curMapObj,
+            },
+
+            type: "INIT_NEXT_MAP_ELE",
+        }
+
+        stompClient.publish({
+            destination: INIT_NEXT_MAP_ELE_MSG,
+            headers: {},
+            body: JSON.stringify(initNpcNextEleMsg),
+        })
     }
 }
 
@@ -292,6 +316,7 @@ async function onMessageReceived(payload: IStompMessage) {
 
         updateNpcCar!.lastCarRotation = updateNpcCar!.positions.npcRotation
         updateNpcCar!.curMapObj = payload.npcInfoResponseDTO!.nextUpperMapObject
+        updateNpcCar!.nextMapObj = payload.npcInfoResponseDTO!.nextnextUpperMapObject
         updateNpcCar!.positions.npcRotation = payload.npcInfoResponseDTO!.newGameAssetRotation
 
         updateNpcCar!.calcMapEleCenter()
@@ -307,7 +332,7 @@ async function onMessageReceived(payload: IStompMessage) {
 
         updateNpcCar!.driving = true
         updateNpcCar!.needsMapEleUpdate = false
-    } else if (payload.type === "INIT_NEXT_POS") {
+    } else if (payload.type === "INIT_NEXT_MAP_ELE") {
         console.log(`initiales setzen des naechsten Map Eles für npc mit id:${payload.npcInfoResponseDTO!.npcId}`)
     }
 }

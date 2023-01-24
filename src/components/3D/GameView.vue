@@ -41,8 +41,8 @@ export default defineComponent({
             resetGameMapObjects,
             updateMapObjsFromGameState,
             updatePosMessage,
-
             receiveNpcUpdates,
+            initNpcNextMapEle,
         } = useGameView()
         const { loadTrafficLight } = useCrossroadData()
 
@@ -136,12 +136,7 @@ export default defineComponent({
                         updatePosMessage(ele.npcId)
                     }
                 })
-            }, 300)
-
-            /*
-            setInterval(() => {
-                console.log(sceneRef.value)
-            },1000)*/
+            }, 500)
         })
 
         return {
@@ -149,12 +144,10 @@ export default defineComponent({
             renderer,
             camera,
             box,
-
             sceneRef,
             moveableObject,
             calcCoordinateX,
             calcCoordinateZ,
-
             loadTrafficLight,
             buildingIDMap,
             mapElements,
