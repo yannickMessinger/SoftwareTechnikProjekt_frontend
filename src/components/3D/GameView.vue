@@ -21,6 +21,7 @@ import {
     ref,
     toRaw,
     getCurrentInstance,
+    watch,
 } from "vue"
 import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { MovmentInputController } from "../../models/MovementInputController"
@@ -255,13 +256,17 @@ export default defineComponent({
             })
         }
 
+        watch(
+            () => gameState.mapObjsFromBackEnd,
+            () => fillPlayerCarState()
+        )
+
         onMounted(() => {
             console.log(
                 `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
             )
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
-            fillPlayerCarState()
 
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
@@ -311,7 +316,10 @@ export default defineComponent({
 <template>
     <Renderer resize="window" ref="renderer">
         <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
-        <Box ref="box" :position="{ x: 0, y: 0, z: 0 }"></Box>
+        <Box
+            ref="box"
+            :position="{ x: playerCarList.get(uid)?.playerCarX, y: 0.75, z: playerCarList.get(uid)?.playerCarZ }"
+        ></Box>
         <Scene background="#87CEEB" ref="scene">
             <AmbientLight></AmbientLight>
             <Plane
@@ -346,6 +354,7 @@ export default defineComponent({
                 <!-- places all game assets of the current element-->
                 <div v-for="asset in ele.game_assets">
                     <GltfModel
+                        v-if="asset.userId === 0"
                         v-bind:src="buildingIDMap.get(22)"
                         :position="{
                             x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
