@@ -1,18 +1,19 @@
 <script setup lang="ts">
-// inspired from https://dev.to/garmideroman/the-simplest-way-to-deal-with-modal-dialogs-in-vue-3-59hl
-import { defineProps, defineEmits } from "vue"
+import { defineProps, defineEmits, ref, computed } from "vue"
 
-const props = defineProps(["question"])
 const emit = defineEmits(["confirm", "cancel"])
+const amountCars = ref(0)
+const maxAmountCars = 100
 </script>
 
 <template>
     <div class="modal-container">
         <div class="modal-body">
             <span class="modal-close" @click="emit('cancel')">🗙</span>
-            <h2 class="question">{{ question }}</h2>
+            <h2 class="question">Wie viele von welchen Fahrzeugen sollen platziert werden?</h2>
+            <p>Auto: <input type="number" :max="maxAmountCars" v-model="amountCars" /></p>
             <div class="modal-action">
-                <button class="modal-button" @click="emit('confirm')">Confirm</button>
+                <button class="modal-button" @click="emit('confirm', { car: amountCars })">Confirm</button>
                 <button class="modal-button" @click="emit('cancel')">Cancel</button>
             </div>
         </div>
