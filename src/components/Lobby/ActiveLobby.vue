@@ -25,7 +25,6 @@
         </div>
         <div class="LobbyClose">
             <div v-if="userId === activeLobby.hostId">
-                <!-- für Host lobby schließen für Client lobby verlassen anzeigen-->
                 <button class="red" @click="closeLobbyClicked()">Lobby Schließen</button>
             </div>
             <div v-else>
@@ -52,10 +51,11 @@
 import useUser from "../../services/UserStore"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import router from "../../router/router"
 
 const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
+const { receiveLobbyUpdates, joinMessage } = useLobbyList()
 const buildMode = ref(true)
 
 console.log("Pl-List")
@@ -96,13 +96,54 @@ function goDrive() {
 
 function closeLobbyClicked() {
     //TODO: Messaage to Backend that Host Closed the lobby (delete lobby, all lobbyuser return to lobby overview)
+    deletePlayerFromLobby()
+    setActiveLobby({
+        lobbyId: -1,
+        hostId: -1,
+        mapId: -1,
+        lobbyName: "",
+        numOfPlayers: 0,
+        lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+        playerList: [],
+    })
     router.push("/lobby")
 }
 
 function leaveLobbyClicked() {
-    //TODO: Message to Backend that player left the Lobby
+    deletePlayerFromLobby()
+    setActiveLobby({
+        lobbyId: -1,
+        hostId: -1,
+        mapId: -1,
+        lobbyName: "",
+        numOfPlayers: 0,
+        lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+        playerList: [],
+    })
     router.push("/lobby")
 }
+
+async function deletePlayerFromLobby() {
+    console.log(userId.value)
+    const url = "/api/lobby/get_players/" + activeLobby.value.lobbyId + "?player_id=" + userId.value
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+        })
+
+        if (!response.ok) {
+            console.log("error in remove player from Lobby I")
+            throw new Error(response.statusText)
+        }
+    } catch (error) {
+        console.log(" error in remove player from Lobby: " + error)
+    }
+}
+
+onMounted(() => {
+    //activate websockets connection to listen for incoming updates
+    receiveLobbyUpdates()
+})
 </script>
 
 <style scoped>

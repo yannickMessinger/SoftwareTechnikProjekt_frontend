@@ -67,8 +67,6 @@
                                         createNewLobby(lobbyNameInput, 0, lobbyModeInput)
 
                                         //fires JOINED event to backend to trigger persistence operations and inform other players on channel and update data
-                                        joinMessage()
-                                        router.push('/lobbyview')
                                     }
                                 "
                             />
