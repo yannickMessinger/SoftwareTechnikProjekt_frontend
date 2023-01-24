@@ -16,16 +16,11 @@
                 <b>Lobbyname: {{ activeLobby.lobbyName }}</b>
             </p>
             <p><b>Kartenname: Rüdigers Karte</b></p>
-            <div v-if="userId === activeLobby.hostId">
-                <p><b>Status: Host</b></p>
-            </div>
-            <div v-else>
-                <p><b>Status: Spieler</b></p>
-            </div>
+            <p v-if="userId === activeLobby.hostId"><b>Status: Host</b></p>
+            <p v-else><b>Status: Spieler</b></p>
         </div>
         <div class="LobbyClose">
             <div v-if="userId === activeLobby.hostId">
-                <!-- für Host lobby schließen für Client lobby verlassen anzeigen-->
                 <button class="red" @click="closeLobbyClicked()">Lobby Schließen</button>
             </div>
             <div v-else>
@@ -33,8 +28,8 @@
             </div>
         </div>
         <div class="PlayMode">
-            <p v-if="!buildMode"><b>Modus:</b> Fahrmodus</p>
-            <p v-if="buildMode"><b>Modus:</b> Baumodus</p>
+            <p v-if="activeLobby.lobbyModeEnum === E_LobbyMode.PLAY_MODE"><b>Modus:</b> Fahrmodus</p>
+            <p v-else><b>Modus:</b> Baumodus</p>
         </div>
         <div class="SwitchMode">
             <div v-if="userId === activeLobby.hostId">
@@ -42,8 +37,10 @@
             </div>
         </div>
         <div class="Button2">
-            <button class="green" v-if="buildMode" @click="goBuild()">zur Bauansicht</button>
-            <button class="green" v-if="!buildMode" @click="goDrive()">zur Fahransicht</button>
+            <button class="green" v-if="activeLobby.lobbyModeEnum === E_LobbyMode.PLAY_MODE" @click="goDrive()">
+                zur Fahransicht
+            </button>
+            <button class="green" v-else @click="goBuild()">zur Bauansicht</button>
         </div>
     </div>
 </template>
@@ -52,35 +49,24 @@
 import useUser from "../../services/UserStore"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import router from "../../router/router"
 
-const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
-const buildMode = ref(true)
+const { userId, activeLobby, setActiveLobby } = useUser()
+const { receiveLobbyUpdates } = useLobbyList()
 
 console.log("Pl-List")
 console.log(activeLobby.value.playerList)
 
-//Methods to switch Lobbymode
-function setActiveLobbyToBuildMode() {
-    activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE
-    useLobbyList().changeLobbyModeMessage()
-}
-
-function setActiveLobbyToPlayMode() {
-    activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE
-    useLobbyList().changeLobbyModeMessage()
-}
-
 let gameId = ref(20) //TODO: gameId must refers to the id in the backend
 
 function changeGamemode() {
-    if (buildMode.value) {
-        buildMode.value = false
-        setActiveLobbyToPlayMode()
+    if (activeLobby.value.lobbyModeEnum == E_LobbyMode.PLAY_MODE) {
+        activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE
+        useLobbyList().changeLobbyModeMessage()
     } else {
-        buildMode.value = true
-        setActiveLobbyToBuildMode()
+        activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE
+        useLobbyList().changeLobbyModeMessage()
     }
 }
 
@@ -96,13 +82,54 @@ function goDrive() {
 
 function closeLobbyClicked() {
     //TODO: Messaage to Backend that Host Closed the lobby (delete lobby, all lobbyuser return to lobby overview)
+    deletePlayerFromLobby()
+    setActiveLobby({
+        lobbyId: -1,
+        hostId: -1,
+        mapId: -1,
+        lobbyName: "",
+        numOfPlayers: 0,
+        lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+        playerList: [],
+    })
     router.push("/lobby")
 }
 
 function leaveLobbyClicked() {
-    //TODO: Message to Backend that player left the Lobby
+    deletePlayerFromLobby()
+    setActiveLobby({
+        lobbyId: -1,
+        hostId: -1,
+        mapId: -1,
+        lobbyName: "",
+        numOfPlayers: 0,
+        lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+        playerList: [],
+    })
     router.push("/lobby")
 }
+
+async function deletePlayerFromLobby() {
+    console.log(userId.value)
+    const url = "/api/lobby/get_players/" + activeLobby.value.lobbyId + "?player_id=" + userId.value
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+        })
+
+        if (!response.ok) {
+            console.log("error in remove player from Lobby I")
+            throw new Error(response.statusText)
+        }
+    } catch (error) {
+        console.log(" error in remove player from Lobby: " + error)
+    }
+}
+
+onMounted(() => {
+    //activate websockets connection to listen for incoming updates
+    receiveLobbyUpdates()
+})
 </script>
 
 <style scoped>

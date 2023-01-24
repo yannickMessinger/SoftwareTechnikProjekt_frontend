@@ -13,6 +13,7 @@ import { Client } from "@stomp/stompjs"
 import { fetchPlayerList } from "./usePlayerList"
 import IUser from "../typings/IUser"
 import { resolve } from "path"
+import router from "../router/router"
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/lobby"
@@ -98,6 +99,8 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
         }
         setActiveLobby(lobby)
         postActiveLobby(lobby)
+        joinMessage()
+        router.push("/lobbyview")
     } catch (error) {
         console.log(error)
         return -1
