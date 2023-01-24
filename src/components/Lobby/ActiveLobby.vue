@@ -16,12 +16,8 @@
                 <b>Lobbyname: {{ activeLobby.lobbyName }}</b>
             </p>
             <p><b>Kartenname: Rüdigers Karte</b></p>
-            <div v-if="userId === activeLobby.hostId">
-                <p><b>Status: Host</b></p>
-            </div>
-            <div v-else>
-                <p><b>Status: Spieler</b></p>
-            </div>
+            <p v-if="userId === activeLobby.hostId"><b>Status: Host</b></p>
+            <p v-else><b>Status: Spieler</b></p>
         </div>
         <div class="LobbyClose">
             <div v-if="userId === activeLobby.hostId">
@@ -32,8 +28,8 @@
             </div>
         </div>
         <div class="PlayMode">
-            <p v-if="!buildMode"><b>Modus:</b> Fahrmodus</p>
-            <p v-if="buildMode"><b>Modus:</b> Baumodus</p>
+            <p v-if="activeLobby.lobbyModeEnum === E_LobbyMode.PLAY_MODE"><b>Modus:</b> Fahrmodus</p>
+            <p v-else><b>Modus:</b> Baumodus</p>
         </div>
         <div class="SwitchMode">
             <div v-if="userId === activeLobby.hostId">
@@ -41,8 +37,10 @@
             </div>
         </div>
         <div class="Button2">
-            <button class="green" v-if="buildMode" @click="goBuild()">zur Bauansicht</button>
-            <button class="green" v-if="!buildMode" @click="goDrive()">zur Fahransicht</button>
+            <button class="green" v-if="activeLobby.lobbyModeEnum === E_LobbyMode.PLAY_MODE" @click="goDrive()">
+                zur Fahransicht
+            </button>
+            <button class="green" v-else @click="goBuild()">zur Bauansicht</button>
         </div>
     </div>
 </template>
@@ -54,33 +52,21 @@ import { useLobbyList } from "../../services/useLobbyList"
 import { onMounted, ref } from "vue"
 import router from "../../router/router"
 
-const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
-const { receiveLobbyUpdates, joinMessage } = useLobbyList()
-const buildMode = ref(true)
+const { userId, activeLobby, setActiveLobby } = useUser()
+const { receiveLobbyUpdates } = useLobbyList()
 
 console.log("Pl-List")
 console.log(activeLobby.value.playerList)
 
-//Methods to switch Lobbymode
-function setActiveLobbyToBuildMode() {
-    activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE
-    useLobbyList().changeLobbyModeMessage()
-}
-
-function setActiveLobbyToPlayMode() {
-    activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE
-    useLobbyList().changeLobbyModeMessage()
-}
-
 let gameId = ref(20) //TODO: gameId must refers to the id in the backend
 
 function changeGamemode() {
-    if (buildMode.value) {
-        buildMode.value = false
-        setActiveLobbyToPlayMode()
+    if (activeLobby.value.lobbyModeEnum == E_LobbyMode.PLAY_MODE) {
+        activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE
+        useLobbyList().changeLobbyModeMessage()
     } else {
-        buildMode.value = true
-        setActiveLobbyToBuildMode()
+        activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE
+        useLobbyList().changeLobbyModeMessage()
     }
 }
 
