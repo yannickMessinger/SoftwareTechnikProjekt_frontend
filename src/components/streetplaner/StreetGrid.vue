@@ -81,6 +81,7 @@ watch(
     (val) => {
         if (val) {
             validateStreetGrid()
+            validateCarPosition()
         }
     }
 )
@@ -123,8 +124,20 @@ onMounted(() => {
     updateMap()
 })
 
+function validateCarPosition() {
+    for (let block of editorState.mapObjects) {
+        if (blockList[block.objectTypeId].type !== "STREET") {
+            if (block.game_assets.length > 0) {
+                for (let gameAsset of block.game_assets) {
+                    gameAsset.isValid = false
+                }
+            }
+        }
+    }
+}
+
 function validateStreetGrid() {
-    let streetElements = editorState.mapObjects.filter((ele) => blockList[ele.objectTypeId].groupId === 0)
+    let streetElements = editorState.mapObjects.filter((ele) => blockList[ele.objectTypeId].type === "STREET")
     console.log(streetElements)
     for (let streetEle of streetElements) {
         if (streetEle.objectTypeId === straightObjTypeId || streetEle.objectTypeId === pedestrianCrossingObjTypeId) {
@@ -488,6 +501,7 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
                     y: randomPosElements[randomPos].y,
                     rotation: randomPosElements[randomPos].rotation,
                     texture: blockList[assetObjectTypeId].texture,
+                    isValid: true,
                 })
                 return true
             }
@@ -500,6 +514,7 @@ function placeRandomCarOnElement(element: IMapObject, assetObjectTypeId: number)
             y: randomPosElements[randomPos].y,
             rotation: randomPosElements[randomPos].rotation,
             texture: blockList[assetObjectTypeId].texture,
+            isValid: true,
         })
         return true
     }
@@ -546,7 +561,7 @@ function onClick(cell: any, e: any) {
                 return
             }
             // only place asset if it's placed on a road
-            if (currCellContent.groupId === 0) {
+            if (blockList[currCellContent.objectTypeId].type === "STREET") {
                 let rect = e.target.getBoundingClientRect()
                 let x = (e.clientX - rect.left) / gridSize.size
                 let y = (e.clientY - rect.top) / gridSize.size
@@ -565,6 +580,7 @@ function onClick(cell: any, e: any) {
                     y: y,
                     rotation: toolState.block.rotation,
                     texture: toolState.block.texture,
+                    isValid: true,
                 })
                 payload = {
                     objectTypeId: currCellContent.objectTypeId,
@@ -613,6 +629,7 @@ function onClick(cell: any, e: any) {
         streetGrid[cell.posX][cell.posY].texture = ""
         deleteMessage(payload)
     }
+    console.log(editorState.mapObjects)
 }
 
 // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
@@ -685,6 +702,9 @@ function saveStreetGrid() {
 function loadStreetGrid(dto: StreetGridDTO) {
     fillGridEmpty()
     for (let ele of dto.mapObjects) {
+        ele.game_assets.forEach((gameAsset) => {
+            gameAsset.isValid = true
+        })
         streetGrid[ele.x][ele.y] = {
             objectTypeId: ele.objectTypeId,
             groupId: blockList[ele.objectTypeId].groupId,
@@ -783,6 +803,19 @@ window.addEventListener(
             />
             <div v-for="asset in ele.game_assets">
                 <img
+                    v-if="!asset.isValid"
+                    :src="asset.texture"
+                    class="no-drag asset-img"
+                    draggable="false"
+                    :style="{
+                        transform: 'rotate(' + asset.rotation * 90 + 'deg)',
+                        left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
+                        top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
+                        backgroundColor: 'red',
+                    }"
+                />
+                <img
+                    v-if="asset.isValid"
                     :src="asset.texture"
                     class="no-drag asset-img"
                     draggable="false"

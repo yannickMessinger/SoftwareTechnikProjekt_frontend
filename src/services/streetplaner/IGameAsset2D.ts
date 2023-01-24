@@ -4,4 +4,5 @@ export interface IGameAsset2D {
     y: number
     rotation: number
     texture: string
+    isValid: boolean
 }
