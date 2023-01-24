@@ -20,7 +20,7 @@ const SWITCHMODE_MSG = "/app/lobby.switchMode"
 const JOIN_MSG = "/app/lobby.join"
 
 let stompClient: Client
-const { user, userId, activeLobby, setActiveLobby } = useUser()
+const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
 
 interface IStompMessage {
     playerContent: IUser
@@ -97,6 +97,7 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
             lobbyModeEnum: addLobbyMode,
         }
         setActiveLobby(lobby)
+        postActiveLobby(lobby)
     } catch (error) {
         console.log(error)
         return -1

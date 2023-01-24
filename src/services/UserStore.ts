@@ -3,7 +3,9 @@ import IUser from "../typings/IUser"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { ILobby } from "../typings/ILobby"
 import { ILoginStateDTO } from "../typings/ILoginStateDTO"
+import { IGetPlayerWALResponseDTO } from "../typings/IGetPlayerWALResponseDTO"
 import router from "../router/router"
+import { ILobbyDTO } from "../typings/ILobbyDTO"
 
 let reloginTried = false
 
@@ -29,7 +31,12 @@ async function retrieveUserFromLocalStorage() {
         const data = JSON.parse(userString)
         const loginResponse = await login(data.username, data.password)
         if (loginResponse?.hasOwnProperty("userId") && loginResponse?.hasOwnProperty("userName")) {
-            router.push("/")
+            await getActiveLobbyOfPlayerDB()
+            if (state.activeLobby.lobbyId != -1) {
+                router.push("/lobbyview")
+            } else {
+                router.push("/lobby")
+            }
         }
     }
 }
@@ -150,6 +157,52 @@ async function postActiveLobby(lobby: ILobby) {
     console.log("setActiveLobby() -> post player to lobby - response", response)
 }
 
+async function getActiveLobbyOfPlayerDB() {
+    const url = "/api/player/wal/" + state.userId
+    var activeLobbyId = -1
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            console.log("error in fetching lobbylist")
+            throw new Error(response.statusText)
+        }
+
+        const jsondata: IGetPlayerWALResponseDTO = await response.json()
+        activeLobbyId = jsondata.activeLobbyId
+    } catch (error) {
+        console.log(" error in updateLobbyList")
+    }
+    if (activeLobbyId != -1) {
+        const url2 = "/api/lobby/" + activeLobbyId
+        try {
+            const response = await fetch(url2, {
+                method: "GET",
+            })
+
+            if (!response.ok) {
+                console.log("error in fetching lobbylist")
+                throw new Error(response.statusText)
+            }
+
+            const jsondata: ILobbyDTO = await response.json()
+            const lobbydata: ILobby = {
+                lobbyId: jsondata.lobbyId,
+                hostId: jsondata.hostId,
+                mapId: jsondata.mapId,
+                lobbyName: jsondata.lobbyName,
+                numOfPlayers: jsondata.numOfPlayers,
+                lobbyModeEnum: jsondata.lobbyModeEnum,
+            }
+            setActiveLobby(lobbydata)
+        } catch (error) {
+            console.log(" error in updateLobbyList")
+        }
+    }
+}
+
 export default function useUser() {
     if (!state.loggedIn && !reloginTried) {
         reloginTried = true
@@ -170,5 +223,6 @@ export default function useUser() {
         register,
         logout,
         updateActiveLobbyPlayerList,
+        postActiveLobby,
     }
 }
