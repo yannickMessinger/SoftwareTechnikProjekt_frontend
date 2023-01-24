@@ -293,26 +293,17 @@ async function onMessageReceived(payload: IStompMessage) {
         updateNpcCar!.lastCarRotation = updateNpcCar!.positions.npcRotation
         updateNpcCar!.curMapObj = payload.npcInfoResponseDTO!.nextUpperMapObject
         updateNpcCar!.positions.npcRotation = payload.npcInfoResponseDTO!.newGameAssetRotation
-        //updateNpcCar!.nextMapObj = payload.nextMapEleInfo.nextUpperMapObject
 
         updateNpcCar!.calcMapEleCenter()
         updateNpcCar!.calcNpcMapLimit()
 
-        if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 1) {
+        if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 0) {
+            updateNpcCar!.viewRotation = updateNpcCar!.rotationMap.get(updateNpcCar!.positions.npcRotation)!
+        } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 1) {
             updateNpcCar!.calculateCurve()
         } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 2) {
-            console.log("muss intersection mache")
             updateNpcCar!.calculateIntersection()
         }
-
-        /*
-        if(updateNpcCar!.lastCarRotation !== payload.npcInfoResponseDTO!.newGameAssetRotation){
-            updateNpcCar!.calculateCurve()
-        }*/
-
-        console.log(
-            `pixelpos nach UPDATE npc: x:${updateNpcCar!.positions.npcPosX} z:${updateNpcCar!.positions.npcPosZ}`
-        )
 
         updateNpcCar!.driving = true
         updateNpcCar!.needsMapEleUpdate = false

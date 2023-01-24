@@ -137,6 +137,11 @@ export default defineComponent({
                     }
                 })
             }, 300)
+
+            /*
+            setInterval(() => {
+                console.log(sceneRef.value)
+            },1000)*/
         })
 
         return {
@@ -189,6 +194,7 @@ export default defineComponent({
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
+                    :props="{ name: ele.objectId }"
                     v-on:load="
                         ele.objectTypeId === 2
                             ? loadTrafficLight(
@@ -217,6 +223,7 @@ export default defineComponent({
                         y: asset[1].viewRotation,
                         z: 0,
                     }"
+                    :props="{ name: 22 }"
                 />
             </div>
         </Scene>

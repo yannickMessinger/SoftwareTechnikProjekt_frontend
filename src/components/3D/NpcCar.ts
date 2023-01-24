@@ -50,6 +50,7 @@ export class NpcCar {
         this.curMapObjCenterCoords = reactive({ centerX: 0, centerZ: 0 })
 
         this.curMapObj = reactive({
+            objectId: 0,
             objectTypeId: curMapObj.objectTypeId,
             x: curMapObj.x,
             y: curMapObj.y,
@@ -82,14 +83,15 @@ export class NpcCar {
         this.calcPixelPosNpc()
         this.calcNpcMapLimit()
 
+        /*
         if (this.curMapObj.objectTypeId === 1) {
             this.calculateCurve()
-        }
+        }*/
     }
 
     //driving
     drive() {
-        const velocity = 0.15
+        const velocity = 0.09
 
         if (this.curMapObj.objectTypeId === 0) {
             this.driveStraight(velocity)
@@ -99,7 +101,7 @@ export class NpcCar {
             if (this.lastCarRotation === this.positions.npcRotation) {
                 this.driveStraight(velocity)
             } else {
-                this.driveCurve(0.025)
+                this.driveCurve(velocity)
             }
         }
     }
@@ -149,6 +151,14 @@ export class NpcCar {
             this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
         this.curMapObjCenterCoords.centerZ =
             this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
+
+        /**
+         *  let mapEleCenterX = this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
+        let mapEleCenterZ = this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
+
+        this.curMapObjCenterCoords.centerX = mapEleCenterX
+        this.curMapObjCenterCoords.centerZ = mapEleCenterZ
+         */
     }
 
     calcPixelPosNpc(): void {
@@ -157,6 +167,17 @@ export class NpcCar {
 
         let originZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
         this.positions.npcPosZ = originZ + this.gameAssetZ * this.fieldSize
+
+        /**
+         *  let originX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+        let x = originX + this.gameAssetX * this.fieldSize
+
+        let originZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+        let z = originZ + this.gameAssetZ * this.fieldSize
+
+        this.positions.npcPosX = x
+        this.positions.npcPosZ = z
+         */
     }
 
     calcNpcMapLimit(): void {
@@ -169,6 +190,21 @@ export class NpcCar {
         } else if (this.positions.npcRotation === 3) {
             this.mapLimit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
         }
+
+        /*
+        let limit = 0
+
+        if (this.positions.npcRotation === 0) {
+            limit  = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+        } else if (this.positions.npcRotation === 1) {
+            limit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+        } else if (this.positions.npcRotation === 2) {
+            limit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+        } else if (this.positions.npcRotation === 3) {
+            limit  = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+        }
+
+        this.mapLimit = limit*/
     }
 
     reachedMapEleLimit(): boolean | undefined {
