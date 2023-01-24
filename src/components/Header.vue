@@ -23,7 +23,8 @@
                 display=""
                 :btn_click="
                     () => {
-                        router.push('/')
+                        if (logindata.activeLobby.lobbyId == -1) router.push('/lobby')
+                        else router.push('/lobbyview')
                     }
                 "
             />
