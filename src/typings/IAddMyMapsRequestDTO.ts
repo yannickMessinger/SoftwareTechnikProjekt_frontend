@@ -3,5 +3,5 @@
 export interface IAddMyMapsRequestDTO {
     userId: number
     lobbyName: string
-    date: Date
+    date: string
 }

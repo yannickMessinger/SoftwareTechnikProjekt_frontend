@@ -9,7 +9,16 @@
                 <input type="text" name="map_name" placeholder="Kartenname eingeben"/>
             </div>
             <div class="flex-items">
-                <button class="green">Karte hinzufügen</button>
+                <!--<button class="green">Karte hinzufügen</button>-->
+                <BasicButton
+                    class="sec btn blue"
+                    display="Karte hinzufuegen"
+                    :btn_click="
+                        () => {
+                            createNewMap(1, 'NeueMap')
+                        }"></BasicButton>
+                    
+                <!--<BasicButton class="sec btn blue" display="SSchließen" :btn_click="TogglePopup()"></BasicButton>-->
                 <button @click="TogglePopup()">schließen</button>
             </div>
         </div>
@@ -20,6 +29,17 @@
     export default {
         props:['TogglePopup']
     }
+</script>
+
+<script setup lang="ts">
+import { createNewMap } from '../../services/useMyMaps';
+import BasicButton from '../Buttons/BasicButton.vue';
+import useUser from "../../services/UserStore"
+
+const { userId } = useUser()
+
+const userID = userId;
+
 </script>
 
 <style scoped>

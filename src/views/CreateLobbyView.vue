@@ -123,7 +123,7 @@ function setBuildMode() {
 }
 
 function addMap() {
-    mapList.push({ name: addNewMapInput.value, datum: "test" })
+    mapList.push({userId: 1, lobbyName: "addNewMapInput.value", date: "test" })
     showAddNewMap.value = false
     addNewMapInput.value = ""
     mapSelect.value = ""
