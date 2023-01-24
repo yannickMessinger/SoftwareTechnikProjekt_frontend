@@ -1,22 +1,33 @@
 <template>
+    <!--div class="headline">
+        <h2>Meine Karten</h2>
+    </div>
+    <div class="mapsList">
+        <table>
+            <tbody>
+                <MyMapsListItem :map="ele" v-for="ele in liste"></MyMapsListItem>
+            </tbody>
+        </table>
+    </div -->
+
     <div id="ownCardsContainer">
         <div class="headline">
             <h2>Meine Karten</h2>
         </div>
-        <div class="container" id="cardListContainer">
+        <div id="cardListContainer">
             <table id="cardList" class="cardBasic">
                 <tr>
                     <th>
-                        <h6>Kartenname</h6>
+                        <h6 class="headline">Kartenname</h6>
                     </th>
                     <th>
-                        <h6>Erstelldatum</h6>
+                        <h6 class="headline">Erstelldatum</h6>
                     </th>
                     <th>
-                        <h6>Lobby starten</h6>
+                        <h6 class="headline">Lobby starten</h6>
                     </th>
                     <th>
-                        <h6>Karte loeschen</h6>
+                        <h6 class="headline">Karte loeschen</h6>
                     </th>
                 </tr>
                 <tr v-for="card in cardList" track-by="id" v-if="!isEmpty" id="cardListItem">
@@ -24,6 +35,7 @@
                         <p class="textfield" id="CardNameTag">
                             {{ card.name }}
                         </p>
+                        <!-- laenge beschränken?-->
                     </td>
                     <td v-if="card !== null">
                         <p class="textfield" id="CardDateTag">
@@ -31,23 +43,28 @@
                         </p>
                     </td>
                     <td v-if="card !== null">
-                        <div v-if="activeLobby.lobbyId === -1">
-                            <button id="startLobbyButton" @click="createLobbyAction(card)">Lobby erstellen</button>
-                        </div>
-                        <div v-else>
-                            <p v-if="card.id == activeLobby.mapId" class="greenButtonLabel">aktuelle Karte</p>
-                            <button v-else id="startLobbyButton" @click="changeMapAction(card)">
-                                zu Karte wechseln
-                            </button>
-                        </div>
+                        <button v-if="!isLobbyOpen" id="startLobbyButton" @click="cardClickedLobbyAction(card)">
+                            Lobby erstellen
+                        </button>
+                        <button
+                            :disabled="!isHost"
+                            v-if="isLobbyOpen && !(card.id == selectedCard.card.id)"
+                            id="startLobbyButton"
+                            @click="cardClickedLobbyAction(card)"
+                        >
+                            Karte wechseln
+                        </button>
+                        <button
+                            :disabled="!isHost"
+                            v-if="isLobbyOpen && card.id == selectedCard.card.id"
+                            id="startLobbyButton"
+                            @click="cardClickedLobbyAction(card)"
+                        >
+                            Lobby schließen
+                        </button>
                     </td>
                     <td v-if="card !== null">
-                        <button
-                            :disabled="card.id == activeLobby.mapId"
-                            class="deleteButton"
-                            id="deleteCardButton"
-                            @click="cardClickedDeleteAction(card)"
-                        >
+                        <button class="deleteButton" id="deleteCardButton" @click="cardClickedDeleteAction(card)">
                             X
                         </button>
                     </td>
@@ -58,7 +75,6 @@
                     </td>
                 </tr>
                 <tr>
-                    <td></td>
                     <td>
                         <button id="startLobbyButton" @click="() => TogglePopup()">Karte hinzufuegen</button>
                         <AddMapPopup v-if="popupTrigger" :TogglePopup="() => TogglePopup()">
@@ -76,19 +92,38 @@
 //import { IMyMapsListItem } from "../../typings/IMyMapsListitem"
 //import { useMyMaps } from "../../services/useMyMaps"
 
-import AddMapPopup from "./AddMapPopup.vue"
-/** Imports: */
-import { reactive, ref, defineEmits } from "vue"
-import type { ICardElement } from "../../services/Lobby/ICardElement"
-import router from "../../router/router"
-import useUser from "../../services/UserStore"
+    import AddMapPopup from "./AddMapPopup.vue"
+    /** Imports: */
+    import { reactive, watch, ref, defineEmits} from "vue"
+    import type { ICardElement } from "../../services/Lobby/ICardElement"
+    import useEventBus from "../../services/eventBus"
+    import router from "../../router/router"
 
-/** Variablen: */
-const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
-var backendOfflineDebugMode = true
-const isEmpty = ref(true)
-const numberOfOwnedCards = ref(0)
-const cardList: ICardElement[] = reactive(Array(numberOfOwnedCards.value).fill(null))
+
+    const props = defineProps({
+        popupTrigger : Boolean
+
+    })
+    
+    
+
+    /** Variablen: */
+    /** bus event */
+    var backendOfflineDebugMode = true
+    const { emit, bus } = useEventBus()
+    var defaultCard: ICardElement = {
+        id: -1,
+        name: "Keine Eintraege",
+        date: new Date("1997-06-07"),
+    }
+    const selectedCard = reactive({ card: defaultCard })
+    const isEmpty = ref(true)
+    const isLobbyOpen = ref(false)
+    const isHost = ref(false)
+    const numberOfOwnedCards = ref(0)
+    const cardList: ICardElement[] = reactive(
+        Array(numberOfOwnedCards.value).fill(null)
+    )
 
     
 
@@ -98,43 +133,67 @@ const cardList: ICardElement[] = reactive(Array(numberOfOwnedCards.value).fill(n
     popupTrigger.value = !popupTrigger.value
     }
 
+    function togglePopup() {
+        if(popupTrigger.value){
+            popupTrigger.value = false
+        }else {
+            popupTrigger.value = true
+        }
+    }
 
-
-    
+    function addNewCardClickAction() {
+    //TODO Add call popup here #282 und console.log entfernen
+    console.log("Karte hinzufuegen geklickt, popup fehlt noch")
+}
 
 /**Card List Data Import from Backend or load default list */
 if (backendOfflineDebugMode) {
     /**TODO Remove Debug Components */
     console.warn("Unable to reach Backend Server, insert default Maps")
     cardList[0] = { id: 0, name: "Testmap 1", date: new Date("1997-06-07") }
-    cardList[1] = { id: 3, name: "Testmap 2", date: new Date("1997-06-07") }
+    cardList[1] = { id: 1, name: "Testmap 2", date: new Date("1997-06-07") }
     cardList[2] = { id: 2, name: "Testmap 3", date: new Date("1997-06-07") }
     isEmpty.value = false
 } else {
     //TODO import list data from backend here (#229 connect backend)
 }
+//TODO Compile imported data into card Elements (#229 connect backend, #42 need card informations)
+
+watch(
+    () => bus.value.get("lobby-closed-event"),
+    (val) => {
+        if (isLobbyOpen.value) {
+            isLobbyOpen.value = false
+        }
+        if (isHost.value) {
+            isHost.value = false
+        }
+        selectedCard.card = defaultCard
+        /** backend communication from event emit?*/
+    }
+)
+
+watch(
+    () => bus.value.get("card-saved-event"),
+    (val) => {
+        selectedCard.card = val
+        var changedIndex = cardList.findIndex((cardElement) => cardElement.id == val.id)
+        cardList[changedIndex] = val
+        /** backend communication from event emit?*/
+    }
+)
 
 /** button functions: */
-function createLobbyAction(clickedCard: ICardElement) {
-    console.log("clicked")
-    activeLobby.value.mapId = clickedCard.id
-    console.log(activeLobby.value.mapId)
-    router.push("/create")
-}
-function changeMapAction(clickedCard: ICardElement) {
-    console.log("Pl-List")
-    console.log(activeLobby.value.playerList)
-    activeLobby.value.mapId = clickedCard.id
-}
 /** Lobby action button*/
-/** 
 function cardClickedLobbyAction(clickedCard: any) {
     if (clickedCard.id == selectedCard.card.id) {
         selectedCard.card = defaultCard
+        isHost.value = false
         isLobbyOpen.value = false
     } else {
         if (!isLobbyOpen.value) {
             selectedCard.card = clickedCard
+            isHost.value = true
             isLobbyOpen.value = true
             router.push("/create")
         } else {
@@ -145,38 +204,9 @@ function cardClickedLobbyAction(clickedCard: any) {
         //TODO inform backend that active map changed (#229 connect backend)
     }
 }
-*/
+
 /** delete button*/
 function cardClickedDeleteAction(clickedCard: any) {
-    var removedIndex = cardList.findIndex((cardElement) => cardElement.id == clickedCard.id)
-    var removedCard = null
-    switch (removedIndex) {
-        case 0:
-            /*delete list head (shift)*/
-            removedCard = cardList.shift()
-            break
-        case -1:
-            console.warn("-1: Deleted Item not found")
-            break
-        default:
-            /* delete list element (splice) */
-            removedCard = cardList.splice(removedIndex, removedIndex)
-    }
-    if (cardList.length == 0) {
-        isEmpty.value = true
-    }
-    if (!backendOfflineDebugMode) {
-        if (removedCard != null) {
-            console.log("Removed Item: " + clickedCard.id)
-            // TODO call delete option in Backend (#229 connect backend)
-        }
-    }
-}
-
-function addNewCardClickAction() {
-    //TODO Add call popup here #282 und console.log entfernen
-    console.log("Karte hinzufuegen geklickt, popup fehlt noch")
-}
     if (clickedCard.id == selectedCard.card.id) {
         /*TODO What if deleted card is active card? (#228) */
     } else {
@@ -226,27 +256,22 @@ const { mapsList } = useMyMaps()
         line-height: 20px;
         }
     */
-table,
-tr {
-    margin: auto;
-    border: 1px solid black;
-    border-collapse: collapse;
+table {
+    /*border: 4px solid black;*/
+    width: 100%;
     color: black;
 }
 
 th {
-    padding: 2%;
-    text-align: center;
+    height: 20px;
+    text-align: left;
     background-color: white;
-}
-
-tr {
-    padding: 2%;
+    display: fixed;
 }
 
 td {
-    padding: 2%;
-    text-align: center;
+    padding-bottom: 20px;
+    padding-left: 30px;
 }
 
 .headline {
@@ -272,7 +297,7 @@ button:hover {
 }
 
 .deleteButton {
-    background: var(--woe-red-50);
+    background: var(--woe-gray-50);
     border: none;
     border-radius: 8px;
     opacity: 1;
@@ -280,24 +305,6 @@ button:hover {
 
 .deleteButton:hover {
     background-color: var(--woe-red-70);
-}
-
-.greenButton {
-    background-color: var(--woe-green-60);
-}
-
-.greenButtonLabel {
-    background-color: var(--woe-green-60);
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 90%;
-    padding: 5px 23px;
-    color: white;
-}
-
-.greenButton:hover {
-    background-color: var(--woe-green-70);
 }
 
 .textfield {
@@ -312,8 +319,5 @@ button:hover {
     display: flex;
     flex-direction: column;
     overflow: auto;
-}
-.container {
-    padding: 5%;
 }
 </style>
