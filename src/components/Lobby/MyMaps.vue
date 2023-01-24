@@ -76,13 +76,17 @@
                 </tr>
                 <tr>
                     <td>
-                        <button id="startLobbyButton" @click="addNewCardClickAction()">Karte hinzufuegen</button>
+                        <button id="startLobbyButton" @click="() => TogglePopup()">Karte hinzufuegen</button>
+                        <AddMapPopup v-if="popupTrigger" :TogglePopup="() => TogglePopup()">
+                            <h2>Karte hinzufuegen</h2>
+                        </AddMapPopup>
                     </td>
                 </tr>
             </table>
         </div>
     </div>
 </template>
+
 
 <script setup lang="ts">
 //import { IMyMapsListItem } from "../../typings/IMyMapsListitem"
@@ -94,7 +98,7 @@
     import type { ICardElement } from "../../services/Lobby/ICardElement"
     import useEventBus from "../../services/eventBus"
     import router from "../../router/router"
-    
+
     /** Variablen: */
     /** bus event */
     var backendOfflineDebugMode = true
@@ -113,15 +117,26 @@
         Array(numberOfOwnedCards.value).fill(null)
     )
 
-    const buttonTrigger = ref(false);
+    
 
-    function TogglePopup() {
-        if(buttonTrigger.value){
-            buttonTrigger.value = false
+    const popupTrigger = ref(false);
+
+    const TogglePopup = () => {
+    popupTrigger.value = !popupTrigger.value
+    }
+
+    function togglePopup() {
+        if(popupTrigger.value){
+            popupTrigger.value = false
         }else {
-            buttonTrigger.value = true
+            popupTrigger.value = true
         }
     }
+
+    function addNewCardClickAction() {
+    //TODO Add call popup here #282 und console.log entfernen
+    console.log("Karte hinzufuegen geklickt, popup fehlt noch")
+}
 
 /**Card List Data Import from Backend or load default list */
 if (backendOfflineDebugMode) {
@@ -211,11 +226,6 @@ function cardClickedDeleteAction(clickedCard: any) {
             }
         }
     }
-}
-
-function addNewCardClickAction() {
-    //TODO Add call popup here #282 und console.log entfernen
-    console.log("Karte hinzufuegen geklickt, popup fehlt noch")
 }
 
 /**
