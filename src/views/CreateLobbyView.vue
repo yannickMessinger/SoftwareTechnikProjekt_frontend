@@ -5,7 +5,7 @@
     <div class="container">
         <div class="content">
             <div class="head">
-                <p><b>Lobby erstellen</b></p>
+                <h2>Lobby erstellen</h2>
             </div>
 
             <div class="formWrapper">
@@ -156,8 +156,8 @@ function switchMapSelect() {
 }
 
 .content {
-    border-radius: 15px;
-    border: 1px solid black;
+    border-radius: 8px;
+
     display: grid;
     grid-template-columns: 1fr 2fr;
     grid-template-rows: 0.5fr 2fr 1fr;
@@ -168,6 +168,7 @@ function switchMapSelect() {
         ". Button";
     height: 90%;
     width: 29em;
+    background-color: var(--woe-gray-30);
 }
 
 .mapWrap {
@@ -182,15 +183,16 @@ function switchMapSelect() {
 }
 
 .head {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    font-style: italic;
+    display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid black;
+    margin-top: 10px;
+    margin-left: 30px;
+    margin-bottom: 10px;
+    font-size: 20px;
 
     grid-area: Header;
     padding-left: 1em;
-    height: 3em;
+    height: 2em;
 }
 
 .lobbyInput {
@@ -252,5 +254,13 @@ label {
     width: 400px;
 
     grid-area: Form;
+}
+
+input {
+    width: auto;
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--woe-gray-40);
+    border-radius: 5px;
 }
 </style>
