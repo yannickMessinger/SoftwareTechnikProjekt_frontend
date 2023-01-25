@@ -15,7 +15,8 @@
                     display="Karte hinzufuegen"
                     :btn_click="
                         () => {
-                            createNewMap(1, mapNameInput), TogglePopup()
+                            createNewMap(id, mapNameInput), TogglePopup()
+                            
                         }
                     "
                 ></BasicButton>
@@ -29,6 +30,7 @@
 
 <script lang="ts">
 import { ref } from "vue"
+import App from "../../App.vue"
 const mapNameInput = ref("")
 export default {
     props: ["TogglePopup"],
@@ -39,10 +41,20 @@ export default {
 import { createNewMap } from "../../services/useMyMaps"
 import BasicButton from "../Buttons/BasicButton.vue"
 import useUser from "../../services/UserStore"
+import watch from 'vue'
 
 const { userId } = useUser()
 
-const userID = userId
+const id = userId.value === undefined? -1 : userId.value
+
+//var userID = ref(-1)
+/*if(userId!=undefined){
+    userID = userId.value
+}else {
+    userID = -1
+}*/
+
+return userId
 </script>
 
 <style scoped>
