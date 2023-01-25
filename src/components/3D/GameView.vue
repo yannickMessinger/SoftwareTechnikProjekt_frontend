@@ -53,22 +53,25 @@ export default defineComponent({
         buildingIDMap.set(3, "/../../../src/assets/3D_Models/Building/house_high.gltf")
         buildingIDMap.set(4, "/../../../src/assets/3D_Models/Building/house.gltf")
         buildingIDMap.set(5, "/../../../src/assets/3D_Models/Building/shop.gltf")
+
         buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
         buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
         buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
         buildingIDMap.set(20, "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf")
+
         buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
-        buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
-        buildingIDMap.set(23, "/../../../src/assets/3D_Models/Pedestrians/Firefighter.gltf")
-        buildingIDMap.set(24, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeBlack.gltf")
-        buildingIDMap.set(25, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeBlue.gltf")
-        buildingIDMap.set(26, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrowneBlue.gltf")
-        buildingIDMap.set(27, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeRed.gltf")
-        buildingIDMap.set(28, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrownPink.gltf")
-        buildingIDMap.set(29, "/../../../src/assets/3D_Models/Pedestrians/pedestrianOrangeGreen.gltf")
-        buildingIDMap.set(30, "/../../../src/assets/3D_Models/Pedestrians/pedestrianOrangeWhite.gltf")
-        buildingIDMap.set(31, "/../../../src/assets/3D_Models/Pedestrians/pedestrianRed.gltf")
-        buildingIDMap.set(32, "/../../../src/assets/3D_Models/Pedestrians/PoliceOfficer.gltf")
+        buildingIDMap.set(7, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
+
+        buildingIDMap.set(50, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeBlack.gltf")
+        buildingIDMap.set(51, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeBlue.gltf")
+        buildingIDMap.set(52, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrowneBlue.gltf")
+        buildingIDMap.set(53, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeRed.gltf")
+        buildingIDMap.set(54, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrownPink.gltf")
+        buildingIDMap.set(55, "/../../../src/assets/3D_Models/Pedestrians/pedestrianOrangeGreen.gltf")
+        buildingIDMap.set(56, "/../../../src/assets/3D_Models/Pedestrians/pedestrianOrangeWhite.gltf")
+        buildingIDMap.set(57, "/../../../src/assets/3D_Models/Pedestrians/pedestrianRed.gltf")
+        buildingIDMap.set(58, "/../../../src/assets/3D_Models/Pedestrians/PoliceOfficer.gltf")
+        buildingIDMap.set(59, "/../../../src/assets/3D_Models/Pedestrians/Firefighter.gltf")
 
         /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()
@@ -80,6 +83,18 @@ export default defineComponent({
         rotationMap.set(2, Math.PI)
         /*270 degree rotation*/
         rotationMap.set(3, Math.PI / 2)
+
+        /*Riadians is used to rotate game assets. The following map set the radians for the passed rotation value from backend*/
+        const assetRotationMap = new Map()
+
+        /*No rotation*/
+        assetRotationMap.set(0, Math.PI)
+        /*90 degree rotation*/
+        assetRotationMap.set(1, Math.PI / 2)
+        /*180 degree rotation*/
+        assetRotationMap.set(2, 0)
+        /*270 degree rotation*/
+        assetRotationMap.set(3, (3 * Math.PI) / 2)
 
         resetGameMapObjects()
         gameState.npcCarMapFromuseGameview.clear()
@@ -104,6 +119,30 @@ export default defineComponent({
         function calcCoordinateZ(n: number) {
             let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
             //console.log(`GameObj z: ${z}`)
+            return z
+        }
+
+        /**
+         * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
+         * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
+         * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
+         */
+        function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
+            let originX = xCoordCenter - fieldSize / 2
+            let x = originX + xCoordAsset * fieldSize
+
+            return x
+        }
+
+        /**
+         * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
+         * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
+         * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
+         */
+        function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
+            let originZ = zCoordCenter - fieldSize / 2
+            let z = originZ + yCoordAsset * fieldSize
+
             return z
         }
 
@@ -137,11 +176,14 @@ export default defineComponent({
             camera,
             box,
             moveableObject,
+            calcAssetCoordinateX,
+            calcAssetCoordinateZ,
             calcCoordinateX,
             calcCoordinateZ,
             buildingIDMap,
             mapElements,
             rotationMap,
+            assetRotationMap,
             gridSizeX,
             gridSizeY,
             fieldSize,
@@ -156,45 +198,41 @@ export default defineComponent({
         <Box ref="box" :position="{ x: 0, y: 5, z: 0 }"></Box>
         <Scene background="#87CEEB">
             <AmbientLight></AmbientLight>
-            <Plane
-                :width="gridSizeX"
-                :height="gridSizeY"
-                :rotation="{ x: -Math.PI / 2 }"
-                :position="{ x: 0, y: 0, z: 0 }"
-                receive-shadow
-            >
-                <PhongMaterial color="#999999" :props="{ depthWrite: false }"
-            /></Plane>
+            <Plane :width="gridSizeX" :height="gridSizeY" :rotation="{ x: -Math.PI / 2 }"
+                :position="{ x: 0, y: 0, z: 0 }" receive-shadow>
+                <PhongMaterial color="#999999" :props="{ depthWrite: false }" />
+            </Plane>
 
             <!-- All elements placed in the editor are read from the list and placed in the scene-->
             <div v-for="ele in mapElements">
-                <GltfModel
-                    v-bind:src="buildingIDMap.get(ele.objectTypeId)"
-                    :position="{
-                        x: calcCoordinateX(ele.y),
+                <GltfModel v-bind:src="buildingIDMap.get(ele.objectTypeId)" :position="{
+                    x: calcCoordinateX(ele.y),
+                    y: 0,
+                    z: calcCoordinateZ(ele.x),
+                }" :scale="{ x: 0.5, y: 0.5, z: 0.5 }" :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }" />
+                <!-- places all game assets of the current element-->
+                <div v-for="asset in ele.game_assets">
+                    <GltfModel v-bind:src="buildingIDMap.get(asset.objectTypeId)" :position="{
+                        x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
                         y: 0,
-                        z: calcCoordinateZ(ele.x),
-                    }"
-                    :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
-                    :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
-                />
+                        z: calcAssetCoordinateZ(calcCoordinateZ(ele.x), asset.y),
+                    }" :scale="{ x: 0.5, y: 0.5, z: 0.5 }" :rotation="{
+    x: 0,
+    y: assetRotationMap.get(asset.rotation),
+    z: 0,
+}" />
+                </div>
             </div>
-
             <div v-for="asset in npcEles">
-                <GltfModel
-                    v-bind:src="buildingIDMap.get(22)"
-                    :position="{
-                        x: asset[1].positions.npcPosX,
-                        y: 0.75,
-                        z: asset[1].positions.npcPosZ,
-                    }"
-                    :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
-                    :rotation="{
-                        x: 0,
-                        y: asset[1].viewRotation,
-                        z: 0,
-                    }"
-                />
+                <GltfModel v-bind:src="buildingIDMap.get(22)" :position="{
+                    x: asset[1].positions.npcPosX,
+                    y: 0.75,
+                    z: asset[1].positions.npcPosZ,
+                }" :scale="{ x: 0.5, y: 0.5, z: 0.5 }" :rotation="{
+    x: 0,
+    y: asset[1].viewRotation,
+    z: 0,
+}" />
             </div>
         </Scene>
     </Renderer>

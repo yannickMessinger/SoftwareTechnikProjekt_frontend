@@ -160,7 +160,7 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
 function placeRandomPedestrians(amount: number) {
     let counter = 0;
     const pedestrianAmount = 10;
-    const firstPedestrianId = 8
+    const firstPedestrianId = 50
     while(counter < amount) {
         let randomPedestrianObjectTypeId = Math.floor(Math.random() * pedestrianAmount + firstPedestrianId) // different objectTypeIds due to different pedestrian models
         placeAssetOnRandomElement(1, randomPedestrianObjectTypeId);
@@ -337,8 +337,8 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
     if (assetObjectTypeId === 7) {
         randomPosElements = getRandomSpawnsCar(element)
     }
-    // if (7 < assetId < 18), then asset = pedestrian
-    else if (assetObjectTypeId > 7 && assetObjectTypeId < 18) {
+    // if (49 < assetId < 60), then asset = pedestrian
+    else if (assetObjectTypeId > 49 && assetObjectTypeId < 60) {
         randomPosElements = getRandomSpawnsPedestrian(element)
     }
 
@@ -444,13 +444,13 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         }
     } else {
         // spawnpoint is free, so place car there
-        console.log("TEXTURE ELEMENT: ", blockList, assetObjectTypeId);
+        console.log("TEXTURE ELEMENT: ", assetObjectTypeId,  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId));
         streetGrid[element.x][element.y].game_assets.push({
             objectTypeId: assetObjectTypeId,
             x: randomPosElements[randomPos].x,
             y: randomPosElements[randomPos].y,
             rotation: randomPosElements[randomPos].rotation,
-            texture: blockList[assetObjectTypeId].texture,
+            texture:  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
         })
         return true
     }
