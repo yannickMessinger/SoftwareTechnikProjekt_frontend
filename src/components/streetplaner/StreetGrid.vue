@@ -148,6 +148,10 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
             }
         }
     }
+    // send all changed elements via stomp broker to backend and other clients
+    for (let ele of changedElements) {
+        updateMessage(ele)
+    }
     return changedElements;
 }
 

@@ -1,34 +1,43 @@
 <script setup lang="ts">
 import { defineProps, defineEmits, ref, computed } from "vue"
-import { useEditor } from "../../services/Editor/useEditor";
-import useUser from "../../services/UserStore";
-import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D";
+import { useEditor } from "../../services/Editor/useEditor"
+import useUser from "../../services/UserStore"
+import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
 const emit = defineEmits(["confirm", "cancel"])
-const {editorState} = useEditor(useUser().activeLobby.value.mapId)
+const { editorState } = useEditor(useUser().activeLobby.value.mapId)
 const maxAmountCars = 100
 const maxAmountPedestrians = 100
 const mapObjects = editorState.mapObjects
-const gameAssets = mapObjects.map(ele => ele.game_assets)
-const filledGameAssetArrays = gameAssets.filter(arr => arr.length > 0)
+const gameAssets = mapObjects.map((ele) => ele.game_assets)
+const filledGameAssetArrays = gameAssets.filter((arr) => arr.length > 0)
 const amountAssets = Array<IGameAsset2D>()
-filledGameAssetArrays.forEach(arr => amountAssets.push(...arr))
-const pedestrians = amountAssets.filter(ele  => ele.objectTypeId > 7 && ele.objectTypeId < 18).length
-const cars = amountAssets.filter(ele => ele.objectTypeId === 7).length
-const amountCars = ref(cars)
-const amountPedestrians = ref(pedestrians)
+filledGameAssetArrays.forEach((arr) => amountAssets.push(...arr))
+const currentAmountPedestrians = amountAssets.filter((ele) => ele.objectTypeId > 7 && ele.objectTypeId < 18).length
+const currentAmountCars = amountAssets.filter((ele) => ele.objectTypeId === 7).length
+const amountCars = ref(0)
+const amountPedestrians = ref(0)
 </script>
 
 <template>
     <div class="modal-container">
         <div class="modal-body">
-            <span class="modal-close" @click="emit('cancel')">🗙</span>
-            <h2 class="question">Wie viele von welchen Fahrzeugen sollen platziert werden?</h2>
+            <span class="modal-close" @click="emit('cancel')">X</span>
+            <p>Aktuelle Anzahl: {{ currentAmountCars }} Autos und {{ currentAmountPedestrians }} Fussgaenger</p>
+            <h2 class="question">Wie viele weitere Fahrzeuge sollen platziert werden?</h2>
             <p>Auto: <input type="number" :min="0" :max="maxAmountCars" v-model="amountCars" /></p>
-            <h2 class="question">Wie viele Fussgaenger sollen platziert werden?</h2>
-            <p>Fussgaengeranzahl: <input type="number" :min="0" :max="maxAmountPedestrians" v-model="amountPedestrians" /></p>
-            <br/>
+            <h2 class="question">Wie viele weitere Fussgaenger sollen platziert werden?</h2>
+            <p>
+                Fussgaengeranzahl:
+                <input type="number" :min="0" :max="maxAmountPedestrians" v-model="amountPedestrians" />
+            </p>
+            <br />
             <div class="modal-action">
-                <button class="modal-button" @click="emit('confirm', { car: amountCars, pedestrian: amountPedestrians})">Confirm</button>
+                <button
+                    class="modal-button"
+                    @click="emit('confirm', { car: amountCars, pedestrian: amountPedestrians })"
+                >
+                    Confirm
+                </button>
                 <button class="modal-button" @click="emit('cancel')">Cancel</button>
             </div>
         </div>
