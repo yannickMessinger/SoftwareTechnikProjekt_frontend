@@ -69,14 +69,26 @@ export default defineComponent({
         } = useCarMultiplayer()
         const { user, userId, activeLobby, setActiveLobby } = useUser()
         const { playerListState, playerList, fetchPlayerList } = usePlayerList()
-        const { playHorn, playEngine, stopEngine, playEngineFromOtherCar, pauseEngineFromOtherCar, connectSound } =
-            useSound()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
         console.log(gameState.sizeX * gameState.fieldSize)
         console.log(gameState.sizeY * gameState.fieldSize)
 
-        connectSound()
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
+
+        const {
+            playHorn,
+            playEngine,
+            stopEngine,
+            playEngineFromOtherCar,
+            pauseEngineFromOtherCar,
+            connectSound,
+            initAmbientSound,
+            stopAmbientSound,
+            disconnectSound,
+            stopAllEngines,
+        } = useSound(activeLobby.value.lobbyId, payload)
+        connectSound()
+
         const scene3DobjectMap = new Map()
 
         const uid = userId.value
@@ -219,7 +231,7 @@ export default defineComponent({
                         //scene3DobjectMap.get(positionEle.id).setRotationFromEuler(new THREE.Euler( positionEle.rotation ))
                         let x = scene3DobjectMap.get(positionEle.id)
                         //x.rotation = positionEle.rotation
-                        checkPlayerCarDistance(ele.playerCarX, ele.playerCarX, ele.playerCarId)
+                        checkPlayerCarDistance(ele.playerCarX, ele.playerCarZ, ele.playerCarId)
                         if (x != undefined) {
                             x.setRotationFromEuler(
                                 new THREE.Euler(
@@ -232,7 +244,7 @@ export default defineComponent({
                             //scene3DobjectMap.set(positionEle.id,x)
                             //console.log("ele.playerCarRotation",ele.playerCarRotation)
 
-                            console.log(
+                            /*   console.log(
                                 "positionEle.rotation",
                                 new THREE.Euler(
                                     positionEle.rotation._x,
@@ -240,8 +252,8 @@ export default defineComponent({
                                     positionEle.rotation._z,
                                     positionEle.rotation.order
                                 )
-                            )
-                            console.log("x", x)
+                            )*/
+                            // console.log("x", x)
                         }
                     }
                 })
@@ -261,13 +273,16 @@ export default defineComponent({
             })
         }
 
-        function checkPlayerCarDistance(posX: number, posY: number, carId: number) {
+        function checkPlayerCarDistance(posX: number, posZ: number, carId: number) {
             let distanceX = movableObject.getPositionX() - posX
-            console.log(distanceX)
+            let distanceZ = movableObject.getPositionZ() - posZ
 
-            if (distanceX < 10 && distanceX > -10) {
-                console.log("hier muss ich drin sein")
-                playEngineFromOtherCar(carId)
+            //console.log("X" + distanceX)
+            //console.log("Y:" + distanceZ)
+            let distance = Math.abs(distanceX) + Math.abs(distanceZ)
+
+            if (distance < 20) {
+                playEngineFromOtherCar(carId, distance)
             } else {
                 pauseEngineFromOtherCar(carId)
             }
@@ -277,6 +292,12 @@ export default defineComponent({
             () => gameState.mapObjsFromBackEnd,
             () => fillPlayerCarState()
         )
+
+        onBeforeUnmount(() => {
+            disconnectSound()
+            stopAmbientSound()
+            stopAllEngines()
+        })
 
         onMounted(() => {
             console.log(
@@ -293,8 +314,6 @@ export default defineComponent({
                 }
                 if (movableObject.enginePlayed) {
                     playEngine()
-                } else {
-                    stopEngine()
                 }
             })
 
@@ -315,15 +334,6 @@ export default defineComponent({
                 })
             })
         })
-
-        function initAmbientSound() {
-            var audio = new Audio("/../../../src/sound/ambient_city_sound.mp3")
-            audio.volume = 0.4
-            audio.play()
-            audio.addEventListener("ended", (e) => {
-                audio.play()
-            })
-        }
 
         return {
             renderer,

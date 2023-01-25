@@ -135,7 +135,7 @@ export class MovmentInputController {
         return this.objects.value.mesh.position.z
     }
     getRotation() {
-        console.log("Rot:", this.objects.value.mesh.rotation)
+        //console.log("Rot:", this.objects.value.mesh.rotation)
         return this.objects.value.mesh.rotation
     }
 }
