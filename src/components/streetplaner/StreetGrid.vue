@@ -116,6 +116,8 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
+    // only place random npc cars on straight
+    let availableElements: IMapObject[] = editorState.mapObjects.filter((ele) => ele.objectTypeId === 0)
     while (counter !== amountAssets) {
         let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
         let randomElement = editorState.mapObjects[randomIndex]
@@ -124,7 +126,7 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
             if (changedElements.includes(randomElement)) {
                 delete changedElements[changedElements.indexOf(randomElement)]
             }
-            changedElements.push(editorState.mapObjects[randomIndex])
+            changedElements.push(availableElements[randomIndex])
             counter++
         } else {
             errorCounter++
@@ -340,6 +342,81 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         randomPosElements = getRandomSpawnsPedestrian(element)
     }
 
+    if (element.objectTypeId === 0) {
+        // element = straight
+        if (element.rotation % 2 === 0) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.37, y: 0.25, rotation: 2 },
+                    { x: 0.37, y: 0.75, rotation: 2 },
+                    { x: 0.62, y: 0.75, rotation: 0 },
+                    { x: 0.62, y: 0.25, rotation: 0 },
+                ]
+            )
+        } else if (element.rotation % 2 === 1) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.25, y: 0.37, rotation: 3 },
+                    { x: 0.75, y: 0.37, rotation: 3 },
+                    { x: 0.75, y: 0.62, rotation: 1 },
+                    { x: 0.25, y: 0.62, rotation: 1 },
+                ]
+            )
+        }
+    } /*else if (element.objectTypeId === 1) {
+        // element = curve
+        if (element.rotation === 0) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.38, y: 0.88, rotation: 2 },
+                    { x: 0.64, y: 0.88, rotation: 0 },
+                    { x: 0.88, y: 0.38, rotation: 3 },
+                    { x: 0.88, y: 0.64, rotation: 1 },
+                ]
+            )
+        } else if (element.rotation === 1) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.36, y: 0.88, rotation: 2 },
+                    { x: 0.62, y: 0.88, rotation: 0 },
+                    { x: 0.12, y: 0.38, rotation: 3 },
+                    { x: 0.12, y: 0.65, rotation: 1 },
+                ]
+            )
+        } else if (element.rotation === 2) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.12, y: 0.34, rotation: 3 },
+                    { x: 0.12, y: 0.62, rotation: 1 },
+                    { x: 0.62, y: 0.12, rotation: 0 },
+                    { x: 0.34, y: 0.12, rotation: 2 },
+                ]
+            )
+        } else if (element.rotation === 3) {
+            randomPosElements.push(
+                ...[
+                    { x: 0.64, y: 0.12, rotation: 0 },
+                    { x: 0.38, y: 0.12, rotation: 2 },
+                    { x: 0.88, y: 0.34, rotation: 3 },
+                    { x: 0.88, y: 0.64, rotation: 1 },
+                ]
+            )
+        }
+    } else if (element.objectTypeId === 2) {
+        // element = intersection
+        randomPosElements.push(
+            ...[
+                { x: 0.37, y: 0.12, rotation: 2 },
+                { x: 0.37, y: 0.88, rotation: 2 },
+                { x: 0.62, y: 0.88, rotation: 0 },
+                { x: 0.62, y: 0.12, rotation: 0 },
+                { x: 0.12, y: 0.37, rotation: 3 },
+                { x: 0.88, y: 0.37, rotation: 3 },
+                { x: 0.88, y: 0.62, rotation: 1 },
+                { x: 0.12, y: 0.62, rotation: 1 },
+            ]
+        )
+    }*/
     // check if the max capacity is reached
     if (element.game_assets.length === randomPosElements.length) {
         return false
@@ -412,6 +489,7 @@ function checkAssetPlacedNearElement(
 // onClick handles click on specific cell
 function onClick(cell: any, e: any) {
     let currCellContent = streetGrid[cell.posX][cell.posY]
+    console.log(`x: ${cell.posX} y:${cell.posY}`)
     let payload: IMapObject
     if (toolState.tool === ToolEnum.CREATE && toolState.block.objectTypeId !== -1) {
         // if toolState block = asset
