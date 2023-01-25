@@ -10,8 +10,10 @@ export class CollisionService {
         this.carBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
     }
 
-    updateCarBoundingBox(car: any) {
-        this.carBB.setFromObject(car.value.mesh)
+    updateCarBoundingBox() {
+        if(this.car.value != null){
+            this.carBB.setFromObject(this.car.value.mesh)
+        }
     }
 
     checkCollision(objects: { id: number; box: THREE.Box3 }[]): boolean {

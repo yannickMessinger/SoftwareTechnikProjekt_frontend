@@ -16,6 +16,7 @@ export class BoundingBoxService {
     }
 
     setObjects(scene: any): void {
+        console.log(scene.value.scene)
         this.objects.push(...scene.value.scene.children)
         this.init()
         this.createBoundingBox()
@@ -32,10 +33,10 @@ export class BoundingBoxService {
         this.relevantIds.push(21)
         this.relevantIds.push(22)
     }
+
     createBoundingBox() {
         for (let i = 0; i < this.objects.length; i++) {
             if (this.relevantIds.includes(this.objects[i].name)) {
-                console.log(this.objects[i].name)
                 let newBB: THREE.Box3 = new THREE.Box3().setFromObject(this.objects[i])
                 this.boundingBoxes.push({ id: this.objects[i].name, box: newBB })
             }
