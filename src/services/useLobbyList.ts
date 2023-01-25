@@ -71,7 +71,7 @@ export async function updateLobbyList(): Promise<void> {
 
 //adds new lobby and sends it to backend, then update of lobbylist
 export async function createNewLobby(addLobbyName: string, addNumOfPlayers: number, addLobbyMode: E_LobbyMode) {
-    const url = "/api/lobby"
+    const url = "/api/lobby/map/" + activeLobby.value.mapId
 
     const addLobby: IAddLobbyRequestDTO = {
         lobbyName: addLobbyName,

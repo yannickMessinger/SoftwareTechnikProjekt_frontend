@@ -1,7 +1,7 @@
 import { reactive, readonly } from "vue"
 import { IMyMapsListItem } from "../typings/IMyMapsListitem"
 import { IMyMapsState } from "../typings/IMyMapsState"
-import { IAddMyMapsRequestDTO} from  "../typings/IAddMyMapsRequestDTO"
+import { IAddMyMapsRequestDTO } from "../typings/IAddMyMapsRequestDTO"
 import { IMapDTO } from "../typings/IMapDTO"
 
 const mapsState = reactive<IMyMapsState>({
@@ -13,7 +13,7 @@ const mapsState = reactive<IMyMapsState>({
 export function useMyMaps() {
     //let date: Date = new Date(500000);
     for (let i = 0; i < 4; i++) {
-        mapsState.mapslist.push({userId: 1,  lobbyName: "Karte " + i, date: "hallo" })
+        mapsState.mapslist.push({ userId: 1, lobbyName: "Karte " + i, date: "hallo" })
     }
 
     return {
@@ -28,10 +28,10 @@ export async function updateMapsList(): Promise<void> {
 
     try {
         const response = await fetch(url, {
-            method: "GET"
+            method: "GET",
         })
 
-        if(!response.ok) {
+        if (!response.ok) {
             mapsState.errormsg = response.statusText
             mapsState.mapslist = []
             console.log("error in fetching maplist")
@@ -42,18 +42,20 @@ export async function updateMapsList(): Promise<void> {
 
         mapsState.mapslist = jsondata
         mapsState.errormsg = ""
-    }catch (error) {
+    } catch (error) {
         console.log("error in updateMapsList")
     }
 }
 
-export async function createNewMap(addUserId: number, addMapName: string){
+export async function createNewMap(addUserId: number, addMapName: string) {
     const url = "/api/map"
 
     const addMap: IAddMyMapsRequestDTO = {
-        userId: addUserId,
-        lobbyName: addMapName,
-        date: getCurrentDate()
+        mapName: addMapName,
+        creationDate: new Date(),
+        sizeX: 0,
+        sizeY: 0,
+        mapOwnerId: addUserId,
     }
 
     try {
@@ -64,18 +66,18 @@ export async function createNewMap(addUserId: number, addMapName: string){
         })
         let id = await res.json()
         await updateMapsList()
+        return id
     } catch (error) {
         console.log(error)
         return -1
     }
 
     function getCurrentDate() {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); 
-        var yyyy = today.getFullYear();
+        var today = new Date()
+        var dd = String(today.getDate()).padStart(2, "0")
+        var mm = String(today.getMonth() + 1).padStart(2, "0")
+        var yyyy = today.getFullYear()
 
-       return (dd + '/' + mm + '/' + yyyy);
+        return dd + "/" + mm + "/" + yyyy
     }
-
 }

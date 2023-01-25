@@ -6,7 +6,7 @@
             </div>
             <div class="flex-items">
                 <label for="map_name"> <b>Karte-Name: </b></label>
-                <input type="text" name="map_name" placeholder="Kartenname eingeben"/>
+                <input type="text" name="map_name" v-model="mapNameInput" placeholder="Kartenname eingeben" />
             </div>
             <div class="flex-items">
                 <!--<button class="green">Karte hinzufügen</button>-->
@@ -15,9 +15,11 @@
                     display="Karte hinzufuegen"
                     :btn_click="
                         () => {
-                            createNewMap(1, 'NeueMap'), TogglePopup()
-                        }"></BasicButton>
-                    
+                            createNewMap(1, mapNameInput), TogglePopup()
+                        }
+                    "
+                ></BasicButton>
+
                 <!--<BasicButton class="sec btn blue" display="SSchließen" :btn_click="TogglePopup()"></BasicButton>-->
                 <button @click="TogglePopup()">schließen</button>
             </div>
@@ -26,20 +28,21 @@
 </template>
 
 <script lang="ts">
-    export default {
-        props:['TogglePopup']
-    }
+import { ref } from "vue"
+const mapNameInput = ref("")
+export default {
+    props: ["TogglePopup"],
+}
 </script>
 
 <script setup lang="ts">
-import { createNewMap } from '../../services/useMyMaps';
-import BasicButton from '../Buttons/BasicButton.vue';
+import { createNewMap } from "../../services/useMyMaps"
+import BasicButton from "../Buttons/BasicButton.vue"
 import useUser from "../../services/UserStore"
 
 const { userId } = useUser()
 
-const userID = userId;
-
+const userID = userId
 </script>
 
 <style scoped>
@@ -61,12 +64,10 @@ const userID = userId;
     border-radius: 20px;
 }
 
-.content{
-    background: #FFF;
+.content {
+    background: #fff;
     padding: 32px;
     border-radius: 8px;
-    
-
 }
 
 /*
@@ -98,14 +99,6 @@ const userID = userId;
 }
 */
 
-
-
-
-
-
-
-
-
 button {
     font-size: 16px;
     border: none;
@@ -136,6 +129,4 @@ input {
 .green:hover {
     background-color: var(--woe-green-70);
 }
-
-
 </style>
