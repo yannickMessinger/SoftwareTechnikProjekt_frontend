@@ -1,6 +1,6 @@
 export interface IMapObject {
-    objectTypeId: number,
-    x: number,
-    y: number,
-    rotation: number,  
+    objectTypeId: number
+    x: number
+    y: number
+    rotation: number
 }

@@ -33,6 +33,7 @@ import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
 import * as THREE from "three"
 import { useCarMap } from "../../services/3DGameView/useCarMap"
+import useCrossroadData from "../../services/3DGameView/useCrossroadData"
 
 export default defineComponent({
     components: {
@@ -55,7 +56,14 @@ export default defineComponent({
         const movableObject = new MovmentInputController(box, camera)
         //const fpsCamera = new FirstPersonCamera(camera, box)
 
-        const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
+        const {
+            gameState,
+            setMapWidthAndMapHeight,
+            resetGameMapObjects,
+            updateMapObjsFromGameState,
+            updatePosMessage,
+            receiveNpcUpdates,
+        } = useGameView()
         const {
             createMessage,
             deleteMessage,
@@ -65,12 +73,10 @@ export default defineComponent({
             fillPlayerCarState,
             playerCarState,
         } = useCarMultiplayer()
+        receiveNpcUpdates()
         const { user, userId, activeLobby, setActiveLobby } = useUser()
         const { playerListState, playerList, fetchPlayerList } = usePlayerList()
-
-        console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
-        console.log(gameState.sizeX * gameState.fieldSize)
-        console.log(gameState.sizeY * gameState.fieldSize)
+        const { loadTrafficLight } = useCrossroadData()
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
         const scene3DobjectMap = new Map()
@@ -154,30 +160,6 @@ export default defineComponent({
         }
 
         /**
-         * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-            let originX = xCoordCenter - fieldSize / 2
-            let x = originX + xCoordAsset * fieldSize
-
-            return x
-        }
-
-        /**
-         * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-            let originZ = zCoordCenter - fieldSize / 2
-            let z = originZ + yCoordAsset * fieldSize
-
-            return z
-        }
-
-        /**
          * Fills the payload with userId and movableObject-data for x,z and takes the y element out of quaternion
          * Is used for create and updating messages for the websocket
          */
@@ -253,7 +235,6 @@ export default defineComponent({
         )
 
         onMounted(() => {
-            console.log(`MapId aus GameView ${gameState.mapId}`)
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
 
@@ -261,6 +242,16 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
             })
+
+            setInterval(() => {
+                npcEles.value.forEach((ele) => {
+                    console.log(ele.reachedMapEleLimit())
+                    if (ele.reachedMapEleLimit()) {
+                        console.log(`ele mit ${ele.npcId} braucht POS Update!`)
+                        updatePosMessage(ele.npcId)
+                    }
+                })
+            }, 500)
 
             /**
              * delayed: waiting for socket connection
@@ -351,29 +342,27 @@ export default defineComponent({
                         ele.objectTypeId === 2
                             ? loadTrafficLight(
                                   ele,
-                                  sceneRef.scene,
+                                  scene.scene,
                                   calcCoordinateX(ele.y),
                                   calcCoordinateZ(ele.x),
                                   rotationMap
                               )
                             : null
                     "
-                    :props="{ name: ele.objectTypeId }"
                 />
                 <!-- places all game assets of the current element-->
-                <div v-for="asset in ele.game_assets">
+                <div v-for="(asset, index) in npcEles" :key="index">
                     <GltfModel
-                        v-if="asset.userId === 0"
                         v-bind:src="buildingIDMap.get(22)"
                         :position="{
-                            x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
+                            x: asset[1].positions.npcPosX,
                             y: 0.75,
-                            z: calcAssetCoordinateZ(calcCoordinateZ(ele.x), asset.y),
+                            z: asset[1].positions.npcPosZ,
                         }"
                         :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                         :rotation="{
                             x: 0,
-                            y: assetRotationMap.get(asset.rotation),
+                            y: asset[1].viewRotation,
                             z: 0,
                         }"
                         :props="{ name: 22 }"
