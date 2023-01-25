@@ -53,7 +53,7 @@ import { onMounted, ref } from "vue"
 import router from "../../router/router"
 
 const { userId, activeLobby, setActiveLobby } = useUser()
-const { receiveLobbyUpdates } = useLobbyList()
+const { receiveLobbyUpdates, leaveLobbyMessage } = useLobbyList()
 
 console.log("Pl-List")
 console.log(activeLobby.value.playerList)
@@ -96,6 +96,7 @@ function closeLobbyClicked() {
 }
 
 function leaveLobbyClicked() {
+    leaveLobbyMessage()
     deletePlayerFromLobby()
     setActiveLobby({
         lobbyId: -1,
@@ -124,6 +125,7 @@ async function deletePlayerFromLobby() {
     } catch (error) {
         console.log(" error in remove player from Lobby: " + error)
     }
+    useLobbyList().updateLobbyList()
 }
 
 onMounted(() => {
