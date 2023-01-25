@@ -34,7 +34,7 @@ const emit = defineEmits(["confirm", "cancel"])
     width: 100%;
     height: 100%;
     background-color: #cececeb5;
-    z-index: 99;
+    z-index: 5;
 }
 .modal-body {
     background-color: #fff;

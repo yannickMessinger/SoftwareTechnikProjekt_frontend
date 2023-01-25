@@ -6,6 +6,7 @@
     By clicking on button "Fahren": Lobbymode is changed to playmode
     By clicking on button "Planungsmodus": Lobbymode is changed to buildmode
 -->
+
 <template>
     <div class="headline">
         <h2>Aktive Lobby</h2>
@@ -45,18 +46,33 @@
             <button class="green" v-else @click="goBuild()">zur Bauansicht</button>
         </div>
     </div>
+    <Chat />
 </template>
 
 <script setup lang="ts">
 import useUser from "../../services/UserStore"
+import Chat from "../UI/Chat.vue"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
-import { onMounted, ref } from "vue"
+import { useChat } from "../../services/Chat/useChat"
+import { onMounted, watch, ref } from "vue"
 import router from "../../router/router"
 import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
 
-const { userId, activeLobby, setActiveLobby } = useUser()
+const { name, userId, activeLobby, setActiveLobby } = useUser()
+const { connectLobbyWs, disconnectLobby, activeLobbyID } = useChat(name.value, activeLobby.value)
 const { receiveLobbyUpdates, leaveLobbyMessage } = useLobbyList()
+
+onMounted(() => {
+    activeLobbyID.value = activeLobby.value.lobbyId
+})
+
+watch(activeLobbyID, (newValue, oldValue): void => {
+    if (oldValue !== -1) {
+        disconnectLobby(oldValue)
+    }
+    connectLobbyWs()
+})
 
 const mapName = ref("")
 getMapName().then((value) => {
@@ -169,6 +185,7 @@ onMounted(() => {
     font-family: Circular, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
     line-height: 20px;
 }
+
 .headline {
     display: flex;
     margin-top: 10px;
@@ -201,27 +218,33 @@ onMounted(() => {
     justify-self: start;
     align-self: end;
 }
+
 .Button2 {
     grid-area: Button2;
     justify-self: center;
     align-self: end;
 }
+
 .Button3 {
     grid-area: Button3;
     justify-self: end;
     align-self: end;
 }
+
 .LobbyName {
     grid-area: LobbyName;
 }
+
 .LobbyClose {
     grid-area: LobbyClose;
     justify-self: end;
 }
+
 .PlayMode {
     grid-area: PlayMode;
     align-self: start;
 }
+
 .SwitchMode {
     grid-area: SwitchMode;
     justify-self: end;

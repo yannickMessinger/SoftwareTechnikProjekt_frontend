@@ -87,7 +87,8 @@ function onRotateClick() {
 }
 
 .selectedBlockImg {
-    width: auto;
+    max-width: 100%;
+    max-width: 100%;
     height: auto;
     display: block;
     border: solid 2px var(--woe-blue-50);

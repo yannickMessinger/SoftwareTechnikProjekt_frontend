@@ -1,6 +1,4 @@
 /**
- * author: Sean Dittmann
- * date: 11.11.2022
  *
  * BlockElement - Block Element of streetplaner list for streetplaner blocks (like sraight, cross or curve block).
  * groupId - categoryId for the list like street or railway (useful Id system needs to be invented later)

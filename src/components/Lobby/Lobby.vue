@@ -21,13 +21,15 @@ import useUser from "../../services/UserStore"
 import router from "../../router/router"
 import { useLobbyList } from "../../services/useLobbyList"
 import { onMounted } from "vue"
+import { useChat } from "../../services/Chat/useChat"
 
 const props = defineProps<{
     lobby: ILobby
 }>()
 
-const { setActiveLobby } = useUser()
+const { setActiveLobby, name } = useUser()
 const { receiveLobbyUpdates, joinMessage } = useLobbyList()
+//const { updateActiveChatLobbyId } = useChat(name.value, )
 
 //for later purposes to link to selected lobby via Vue Router
 async function selectLobby() {
