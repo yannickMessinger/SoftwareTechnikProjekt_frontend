@@ -15,6 +15,9 @@ export class MovmentInputController {
     public rotation: number
     public rotAngle: number
 
+    public hornPlayed: boolean
+    public enginePlayed: boolean
+
     //temp data
     walkDirection = new THREE.Vector3()
 
@@ -32,6 +35,8 @@ export class MovmentInputController {
         this.translation = new THREE.Vector3(0, 1, 0)
         this.KEYS = { a: 65, s: 83, w: "w", d: 68 }
         this.keyboard = new KeyboardState()
+        this.hornPlayed = false
+        this.enginePlayed = true
         this.initialize()
     }
 
@@ -41,6 +46,7 @@ export class MovmentInputController {
         const velocity = 0.05
         this.updateTranslation()
         this.updateCamera()
+        this.updateSound()
     }
 
     updateTranslation() {
@@ -99,6 +105,26 @@ export class MovmentInputController {
         this.camera.value.camera.setRotationFromEuler(this.objects.value.mesh.rotation)
     }
 
+    updateSound() {
+        if (this.keyboard.pressed("Y")) {
+            console.log("pressed Y")
+            this.hornPlayed = true
+        } else {
+            this.hornPlayed = false
+        }
+
+        if (
+            this.keyboard.pressed("W") ||
+            this.keyboard.pressed("A") ||
+            this.keyboard.pressed("S") ||
+            this.keyboard.pressed("D")
+        ) {
+            this.enginePlayed = true
+        } else {
+            this.enginePlayed = false
+        }
+    }
+
     getPositionX() {
         return this.objects.value.mesh.position.x
     }
@@ -109,7 +135,7 @@ export class MovmentInputController {
         return this.objects.value.mesh.position.z
     }
     getRotation() {
-        // console.log("Rot:", this.objects.value.mesh.rotation)
+        //console.log("Rot:", this.objects.value.mesh.rotation)
         return this.objects.value.mesh.rotation
     }
 }

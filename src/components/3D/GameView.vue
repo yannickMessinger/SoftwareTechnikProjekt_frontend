@@ -31,6 +31,8 @@ import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
+import { useSound } from "../../services/useSound"
+import { on } from "events"
 import * as THREE from "three"
 import { useCarMap } from "../../services/3DGameView/useCarMap"
 import useCrossroadData from "../../services/3DGameView/useCrossroadData"
@@ -79,6 +81,21 @@ export default defineComponent({
         const { loadTrafficLight } = useCrossroadData()
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
+
+        const {
+            playHorn,
+            playEngine,
+            stopEngine,
+            playEngineFromOtherCar,
+            pauseEngineFromOtherCar,
+            connectSound,
+            initAmbientSound,
+            stopAmbientSound,
+            disconnectSound,
+            stopAllEngines,
+        } = useSound(activeLobby.value.lobbyId, payload)
+        connectSound()
+
         const scene3DobjectMap = new Map()
 
         const uid = userId.value
@@ -188,6 +205,7 @@ export default defineComponent({
                         //scene3DobjectMap.get(positionEle.id).setRotationFromEuler(new THREE.Euler( positionEle.rotation ))
                         let x = scene3DobjectMap.get(positionEle.id)
                         //x.rotation = positionEle.rotation
+                        checkPlayerCarDistance(ele.playerCarX, ele.playerCarZ, ele.playerCarId)
                         if (x != undefined) {
                             x.setRotationFromEuler(
                                 new THREE.Euler(
@@ -227,13 +245,33 @@ export default defineComponent({
                     }
                 })
             })
-            console.log(scene3DobjectMap)
+        }
+
+        function checkPlayerCarDistance(posX: number, posZ: number, carId: number) {
+            let distanceX = movableObject.getPositionX() - posX
+            let distanceZ = movableObject.getPositionZ() - posZ
+
+            //console.log("X" + distanceX)
+            //console.log("Y:" + distanceZ)
+            let distance = Math.abs(distanceX) + Math.abs(distanceZ)
+
+            if (distance < 20) {
+                playEngineFromOtherCar(carId, distance)
+            } else {
+                pauseEngineFromOtherCar(carId)
+            }
         }
 
         watch(
             () => gameState.mapObjsFromBackEnd,
             () => fillPlayerCarState()
         )
+
+        onBeforeUnmount(() => {
+            disconnectSound()
+            stopAmbientSound()
+            stopAllEngines()
+        })
 
         onMounted(() => {
             updateMapObjsFromGameState()
@@ -247,6 +285,12 @@ export default defineComponent({
                         ele.drive()
                     }
                 })
+                if (movableObject.hornPlayed) {
+                    playHorn()
+                }
+                if (movableObject.enginePlayed) {
+                    playEngine()
+                }
             })
 
             setInterval(() => {
@@ -258,6 +302,8 @@ export default defineComponent({
                     }
                 })
             }, 500)
+
+            initAmbientSound()
 
             /**
              * delayed: waiting for socket connection
