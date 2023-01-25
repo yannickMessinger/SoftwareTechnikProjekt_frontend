@@ -1,7 +1,7 @@
 import { Client } from "@stomp/stompjs"
 import { reactive, readonly } from "vue"
 import { IPosition } from "../../typings/IPosition"
-import { CreatePlayerCars } from "../../models/createPlayerCars"
+import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "./useGameView"
 import { routeLocationKey } from "vue-router"
 
