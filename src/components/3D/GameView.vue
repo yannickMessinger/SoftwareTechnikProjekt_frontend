@@ -93,6 +93,9 @@ export default defineComponent({
             stopAmbientSound,
             disconnectSound,
             stopAllEngines,
+            pauseEngineFromOtherCarNPC,
+            playEngineFromOtherCarNPC,
+            stopAllEnginesNPC,
         } = useSound(activeLobby.value.lobbyId, payload)
         connectSound()
 
@@ -262,6 +265,21 @@ export default defineComponent({
             }
         }
 
+        function checkPlayerCarDistanceNPC(posX: number, posZ: number, carId: number) {
+            let distanceX = movableObject.getPositionX() - posX
+            let distanceZ = movableObject.getPositionZ() - posZ
+
+            // console.log("X" + posX)
+            //console.log("Y:" + posZ)
+            let distance = Math.abs(distanceX) + Math.abs(distanceZ)
+
+            if (distance < 20) {
+                playEngineFromOtherCarNPC(carId, distance)
+            } else {
+                pauseEngineFromOtherCarNPC(carId)
+            }
+        }
+
         watch(
             () => gameState.mapObjsFromBackEnd,
             () => fillPlayerCarState()
@@ -271,6 +289,8 @@ export default defineComponent({
             disconnectSound()
             stopAmbientSound()
             stopAllEngines()
+            stopAllEnginesNPC()
+            stopEngine()
         })
 
         onMounted(() => {
@@ -281,6 +301,9 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
                 npcEles.value.forEach((ele) => {
+                    console.log(ele.positions.npcPosX)
+                    console.log(ele.positions.npcPosZ)
+                    checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
                     if (ele.driving) {
                         ele.drive()
                     }
