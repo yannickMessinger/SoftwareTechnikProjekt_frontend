@@ -10,9 +10,13 @@
             </div>
         </div>
     </div>
+    <Chat />
+
 </template>
 
 <script setup lang="ts">
+import Chat from "../components/UI/Chat.vue"
+
 import Header from "../components/Header.vue"
 import { useLobbyList } from "../services/useLobbyList"
 import { useMyMaps } from "../services/useMyMaps"

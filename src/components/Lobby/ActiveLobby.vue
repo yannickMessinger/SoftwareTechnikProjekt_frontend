@@ -62,17 +62,14 @@ import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
 const { name, userId, activeLobby, setActiveLobby } = useUser()
 const { connectLobbyWs, disconnectLobby, activeLobbyID } = useChat(name.value, activeLobby.value)
 const { receiveLobbyUpdates, leaveLobbyMessage } = useLobbyList()
-
-onMounted(() => {
-    activeLobbyID.value = activeLobby.value.lobbyId
-})
-
+/*
 watch(activeLobbyID, (newValue, oldValue): void => {
+    console.log(oldValue)
     if (oldValue !== -1) {
         disconnectLobby(oldValue)
     }
     connectLobbyWs()
-})
+})*/
 
 const mapName = ref("")
 getMapName().then((value) => {
@@ -177,6 +174,8 @@ async function getMapName() {
 onMounted(() => {
     //activate websockets connection to listen for incoming updates
     receiveLobbyUpdates()
+    activeLobbyID.value = activeLobby.value.lobbyId
+    console.log(activeLobbyID.value)
 })
 </script>
 
