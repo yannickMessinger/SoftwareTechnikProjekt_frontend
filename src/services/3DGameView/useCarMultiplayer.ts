@@ -1,9 +1,9 @@
 import { Client } from "@stomp/stompjs"
 import { reactive, readonly } from "vue"
 import { IPosition } from "../../typings/IPosition"
-import { CreatePlayerCars } from "../../models/createPlayerCars"
 import { useGameView } from "./useGameView"
 import { routeLocationKey } from "vue-router"
+import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/position"
