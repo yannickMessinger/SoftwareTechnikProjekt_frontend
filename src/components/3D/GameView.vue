@@ -242,6 +242,11 @@ export default defineComponent({
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
                 movePlayerCars()
+                npcEles.value.forEach((ele) => {
+                    if (ele.driving) {
+                        ele.drive()
+                    }
+                })
             })
 
             setInterval(() => {
@@ -328,7 +333,7 @@ export default defineComponent({
             /></Plane>
 
             <!-- All elements placed in the editor are read from the list and placed in the scene-->
-            <div v-for="(ele, index) in mapElements" :key="index">
+            <div v-for="ele in mapElements">
                 <GltfModel
                     v-bind:src="buildingIDMap.get(ele.objectTypeId)"
                     :position="{
@@ -351,24 +356,24 @@ export default defineComponent({
                             : null
                     "
                 />
-                <!-- places all game assets of the current element-->
-                <div v-for="(asset, index) in npcEles" :key="index">
-                    <GltfModel
-                        v-bind:src="buildingIDMap.get(22)"
-                        :position="{
-                            x: asset[1].positions.npcPosX,
-                            y: 0.75,
-                            z: asset[1].positions.npcPosZ,
-                        }"
-                        :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
-                        :rotation="{
-                            x: 0,
-                            y: asset[1].viewRotation,
-                            z: 0,
-                        }"
-                        :props="{ name: 22 }"
-                    />
-                </div>
+            </div>
+            <!-- places all game assets of the current element-->
+            <div v-for="asset in npcEles">
+                <GltfModel
+                    v-bind:src="buildingIDMap.get(22)"
+                    :position="{
+                        x: asset[1].positions.npcPosX,
+                        y: 0.75,
+                        z: asset[1].positions.npcPosZ,
+                    }"
+                    :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
+                    :rotation="{
+                        x: 0,
+                        y: asset[1].viewRotation,
+                        z: 0,
+                    }"
+                    :props="{ name: 22 }"
+                />
             </div>
             <!-- creates and sets taxi bassed on playerCarList sets car for each playerId !== userId-->
             <div v-for="player in playerCarList">
@@ -377,7 +382,7 @@ export default defineComponent({
                         v-bind:src="buildingIDMap.get(21)"
                         :position="{
                             x: player[1].playerCarX,
-                            y: 0.75,
+                            y: 0,
                             z: player[1].playerCarZ,
                         }"
                         :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
