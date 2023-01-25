@@ -16,12 +16,12 @@
                 <div class="cellone">
                     <td style="width: 100%">{{ props.player.userName }}</td>
                 </div>
-                <td style="width: 10%"><button>Nachricht</button></td>
-              
-                    <td style="width: 10%">
-                        <button class="deleteButton" v-if="userId === hostId">X</button>
-                    </td>
-
+                <td style="width: 10%">
+                    <button v-if="userId !== props.player.userId">Nachricht</button>
+                </td>
+                <td style="width: 10%">
+                    <button class="deleteButton" v-if="userId === hostId && userId !== props.player.userId">X</button>
+                </td>
             </tr>
         </table>
     </div>
@@ -36,9 +36,6 @@ const { userId, hostId } = useUser()
 const props = defineProps<{
     player: IUser
 }>()
-
-
-
 </script>
 
 <style scoped>
