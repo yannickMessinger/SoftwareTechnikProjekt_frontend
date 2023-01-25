@@ -227,7 +227,7 @@ export default defineComponent({
                             //scene3DobjectMap.set(positionEle.id,x)
                             //console.log("ele.playerCarRotation",ele.playerCarRotation)
 
-                            console.log(
+                            /*console.log(
                                 "positionEle.rotation",
                                 new THREE.Euler(
                                     positionEle.rotation._x,
@@ -236,7 +236,7 @@ export default defineComponent({
                                     positionEle.rotation.order
                                 )
                             )
-                            console.log("x", x)
+                            console.log("x", x)*/
                         }
                     }
                 })
@@ -247,13 +247,14 @@ export default defineComponent({
             console.log("anfangfunction", scene3DobjectMap)
             sceneObjChildren.forEach((ele) => {
                 rawPlayerList.forEach((player) => {
-                    if (ele.name === 21) {
+                    if (ele.name === `player_${player.userId}`) {
                         if (!scene3DobjectMap.get(player.userId) && player.userId !== uid) {
                             scene3DobjectMap.set(player.userId, ele)
                         }
                     }
                 })
             })
+            console.log(scene3DobjectMap)
         }
 
         watch(
@@ -387,7 +388,7 @@ export default defineComponent({
                             y: 0, //player[1].playerCarRotation[1],
                             z: 0,
                         }"
-                        :props="{ name: 21 }"
+                        :props="{ name: `player_${player[1].playerCarId}` }"
                     />
                 </div>
             </div>
