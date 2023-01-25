@@ -96,16 +96,7 @@ const mapsState = reactive<IMyMapsState>({
 })
 
 /** Variablen: */
-/** bus event */
-
-const { emit, bus } = useEventBus()
-var defaultCard: ICardElement = {
-    id: -1,
-    name: "Keine Eintraege",
-    date: new Date("1997-06-07"),
-}
 const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
-var backendOfflineDebugMode = false
 const isEmpty = ref(true)
 const numberOfOwnedCards = ref(0)
 const cardList: ICardElement[] = reactive(Array(numberOfOwnedCards.value).fill(null))
@@ -117,20 +108,7 @@ const TogglePopup = () => {
 }
 
 /**Card List Data Import from Backend or load default list */
-if (backendOfflineDebugMode) {
-    /**TODO Remove Debug Components */
-    console.warn("Unable to reach Backend Server, insert default Maps")
-    cardList[0] = { id: 0, name: "Testmap 1", date: new Date("1997-06-07") }
-    cardList[1] = { id: 1, name: "Testmap 2", date: new Date("1997-06-07") }
-    cardList[2] = { id: 2, name: "Testmap 3", date: new Date("1997-06-07") }
-    isEmpty.value = false
-} else {
-    getMapsFromBackend()
-    //console.log("cardL len: "+cardList.length)
-
-    //TODO import list data from backend here (#229 connect backend)
-}
-//TODO Compile imported data into card Elements (#229 connect backend, #42 need card informations)
+getMapsFromBackend()
 
 /** button functions: */
 function createLobbyAction(clickedCard: ICardElement) {
@@ -145,28 +123,6 @@ function changeMapAction(clickedCard: ICardElement) {
     activeLobby.value.mapId = clickedCard.id
 }
 
-/** Lobby action button*/
-/** 
-function cardClickedLobbyAction(clickedCard: any) {
-    if (clickedCard.id == selectedCard.card.id) {
-        selectedCard.card = defaultCard
-        isHost.value = false
-        isLobbyOpen.value = false
-    } else {
-        if (!isLobbyOpen.value) {
-            selectedCard.card = clickedCard
-            isHost.value = true
-            isLobbyOpen.value = true
-            router.push("/create")
-        } else {
-            selectedCard.card = clickedCard
-        }
-        //TODO control if watcher can handle the change at all time, otherwise prevent the player from changing
-        emit("card-load-event", selectedCard.card)
-        //TODO inform backend that active map changed (#229 connect backend)
-    }
-}
-*/
 /** delete button*/
 function cardClickedDeleteAction(clickedCard: any) {
     var removedIndex = cardList.findIndex((cardElement) => cardElement.id == clickedCard.id)
@@ -186,11 +142,9 @@ function cardClickedDeleteAction(clickedCard: any) {
     if (cardList.length == 0) {
         isEmpty.value = true
     }
-    if (!backendOfflineDebugMode) {
-        if (removedCard != null) {
-            console.log("Removed Item: " + clickedCard.id)
-            // TODO call delete option in Backend (#229 connect backend)
-        }
+    if (removedCard != null) {
+        console.log("Removed Item: " + clickedCard.id)
+        // TODO call delete option in Backend (#229 connect backend)
     }
 }
 
@@ -225,15 +179,6 @@ async function getMapsFromBackend() {
         isEmpty.value = false
     }
 }
-
-/**
-const props = defineProps<{
-    liste: Readonly<IMyMapsListItem[]>
-}>()
-
-const { mapsList } = useMyMaps()
-
-*/
 </script>
 
 <style scoped>
