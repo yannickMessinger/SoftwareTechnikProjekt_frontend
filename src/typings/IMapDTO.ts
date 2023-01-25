@@ -1,5 +1,5 @@
 export interface IMapDTO {
-    userId : number
-    lobbyName : string
+    userId: number
+    lobbyName: string
     date: string
 }

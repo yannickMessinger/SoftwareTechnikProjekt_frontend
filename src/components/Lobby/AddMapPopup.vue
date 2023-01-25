@@ -16,7 +16,6 @@
                     :btn_click="
                         () => {
                             createNewMap(id, mapNameInput), TogglePopup()
-                            
                         }
                     "
                 ></BasicButton>
@@ -41,11 +40,11 @@ export default {
 import { createNewMap } from "../../services/useMyMaps"
 import BasicButton from "../Buttons/BasicButton.vue"
 import useUser from "../../services/UserStore"
-import watch from 'vue'
+import watch from "vue"
 
 const { userId } = useUser()
 
-const id = userId.value === undefined? -1 : userId.value
+const id = userId.value === undefined ? -1 : userId.value
 
 //var userID = ref(-1)
 /*if(userId!=undefined){
