@@ -19,6 +19,7 @@ const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/lobby"
 const SWITCHMODE_MSG = "/app/lobby.switchMode"
 const JOIN_MSG = "/app/lobby.join"
+const LEAVE_MSG = "/app/lobby.leave"
 
 let stompClient: Client
 const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
@@ -41,6 +42,7 @@ export function useLobbyList() {
         receiveLobbyUpdates,
         joinMessage,
         changeLobbyModeMessage,
+        leaveLobbyMessage,
     }
 }
 
@@ -145,6 +147,38 @@ function joinMessage() {
 
 /*method that fires a "SWITCH_MODE" message to path /app/lobby.switchMode in backend via Websocket connetction.
 Purpose to update Lobbymode of current active Lobby for all players who joined that lobby. */
+function leaveLobbyMessage() {
+    console.log("LEAVE")
+    const leaveLobbyMessage: IStompMessage = {
+        playerContent: {
+            userId: user.userId,
+            userName: user.userName,
+            activeLobby: {
+                lobbyId: user.activeLobby.lobbyId,
+                mapId: user.activeLobby.mapId,
+                lobbyName: user.activeLobby.lobbyName,
+                numOfPlayers: user.activeLobby.numOfPlayers,
+                lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+            },
+        },
+        lobbyContent: {
+            lobbyId: user.activeLobby.lobbyId,
+            hostId: user.activeLobby.hostId,
+            mapId: user.activeLobby.mapId,
+            lobbyName: user.activeLobby.lobbyName,
+            numOfPlayers: user.activeLobby.numOfPlayers,
+            lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+        },
+        type: "LEAVE",
+    }
+
+    stompClient.publish({
+        destination: LEAVE_MSG,
+        headers: {},
+        body: JSON.stringify(leaveLobbyMessage),
+    })
+}
+
 function changeLobbyModeMessage() {
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
     }
@@ -214,6 +248,7 @@ If message tpye if of type "JOIN", the playerlist of this current lobby is updat
 If message is of type "SWITCH_MODE", the lobbymode is changed to the payload content of the message for all players of the lobby.
 */
 async function onMessageReceived(payload: IStompMessage) {
+    console.log("MS recieved")
     if (payload.lobbyContent.lobbyId === activeLobby.value.lobbyId) {
         if (payload.type === "JOIN") {
             await fetchPlayerList()
@@ -225,6 +260,29 @@ async function onMessageReceived(payload: IStompMessage) {
         }
         if (payload.type === "SWITCH_MODE") {
             activeLobby.value.lobbyModeEnum = payload.lobbyContent.lobbyModeEnum
+        }
+        if (payload.type === "LEAVE") {
+            console.log("LEAVE 2")
+            await fetchPlayerList()
+            var index = activeLobby.value.playerList?.findIndex(
+                (element) => element.userId == payload.playerContent.userId
+            )
+            if (index != undefined) {
+                switch (index) {
+                    case 0:
+                        /*delete list head (shift)*/
+                        activeLobby.value.playerList?.shift()
+                        break
+                    case -1:
+                        console.warn("-1: Deleted Item not found")
+                        break
+                    default:
+                        /* delete list element (splice) */
+                        activeLobby.value.playerList?.splice(index, index)
+                }
+            }
+        }
+        if (payload.type === "CLOSE") {
         }
     }
 }

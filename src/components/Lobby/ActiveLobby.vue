@@ -56,7 +56,7 @@ import router from "../../router/router"
 import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
 
 const { userId, activeLobby, setActiveLobby } = useUser()
-const { receiveLobbyUpdates } = useLobbyList()
+const { receiveLobbyUpdates, leaveLobbyMessage } = useLobbyList()
 
 const mapName = ref("")
 getMapName().then((value) => {
@@ -105,6 +105,7 @@ function closeLobbyClicked() {
 }
 
 function leaveLobbyClicked() {
+    leaveLobbyMessage()
     deletePlayerFromLobby()
     setActiveLobby({
         lobbyId: -1,
@@ -133,6 +134,7 @@ async function deletePlayerFromLobby() {
     } catch (error) {
         console.log(" error in remove player from Lobby: " + error)
     }
+    useLobbyList().updateLobbyList()
 }
 
 async function getMapName() {
