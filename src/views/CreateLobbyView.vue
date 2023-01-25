@@ -65,8 +65,6 @@
                                     () => {
                                         //set ActiveLoppy property to the selected Lobby
                                         createNewLobby(lobbyNameInput, 0, lobbyModeInput)
-
-                                        //fires JOINED event to backend to trigger persistence operations and inform other players on channel and update data
                                     }
                                 "
                             />
@@ -96,14 +94,16 @@ import BasicButton from "../components/Buttons/BasicButton.vue"
 import Header from "../components/Header.vue"
 import router from "../router/router"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
-import { createNewLobby, useLobbyList } from "../services/useLobbyList"
+import { createNewLobby } from "../services/useLobbyList"
+/*
 import { useMyMaps } from "../services/useMyMaps"
 import useUser from "../services/UserStore"
 import { ILobby } from "../typings/ILobby"
-
+*/
 const lobbyNameInput = ref("")
 const passwordInput = ref("")
 const lobbyModeInput = ref(E_LobbyMode.BUILD_MODE)
+/*
 const lobbyModeSelect = ref("")
 const mapSelect = ref("")
 const addNewMapInput = ref("")
@@ -141,6 +141,7 @@ function switchMapSelect() {
     }
     console.log(showAddNewMap.value)
 }
+*/
 </script>
 
 <style scoped>
