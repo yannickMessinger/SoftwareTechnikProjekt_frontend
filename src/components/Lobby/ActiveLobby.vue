@@ -15,7 +15,9 @@
             <p>
                 <b>Lobbyname: {{ activeLobby.lobbyName }}</b>
             </p>
-            <p><b>Kartenname: Rüdigers Karte</b></p>
+            <p>
+                <b>Kartenname: {{ mapName }}</b>
+            </p>
             <p v-if="userId === activeLobby.hostId"><b>Status: Host</b></p>
             <p v-else><b>Status: Spieler</b></p>
         </div>
@@ -51,23 +53,30 @@ import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
 import { onMounted, ref } from "vue"
 import router from "../../router/router"
+import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
 
 const { userId, activeLobby, setActiveLobby } = useUser()
 const { receiveLobbyUpdates } = useLobbyList()
 
-console.log("Pl-List")
-console.log(activeLobby.value.playerList)
+const mapName = ref("")
+getMapName().then((value) => {
+    if (value != undefined) {
+        const str: string = value
+        mapName.value = str
+    } else {
+        mapName.value = "no name found"
+    }
+})
 
 let gameId = ref(20) //TODO: gameId must refers to the id in the backend
 
 function changeGamemode() {
     if (activeLobby.value.lobbyModeEnum == E_LobbyMode.PLAY_MODE) {
         activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE
-        useLobbyList().changeLobbyModeMessage()
     } else {
         activeLobby.value.lobbyModeEnum = E_LobbyMode.PLAY_MODE
-        useLobbyList().changeLobbyModeMessage()
     }
+    useLobbyList().changeLobbyModeMessage()
 }
 
 function goBuild() {
@@ -121,6 +130,27 @@ async function deletePlayerFromLobby() {
             console.log("error in remove player from Lobby I")
             throw new Error(response.statusText)
         }
+    } catch (error) {
+        console.log(" error in remove player from Lobby: " + error)
+    }
+}
+
+async function getMapName() {
+    const url = "/api/map/" + activeLobby.value.mapId
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            console.log("error in remove player from Lobby I")
+            throw new Error(response.statusText)
+        }
+        const result: IGetMapByMapIdDTO = await response.json()
+        if (result.mapName != undefined) {
+            return result.mapName
+        }
+        return "no name found"
     } catch (error) {
         console.log(" error in remove player from Lobby: " + error)
     }
