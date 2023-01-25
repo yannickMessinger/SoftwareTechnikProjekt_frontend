@@ -4,6 +4,7 @@ import { IPosition } from "../../typings/IPosition"
 import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "./useGameView"
 import { routeLocationKey } from "vue-router"
+import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/position"

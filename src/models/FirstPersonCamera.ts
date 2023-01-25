@@ -14,6 +14,7 @@ export class FirstPersonCamera {
     public headBobActive: any
     public headBobTimer: any
     public KEYS: any
+    public audio = new Audio("/../../src/sound/engine-sound.mp3")
 
     constructor(camera: any, objects: any) {
         this.camera = camera
@@ -28,7 +29,8 @@ export class FirstPersonCamera {
         this.headBobActive = false
         this.headBobTimer = 0
         this.objects = objects
-        this.KEYS = { a: 65, s: 83, w: 87, d: 68 }
+        this.KEYS = { a: 65, s: 83, w: 87, d: 68, y: 89 }
+        this.audio.volume = 0.2
     }
 
     update() {
@@ -36,6 +38,8 @@ export class FirstPersonCamera {
         this.updateRotation(velocity)
         this.updateCamera()
         this.updateTranslation(velocity)
+        this.updateWasHonked()
+        this.updateEngineSound()
         this.input.update()
     }
 
@@ -98,5 +102,32 @@ export class FirstPersonCamera {
 
     clamp(x: any, a: any, b: any) {
         return Math.min(Math.max(x, a), b)
+    }
+
+    updateWasHonked() {
+        if (this.input.key(this.KEYS.y)) {
+            var audio = new Audio("/../../src/sound/honk-sound.wav")
+            audio.play()
+            this.input.keys[this.KEYS.y] = false
+        }
+    }
+
+    updateEngineSound() {
+        console.log(this.audio.currentTime)
+
+        if (
+            this.input.key(this.KEYS.a) ||
+            this.input.key(this.KEYS.w) ||
+            this.input.key(this.KEYS.d) ||
+            this.input.key(this.KEYS.s)
+        ) {
+            let buffer = 0.2
+            if (this.audio.currentTime > this.audio.duration - buffer) {
+                this.audio.currentTime = 0.2
+            }
+            this.audio.play()
+        } else {
+            this.audio.pause()
+        }
     }
 }

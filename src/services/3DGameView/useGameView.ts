@@ -193,43 +193,45 @@ export function fillGameState(): void {
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
         if (mapObj.game_assets.length > 0) {
             mapObj.game_assets.forEach((gameAsset) => {
-                if (gameAsset.assetId === null) {
-                    let tempId = -1
-                    gameState.npcCarMapFromuseGameview.set(
-                        tempId,
-                        new NpcCar(
+                if (gameAsset.userId === 0) {
+                    if (gameAsset.assetId === null) {
+                        let tempId = -1
+                        gameState.npcCarMapFromuseGameview.set(
                             tempId,
-                            gameAsset.x,
-                            0,
-                            gameAsset.y,
-                            gameAsset.rotation,
-                            gridSizeX,
-                            gridSizeY,
-                            fieldSize,
-                            mapObj
+                            new NpcCar(
+                                tempId,
+                                gameAsset.x,
+                                0,
+                                gameAsset.y,
+                                gameAsset.rotation,
+                                gridSizeX,
+                                gridSizeY,
+                                fieldSize,
+                                mapObj
+                            )
                         )
-                    )
 
                 //placing train if trainstation is placed
                 } else if (gameAsset.assetId === 11){
                     anzBahnhof ++
                     console.log("Anzahl Platzierter Bahnhöfe:")
                     console.log(anzBahnhof)
-                } else {
-                    gameState.npcCarMapFromuseGameview.set(
-                        gameAsset.assetId!,
-                        new NpcCar(
+                    } else {
+                        gameState.npcCarMapFromuseGameview.set(
                             gameAsset.assetId!,
-                            gameAsset.x,
-                            0,
-                            gameAsset.y,
-                            gameAsset.rotation,
-                            gridSizeX,
-                            gridSizeY,
-                            fieldSize,
-                            mapObj
+                            new NpcCar(
+                                gameAsset.assetId!,
+                                gameAsset.x,
+                                0,
+                                gameAsset.y,
+                                gameAsset.rotation,
+                                gridSizeX,
+                                gridSizeY,
+                                fieldSize,
+                                mapObj
+                            )
                         )
-                    )
+                    }
                 }
             })
         }
@@ -246,7 +248,7 @@ function updatePosMessage(npcId: number) {
         console.log("vurUpdate", tempCar.nextMapObj)
         const updatePosMsg: IStompMessage = {
             npcInfoRequestDTO: {
-                mapId: gameState.mapId,
+                mapId: activeLobby.value.mapId,
                 npcId: tempCar!.npcId,
                 npcRotation: tempCar!.positions.npcRotation,
                 currentMapObject: tempCar!.curMapObj,
@@ -338,7 +340,7 @@ async function onMessageReceived(payload: IStompMessage) {
             console.log("AMPEL")
             console.log(`Ampel mit Rot: ${rotationOfSearchedTrafficLight} muss abgefragt werden`)
             console.log(
-                Array.from(crossroadMap.get(updateNpcCar!.curMapObj.objectId)!.trafficLights.values())[
+                Array.from(crossroadMap.get(updateNpcCar!.curMapObj.objectId!)!.trafficLights.values())[
                     rotationOfSearchedTrafficLight
                 ]
             )

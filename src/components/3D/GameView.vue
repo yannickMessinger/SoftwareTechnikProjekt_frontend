@@ -31,6 +31,8 @@ import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
+import { useSound } from "../../services/useSound"
+import { on } from "events"
 import * as THREE from "three"
 import { useCarMap } from "../../services/3DGameView/useCarMap"
 import useCrossroadData from "../../services/3DGameView/useCrossroadData"
@@ -79,6 +81,21 @@ export default defineComponent({
         const { loadTrafficLight } = useCrossroadData()
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
+
+        const {
+            playHorn,
+            playEngine,
+            stopEngine,
+            playEngineFromOtherCar,
+            pauseEngineFromOtherCar,
+            connectSound,
+            initAmbientSound,
+            stopAmbientSound,
+            disconnectSound,
+            stopAllEngines,
+        } = useSound(activeLobby.value.lobbyId, payload)
+        connectSound()
+
         const scene3DobjectMap = new Map()
 
         const uid = userId.value
@@ -188,6 +205,7 @@ export default defineComponent({
                         //scene3DobjectMap.get(positionEle.id).setRotationFromEuler(new THREE.Euler( positionEle.rotation ))
                         let x = scene3DobjectMap.get(positionEle.id)
                         //x.rotation = positionEle.rotation
+                        checkPlayerCarDistance(ele.playerCarX, ele.playerCarZ, ele.playerCarId)
                         if (x != undefined) {
                             x.setRotationFromEuler(
                                 new THREE.Euler(
@@ -227,13 +245,33 @@ export default defineComponent({
                     }
                 })
             })
-            console.log(scene3DobjectMap)
+        }
+
+        function checkPlayerCarDistance(posX: number, posZ: number, carId: number) {
+            let distanceX = movableObject.getPositionX() - posX
+            let distanceZ = movableObject.getPositionZ() - posZ
+
+            //console.log("X" + distanceX)
+            //console.log("Y:" + distanceZ)
+            let distance = Math.abs(distanceX) + Math.abs(distanceZ)
+
+            if (distance < 20) {
+                playEngineFromOtherCar(carId, distance)
+            } else {
+                pauseEngineFromOtherCar(carId)
+            }
         }
 
         watch(
             () => gameState.mapObjsFromBackEnd,
             () => fillPlayerCarState()
         )
+
+        onBeforeUnmount(() => {
+            disconnectSound()
+            stopAmbientSound()
+            stopAllEngines()
+        })
 
         onMounted(() => {
             updateMapObjsFromGameState()
@@ -242,6 +280,17 @@ export default defineComponent({
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
                 movePlayerCars()
+                npcEles.value.forEach((ele) => {
+                    if (ele.driving) {
+                        ele.drive()
+                    }
+                })
+                if (movableObject.hornPlayed) {
+                    playHorn()
+                }
+                if (movableObject.enginePlayed) {
+                    playEngine()
+                }
             })
 
             setInterval(() => {
@@ -253,6 +302,8 @@ export default defineComponent({
                     }
                 })
             }, 500)
+
+            initAmbientSound()
 
             /**
              * delayed: waiting for socket connection
@@ -328,7 +379,7 @@ export default defineComponent({
             /></Plane>
 
             <!-- All elements placed in the editor are read from the list and placed in the scene-->
-            <div v-for="(ele, index) in mapElements" :key="index">
+            <div v-for="ele in mapElements">
                 <GltfModel
                     v-bind:src="buildingIDMap.get(ele.objectTypeId)"
                     :position="{
@@ -351,24 +402,24 @@ export default defineComponent({
                             : null
                     "
                 />
-                <!-- places all game assets of the current element-->
-                <div v-for="(asset, index) in npcEles" :key="index">
-                    <GltfModel
-                        v-bind:src="buildingIDMap.get(22)"
-                        :position="{
-                            x: asset[1].positions.npcPosX,
-                            y: 0.75,
-                            z: asset[1].positions.npcPosZ,
-                        }"
-                        :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
-                        :rotation="{
-                            x: 0,
-                            y: asset[1].viewRotation,
-                            z: 0,
-                        }"
-                        :props="{ name: 22 }"
-                    />
-                </div>
+            </div>
+            <!-- places all game assets of the current element-->
+            <div v-for="asset in npcEles">
+                <GltfModel
+                    v-bind:src="buildingIDMap.get(22)"
+                    :position="{
+                        x: asset[1].positions.npcPosX,
+                        y: 0.75,
+                        z: asset[1].positions.npcPosZ,
+                    }"
+                    :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
+                    :rotation="{
+                        x: 0,
+                        y: asset[1].viewRotation,
+                        z: 0,
+                    }"
+                    :props="{ name: 22 }"
+                />
             </div>
             <!-- creates and sets taxi bassed on playerCarList sets car for each playerId !== userId-->
             <div v-for="player in playerCarList">
@@ -377,7 +428,7 @@ export default defineComponent({
                         v-bind:src="buildingIDMap.get(21)"
                         :position="{
                             x: player[1].playerCarX,
-                            y: 0.75,
+                            y: 0,
                             z: player[1].playerCarZ,
                         }"
                         :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
