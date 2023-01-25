@@ -154,12 +154,12 @@ export default defineComponent({
                 fpsCamera.update()
             })
             setInterval(() => {
-                collisionService.updateCarBoundingBox(box)
+                collisionService.updateCarBoundingBox()
                 collisionService.checkCollision(bbService.getBoundingBoxes())
             }, 2500)
             setTimeout(() => {
                 bbService.setObjects(scene)
-            }, 5000)
+            }, 10000)
         })
 
         return {
@@ -220,7 +220,7 @@ export default defineComponent({
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
                     :props="{ name: ele.objectTypeId }"
                 />
-                <!-- places all game assets of the current element-->
+                <!-- places all game assets of the current javascriptelement-->
                 <div v-for="asset in ele.game_assets">
                     <GltfModel
                         v-bind:src="buildingIDMap.get(22)"
