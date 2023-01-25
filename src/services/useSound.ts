@@ -10,6 +10,8 @@ let ambientSound: HTMLAudioElement
 let audioHorn = new Audio("/../../src/sound/honk-sound.wav")
 let audioEngine = new Audio("/../../src/sound/engine-sound.mp3")
 const audioEnginesOtherCars = new Map<number, HTMLAudioElement>()
+const audioEnginesOtherCarsNPC = new Map<number, HTMLAudioElement>()
+
 audioEngine.volume = 0.1
 let lobbyId: number
 let payloadObject: IPosition
@@ -50,7 +52,7 @@ function playHornFromFromOtherCar(distance: number) {
 
 function playEngine() {
     let buffer = 0.09
-    audioEngine.volume = 0.02
+    audioEngine.volume = 0.009
     if (audioEngine.currentTime > audioEngine.duration - buffer) {
         audioEngine.currentTime = 0.03
     }
@@ -82,6 +84,25 @@ function playEngineFromOtherCar(carId: number, distance: number) {
     }
 }
 
+function playEngineFromOtherCarNPC(carId: number, distance: number) {
+    let volume = calculateSoundVolume(distance, 20)
+    let engine
+    if (audioEnginesOtherCarsNPC.has(carId)) {
+        engine = audioEnginesOtherCarsNPC.get(carId)
+        if (engine !== undefined) {
+            engine.volume = volume
+            if (engine.paused) {
+                engine.play()
+            }
+        }
+    } else {
+        engine = new Audio("/../../src/sound/engine-sound_other.mp3")
+        audioEnginesOtherCarsNPC.set(carId, engine)
+        engine.volume = volume
+        engine.play
+    }
+}
+
 function calculateSoundVolume(distance: number, factor: number) {
     //console.log(distance)
     distance -= factor
@@ -103,6 +124,21 @@ function stopAllEngines() {
     })
 }
 
+function pauseEngineFromOtherCarNPC(carId: number) {
+    if (audioEnginesOtherCarsNPC.has(carId)) {
+        let engine = audioEnginesOtherCarsNPC.get(carId)
+        if (engine !== undefined) {
+            engine.pause()
+        }
+    }
+}
+
+function stopAllEnginesNPC() {
+    audioEnginesOtherCarsNPC.forEach((engine) => {
+        engine.pause()
+    })
+}
+
 export function useSound(activeLobbyId: number, payload: IPosition) {
     lobbyId = activeLobbyId
     payloadObject = payload
@@ -117,6 +153,9 @@ export function useSound(activeLobbyId: number, payload: IPosition) {
         stopAmbientSound,
         disconnectSound,
         stopAllEngines,
+        pauseEngineFromOtherCarNPC,
+        playEngineFromOtherCarNPC,
+        stopAllEnginesNPC,
     }
 }
 
