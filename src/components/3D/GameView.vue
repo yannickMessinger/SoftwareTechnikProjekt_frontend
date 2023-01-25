@@ -1,11 +1,9 @@
 <script lang="ts">
 import {
-    PointLight,
     Box,
     Camera,
     Renderer,
     Scene,
-    LambertMaterial,
     GltfModel,
     AmbientLight,
     Plane,
@@ -14,25 +12,18 @@ import {
 import {
     computed,
     defineComponent,
-    onBeforeMount,
-    onBeforeUnmount,
     onMounted,
-    reactive,
     ref,
     toRaw,
-    getCurrentInstance,
     watch,
 } from "vue"
-import { FirstPersonCamera } from "../../models/FirstPersonCamera"
 import { MovmentInputController } from "../../models/MovementInputController"
 import { usePlayerList } from "../../services/usePlayerList"
 import useUser from "../../services/UserStore"
-import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
-import * as THREE from "three"
-import { useCarMap } from "../../services/3DGameView/useCarMap"
+import { MultiplayerCarlistService } from "../../services/3DGameView/MultiplayerCarlistService"
 
 export default defineComponent({
     components: {
@@ -77,6 +68,7 @@ export default defineComponent({
 
         const uid = userId.value
         const rawPlayerList = toRaw(playerList.value)
+        const multiplayerCarlistService = new MultiplayerCarlistService(rawPlayerList)
         //counter variables for loops to prefill map with dummy data
         let mapWidth = 30
         let mapHeight = 20
@@ -199,64 +191,6 @@ export default defineComponent({
             }
         }
 
-        /**
-         * Used for moving other Playercars according to positionState Values which are set/changed in useCarMultiplayer
-         * iterates through ele of Map<playerid,car>  and list of Iposition in positionState for value
-         *
-         */
-        function movePlayerCars() {
-            playerCarList.value.forEach((ele) => {
-                positionState.mapObjects.forEach((positionEle) => {
-                    if (ele.playerCarId !== uid && positionEle.id === ele.playerCarId) {
-                        //let rotationValue = positionEle.rotation * Math.PI
-                        ele.playerCarX = positionEle.x
-                        ele.playerCarZ = positionEle.z
-                        ele.playerCarRotation
-                        //scene3DobjectMap.get(positionEle.id).setRotationFromEuler(new THREE.Euler( positionEle.rotation ))
-                        let x = scene3DobjectMap.get(positionEle.id)
-                        //x.rotation = positionEle.rotation
-                        if (x != undefined) {
-                            x.setRotationFromEuler(
-                                new THREE.Euler(
-                                    positionEle.rotation._x,
-                                    positionEle.rotation._y,
-                                    positionEle.rotation._z,
-                                    positionEle.rotation.order
-                                )
-                            )
-                            //scene3DobjectMap.set(positionEle.id,x)
-                            //console.log("ele.playerCarRotation",ele.playerCarRotation)
-
-                            /*console.log(
-                                "positionEle.rotation",
-                                new THREE.Euler(
-                                    positionEle.rotation._x,
-                                    positionEle.rotation._y,
-                                    positionEle.rotation._z,
-                                    positionEle.rotation.order
-                                )
-                            )
-                            console.log("x", x)*/
-                        }
-                    }
-                })
-            })
-        }
-
-        function loadSceneChildrenWithKey(sceneObjChildren: Map<any, any>) {
-            console.log("anfangfunction", scene3DobjectMap)
-            sceneObjChildren.forEach((ele) => {
-                rawPlayerList.forEach((player) => {
-                    if (ele.name === `player_${player.userId}`) {
-                        if (!scene3DobjectMap.get(player.userId) && player.userId !== uid) {
-                            scene3DobjectMap.set(player.userId, ele)
-                        }
-                    }
-                })
-            })
-            console.log(scene3DobjectMap)
-        }
-
         watch(
             () => gameState.mapObjsFromBackEnd,
             () => fillPlayerCarState()
@@ -271,7 +205,7 @@ export default defineComponent({
 
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
-                movePlayerCars()
+                multiplayerCarlistService.updatePlayerCars(playerCarList, positionState, uid)
             })
 
             /**
@@ -280,14 +214,9 @@ export default defineComponent({
             setInterval(() => fillPayload(), 25)
             setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
             setTimeout(() => createMessage(payload), 5000)
-            setTimeout(() => console.log("scene:", scene.value.scene.children), 7500)
-            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 8000)
-            setTimeout(() => console.log("map:", scene3DobjectMap), 7500)
             setInterval(() => {
-                scene3DobjectMap.forEach((player) => {
-                    //console.log(player.setRotationFromEuler(new THREE.Vector3(0, 1, 0),10))
-                })
-            })
+               multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
+            }, 8000)
         })
 
         return {
