@@ -144,7 +144,7 @@ function cardClickedDeleteAction(clickedCard: any) {
     }
     if (removedCard != null) {
         console.log("Removed Item: " + clickedCard.id)
-        // TODO call delete option in Backend (#229 connect backend)
+        deleteMapByGivenId(clickedCard.id)
     }
 }
 
@@ -166,9 +166,7 @@ async function getMapsFromBackend() {
 
         const jsondata: IGetMapsByPlayerResponseDTO[] = await response.json()
         jsondata.forEach(function (value) {
-            console.log("loop: " + value.mapId)
             cardList.push({ id: value.mapId, name: value.mapName, date: new Date(value.creationDate) })
-            console.log(cardList)
         })
         //mapsState.mapslist = jsondata
         mapsState.errormsg = ""
@@ -177,6 +175,21 @@ async function getMapsFromBackend() {
     }
     if (cardList.length > 0) {
         isEmpty.value = false
+    }
+}
+
+async function deleteMapByGivenId(mapId: number) {
+    const url = "/api/map/" + mapId
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+        })
+        if (!response.ok) {
+            console.log("error in remove map")
+            throw new Error(response.statusText)
+        }
+    } catch (error) {
+        console.log(" error in remove map: " + error)
     }
 }
 </script>
