@@ -20,6 +20,7 @@ export class NpcCar {
     public viewRotation: number
     public rotationMap: Map<number, number>
     public velocity: number
+    public objectTypeId: number
 
     public curveRadius: number
     public curveCenterX: number
@@ -30,6 +31,7 @@ export class NpcCar {
 
     constructor(
         npcId: number,
+        objectTypeId: number,
         gameAssetX: number,
         posY: number,
         gameAssetZ: number,
@@ -69,7 +71,7 @@ export class NpcCar {
             game_assets: [],
         })
         this.velocity = 0.05
-
+        this.objectTypeId = objectTypeId
         this.gridSizeX = gridSizeX
         this.gridSizeY = gridSizeY
         this.fieldSize = fieldSize
@@ -98,9 +100,9 @@ export class NpcCar {
 
     //driving
     drive() {
-        if (this.curMapObj.objectTypeId === 0) {
+        if (this.curMapObj.objectTypeId === 0 || this.curMapObj.objectTypeId === 12 || this.curMapObj.objectTypeId === 9 || this.curMapObj.objectTypeId === 11) {
             this.driveStraight(this.velocity)
-        } else if (this.curMapObj.objectTypeId === 1) {
+        } else if (this.curMapObj.objectTypeId === 1 || this.curMapObj.objectTypeId === 10) {
             this.driveCurve(0.025)
         } else if (this.curMapObj.objectTypeId === 2) {
             if (this.lastCarRotation === this.positions.npcRotation) {

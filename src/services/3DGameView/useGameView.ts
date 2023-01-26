@@ -87,6 +87,7 @@ export function useGameView() {
         setGameStateMapId,
         updatePosMessage,
         receiveNpcUpdates,
+        randomNumber
     }
 }
 
@@ -162,7 +163,7 @@ export function resetMapObjsFromBackEnd() {
  * @param max value for random numbwer
  * @returns random number
  */
-function randomNumer(min: number, max: number) {
+function randomNumber(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 /**
@@ -176,10 +177,10 @@ export function fillGameState(): void {
         for (let j = 0; j < mapWidth.value; j++) {
             gameState.gameMapObjects[counter] = {
                 objectId: -1,
-                objectTypeId: randomNumer(17, 20),
+                objectTypeId: randomNumber(17, 20),
                 x: i,
                 y: j,
-                rotation: randomNumer(0, 3),
+                rotation: randomNumber(0, 3),
                 game_assets: [],
             }
             counter += 1
@@ -199,6 +200,7 @@ export function fillGameState(): void {
                             tempId,
                             new NpcCar(
                                 tempId,
+                                gameAsset.objectTypeId,
                                 gameAsset.x,
                                 0,
                                 gameAsset.y,
@@ -210,10 +212,28 @@ export function fillGameState(): void {
                             )
                         )
                     } else {
+                        if(gameAsset.objectTypeId === 14){
+                            gameState.npcCarMapFromuseGameview.set(
+                                gameAsset.assetId!,
+                                new NpcCar(
+                                    gameAsset.assetId!,
+                                    gameAsset.objectTypeId,
+                                    gameAsset.x,
+                                    0,
+                                    gameAsset.y,
+                                    gameAsset.rotation,
+                                    gridSizeX,
+                                    gridSizeY,
+                                    fieldSize,
+                                    mapObj
+                                )
+                            )
+                        }
                         gameState.npcCarMapFromuseGameview.set(
                             gameAsset.assetId!,
                             new NpcCar(
                                 gameAsset.assetId!,
+                                gameAsset.objectTypeId,
                                 gameAsset.x,
                                 0,
                                 gameAsset.y,
@@ -306,9 +326,9 @@ async function onMessageReceived(payload: IStompMessage) {
         updateNpcCar!.calcMapEleCenter()
         updateNpcCar!.calcNpcMapLimit()
 
-        if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 0) {
+        if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 0 || payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 12 || payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 9 || payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 11) {
             updateNpcCar!.viewRotation = updateNpcCar!.rotationMap.get(updateNpcCar!.positions.npcRotation)!
-        } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 1) {
+        } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 1 || payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 10) {
             updateNpcCar!.calculateCurve()
         } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 2) {
             updateNpcCar!.calculateIntersection()

@@ -31,6 +31,8 @@ const toolState = reactive({
 const lobbyState = useUser().activeLobby
 const { gridSize } = useGridSize()
 const npcCarObjTypeId = 7
+const trainStationObjTypeId = 11
+const trainObjTypeId = 14
 const playerSpawnObjTypeId = 13
 
 const {
@@ -380,15 +382,36 @@ function onClick(cell: any, e: any) {
             streetGrid[cell.posX][cell.posY].objectTypeId = toolState.block.objectTypeId
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
-            payload = {
-                objectId: -1,
-                objectTypeId: toolState.block.objectTypeId,
-                x: cell.posX,
-                y: cell.posY,
-                rotation: toolState.block.rotation,
-                game_assets: streetGrid[cell.posX][cell.posY].game_assets,
+            if(toolState.block.objectTypeId === trainStationObjTypeId){
+                let newGameAssets = streetGrid[cell.posX][cell.posY].game_assets
+                newGameAssets.push({
+                    objectTypeId:trainObjTypeId,
+                    x: 0.5,
+                    y: 0.5,
+                    rotation: toolState.block.rotation,
+                    texture: blockList[trainObjTypeId].texture,
+                    userId: 0,
+                })
+                payload = {
+                    objectId: -1,
+                    objectTypeId: toolState.block.objectTypeId,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: toolState.block.rotation,
+                    game_assets: newGameAssets
+                }
+            }else {
+                payload = {
+                    objectId: -1,
+                    objectTypeId: toolState.block.objectTypeId,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: toolState.block.rotation,
+                    game_assets: streetGrid[cell.posX][cell.posY].game_assets,
+                }
             }
             createMessage(payload)
+            console.log("Payload: ", payload)
         }
     }
     if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].objectTypeId !== -1) {

@@ -65,6 +65,7 @@ export default defineComponent({
             updateMapObjsFromGameState,
             updatePosMessage,
             receiveNpcUpdates,
+            randomNumber
         } = useGameView()
         const {
             createMessage,
@@ -137,9 +138,9 @@ export default defineComponent({
 
         buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
 
-        buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
+        buildingIDMap.set(7, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
         buildingIDMap.set(23, "/../../../src/assets/3D_Models/TrafficLight/Traffic_Light.gltf")
-        buildingIDMap.set(24, "/../../../src/assets/3D_Models/Vehicles/thomas2.gltf")
+        buildingIDMap.set(14, "/../../../src/assets/3D_Models/Vehicles/thomas2.gltf")
 
         /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()
@@ -302,8 +303,8 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
                 npcEles.value.forEach((ele) => {
-                    console.log(ele.positions.npcPosX)
-                    console.log(ele.positions.npcPosZ)
+                    //console.log(ele.positions.npcPosX)
+                    //console.log(ele.positions.npcPosZ)
                     checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
                     if (ele.driving) {
                         ele.drive()
@@ -315,6 +316,7 @@ export default defineComponent({
                 if (movableObject.enginePlayed) {
                     playEngine()
                 }
+                console.log("NPC Car", npcEles)
             })
 
             setInterval(() => {
@@ -346,9 +348,9 @@ export default defineComponent({
 
             setInterval(() => {
                 npcEles.value.forEach((ele) => {
-                    console.log(ele.reachedMapEleLimit())
+                    //console.log(ele.reachedMapEleLimit())
                     if (ele.reachedMapEleLimit()) {
-                        console.log(`ele mit ${ele.npcId} braucht POS Update!`)
+                        //console.log(`ele mit ${ele.npcId} braucht POS Update!`)
                         updatePosMessage(ele.npcId)
                     }
                 })
@@ -378,6 +380,7 @@ export default defineComponent({
             fieldSize,
             playerCarList,
             uid,
+            randomNumber
         }
     },
 })
@@ -428,9 +431,10 @@ export default defineComponent({
                 />
             </div>
             <!-- places all game assets of the current element-->
+            <!--randomNumber(randomCar)-->
             <div v-for="asset in npcEles">
                 <GltfModel
-                    v-bind:src="buildingIDMap.get(22)"
+                    v-bind:src="buildingIDMap.get(asset[1].objectTypeId)"
                     :position="{
                         x: asset[1].positions.npcPosX,
                         y: 0.75,
