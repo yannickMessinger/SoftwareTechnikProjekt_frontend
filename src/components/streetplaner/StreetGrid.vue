@@ -382,10 +382,10 @@ function onClick(cell: any, e: any) {
             streetGrid[cell.posX][cell.posY].objectTypeId = toolState.block.objectTypeId
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
-            if(toolState.block.objectTypeId === trainStationObjTypeId){
-                let newGameAssets = streetGrid[cell.posX][cell.posY].game_assets
+            if (toolState.block.objectTypeId === trainStationObjTypeId) {
+                let newGameAssets = []
                 newGameAssets.push({
-                    objectTypeId:trainObjTypeId,
+                    objectTypeId: trainObjTypeId,
                     x: 0.5,
                     y: 0.5,
                     rotation: toolState.block.rotation,
@@ -398,9 +398,9 @@ function onClick(cell: any, e: any) {
                     x: cell.posX,
                     y: cell.posY,
                     rotation: toolState.block.rotation,
-                    game_assets: newGameAssets
+                    game_assets: newGameAssets,
                 }
-            }else {
+            } else {
                 payload = {
                     objectId: -1,
                     objectTypeId: toolState.block.objectTypeId,
@@ -411,7 +411,6 @@ function onClick(cell: any, e: any) {
                 }
             }
             createMessage(payload)
-            console.log("Payload: ", payload)
         }
     }
     if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].objectTypeId !== -1) {

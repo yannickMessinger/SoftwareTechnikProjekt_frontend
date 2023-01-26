@@ -65,7 +65,7 @@ export default defineComponent({
             updateMapObjsFromGameState,
             updatePosMessage,
             receiveNpcUpdates,
-            randomNumber
+            randomNumber,
         } = useGameView()
         const {
             createMessage,
@@ -316,7 +316,6 @@ export default defineComponent({
                 if (movableObject.enginePlayed) {
                     playEngine()
                 }
-                console.log("NPC Car", npcEles)
             })
 
             setInterval(() => {
@@ -380,7 +379,7 @@ export default defineComponent({
             fieldSize,
             playerCarList,
             uid,
-            randomNumber
+            randomNumber,
         }
     },
 })
@@ -437,7 +436,7 @@ export default defineComponent({
                     v-bind:src="buildingIDMap.get(asset[1].objectTypeId)"
                     :position="{
                         x: asset[1].positions.npcPosX,
-                        y: 0.75,
+                        y: 0,
                         z: asset[1].positions.npcPosZ,
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
