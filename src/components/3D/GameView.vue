@@ -414,22 +414,16 @@ export default defineComponent({
                 <GltfModel
                     v-bind:src="buildingIDMap.get(ele.objectTypeId)"
                     :position="{
-                        x: calcCoordinateX(ele.y),
+                        x: ele.centerX3d,
                         y: 0,
-                        z: calcCoordinateZ(ele.x),
+                        z: ele.centerZ3d,
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
                     :props="{ name: ele.objectId }"
                     v-on:load="
                         ele.objectTypeId === 2
-                            ? loadTrafficLight(
-                                  ele,
-                                  scene.scene,
-                                  calcCoordinateX(ele.y),
-                                  calcCoordinateZ(ele.x),
-                                  rotationMap
-                              )
+                            ? loadTrafficLight(ele, scene.scene, ele.centerX3d!, ele.centerZ3d!, rotationMap)
                             : null
                     "
                 />

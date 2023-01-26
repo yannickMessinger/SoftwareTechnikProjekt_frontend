@@ -87,7 +87,7 @@ export function useGameView() {
         setGameStateMapId,
         updatePosMessage,
         receiveNpcUpdates,
-        randomNumber
+        randomNumber,
     }
 }
 
@@ -157,6 +157,20 @@ export function resetMapObjsFromBackEnd() {
     gameState.mapObjsFromBackEnd.splice(0, gameState.mapObjsFromBackEnd.length)
 }
 
+/*Calculates X coordinates position of loaded Model */
+function calcCoordinateX(n: number) {
+    let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
+    //console.log(`GameObj x: ${x}`)
+    return x
+}
+
+/*Calculates Z coordinates position of loaded Model */
+function calcCoordinateZ(n: number) {
+    let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
+    //console.log(`GameObj z: ${z}`)
+    return z
+}
+
 /**
  * function to generate random numbers between the given min and max values
  * @param min min value for random number
@@ -178,8 +192,10 @@ export function fillGameState(): void {
             gameState.gameMapObjects[counter] = {
                 objectId: -1,
                 objectTypeId: randomNumber(17, 20),
-                x: i,
-                y: j,
+                x: -1,
+                y: -1,
+                centerX3d: calcCoordinateX(j),
+                centerZ3d: calcCoordinateZ(i),
                 rotation: randomNumber(0, 3),
                 game_assets: [],
             }
@@ -201,62 +217,50 @@ export function fillGameState(): void {
                             new NpcCar(
                                 tempId,
                                 gameAsset.objectTypeId,
-                                gameAsset.x,
-                                0,
-                                gameAsset.y,
+                                gameAsset.x3d!,
+                                gameAsset.z3d!,
                                 gameAsset.rotation,
-                                gridSizeX,
-                                gridSizeY,
                                 fieldSize,
                                 mapObj
                             )
                         )
                     } else {
-                        if(gameAsset.objectTypeId === 14){
+                        if (gameAsset.objectTypeId === 14) {
                             console.log("THOMAS IST DAAAA")
                             gameState.npcCarMapFromuseGameview.set(
                                 gameAsset.assetId!,
                                 new NpcCar(
                                     gameAsset.assetId!,
                                     14,
-                                    gameAsset.x,
-                                    0,
-                                    gameAsset.y,
+                                    gameAsset.x3d!,
+                                    gameAsset.z3d!,
                                     gameAsset.rotation,
-                                    gridSizeX,
-                                    gridSizeY,
                                     fieldSize,
                                     mapObj
                                 )
-                                    
                             )
-                            
-                        }else {
+                        } else {
                             gameState.npcCarMapFromuseGameview.set(
-                            gameAsset.assetId!,
+                                gameAsset.assetId!,
                                 new NpcCar(
                                     gameAsset.assetId!,
                                     randomNumber(30, 33),
-                                    gameAsset.x,
-                                    0,
-                                    gameAsset.y,
+                                    gameAsset.x3d!,
+                                    gameAsset.z3d!,
                                     gameAsset.rotation,
-                                    gridSizeX,
-                                    gridSizeY,
                                     fieldSize,
                                     mapObj
                                 )
                             )
                         }
-                        
                     }
                 }
             })
         }
 
         gameState.gameMapObjects[mapObj.x * 30 + mapObj.y] = mapObj
-        console.log(gameState.npcCarMapFromuseGameview)
     })
+    console.log(gameState.gameMapObjects)
 }
 
 //emits event to backend with current information, so that next map element can be calculated.
@@ -329,12 +333,21 @@ async function onMessageReceived(payload: IStompMessage) {
         updateNpcCar!.nextMapObj = payload.npcInfoResponseDTO!.nextnextUpperMapObject
         updateNpcCar!.positions.npcRotation = payload.npcInfoResponseDTO!.newGameAssetRotation
 
-        updateNpcCar!.calcMapEleCenter()
+        updateNpcCar!.curMapObjCenterCoords.centerX = updateNpcCar!.curMapObj.centerX3d!
+        updateNpcCar!.curMapObjCenterCoords.centerZ = updateNpcCar!.curMapObj.centerZ3d!
         updateNpcCar!.calcNpcMapLimit()
 
-        if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 0 || payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 12 || payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 9 || payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 11) {
+        if (
+            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 0 ||
+            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 12 ||
+            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 9 ||
+            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 11
+        ) {
             updateNpcCar!.viewRotation = updateNpcCar!.rotationMap.get(updateNpcCar!.positions.npcRotation)!
-        } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 1 || payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 10) {
+        } else if (
+            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 1 ||
+            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 10
+        ) {
             updateNpcCar!.calculateCurve()
         } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 2) {
             updateNpcCar!.calculateIntersection()

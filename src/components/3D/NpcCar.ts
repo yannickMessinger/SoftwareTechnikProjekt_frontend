@@ -7,8 +7,6 @@ export class NpcCar {
     public curMapObjCenterCoords: any
     public curMapObj: IMapObject
     public nextMapObj: IMapObject
-    public gridSizeX: number
-    public gridSizeY: number
     public fieldSize: number
     public mapLimit: number
     public gameAssetX: number
@@ -33,11 +31,8 @@ export class NpcCar {
         npcId: number,
         objectTypeId: number,
         gameAssetX: number,
-        posY: number,
         gameAssetZ: number,
         npcRotation: number,
-        gridSizeX: number,
-        gridSizeY: number,
         fieldSize: number,
         curMapObj: IMapObject
     ) {
@@ -50,8 +45,7 @@ export class NpcCar {
             [3, (3 * Math.PI) / 2],
         ])
 
-        this.positions = reactive({ npcPosX: 0, npcPosY: posY, npcPosZ: 0, npcRotation: npcRotation })
-        this.curMapObjCenterCoords = reactive({ centerX: 0, centerZ: 0 })
+        this.positions = reactive({ npcPosX: gameAssetX, npcPosY: 0, npcPosZ: gameAssetZ, npcRotation: npcRotation })
 
         this.curMapObj = reactive({
             objectId: curMapObj.objectId,
@@ -70,10 +64,12 @@ export class NpcCar {
             rotation: -1,
             game_assets: [],
         })
+
+        this.curMapObjCenterCoords = reactive({ centerX: this.curMapObj.centerX3d, centerZ: this.curMapObj.centerX3d })
+
         this.velocity = 0.05
         this.objectTypeId = objectTypeId
-        this.gridSizeX = gridSizeX
-        this.gridSizeY = gridSizeY
+
         this.fieldSize = fieldSize
         this.mapLimit = 0
         this.gameAssetX = gameAssetX
@@ -93,14 +89,17 @@ export class NpcCar {
         this.currCurveAngle = 0.5
         this.curveAngleInc = 0.5
 
-        this.calcMapEleCenter()
-        this.calcPixelPosNpc()
         this.calcNpcMapLimit()
     }
 
     //driving
     drive() {
-        if (this.curMapObj.objectTypeId === 0 || this.curMapObj.objectTypeId === 12 || this.curMapObj.objectTypeId === 9 || this.curMapObj.objectTypeId === 11) {
+        if (
+            this.curMapObj.objectTypeId === 0 ||
+            this.curMapObj.objectTypeId === 12 ||
+            this.curMapObj.objectTypeId === 9 ||
+            this.curMapObj.objectTypeId === 11
+        ) {
             this.driveStraight(this.velocity)
         } else if (this.curMapObj.objectTypeId === 1 || this.curMapObj.objectTypeId === 10) {
             this.driveCurve(0.025)
@@ -151,21 +150,6 @@ export class NpcCar {
         } else {
             this.viewRotation += 0.5 * (Math.PI / 180)
         }
-    }
-
-    calcMapEleCenter(): void {
-        this.curMapObjCenterCoords.centerX =
-            this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
-        this.curMapObjCenterCoords.centerZ =
-            this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
-    }
-
-    calcPixelPosNpc(): void {
-        let originX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-        this.positions.npcPosX = originX + this.gameAssetX * this.fieldSize
-
-        let originZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-        this.positions.npcPosZ = originZ + this.gameAssetZ * this.fieldSize
     }
 
     calcNpcMapLimit(): void {
@@ -301,7 +285,7 @@ export class NpcCar {
     }
 
     calculateCurve(): void {
-        this.calcMapEleCenter()
+        //this.calcMapEleCenter()
         if (this.curMapObj.rotation === 0) {
             this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
             this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
