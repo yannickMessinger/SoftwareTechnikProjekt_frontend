@@ -15,18 +15,10 @@ import useUser from "../../services/UserStore"
 import { useEditor } from "../../services/Editor/useEditor"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
-const { bus } = useEventBus()
-const { setGameStateSizes, setGameStateMapId } = useGameView()
-const { blockListState, updateBlockList } = useBlockList()
+import { useValidation } from "../../services/streetplaner/useValidation"
 
 var gridSizeX = 20
 var gridSizeY = 30
-const toolState = reactive({
-    tool: ToolEnum.EMPTY,
-    block: { objectTypeId: -1, groupId: -1, rotation: 0, texture: "" },
-})
-const lobbyState = useUser().activeLobby
-const { gridSize } = useGridSize()
 
 const straightObjTypeId = 0
 const curveObjTypeId = 1
@@ -36,6 +28,32 @@ const curveRailObjTypeId = 10
 const trainStationObjTypeId = 11
 const railRoadCrossObjTypeId = 12
 const pedestrianCrossingObjTypeId = 8
+
+// initialize gridSize
+const { gridSize } = useGridSize()
+// initialize gridSizePx used in css
+const gridSizePx = computed(() => gridSize.size.toString() + "px")
+const assetSize = computed(() => gridSize.size / 4)
+const assetSizePx = computed(() => assetSize.value.toString() + "px")
+
+const { bus } = useEventBus()
+const { setGameStateSizes, setGameStateMapId } = useGameView()
+const { blockListState, updateBlockList } = useBlockList()
+const {
+    initValidator,
+    checkStraightValid,
+    checkCurveValid,
+    checkIntersectionValid,
+    checkStraightRailValid,
+    checkCurveRailValid,
+    checkRailRoadCrossingValid,
+} = useValidation()
+
+const toolState = reactive({
+    tool: ToolEnum.EMPTY,
+    block: { objectTypeId: -1, groupId: -1, rotation: 0, texture: "" },
+})
+const lobbyState = useUser().activeLobby
 
 const {
     editorState,
@@ -47,6 +65,14 @@ const {
     receiveEditorUpdates,
     updateMapId,
 } = useEditor(lobbyState.value!.mapId)
+
+// create and initialize streetGrid
+const streetGrid: IGridElement[][] = reactive(
+    Array(gridSizeX)
+        .fill([])
+        .map(() => Array(gridSizeY).fill(null))
+)
+fillGridEmpty()
 
 watch(
     () => bus.value.get("tool-select-event"),
@@ -91,20 +117,6 @@ watch(
     }
 )
 
-// create and initialize streetGrid
-const streetGrid: IGridElement[][] = reactive(
-    Array(gridSizeX)
-        .fill([])
-        .map(() => Array(gridSizeY).fill(null))
-)
-fillGridEmpty()
-
-// initialize gridSize
-//const gridSize = ref(40)
-// initialize gridSizePx used in css
-const gridSizePx = computed(() => gridSize.size.toString() + "px")
-const assetSize = computed(() => gridSize.size / 4)
-const assetSizePx = computed(() => assetSize.value.toString() + "px")
 // declare blockList
 var blockList: Array<IBlockElement>
 watch(
@@ -121,6 +133,7 @@ onMounted(() => {
     // get streetgrid from backend via mapID
 
     setGameStateSizes(gridSizeY, gridSizeX, gridSize.size)
+    initValidator(streetGrid, gridSizeX, gridSizeY)
 
     updateBlockList()
     receiveEditorUpdates()
@@ -129,453 +142,79 @@ onMounted(() => {
     updateMap()
 })
 
-function validateCarPosition() {
+function validateCarPosition(): boolean {
+    let isValid: boolean = true
     for (let block of editorState.mapObjects) {
         if (blockList[block.objectTypeId].type !== "STREET") {
             if (block.game_assets.length > 0) {
                 for (let gameAsset of block.game_assets) {
                     gameAsset.isValid = false
+                    isValid = false
                 }
             }
         }
     }
+    return isValid
 }
 
-function validateStreetGrid() {
+function validateStreetGrid(): boolean {
+    let isValid: boolean = true
     let streetElements = editorState.mapObjects.filter((ele) => blockList[ele.objectTypeId].type === "STREET")
     for (let streetEle of streetElements) {
-        if (streetEle.objectTypeId === straightObjTypeId || streetEle.objectTypeId === pedestrianCrossingObjTypeId) {
-            if (!checkStraightValid(streetEle)) {
-                streetGrid[streetEle.x][streetEle.y].isValid = false
-            }
-        } else if (streetEle.objectTypeId === intersectionObjTypeId) {
-            if (!checkIntersectionValid(streetEle)) {
-                streetGrid[streetEle.x][streetEle.y].isValid = false
-            }
-        } else if (streetEle.objectTypeId === curveObjTypeId) {
-            if (!checkCurveValid(streetEle)) {
-                streetGrid[streetEle.x][streetEle.y].isValid = false
-            }
+        switch (streetEle.objectTypeId) {
+            case straightObjTypeId:
+            case pedestrianCrossingObjTypeId:
+                if (!checkStraightValid(streetEle)) {
+                    streetGrid[streetEle.x][streetEle.y].isValid = false
+                    isValid = false
+                }
+                break
+            case intersectionObjTypeId:
+                if (!checkIntersectionValid(streetEle)) {
+                    streetGrid[streetEle.x][streetEle.y].isValid = false
+                    isValid = false
+                }
+                break
+            case curveObjTypeId:
+                if (!checkCurveValid(streetEle)) {
+                    streetGrid[streetEle.x][streetEle.y].isValid = false
+                    isValid = false
+                }
+                break
         }
     }
+    return isValid
 }
 
-function validateRailGrid() {
-    let railElements = editorState.mapObjects.filter((ele) => blockList[ele.objectTypeId].type === "RAIL" || blockList[ele.objectTypeId].type === "STREET_RAIL")
+function validateRailGrid(): boolean {
+    let isValid: boolean = true
+    let railElements = editorState.mapObjects.filter(
+        (ele) => blockList[ele.objectTypeId].type === "RAIL" || blockList[ele.objectTypeId].type === "STREET_RAIL"
+    )
     for (let railEle of railElements) {
-        if (railEle.objectTypeId === straightRailObjTypeId || railEle.objectTypeId === trainStationObjTypeId) {
-            if (!checkStraightRailValid(railEle)) {
-                streetGrid[railEle.x][railEle.y].isValid = false
-            }
-        } else if (railEle.objectTypeId === curveRailObjTypeId) {
-            if (!checkCurveRailValid(railEle)) {
-                streetGrid[railEle.x][railEle.y].isValid = false
-            }
-        } else if (railEle.objectTypeId === railRoadCrossObjTypeId) {
-            if (!checkRailRoadCrossingValid(railEle)) {
-                streetGrid[railEle.x][railEle.y].isValid = false
-            }
-        } 
-    }
-}
-
-function checkStraightValid(element: IMapObject): boolean {
-    if (element.rotation % 2 == 0) {
-        // check bottom
-        if (!checkStreetBottom(element)) {
-            return false
-        }
-        // check top
-        if (!checkStreetTop(element)) {
-            return false
-        }
-    } else {
-        // check left
-        if (!checkStreetLeft(element)) {
-            return false
-        }
-        // check right
-        if (!checkStreetRight(element)) {
-            return false
+        switch (railEle.objectTypeId) {
+            case straightRailObjTypeId:
+            case trainStationObjTypeId:
+                if (!checkStraightRailValid(railEle)) {
+                    streetGrid[railEle.x][railEle.y].isValid = false
+                    isValid = false
+                }
+                break
+            case curveRailObjTypeId:
+                if (!checkCurveRailValid(railEle)) {
+                    streetGrid[railEle.x][railEle.y].isValid = false
+                    isValid = false
+                }
+                break
+            case railRoadCrossObjTypeId:
+                if (!checkRailRoadCrossingValid(railEle)) {
+                    streetGrid[railEle.x][railEle.y].isValid = false
+                    isValid = false
+                }
+                break
         }
     }
-    return true
-}
-
-function checkCurveValid(element: IMapObject): boolean {
-    if (element.rotation === 0) {
-        if (!checkStreetBottom(element)) {
-            return false
-        }
-        if (!checkStreetRight(element)) {
-            return false
-        }
-    } else if (element.rotation === 1) {
-        if (!checkStreetBottom(element)) {
-            return false
-        }
-        if (!checkStreetLeft(element)) {
-            return false
-        }
-    } else if (element.rotation === 2) {
-        if (!checkStreetLeft(element)) {
-            return false
-        }
-        if (!checkStreetTop(element)) {
-            return false
-        }
-    } else if (element.rotation === 3) {
-        if (!checkStreetTop(element)) {
-            return false
-        }
-        if (!checkStreetRight(element)) {
-            return false
-        }
-    } else {
-        return false
-    }
-    return true
-}
-
-function checkIntersectionValid(element: IMapObject): boolean {
-    // check bottom
-    if (!checkStreetBottom(element)) {
-        return false
-    }
-    // check top
-    if (!checkStreetTop(element)) {
-        return false
-    }
-    // check left
-    if (!checkStreetLeft(element)) {
-        return false
-    }
-    // check right
-    if (!checkStreetRight(element)) {
-        return false
-    }
-    return true
-}
-
-function checkStraightRailValid(element: IMapObject): boolean {
-    if (element.rotation % 2 === 0) {
-        if (!checkRailTop(element)) {
-            return false
-        }
-        if (!checkRailBottom(element)) {
-            return false
-        }
-    } else {
-        if (!checkRailLeft(element)) {
-            return false
-        }
-        if (!checkRailRight(element)) {
-            return false
-        }
-    }
-    return true
-}
-
-function checkCurveRailValid(element: IMapObject): boolean {
-    if (element.rotation === 0) {
-        if (!checkRailBottom(element)) {
-            return false
-        }
-        if (!checkRailRight(element)) {
-            return false
-        }
-    } else if (element.rotation === 1) {
-        if (!checkRailBottom(element)) {
-            return false
-        }
-        if (!checkRailLeft(element)) {
-            return false
-        }
-    } else if (element.rotation === 2) {
-        if (!checkRailLeft(element)) {
-            return false
-        }
-        if (!checkRailTop(element)) {
-            return false
-        }
-    } else if (element.rotation === 3) {
-        if (!checkRailTop(element)) {
-            return false
-        }
-        if (!checkRailRight(element)) {
-            return false
-        }
-    } else {
-        return false
-    }
-    return true
-}
-
-function checkRailRoadCrossingValid(element: IMapObject): boolean {
-    if (element.rotation % 2 === 0) {
-        if (!checkRailLeft(element)) {
-            return false
-        }
-        if (!checkRailRight(element)) {
-            return false
-        }
-        if (!checkStreetTop(element)) {
-            return false
-        }
-        if (!checkStreetBottom(element)) {
-            return false
-        }
-    } else {
-        if (!checkRailTop(element)) {
-            return false
-        }
-        if (!checkRailBottom(element)) {
-            return false
-        }
-        if (!checkStreetRight(element)) {
-            return false
-        }
-        if (!checkStreetLeft(element)) {
-            return false
-        }
-    }
-    return true
-}
-
-function checkRailTop(element: IMapObject): boolean {
-    let checkElement: IGridElement
-    if (element.x - 1 >= 0) {
-        checkElement = streetGrid[element.x - 1][element.y]
-        if (checkElement.objectTypeId === -1) {
-            return false
-        } else if (checkElement.objectTypeId === straightRailObjTypeId || checkElement.objectTypeId === trainStationObjTypeId) {
-            if (checkElement.rotation % 2 !== 0) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === curveRailObjTypeId) {
-            if (checkElement.rotation === 2 || checkElement.rotation === 3) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === railRoadCrossObjTypeId) {
-            if (checkElement.rotation % 2 !== 1) {
-                return false
-            }
-        }
-    } else {
-        return false
-    }
-    return true
-}
-
-function checkRailBottom(element: IMapObject): boolean {
-    let checkElement: IGridElement
-    if (element.x + 1 < gridSizeX) {
-        checkElement = streetGrid[element.x + 1][element.y]
-        if (checkElement.objectTypeId === -1) {
-            return false
-        } else if (checkElement.objectTypeId === straightRailObjTypeId || checkElement.objectTypeId === trainStationObjTypeId) {
-            if (checkElement.rotation % 2 !== 0) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === curveRailObjTypeId) {
-            if (checkElement.rotation === 0 || checkElement.rotation === 1) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === railRoadCrossObjTypeId) {
-            if (checkElement.rotation % 2 !== 1) {
-                return false
-            }
-        }
-    } else {
-        return false
-    }
-    return true
-}
-
-function checkRailLeft(element: IMapObject): boolean {
-    let checkElement: IGridElement
-    if (element.y - 1 >= 0) {
-        checkElement = streetGrid[element.x][element.y - 1]
-        if (checkElement.objectTypeId === -1) {
-            return false
-        } else if (checkElement.objectTypeId === straightRailObjTypeId || checkElement.objectTypeId === trainStationObjTypeId) {
-            if (checkElement.rotation % 2 !== 1) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === curveRailObjTypeId) {
-            if (checkElement.rotation === 1 || checkElement.rotation === 2) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === railRoadCrossObjTypeId) {
-            if (checkElement.rotation % 2 !== 0) {
-                return false
-            }
-        }
-    }
-    return true
-}
-
-function checkRailRight(element: IMapObject): boolean {
-    let checkElement: IGridElement
-    if (element.y + 1 < gridSizeY) {
-        checkElement = streetGrid[element.x][element.y + 1]
-        if (checkElement.objectTypeId === -1) {
-            return false
-        } else if (checkElement.objectTypeId === straightRailObjTypeId || checkElement.objectTypeId === trainStationObjTypeId) {
-            if (checkElement.rotation % 2 !== 1) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === curveRailObjTypeId) {
-            if (checkElement.rotation === 0 || checkElement.rotation === 3) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === railRoadCrossObjTypeId) {
-            if (checkElement.rotation % 2 !== 0) {
-                return false
-            }
-        }
-    }
-    return true
-}
-
-function checkStreetTop(element: IMapObject): boolean {
-    let checkElement: IGridElement
-    // check top
-    if (element.x - 1 >= 0) {
-        checkElement = streetGrid[element.x - 1][element.y]
-        if (checkElement.objectTypeId === -1) {
-            // invalid if checkElement is empty
-            return false
-        } else if (
-            checkElement.objectTypeId === straightObjTypeId ||
-            checkElement.objectTypeId === pedestrianCrossingObjTypeId
-        ) {
-            // invalid if checkElement is straight or crossing and isn't looking in the same direction as element
-            if (checkElement.rotation % 2 !== 0) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === curveObjTypeId) {
-            // invalid if checkElement is curve and isn't looking towards element
-            if (checkElement.rotation >= 2) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === railRoadCrossObjTypeId) {
-            if (checkElement.rotation % 2 !== 0) {
-                return false
-            } 
-        } else if (checkElement.objectTypeId !== intersectionObjTypeId) {
-            // invalid if checkElement isn't a straight, curve or intersection
-            return false
-        }
-    } else {
-        // top element is out of bound
-        return false
-    }
-    return true
-}
-
-function checkStreetBottom(element: IMapObject): boolean {
-    let checkElement: IGridElement
-    // check bottom
-    if (element.x + 1 < gridSizeX) {
-        checkElement = streetGrid[element.x + 1][element.y]
-        if (
-            checkElement.objectTypeId === straightObjTypeId ||
-            checkElement.objectTypeId === pedestrianCrossingObjTypeId
-        ) {
-            if (checkElement.rotation % 2 !== 0) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === curveObjTypeId) {
-            // invalid if checkElement is curve and isn't looking towards element
-            if (checkElement.rotation <= 1) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === railRoadCrossObjTypeId) {
-            if (checkElement.rotation % 2 !== 0) {
-                return false
-            } 
-        } else if (checkElement.objectTypeId !== intersectionObjTypeId) {
-            // invalid if checkElement isn't a straight, curve or intersection
-            return false
-        }
-    } else {
-        // bottom element is out of bound
-        return false
-    }
-    return true
-}
-
-function checkStreetLeft(element: IMapObject): boolean {
-    let checkElement: IGridElement
-    // check left
-    if (element.y - 1 >= 0) {
-        checkElement = streetGrid[element.x][element.y - 1]
-        if (checkElement.objectTypeId === -1) {
-            // invalid if checkElement is empty
-            return false
-        } else if (
-            checkElement.objectTypeId === straightObjTypeId ||
-            checkElement.objectTypeId === pedestrianCrossingObjTypeId
-        ) {
-            // invalid if checkElement is straight or crossing and isn't looking in the same direction as element
-            if (checkElement.rotation % 2 !== 1) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === curveObjTypeId) {
-            // invalid if checkElement is curve and isn't looking towards element
-            if (checkElement.rotation === 1 || checkElement.rotation === 2) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === railRoadCrossObjTypeId) {
-            if (checkElement.rotation % 2 !== 1) {
-                return false
-            } 
-        } else if (checkElement.objectTypeId !== intersectionObjTypeId) {
-            // invalid if checkElement isn't a straight, curve or intersection
-            return false
-        }
-    } else {
-        // left element is out of bound
-        return false
-    }
-    return true
-}
-
-function checkStreetRight(element: IMapObject): boolean {
-    let checkElement: IGridElement
-    // check right
-    if (element.y + 1 < gridSizeY) {
-        checkElement = streetGrid[element.x][element.y + 1]
-        if (checkElement.objectTypeId === -1) {
-            // invalid if checkElement is empty
-            return false
-        } else if (
-            checkElement.objectTypeId === straightObjTypeId ||
-            checkElement.objectTypeId === pedestrianCrossingObjTypeId
-        ) {
-            // invalid if checkElement is straight or crossing and isn't looking in the same direction as element
-            if (checkElement.rotation % 2 !== 1) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === curveObjTypeId) {
-            // invalid if checkElement is curve and isn't looking towards element
-            if (checkElement.rotation === 0 || checkElement.rotation === 3) {
-                return false
-            }
-        } else if (checkElement.objectTypeId === railRoadCrossObjTypeId) {
-            if (checkElement.rotation % 2 !== 1) {
-                return false
-            } 
-        } else if (checkElement.objectTypeId !== intersectionObjTypeId) {
-            // invalid if checkElement isn't a straight, curve or intersection
-            return false
-        }
-    } else {
-        // right element is out of bound
-        return false
-    }
-    return true
+    return isValid
 }
 
 // function places 'amountCars' random cars until no spawnpoints are available
