@@ -1,5 +1,5 @@
 import { reactive, readonly } from "vue"
-import { IMyMapsListItem } from "../typings/IMyMapsListitem"
+import { IMyMapsListItem } from "../typings/IMyMapsListItem"
 import { IMyMapsState } from "../typings/IMyMapsState"
 
 const mapsState = reactive<IMyMapsState>({

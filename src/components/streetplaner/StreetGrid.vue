@@ -15,6 +15,9 @@ import useUser from "../../services/UserStore"
 import { useEditor } from "../../services/Editor/useEditor"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
+import UserStore from "../../services/UserStore"
+
+const { userId } = UserStore()
 const { bus } = useEventBus()
 const { setGameStateSizes, setGameStateMapId } = useGameView()
 const { blockListState, updateBlockList } = useBlockList()
@@ -27,6 +30,10 @@ const toolState = reactive({
 })
 const lobbyState = useUser().activeLobby
 const { gridSize } = useGridSize()
+const npcCarObjTypeId = 7
+const trainStationObjTypeId = 11
+const trainObjTypeId = 14
+const playerSpawnObjTypeId = 13
 
 const {
     editorState,
@@ -116,11 +123,11 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
-    // only place random npc cars on straight
+    // only place random npc assets on straight
     let availableElements: IMapObject[] = editorState.mapObjects.filter((ele) => ele.objectTypeId === 0)
     while (counter !== amountAssets) {
-        let randomIndex = Math.floor(Math.random() * editorState.mapObjects.length)
-        let randomElement = editorState.mapObjects[randomIndex]
+        let randomIndex = Math.floor(Math.random() * availableElements.length)
+        let randomElement = availableElements[randomIndex]
         // try to place asset on random element
         if (placeRandomAssetOnElement(randomElement, assetObjectId)) {
             if (changedElements.includes(randomElement)) {
@@ -193,7 +200,7 @@ function getRandomSpawnsCar(element: IMapObject) {
                     ]
                 )
             }
-        } else if (element.objectTypeId === 1) {
+        } /*else if (element.objectTypeId === 1) {
             // element = curve
             if (element.rotation === 0) {
                 randomPosElements.push(
@@ -246,7 +253,7 @@ function getRandomSpawnsCar(element: IMapObject) {
                     { x: 0.12, y: 0.62, rotation: 1 },
                 ]
             )
-        }
+        }*/
     }
     return randomPosElements
 }
@@ -341,82 +348,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
     else if (assetObjectTypeId > 49 && assetObjectTypeId < 60) {
         randomPosElements = getRandomSpawnsPedestrian(element)
     }
-
-    if (element.objectTypeId === 0) {
-        // element = straight
-        if (element.rotation % 2 === 0) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.37, y: 0.25, rotation: 2 },
-                    { x: 0.37, y: 0.75, rotation: 2 },
-                    { x: 0.62, y: 0.75, rotation: 0 },
-                    { x: 0.62, y: 0.25, rotation: 0 },
-                ]
-            )
-        } else if (element.rotation % 2 === 1) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.25, y: 0.37, rotation: 3 },
-                    { x: 0.75, y: 0.37, rotation: 3 },
-                    { x: 0.75, y: 0.62, rotation: 1 },
-                    { x: 0.25, y: 0.62, rotation: 1 },
-                ]
-            )
-        }
-    } /*else if (element.objectTypeId === 1) {
-        // element = curve
-        if (element.rotation === 0) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.38, y: 0.88, rotation: 2 },
-                    { x: 0.64, y: 0.88, rotation: 0 },
-                    { x: 0.88, y: 0.38, rotation: 3 },
-                    { x: 0.88, y: 0.64, rotation: 1 },
-                ]
-            )
-        } else if (element.rotation === 1) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.36, y: 0.88, rotation: 2 },
-                    { x: 0.62, y: 0.88, rotation: 0 },
-                    { x: 0.12, y: 0.38, rotation: 3 },
-                    { x: 0.12, y: 0.65, rotation: 1 },
-                ]
-            )
-        } else if (element.rotation === 2) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.12, y: 0.34, rotation: 3 },
-                    { x: 0.12, y: 0.62, rotation: 1 },
-                    { x: 0.62, y: 0.12, rotation: 0 },
-                    { x: 0.34, y: 0.12, rotation: 2 },
-                ]
-            )
-        } else if (element.rotation === 3) {
-            randomPosElements.push(
-                ...[
-                    { x: 0.64, y: 0.12, rotation: 0 },
-                    { x: 0.38, y: 0.12, rotation: 2 },
-                    { x: 0.88, y: 0.34, rotation: 3 },
-                    { x: 0.88, y: 0.64, rotation: 1 },
-                ]
-            )
-        }
-    } else if (element.objectTypeId === 2) {
-        // element = intersection
-        randomPosElements.push(
-            ...[
-                { x: 0.37, y: 0.12, rotation: 2 },
-                { x: 0.37, y: 0.88, rotation: 2 },
-                { x: 0.62, y: 0.88, rotation: 0 },
-                { x: 0.62, y: 0.12, rotation: 0 },
-                { x: 0.12, y: 0.37, rotation: 3 },
-                { x: 0.88, y: 0.37, rotation: 3 },
-                { x: 0.88, y: 0.62, rotation: 1 },
-                { x: 0.12, y: 0.62, rotation: 1 },
-            ]
-        )
-    }*/
+    
     // check if the max capacity is reached
     if (element.game_assets.length === randomPosElements.length) {
         return false
@@ -444,7 +376,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         }
     } else {
         // spawnpoint is free, so place car there
-        console.log("TEXTURE ELEMENT: ", assetObjectTypeId,  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId));
+        // console.log("TEXTURE ELEMENT: ", assetObjectTypeId,  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId));
         streetGrid[element.x][element.y].game_assets.push({
             objectTypeId: assetObjectTypeId,
             x: randomPosElements[randomPos].x,
@@ -497,8 +429,8 @@ function onClick(cell: any, e: any) {
             if (e.target.classList.contains("asset-img")) {
                 return
             }
-            // only place asset if it's placed on a road
-            if (currCellContent.groupId === 0) {
+            // only place asset if it's placed on a straight road
+            if (currCellContent.objectTypeId === 0) {
                 let rect = e.target.getBoundingClientRect()
                 let x = (e.clientX - rect.left) / gridSize.size
                 let y = (e.clientY - rect.top) / gridSize.size
@@ -511,14 +443,42 @@ function onClick(cell: any, e: any) {
                 ) {
                     return
                 }
-                streetGrid[cell.posX][cell.posY].game_assets.push({
-                    objectTypeId: toolState.block.objectTypeId,
-                    x: x,
-                    y: y,
-                    rotation: toolState.block.rotation,
-                    texture: toolState.block.texture,
-                })
+                if (toolState.block.objectTypeId === playerSpawnObjTypeId) {
+                    // if asset is spawnpoint
+                    let oldSpawnCell = editorState.mapObjects.filter(
+                        (ele) => ele.game_assets.filter((asset) => asset.userId === userId.value).length
+                    )
+                    for (let oldCell of oldSpawnCell) {
+                        payload = {
+                            objectTypeId: oldCell.objectTypeId,
+                            x: oldCell.x,
+                            y: oldCell.y,
+                            rotation: oldCell.rotation,
+                            game_assets: oldCell.game_assets.filter((asset) => asset.userId !== userId.value),
+                        }
+
+                        updateMessage(payload)
+                    }
+                    streetGrid[cell.posX][cell.posY].game_assets.push({
+                        objectTypeId: toolState.block.objectTypeId,
+                        x: x,
+                        y: y,
+                        rotation: toolState.block.rotation,
+                        texture: toolState.block.texture,
+                        userId: userId.value,
+                    })
+                } else {
+                    streetGrid[cell.posX][cell.posY].game_assets.push({
+                        objectTypeId: toolState.block.objectTypeId,
+                        x: x,
+                        y: y,
+                        rotation: toolState.block.rotation,
+                        texture: toolState.block.texture,
+                    })
+                }
+
                 payload = {
+                    objectId: -1,
                     objectTypeId: currCellContent.objectTypeId,
                     x: cell.posX,
                     y: cell.posY,
@@ -531,12 +491,33 @@ function onClick(cell: any, e: any) {
             streetGrid[cell.posX][cell.posY].objectTypeId = toolState.block.objectTypeId
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
-            payload = {
-                objectTypeId: toolState.block.objectTypeId,
-                x: cell.posX,
-                y: cell.posY,
-                rotation: toolState.block.rotation,
-                game_assets: streetGrid[cell.posX][cell.posY].game_assets,
+            if (toolState.block.objectTypeId === trainStationObjTypeId) {
+                let newGameAssets = []
+                newGameAssets.push({
+                    objectTypeId: trainObjTypeId,
+                    x: 0.5,
+                    y: 0.5,
+                    rotation: toolState.block.rotation,
+                    texture: blockList[trainObjTypeId].texture,
+                    userId: 0,
+                })
+                payload = {
+                    objectId: -1,
+                    objectTypeId: toolState.block.objectTypeId,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: toolState.block.rotation,
+                    game_assets: newGameAssets,
+                }
+            } else {
+                payload = {
+                    objectId: -1,
+                    objectTypeId: toolState.block.objectTypeId,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: toolState.block.rotation,
+                    game_assets: streetGrid[cell.posX][cell.posY].game_assets,
+                }
             }
             createMessage(payload)
         }
@@ -544,6 +525,7 @@ function onClick(cell: any, e: any) {
     if (toolState.tool == ToolEnum.ROTATE && streetGrid[cell.posX][cell.posY].objectTypeId !== -1) {
         streetGrid[cell.posX][cell.posY].rotation = (streetGrid[cell.posX][cell.posY].rotation + 1) % 4
         payload = {
+            objectId: -1,
             objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
             x: cell.posX,
             y: cell.posY,
@@ -554,6 +536,7 @@ function onClick(cell: any, e: any) {
     }
     if (toolState.tool === ToolEnum.DELETE) {
         payload = {
+            objectId: -1,
             objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
             x: cell.posX,
             y: cell.posY,
@@ -565,6 +548,7 @@ function onClick(cell: any, e: any) {
         streetGrid[cell.posX][cell.posY].texture = ""
         deleteMessage(payload)
     }
+    console.log(streetGrid)
 }
 
 // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
@@ -587,6 +571,7 @@ function onMouseMove(cell: any, event: MouseEvent) {
             streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
             streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
             payload = {
+                objectId: -1,
                 objectTypeId: toolState.block.objectTypeId,
                 x: cell.posX,
                 y: cell.posY,
@@ -599,6 +584,7 @@ function onMouseMove(cell: any, event: MouseEvent) {
     if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
         if (currCellContent.objectTypeId !== -1) {
             payload = {
+                objectId: -1,
                 objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
                 x: cell.posX,
                 y: cell.posY,
@@ -621,6 +607,7 @@ function saveStreetGrid() {
             let ele = streetGrid[row][col]
             if (ele.objectTypeId !== -1) {
                 dto.mapObjects.push({
+                    objectId: -1,
                     objectTypeId: ele.objectTypeId,
                     x: ele.posX,
                     y: ele.posY,
@@ -721,8 +708,22 @@ window.addEventListener(
                 :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }"
             />
             <div v-for="asset in ele.game_assets">
+                <!-- if asset is npc (asset.userId not present or 0) or asset is our spawnpoint (asset.userId === our userId) use given asset.texture -->
                 <img
+                    v-if="!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()"
                     :src="asset.texture"
+                    class="no-drag asset-img"
+                    draggable="false"
+                    :style="{
+                        transform: 'rotate(' + asset.rotation * 90 + 'deg)',
+                        left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
+                        top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
+                    }"
+                />
+                <!-- else the asset is not our spawnpoint nor a npc car, so asset is another players car -->
+                <img
+                    v-else
+                    src="/img/streetplaner/object-icons/car-top-view-green.svg"
                     class="no-drag asset-img"
                     draggable="false"
                     :style="{
@@ -741,11 +742,9 @@ window.addEventListener(
     display: table;
     overflow: scroll;
 }
-
 .col {
     display: table-cell;
 }
-
 .grid-size {
     min-width: v-bind(gridSizePx);
     max-width: v-bind(gridSizePx);
@@ -754,24 +753,20 @@ window.addEventListener(
     width: v-bind(gridSizePx);
     height: v-bind(gridSizePx);
 }
-
 .grid-item {
     border: solid 1px black;
     z-index: 0;
 }
-
 .grid-img {
     width: 100%;
     height: 100%;
     display: block;
 }
-
 .asset-img {
     width: v-bind(assetSizePx);
     height: v-bind(assetSizePx);
     position: absolute;
 }
-
 .no-drag {
     user-select: none;
     -webkit-user-drag: none;

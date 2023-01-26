@@ -5,4 +5,5 @@ export interface IGameAsset2D {
     y: number
     rotation: number
     texture: string
+    userId?: number
 }

@@ -12,7 +12,7 @@ const gameAssets = mapObjects.map((ele) => ele.game_assets)
 const filledGameAssetArrays = gameAssets.filter((arr) => arr.length > 0)
 const amountAssets = Array<IGameAsset2D>()
 filledGameAssetArrays.forEach((arr) => amountAssets.push(...arr))
-const currentAmountPedestrians = amountAssets.filter((ele) => ele.objectTypeId > 7 && ele.objectTypeId < 18).length
+const currentAmountPedestrians = amountAssets.filter((ele) => ele.objectTypeId > 49 && ele.objectTypeId < 60).length
 const currentAmountCars = amountAssets.filter((ele) => ele.objectTypeId === 7).length
 const amountCars = ref(0)
 const amountPedestrians = ref(0)
