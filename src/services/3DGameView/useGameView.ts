@@ -211,11 +211,11 @@ export function fillGameState(): void {
                             )
                         )
 
-                //placing train if trainstation is placed
-                } else if (gameAsset.assetId === 11){
-                    anzBahnhof ++
-                    console.log("Anzahl Platzierter Bahnhöfe:")
-                    console.log(anzBahnhof)
+                        //placing train if trainstation is placed
+                    } else if (gameAsset.assetId === 11) {
+                        anzBahnhof++
+                        console.log("Anzahl Platzierter Bahnhöfe:")
+                        console.log(anzBahnhof)
                     } else {
                         gameState.npcCarMapFromuseGameview.set(
                             gameAsset.assetId!,

@@ -139,6 +139,7 @@ export default defineComponent({
 
         buildingIDMap.set(22, "/../../../src/assets/3D_Models/Vehicles/car_1.gltf")
         buildingIDMap.set(23, "/../../../src/assets/3D_Models/TrafficLight/Traffic_Light.gltf")
+        buildingIDMap.set(24, "/../../../src/assets/3D_Models/Vehicles/thomas2.gltf")
 
         /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()

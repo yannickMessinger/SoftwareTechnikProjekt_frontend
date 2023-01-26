@@ -94,20 +94,6 @@ export class NpcCar {
         this.calcMapEleCenter()
         this.calcPixelPosNpc()
         this.calcNpcMapLimit()
-
-        /**
-         * WICHTIG: MAP ID IM BACKEND FÜR SCRIPT NOCH HARDCODED!!!
-         *
-         *
-         *
-         *
-         *
-         */
-
-        /*
-        if (this.curMapObj.objectTypeId === 1) {
-            this.calculateCurve()
-        }*/
     }
 
     //driving
