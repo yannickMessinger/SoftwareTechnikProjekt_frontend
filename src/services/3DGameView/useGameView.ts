@@ -22,7 +22,6 @@ const mapHeight = ref()
 let gridSizeX = 300
 let gridSizeY = 200
 const fieldSize = 10
-let anzBahnhof = 0
 
 /**
  * Gamestate obj with two lists containing necessary MapObjects
@@ -210,12 +209,6 @@ export function fillGameState(): void {
                                 mapObj
                             )
                         )
-
-                        //placing train if trainstation is placed
-                    } else if (gameAsset.assetId === 11) {
-                        anzBahnhof++
-                        console.log("Anzahl Platzierter Bahnhöfe:")
-                        console.log(anzBahnhof)
                     } else {
                         gameState.npcCarMapFromuseGameview.set(
                             gameAsset.assetId!,
