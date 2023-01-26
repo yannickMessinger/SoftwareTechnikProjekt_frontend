@@ -1,22 +1,6 @@
 <script lang="ts">
-import {
-    Box,
-    Camera,
-    Renderer,
-    Scene,
-    GltfModel,
-    AmbientLight,
-    Plane,
-    PhongMaterial,
-} from "troisjs"
-import {
-    computed,
-    defineComponent,
-    onMounted,
-    ref,
-    toRaw,
-    watch,
-} from "vue"
+import { Box, Camera, Renderer, Scene, GltfModel, AmbientLight, Plane, PhongMaterial } from "troisjs"
+import { computed, defineComponent, onMounted, ref, toRaw, watch } from "vue"
 import { MovmentInputController } from "../../models/MovementInputController"
 import { usePlayerList } from "../../services/usePlayerList"
 import useUser from "../../services/UserStore"
@@ -215,7 +199,7 @@ export default defineComponent({
             setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
             setTimeout(() => createMessage(payload), 5000)
             setInterval(() => {
-               multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
+                multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
             }, 8000)
         })
 
