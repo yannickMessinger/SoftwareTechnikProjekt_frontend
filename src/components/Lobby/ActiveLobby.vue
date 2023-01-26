@@ -6,6 +6,7 @@
     By clicking on button "Fahren": Lobbymode is changed to playmode
     By clicking on button "Planungsmodus": Lobbymode is changed to buildmode
 -->
+
 <template>
     <div class="headline">
         <h2>Aktive Lobby</h2>
@@ -44,13 +45,30 @@
             <button class="grey">Lobby verlassen</button>
         </div>
     </div>
+    <Chat />
 </template>
 
 <script setup lang="ts">
 import useUser from "../../services/UserStore"
+import Chat from "../UI/Chat.vue"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
-const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
+import { useChat } from "../../services/Chat/useChat"
+import { onMounted, watch } from "vue"
+
+const { name, userId, activeLobby } = useUser()
+const { connectLobbyWs, disconnectLobby, activeLobbyID } = useChat(name.value, activeLobby.value)
+
+onMounted(() => {
+    activeLobbyID.value = activeLobby.value.lobbyId
+})
+
+watch(activeLobbyID, (newValue, oldValue): void => {
+    if (oldValue !== -1) {
+        disconnectLobby(oldValue)
+    }
+    connectLobbyWs()
+})
 
 //Methods to switch Lobbymode
 function setActiveLobbyToBuildMode() {
@@ -69,6 +87,7 @@ function setActiveLobbyToPlayMode() {
     font-family: Circular, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
     line-height: 20px;
 }
+
 .headline {
     display: flex;
     margin-top: 10px;
@@ -100,27 +119,33 @@ function setActiveLobbyToPlayMode() {
     justify-self: start;
     align-self: end;
 }
+
 .Button2 {
     grid-area: Button2;
     justify-self: center;
     align-self: end;
 }
+
 .Button3 {
     grid-area: Button3;
     justify-self: end;
     align-self: end;
 }
+
 .LobbyName {
     grid-area: LobbyName;
 }
+
 .LobbyClose {
     grid-area: LobbyClose;
     justify-self: end;
 }
+
 .PlayMode {
     grid-area: PlayMode;
     align-self: start;
 }
+
 .SwitchMode {
     grid-area: SwitchMode;
     justify-self: end;

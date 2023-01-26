@@ -1,19 +1,29 @@
 <script lang="ts">
 import {
-    PointLight,
     Box,
     Camera,
     Renderer,
     Scene,
-    LambertMaterial,
     GltfModel,
     AmbientLight,
     Plane,
     PhongMaterial,
 } from "troisjs"
-import { computed, defineComponent, onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue"
-import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+import {
+    computed,
+    defineComponent,
+    onMounted,
+    ref,
+    toRaw,
+    watch,
+} from "vue"
+import { MovmentInputController } from "../../models/MovementInputController"
+import { usePlayerList } from "../../services/usePlayerList"
+import useUser from "../../services/UserStore"
 import { useGameView } from "../../services/3DGameView/useGameView"
+import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
+import { IPosition } from "../../typings/IPosition"
+import { MultiplayerCarlistService } from "../../services/3DGameView/MultiplayerCarlistService"
 
 export default defineComponent({
     components: {
@@ -31,12 +41,34 @@ export default defineComponent({
         const renderer = ref()
         const box = ref()
         const camera = ref()
-        const fpsCamera = new FirstPersonCamera(camera, box)
+        const scene = ref()
+        // allows the manipulation of object through key input and sets camera as first person
+        const movableObject = new MovmentInputController(box, camera)
+        //const fpsCamera = new FirstPersonCamera(camera, box)
+
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
+        const {
+            createMessage,
+            deleteMessage,
+            updateMessage,
+            initCarUpdateWebsocket,
+            positionState,
+            fillPlayerCarState,
+            playerCarState,
+        } = useCarMultiplayer()
+        const { user, userId, activeLobby, setActiveLobby } = useUser()
+        const { playerListState, playerList, fetchPlayerList } = usePlayerList()
+
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
         console.log(gameState.sizeX * gameState.fieldSize)
         console.log(gameState.sizeY * gameState.fieldSize)
 
+        let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
+        const scene3DobjectMap = new Map()
+
+        const uid = userId.value
+        const rawPlayerList = toRaw(playerList.value)
+        const multiplayerCarlistService = new MultiplayerCarlistService(rawPlayerList)
         //counter variables for loops to prefill map with dummy data
         let mapWidth = 30
         let mapHeight = 20
@@ -57,6 +89,13 @@ export default defineComponent({
         buildingIDMap.set(3, "/../../../src/assets/3D_Models/Building/house_high.gltf")
         buildingIDMap.set(4, "/../../../src/assets/3D_Models/Building/house.gltf")
         buildingIDMap.set(5, "/../../../src/assets/3D_Models/Building/shop.gltf")
+
+        buildingIDMap.set(8, "/../../../src/assets/3D_Models/Streets/streetCrossing.gltf")
+        buildingIDMap.set(9, "/../../../src/assets/3D_Models/Railroad/straight_rail.gltf")
+        buildingIDMap.set(10, "/../../../src/assets/3D_Models/Railroad/curved_rail.gltf")
+        buildingIDMap.set(11, "/../../../src/assets/3D_Models/Railroad/trainstation.gltf")
+        buildingIDMap.set(12, "/../../../src/assets/3D_Models/Railroad/road_train_crossing.gltf")
+
         buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
         buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
         buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
@@ -93,6 +132,8 @@ export default defineComponent({
 
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
+
+        const playerCarList = computed(() => playerCarState.playerCarMap)
 
         /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
@@ -137,22 +178,53 @@ export default defineComponent({
             return z
         }
 
+        /**
+         * Fills the payload with userId and movableObject-data for x,z and takes the y element out of quaternion
+         * Is used for create and updating messages for the websocket
+         */
+        function fillPayload() {
+            if (userId.value !== undefined) {
+                payload.id = userId.value
+                payload.rotation = movableObject.getRotation()
+                payload.x = movableObject.getPositionX()
+                payload.z = movableObject.getPositionZ()
+            }
+        }
+
+        watch(
+            () => gameState.mapObjsFromBackEnd,
+            () => fillPlayerCarState()
+        )
+
         onMounted(() => {
             console.log(
                 `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
             )
             updateMapObjsFromGameState()
+            initCarUpdateWebsocket()
 
             renderer.value.onBeforeRender(() => {
-                fpsCamera.update()
+                movableObject.update()
+                multiplayerCarlistService.updatePlayerCars(playerCarList, positionState, uid)
             })
+
+            /**
+             * delayed: waiting for socket connection
+             */
+            setInterval(() => fillPayload(), 25)
+            setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
+            setTimeout(() => createMessage(payload), 5000)
+            setInterval(() => {
+               multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
+            }, 8000)
         })
 
         return {
             renderer,
             camera,
             box,
-            fpsCamera,
+            scene,
+            movableObject,
             calcCoordinateX,
             calcCoordinateZ,
             calcAssetCoordinateX,
@@ -164,6 +236,8 @@ export default defineComponent({
             gridSizeX,
             gridSizeY,
             fieldSize,
+            playerCarList,
+            uid,
         }
     },
 })
@@ -172,7 +246,11 @@ export default defineComponent({
 <template>
     <Renderer resize="window" ref="renderer">
         <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
-        <Scene background="#87CEEB">
+        <Box
+            ref="box"
+            :position="{ x: playerCarList.get(uid)?.playerCarX, y: 0.75, z: playerCarList.get(uid)?.playerCarZ }"
+        ></Box>
+        <Scene background="#87CEEB" ref="scene">
             <AmbientLight></AmbientLight>
             <Plane
                 :width="gridSizeX"
@@ -201,10 +279,12 @@ export default defineComponent({
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
+                    :props="{ name: ele.objectTypeId }"
                 />
                 <!-- places all game assets of the current element-->
                 <div v-for="asset in ele.game_assets">
                     <GltfModel
+                        v-if="asset.userId === 0"
                         v-bind:src="buildingIDMap.get(22)"
                         :position="{
                             x: calcAssetCoordinateX(calcCoordinateX(ele.y), asset.x),
@@ -217,6 +297,27 @@ export default defineComponent({
                             y: assetRotationMap.get(asset.rotation),
                             z: 0,
                         }"
+                        :props="{ name: 22 }"
+                    />
+                </div>
+            </div>
+            <!-- creates and sets taxi bassed on playerCarList sets car for each playerId !== userId-->
+            <div v-for="player in playerCarList">
+                <div v-if="player[1].playerCarId !== uid">
+                    <GltfModel
+                        v-bind:src="buildingIDMap.get(21)"
+                        :position="{
+                            x: player[1].playerCarX,
+                            y: 0.75,
+                            z: player[1].playerCarZ,
+                        }"
+                        :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
+                        :rotation="{
+                            x: 0,
+                            y: 0, //player[1].playerCarRotation[1],
+                            z: 0,
+                        }"
+                        :props="{ name: `player_${player[1].playerCarId}` }"
                     />
                 </div>
             </div>

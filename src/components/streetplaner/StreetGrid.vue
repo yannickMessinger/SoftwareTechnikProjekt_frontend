@@ -33,6 +33,8 @@ const toolState = reactive({
 })
 const lobbyState = useUser().activeLobby
 const { gridSize } = useGridSize()
+const npcCarObjTypeId = 7
+const playerSpawnObjTypeId = 13
 
 const {
     editorState,
