@@ -213,11 +213,30 @@ export function fillGameState(): void {
                         )
                     } else {
                         if(gameAsset.objectTypeId === 14){
+                            console.log("THOMAS IST DAAAA")
                             gameState.npcCarMapFromuseGameview.set(
                                 gameAsset.assetId!,
                                 new NpcCar(
                                     gameAsset.assetId!,
-                                    gameAsset.objectTypeId,
+                                    14,
+                                    gameAsset.x,
+                                    0,
+                                    gameAsset.y,
+                                    gameAsset.rotation,
+                                    gridSizeX,
+                                    gridSizeY,
+                                    fieldSize,
+                                    mapObj
+                                )
+                                    
+                            )
+                            
+                        }else {
+                            gameState.npcCarMapFromuseGameview.set(
+                            gameAsset.assetId!,
+                                new NpcCar(
+                                    gameAsset.assetId!,
+                                    randomNumber(30, 33),
                                     gameAsset.x,
                                     0,
                                     gameAsset.y,
@@ -229,27 +248,14 @@ export function fillGameState(): void {
                                 )
                             )
                         }
-                        gameState.npcCarMapFromuseGameview.set(
-                            gameAsset.assetId!,
-                            new NpcCar(
-                                gameAsset.assetId!,
-                                gameAsset.objectTypeId,
-                                gameAsset.x,
-                                0,
-                                gameAsset.y,
-                                gameAsset.rotation,
-                                gridSizeX,
-                                gridSizeY,
-                                fieldSize,
-                                mapObj
-                            )
-                        )
+                        
                     }
                 }
             })
         }
 
         gameState.gameMapObjects[mapObj.x * 30 + mapObj.y] = mapObj
+        console.log(gameState.npcCarMapFromuseGameview)
     })
 }
 
