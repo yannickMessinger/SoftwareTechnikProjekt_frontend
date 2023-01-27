@@ -52,14 +52,14 @@ export function useChat(username: string, lobby: ILobby) {
         chat: readonly(chatState),
         sendMessage,
         sendLobbyMessage,
-        connectGlobalWs,
-        connectLobbyWs,
-        disconnectLobby,
+        connectGlobalChat,
+        connectLobbyChat,
+        disconnectLobbyChat,
         activeLobbyID,
     }
 }
 
-function connectGlobalWs() {
+function connectGlobalChat() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
     stompClient.connect({}, onConnectedGlobalWs, onError)
@@ -78,7 +78,7 @@ function onError(error: Error) {
 }
 
 //connect second ws for local lobbychat
-function connectLobbyWs() {
+function connectLobbyChat() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
     stompClient.connect({}, onConnectedLobbyWs, onError)
@@ -97,10 +97,12 @@ function onConnectedLobbyWs() {
     )
 }
 
-function disconnectLobby(oldValue: number) {
+function disconnectLobbyChat(oldValue: number) {
     stompClient.send(LOBBY_MSG + oldValue, {}, JSON.stringify({ author: chatState.userName, type: "LEAVE" }))
     chatState.chatList_lobby = []
-    lobbySubscription.unsubscribe()
+    if(lobbySubscription !== undefined) {
+        lobbySubscription.unsubscribe()
+    }
 }
 
 function sendMessage(message: string) {
