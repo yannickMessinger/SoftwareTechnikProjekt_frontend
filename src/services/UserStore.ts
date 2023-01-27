@@ -1,4 +1,4 @@
-import { computed, reactive, readonly, ref } from "vue"
+import { computed, reactive, readonly } from "vue"
 import IUser from "../typings/IUser"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { ILobby } from "../typings/ILobby"
@@ -6,7 +6,6 @@ import { ILoginStateDTO } from "../typings/ILoginStateDTO"
 import { IGetPlayerWALResponseDTO } from "../typings/IGetPlayerWALResponseDTO"
 import router from "../router/router"
 import { ILobbyDTO } from "../typings/ILobbyDTO"
-import { stat } from "fs"
 
 let reloginTried = false
 
@@ -122,6 +121,22 @@ async function login(username: string, password: string): Promise<{ userId: numb
             return data
         })
         .catch((err) => console.log(err))
+}
+
+async function removePlayerFromLobby() {
+    const url = "/api/lobby/get_players/" + state.activeLobby.lobbyId + "?player_id=" + state.userId
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+        })
+
+        if (!response.ok) {
+            console.log("error in remove player from Lobby I")
+            throw new Error(response.statusText)
+        }
+    } catch (error) {
+        console.log(" error in remove player from Lobby: " + error)
+    }
 }
 
 function logout() {

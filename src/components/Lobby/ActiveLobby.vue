@@ -40,10 +40,16 @@
             </div>
         </div>
         <div class="Button2">
-            <button class="green" v-if="activeLobby.lobbyModeEnum === E_LobbyMode.PLAY_MODE" @click="goDrive()">
+            <button
+                class="green"
+                v-if="activeLobby.lobbyModeEnum === E_LobbyMode.PLAY_MODE && userId === activeLobby.hostId"
+                @click="goDrive()"
+            >
                 zur Fahransicht
             </button>
-            <button class="green" v-else @click="goBuild()">zur Bauansicht</button>
+            <button class="green" v-if="activeLobby.lobbyModeEnum === E_LobbyMode.BUILD_MODE" @click="goBuild()">
+                zur Bauansicht
+            </button>
         </div>
     </div>
     <Chat />
@@ -62,7 +68,7 @@ import useEventBus from "../../services/eventBus"
 
 const { name, userId, activeLobby, setActiveLobby } = useUser()
 const { connectLobbyChat, disconnectLobbyChat, activeLobbyID } = useChat(name.value, activeLobby.value)
-const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage } = useLobbyList()
+const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage, driveMessage } = useLobbyList()
 const { bus } = useEventBus()
 
 const mapName = ref("")
@@ -108,14 +114,15 @@ function goBuild() {
 
 function goDrive() {
     const url = "/game/" + { gameId }
+    driveMessage()
     router.push(url)
 }
 
 function closeLobbyClicked() {
     //TODO: Messaage to Backend that Host Closed the lobby (delete lobby, all lobbyuser return to lobby overview)
+    deletePlayerFromLobby()
     closeLobbyMessage()
     disconnectLobbyChat(activeLobbyID.value)
-    deletePlayerFromLobby()
     setActiveLobby({
         lobbyId: -1,
         hostId: -1,
@@ -144,7 +151,6 @@ function leaveLobbyClicked() {
 }
 
 async function deletePlayerFromLobby() {
-    console.log(userId.value)
     const url = "/api/lobby/get_players/" + activeLobby.value.lobbyId + "?player_id=" + userId.value
     try {
         const response = await fetch(url, {

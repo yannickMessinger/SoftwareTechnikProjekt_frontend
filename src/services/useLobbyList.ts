@@ -15,7 +15,9 @@ import { useChat } from "./Chat/useChat"
 import IUser from "../typings/IUser"
 import { resolve } from "path"
 import router from "../router/router"
+import useEventBus from "./eventBus"
 
+const { emit } = useEventBus()
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/lobby"
 const SWITCHMODE_MSG = "/app/lobby.switchMode"
@@ -23,7 +25,8 @@ const JOIN_MSG = "/app/lobby.join"
 const LEAVE_MSG = "/app/lobby.leave"
 const CREATE_MSG = "/app/lobby.create"
 const CLOSE_MSG = "/app/lobby.close"
-const SWITCHMAP_MSG = "app/lobby.switchMap"
+const DRIVE_MSG = "/app/lobby.drive"
+const SWITCHMAP_MSG = "/app/lobby.switchMap"
 
 let stompClient: Client
 const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
@@ -50,6 +53,7 @@ export function useLobbyList() {
         leaveLobbyMessage,
         closeLobbyMessage,
         changeMapMessage,
+        driveMessage,
     }
 }
 
@@ -354,6 +358,39 @@ function changeMapMessage() {
     })
 }
 
+function driveMessage() {
+    if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
+    }
+    const driveMessage: IStompMessage = {
+        playerContent: {
+            userId: user.userId,
+            userName: user.userName,
+            activeLobby: {
+                lobbyId: user.activeLobby.lobbyId,
+                mapId: user.activeLobby.mapId,
+                lobbyName: user.activeLobby.lobbyName,
+                numOfPlayers: user.activeLobby.numOfPlayers,
+                lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+            },
+        },
+        lobbyContent: {
+            lobbyId: user.activeLobby.lobbyId,
+            hostId: user.activeLobby.hostId,
+            mapId: user.activeLobby.mapId,
+            lobbyName: user.activeLobby.lobbyName,
+            numOfPlayers: user.activeLobby.numOfPlayers,
+            lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+        },
+        type: "DRIVE",
+    }
+
+    stompClient.publish({
+        destination: DRIVE_MSG,
+        headers: {},
+        body: JSON.stringify(driveMessage),
+    })
+}
+
 /*function to activate Websockets on specific destination in backend. 
 Also for errorhandling if connection could not successfully be established.
 If new message is arriving it is passed to onMessageReceived function*/
@@ -397,6 +434,7 @@ async function onMessageReceived(payload: IStompMessage) {
     if (payload.type === "CREATE") {
         updateLobbyList()
     }
+
     if (payload.lobbyContent.lobbyId === activeLobby.value.lobbyId) {
         if (payload.type === "JOIN") {
             await fetchPlayerList()
@@ -411,6 +449,7 @@ async function onMessageReceived(payload: IStompMessage) {
         }
         if (payload.type === "SWITCH_MAP") {
             activeLobby.value.mapId = payload.lobbyContent.mapId
+            emit("change-map-event", payload.lobbyContent.mapId)
         }
         if (payload.type === "LEAVE") {
             console.log("LEAVE 2")
@@ -434,7 +473,19 @@ async function onMessageReceived(payload: IStompMessage) {
             }
         }
         if (payload.type === "CLOSE") {
+            setActiveLobby({
+                lobbyId: -1,
+                hostId: -1,
+                mapId: -1,
+                lobbyName: "",
+                numOfPlayers: 0,
+                lobbyModeEnum: E_LobbyMode.BUILD_MODE,
+                playerList: [],
+            })
             router.push("/lobby")
+        }
+        if (payload.type === "DRIVE") {
+            router.push("/game/20")
         }
     }
 }

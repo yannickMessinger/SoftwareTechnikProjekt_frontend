@@ -1,5 +1,5 @@
 <template>
-    <Header text="World of eMobility" :displayHomebutton="true"></Header>
+    <Header :displayHomebutton="true"></Header>
     <div class="container">
         <div class="content">
             <MyMaps :liste="mapsList.mapslist" v-bind:popupTrigger="false"></MyMaps>

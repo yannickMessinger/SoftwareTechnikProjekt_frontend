@@ -1,5 +1,5 @@
 <template>
-    <Header text="World of eMobility" :displayHomebutton="true"></Header>
+    <Header :displayHomebutton="true"></Header>
     <div class="container" id="game-view">
         <div class="box">
             <SkelletonTrois></SkelletonTrois>

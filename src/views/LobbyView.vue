@@ -1,5 +1,5 @@
 <template>
-    <Header text="World of eMobility" :displayHomebutton="true"></Header>
+    <Header :displayHomebutton="true"></Header>
     <div class="container">
         <div class="content">
             <!--<PlayerList :liste="playerList.playerlist"></PlayerList>-->
