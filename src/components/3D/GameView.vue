@@ -11,30 +11,19 @@ import {
     Plane,
     PhongMaterial,
 } from "troisjs"
-import {
-    computed,
-    defineComponent,
-    onBeforeMount,
-    onBeforeUnmount,
-    onMounted,
-    reactive,
-    ref,
-    toRaw,
-    getCurrentInstance,
-    watch,
-} from "vue"
-import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref, toRaw, watch } from "vue"
+
 import { MovmentInputController } from "../../models/MovementInputController"
 import { usePlayerList } from "../../services/usePlayerList"
 import useUser from "../../services/UserStore"
-import { CreatePlayerCars } from "../../models/CreatePlayerCars"
+
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
 import { useSound } from "../../services/useSound"
 import { on } from "events"
 import * as THREE from "three"
-import { useCarMap } from "../../services/3DGameView/useCarMap"
+
 import useCrossroadData from "../../services/3DGameView/useCrossroadData"
 
 export default defineComponent({
@@ -54,9 +43,8 @@ export default defineComponent({
         const box = ref()
         const camera = ref()
         const scene = ref()
-        // allows the manipulation of object through key input and sets camera as first person
+
         const movableObject = new MovmentInputController(box, camera)
-        //const fpsCamera = new FirstPersonCamera(camera, box)
 
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState, randomNumber } =
             useGameView()
@@ -74,8 +62,8 @@ export default defineComponent({
             fillNpcCars,
         } = useCarMultiplayer()
 
-        const { user, userId, activeLobby, setActiveLobby } = useUser()
-        const { playerListState, playerList, fetchPlayerList } = usePlayerList()
+        const { userId, activeLobby } = useUser()
+        const { playerList } = usePlayerList()
         const { loadTrafficLight } = useCrossroadData()
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
@@ -113,7 +101,6 @@ export default defineComponent({
 
         setMapWidthAndMapHeight(mapWidth, mapHeight)
 
-        /*Map of 3d-model paths*/
         const buildingIDMap = new Map()
         buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
         buildingIDMap.set(1, "/../../../src/assets/3D_Models/Streets/curved_road.gltf")
@@ -144,15 +131,14 @@ export default defineComponent({
         buildingIDMap.set(32, "/../../../src/assets/3D_Models/Vehicles/car_orange.gltf")
         buildingIDMap.set(33, "/../../../src/assets/3D_Models/Vehicles/car_white.gltf")
 
-        /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()
-        /*No rotation*/
+
         rotationMap.set(0, 0)
-        /*90 degree rotation*/
+
         rotationMap.set(1, (3 * Math.PI) / 2)
-        /*180 degree rotation*/
+
         rotationMap.set(2, Math.PI)
-        /*270 degree rotation*/
+
         rotationMap.set(3, Math.PI / 2)
 
         resetGameMapObjects()
@@ -189,13 +175,12 @@ export default defineComponent({
             playerCarList.value.forEach((ele) => {
                 positionState.mapObjects.forEach((positionEle) => {
                     if (ele.playerCarId !== uid && positionEle.id === ele.playerCarId) {
-                        //let rotationValue = positionEle.rotation * Math.PI
                         ele.playerCarX = positionEle.x
                         ele.playerCarZ = positionEle.z
                         ele.playerCarRotation
-                        //scene3DobjectMap.get(positionEle.id).setRotationFromEuler(new THREE.Euler( positionEle.rotation ))
+
                         let x = scene3DobjectMap.get(positionEle.id)
-                        //x.rotation = positionEle.rotation
+
                         checkPlayerCarDistance(ele.playerCarX, ele.playerCarZ, ele.playerCarId)
                         if (x != undefined) {
                             x.setRotationFromEuler(
@@ -206,19 +191,6 @@ export default defineComponent({
                                     positionEle.rotation.order
                                 )
                             )
-                            //scene3DobjectMap.set(positionEle.id,x)
-                            //console.log("ele.playerCarRotation",ele.playerCarRotation)
-
-                            /*console.log(
-                                "positionEle.rotation",
-                                new THREE.Euler(
-                                    positionEle.rotation._x,
-                                    positionEle.rotation._y,
-                                    positionEle.rotation._z,
-                                    positionEle.rotation.order
-                                )
-                            )
-                            console.log("x", x)*/
                         }
                     }
                 })
@@ -242,8 +214,6 @@ export default defineComponent({
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
-            //console.log("X" + distanceX)
-            //console.log("Y:" + distanceZ)
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < 20) {
@@ -257,8 +227,6 @@ export default defineComponent({
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
-            // console.log("X" + posX)
-            //console.log("Y:" + posZ)
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < 20) {
@@ -329,16 +297,6 @@ export default defineComponent({
             setTimeout(() => console.log("scene:", scene.value.scene.children), 7500)
             setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 8000)
             setTimeout(() => console.log("map:", scene3DobjectMap), 7500)
-            setInterval(() => {
-                scene3DobjectMap.forEach((player) => {
-                    //console.log(player.setRotationFromEuler(new THREE.Vector3(0, 1, 0),10))
-                })
-            })
-
-            /*
-            setInterval(() => {
-                console.log(sceneRef.value.scene)
-            },1000)*/
         })
 
         return {

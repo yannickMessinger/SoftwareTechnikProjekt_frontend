@@ -40,7 +40,6 @@ interface IGameState {
 const gameState = reactive<IGameState>({
     gameMapObjects: Array<IMapObject>(),
     mapObjsFromBackEnd: Array<IMapObject>(),
-    //npcCarMapFromuseGameview: new Map<number, NpcCar>(),
     mapId: -1,
 })
 
