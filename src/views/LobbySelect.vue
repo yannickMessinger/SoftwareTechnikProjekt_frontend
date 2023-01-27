@@ -11,7 +11,6 @@
         </div>
     </div>
     <Chat />
-
 </template>
 
 <script setup lang="ts">

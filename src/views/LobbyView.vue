@@ -14,11 +14,9 @@
             <MyMaps></MyMaps>
         </div>
     </div>
-
 </template>
 
 <script setup lang="ts">
-
 import Chat from "../components/UI/Chat.vue"
 
 import { onMounted, reactive } from "vue"

@@ -11,7 +11,7 @@ import useUser from "./UserStore"
 import { ILobbyDTO } from "../typings/ILobbyDTO"
 import { Client } from "@stomp/stompjs"
 import { fetchPlayerList } from "./usePlayerList"
-import {useChat} from "./Chat/useChat"
+import { useChat } from "./Chat/useChat"
 import IUser from "../typings/IUser"
 import { resolve } from "path"
 import router from "../router/router"
@@ -24,7 +24,7 @@ const LEAVE_MSG = "/app/lobby.leave"
 
 let stompClient: Client
 const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
-const {disconnectLobby,connectLobbyWs } = useChat(user.userName, activeLobby.value)
+const { disconnectLobby, connectLobbyWs } = useChat(user.userName, activeLobby.value)
 
 interface IStompMessage {
     playerContent: IUser

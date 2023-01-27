@@ -52,7 +52,6 @@ const id = userId.value === undefined ? -1 : userId.value
 }else {
     userID = -1
 }*/
-
 </script>
 
 <style scoped>
