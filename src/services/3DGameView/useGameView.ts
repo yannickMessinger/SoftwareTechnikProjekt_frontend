@@ -231,7 +231,24 @@ export function fillGameState(): void {
                                     
                             )
                             
-                        }else {
+                        } else if (gameAsset.objectTypeId >  49 && gameAsset.objectTypeId < 60) {
+                            console.log("Fussgaenger sind da")
+                            gameState.npcCarMapFromuseGameview.set(
+                                gameAsset.assetId!,
+                                new NpcCar(
+                                    gameAsset.assetId!,
+                                    gameAsset.objectTypeId,
+                                    gameAsset.x,
+                                    0,
+                                    gameAsset.y,
+                                    gameAsset.rotation,
+                                    gridSizeX,
+                                    gridSizeY,
+                                    fieldSize,
+                                    mapObj
+                                )
+                            )
+                        } else {
                             gameState.npcCarMapFromuseGameview.set(
                             gameAsset.assetId!,
                                 new NpcCar(

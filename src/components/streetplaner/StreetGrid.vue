@@ -200,60 +200,7 @@ function getRandomSpawnsCar(element: IMapObject) {
                     ]
                 )
             }
-        } /*else if (element.objectTypeId === 1) {
-            // element = curve
-            if (element.rotation === 0) {
-                randomPosElements.push(
-                    ...[
-                        { x: 0.38, y: 0.88, rotation: 2 },
-                        { x: 0.64, y: 0.88, rotation: 0 },
-                        { x: 0.88, y: 0.38, rotation: 3 },
-                        { x: 0.88, y: 0.64, rotation: 1 },
-                    ]
-                )
-            } else if (element.rotation === 1) {
-                randomPosElements.push(
-                    ...[
-                        { x: 0.36, y: 0.88, rotation: 2 },
-                        { x: 0.62, y: 0.88, rotation: 0 },
-                        { x: 0.12, y: 0.38, rotation: 3 },
-                        { x: 0.12, y: 0.65, rotation: 1 },
-                    ]
-                )
-            } else if (element.rotation === 2) {
-                randomPosElements.push(
-                    ...[
-                        { x: 0.12, y: 0.34, rotation: 3 },
-                        { x: 0.12, y: 0.62, rotation: 1 },
-                        { x: 0.62, y: 0.12, rotation: 0 },
-                        { x: 0.34, y: 0.12, rotation: 2 },
-                    ]
-                )
-            } else if (element.rotation === 3) {
-                randomPosElements.push(
-                    ...[
-                        { x: 0.64, y: 0.12, rotation: 0 },
-                        { x: 0.38, y: 0.12, rotation: 2 },
-                        { x: 0.88, y: 0.34, rotation: 3 },
-                        { x: 0.88, y: 0.64, rotation: 1 },
-                    ]
-                )
-            }
-        } else if (element.objectTypeId === 2) {
-            // element = intersection
-            randomPosElements.push(
-                ...[
-                    { x: 0.37, y: 0.12, rotation: 2 },
-                    { x: 0.37, y: 0.88, rotation: 2 },
-                    { x: 0.62, y: 0.88, rotation: 0 },
-                    { x: 0.62, y: 0.12, rotation: 0 },
-                    { x: 0.12, y: 0.37, rotation: 3 },
-                    { x: 0.88, y: 0.37, rotation: 3 },
-                    { x: 0.88, y: 0.62, rotation: 1 },
-                    { x: 0.12, y: 0.62, rotation: 1 },
-                ]
-            )
-        }*/
+        }
     }
     return randomPosElements
 }
