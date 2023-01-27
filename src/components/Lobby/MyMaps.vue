@@ -36,7 +36,12 @@
                         </div>
                         <div v-else>
                             <p v-if="card.id == activeLobby.mapId" class="greenButtonLabel">aktuelle Karte</p>
-                            <button v-else id="startLobbyButton" @click="changeMapAction(card)">
+                            <button
+                                :disabled="activeLobby.lobbyModeEnum == E_LobbyMode.PLAY_MODE"
+                                v-else
+                                id="startLobbyButton"
+                                @click="changeMapAction(card)"
+                            >
                                 zu Karte wechseln
                             </button>
                         </div>
@@ -84,6 +89,7 @@ import useUser from "../../services/UserStore"
 import { IMapDTO } from "../../typings/IMapDTO"
 import { IMyMapsState } from "../../typings/IMyMapsState"
 import { IGetMapsByPlayerResponseDTO } from "../../typings/IGetMapsByPlayerResponseDTO"
+import { E_LobbyMode } from "../../typings/E_LobbyMode"
 
 const props = defineProps<{
     liste: Readonly<IMapDTO[]>
