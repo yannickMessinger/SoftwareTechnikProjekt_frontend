@@ -23,6 +23,7 @@ const JOIN_MSG = "/app/lobby.join"
 const LEAVE_MSG = "/app/lobby.leave"
 const CREATE_MSG = "/app/lobby.create"
 const CLOSE_MSG = "/app/lobby.close"
+const SWITCHMAP_MSG = "app/lobby.switchMap"
 
 let stompClient: Client
 const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
@@ -48,6 +49,7 @@ export function useLobbyList() {
         changeLobbyModeMessage,
         leaveLobbyMessage,
         closeLobbyMessage,
+        changeMapMessage,
     }
 }
 
@@ -108,7 +110,6 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
         setActiveLobby(lobby)
         postActiveLobby(lobby)
         createLobbyMessage()
-        joinMessage()
         router.push("/lobbyview")
     } catch (error) {
         console.log(error)
@@ -191,33 +192,67 @@ function leaveLobbyMessage() {
 
 function createLobbyMessage() {
     console.log("CREATE")
-    const createLobbyMessage: IStompMessage = {
-        playerContent: {
-            userId: user.userId,
-            userName: user.userName,
-            activeLobby: {
+    connectLobbyChat()
+    if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
+        //if(activeLobby.value)
+        console.log("join message methode wurde aufgerufen")
+        const lobbyMessage: IStompMessage = {
+            playerContent: {
+                userId: user.userId,
+                userName: user.userName,
+                activeLobby: {
+                    lobbyId: user.activeLobby.lobbyId,
+                    mapId: user.activeLobby.mapId,
+                    lobbyName: user.activeLobby.lobbyName,
+                    numOfPlayers: user.activeLobby.numOfPlayers,
+                    lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+                },
+            },
+            lobbyContent: {
                 lobbyId: user.activeLobby.lobbyId,
+                hostId: user.activeLobby.hostId,
                 mapId: user.activeLobby.mapId,
                 lobbyName: user.activeLobby.lobbyName,
                 numOfPlayers: user.activeLobby.numOfPlayers,
                 lobbyModeEnum: user.activeLobby.lobbyModeEnum,
             },
-        },
-        lobbyContent: {
-            lobbyId: user.activeLobby.lobbyId,
-            hostId: user.activeLobby.hostId,
-            mapId: user.activeLobby.mapId,
-            lobbyName: user.activeLobby.lobbyName,
-            numOfPlayers: user.activeLobby.numOfPlayers,
-            lobbyModeEnum: user.activeLobby.lobbyModeEnum,
-        },
-        type: "CREATE",
+            type: "JOIN",
+        }
+        console.log(lobbyMessage.lobbyContent)
+        stompClient.publish({
+            destination: JOIN_MSG,
+            headers: {},
+            body: JSON.stringify(lobbyMessage),
+        })
+
+        const createLobbyMessage: IStompMessage = {
+            playerContent: {
+                userId: user.userId,
+                userName: user.userName,
+                activeLobby: {
+                    lobbyId: user.activeLobby.lobbyId,
+                    mapId: user.activeLobby.mapId,
+                    lobbyName: user.activeLobby.lobbyName,
+                    numOfPlayers: user.activeLobby.numOfPlayers,
+                    lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+                },
+            },
+            lobbyContent: {
+                lobbyId: user.activeLobby.lobbyId,
+                hostId: user.activeLobby.hostId,
+                mapId: user.activeLobby.mapId,
+                lobbyName: user.activeLobby.lobbyName,
+                numOfPlayers: user.activeLobby.numOfPlayers,
+                lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+            },
+            type: "CREATE",
+        }
+        stompClient.publish({
+            destination: CREATE_MSG,
+            headers: {},
+            body: JSON.stringify(createLobbyMessage),
+        })
     }
-    stompClient.publish({
-        destination: CREATE_MSG,
-        headers: {},
-        body: JSON.stringify(createLobbyMessage),
-    })
 }
 
 function closeLobbyMessage() {
@@ -285,6 +320,40 @@ function changeLobbyModeMessage() {
     })
 }
 
+function changeMapMessage() {
+    console.log("change Message send")
+    if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
+    }
+    const changeMapMessage: IStompMessage = {
+        playerContent: {
+            userId: user.userId,
+            userName: user.userName,
+            activeLobby: {
+                lobbyId: user.activeLobby.lobbyId,
+                mapId: user.activeLobby.mapId,
+                lobbyName: user.activeLobby.lobbyName,
+                numOfPlayers: user.activeLobby.numOfPlayers,
+                lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+            },
+        },
+        lobbyContent: {
+            lobbyId: user.activeLobby.lobbyId,
+            hostId: user.activeLobby.hostId,
+            mapId: user.activeLobby.mapId,
+            lobbyName: user.activeLobby.lobbyName,
+            numOfPlayers: user.activeLobby.numOfPlayers,
+            lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+        },
+        type: "SWITCH_MAP",
+    }
+
+    stompClient.publish({
+        destination: SWITCHMAP_MSG,
+        headers: {},
+        body: JSON.stringify(changeMapMessage),
+    })
+}
+
 /*function to activate Websockets on specific destination in backend. 
 Also for errorhandling if connection could not successfully be established.
 If new message is arriving it is passed to onMessageReceived function*/
@@ -340,6 +409,9 @@ async function onMessageReceived(payload: IStompMessage) {
         if (payload.type === "SWITCH_MODE") {
             activeLobby.value.lobbyModeEnum = payload.lobbyContent.lobbyModeEnum
         }
+        if (payload.type === "SWITCH_MAP") {
+            activeLobby.value.mapId = payload.lobbyContent.mapId
+        }
         if (payload.type === "LEAVE") {
             console.log("LEAVE 2")
             await fetchPlayerList()
@@ -362,7 +434,6 @@ async function onMessageReceived(payload: IStompMessage) {
             }
         }
         if (payload.type === "CLOSE") {
-            console.log("LEAVE 2")
             router.push("/lobby")
         }
     }

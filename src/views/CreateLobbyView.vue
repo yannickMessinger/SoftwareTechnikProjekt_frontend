@@ -89,17 +89,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
 import BasicButton from "../components/Buttons/BasicButton.vue"
 import Header from "../components/Header.vue"
 import router from "../router/router"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
-import { createNewLobby } from "../services/useLobbyList"
+
 /*
 import { useMyMaps } from "../services/useMyMaps"
 import useUser from "../services/UserStore"
 import { ILobby } from "../typings/ILobby"
 */
+import { createNewLobby, useLobbyList } from "../services/useLobbyList"
+import { onMounted, ref } from "vue"
+const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage } = useLobbyList()
+onMounted(() => {
+    //activate websockets connection to listen for incoming updates
+    receiveLobbyUpdates()
+})
+
 const lobbyNameInput = ref("")
 const passwordInput = ref("")
 const lobbyModeInput = ref(E_LobbyMode.BUILD_MODE)

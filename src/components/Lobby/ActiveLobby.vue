@@ -58,12 +58,15 @@ import { useChat } from "../../services/Chat/useChat"
 import { onMounted, watch, ref } from "vue"
 import router from "../../router/router"
 import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
+import useEventBus from "../../services/eventBus"
 
 const { name, userId, activeLobby, setActiveLobby } = useUser()
 const { connectLobbyChat, disconnectLobbyChat, activeLobbyID } = useChat(name.value, activeLobby.value)
 const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage } = useLobbyList()
+const { bus } = useEventBus()
 
 const mapName = ref("")
+
 getMapName().then((value) => {
     if (value != undefined) {
         const str: string = value
@@ -72,6 +75,20 @@ getMapName().then((value) => {
         mapName.value = "no name found"
     }
 })
+
+watch(
+    () => bus.value.get("change-map-event"),
+    (id) => {
+        getMapName().then((value) => {
+            if (value != undefined) {
+                const str: string = value
+                mapName.value = str
+            } else {
+                mapName.value = "no name found"
+            }
+        })
+    }
+)
 
 let gameId = ref(20) //TODO: gameId must refers to the id in the backend
 

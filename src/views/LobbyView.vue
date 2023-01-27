@@ -11,7 +11,7 @@
     </div>
     <div class="container2">
         <div v-if="userId === hostId" class="content2">
-            <MyMaps></MyMaps>
+            <MyMaps :liste="mapsList.mapslist" v-bind:popupTrigger="false"></MyMaps>
         </div>
     </div>
 </template>
@@ -26,7 +26,9 @@ import { usePlayerList } from "../services/usePlayerList"
 import ActiveLobby from "../components/Lobby/ActiveLobby.vue"
 import MyMaps from "../components/Lobby/MyMaps.vue"
 import useUser from "../services/UserStore"
+import { useMyMaps } from "../services/useMyMaps"
 
+const { mapsList, updateMapsList } = useMyMaps()
 const { playerList, fetchPlayerList } = usePlayerList()
 const { userId, hostId, activeLobby } = useUser()
 

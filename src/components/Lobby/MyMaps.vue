@@ -90,6 +90,16 @@ import { IMapDTO } from "../../typings/IMapDTO"
 import { IMyMapsState } from "../../typings/IMyMapsState"
 import { IGetMapsByPlayerResponseDTO } from "../../typings/IGetMapsByPlayerResponseDTO"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
+import { useLobbyList } from "../../services/useLobbyList"
+
+import { onMounted } from "vue"
+const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage } = useLobbyList()
+onMounted(() => {
+    //activate websockets connection to listen for incoming updates
+    receiveLobbyUpdates()
+})
+
+const { changeMapMessage } = useLobbyList()
 
 const props = defineProps<{
     liste: Readonly<IMapDTO[]>
@@ -101,14 +111,7 @@ const mapsState = reactive<IMyMapsState>({
     errormsg: "",
 })
 
-const { bus } = useEventBus()
-
-watch(
-    () => bus.value.get("new-map-event"),
-    (id) => {
-        getMapsFromBackend()
-    }
-)
+const { bus, emit } = useEventBus()
 
 /** Variablen: */
 const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
@@ -125,6 +128,13 @@ const TogglePopup = () => {
 /**Card List Data Import from Backend or load default list */
 getMapsFromBackend()
 
+watch(
+    () => bus.value.get("new-map-event"),
+    (id) => {
+        getMapsFromBackend()
+    }
+)
+
 /** button functions: */
 function createLobbyAction(clickedCard: ICardElement) {
     console.log("clicked")
@@ -133,9 +143,8 @@ function createLobbyAction(clickedCard: ICardElement) {
     router.push("/create")
 }
 function changeMapAction(clickedCard: ICardElement) {
-    console.log("Pl-List")
-    console.log(activeLobby.value.playerList)
     activeLobby.value.mapId = clickedCard.id
+    changeMapInBackend(clickedCard.id)
 }
 
 /** delete button*/
@@ -161,6 +170,27 @@ function cardClickedDeleteAction(clickedCard: any) {
         console.log("Removed Item: " + clickedCard.id)
         deleteMapByGivenId(clickedCard.id)
     }
+}
+
+async function changeMapInBackend(mapId: number) {
+    console.log("CHANGE map")
+    const url = "api/lobby/" + activeLobby.value.lobbyId + "/" + mapId
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+        })
+
+        if (!response.ok) {
+            mapsState.errormsg = response.statusText
+            mapsState.mapslist = []
+            console.log("error in changing map")
+            throw new Error(response.statusText)
+        }
+    } catch (error) {
+        console.log("error in changing map")
+    }
+    emit("change-map-event", mapId)
+    changeMapMessage()
 }
 
 async function getMapsFromBackend() {
