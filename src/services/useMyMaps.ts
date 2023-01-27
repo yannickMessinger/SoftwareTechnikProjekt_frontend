@@ -3,12 +3,14 @@ import { IMyMapsListItem } from "../typings/IMyMapsListitem"
 import { IMyMapsState } from "../typings/IMyMapsState"
 import { IAddMyMapsRequestDTO } from "../typings/IAddMyMapsRequestDTO"
 import { IMapDTO } from "../typings/IMapDTO"
+import useEventBus from "./eventBus"
 
 const mapsState = reactive<IMyMapsState>({
     mapslist: Array<IMapDTO>(),
     errormsg: "",
 })
 
+const { emit } = useEventBus()
 //temporary function to test MyMapsList
 export function useMyMaps() {
     //let date: Date = new Date(500000);
@@ -66,6 +68,7 @@ export async function createNewMap(addUserId: number, addMapName: string) {
         })
         let id = await res.json()
         await updateMapsList()
+        emit("new-map-event", id)
         return id
     } catch (error) {
         console.log(error)

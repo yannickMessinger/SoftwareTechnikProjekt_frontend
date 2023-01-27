@@ -95,6 +95,15 @@ const mapsState = reactive<IMyMapsState>({
     errormsg: "",
 })
 
+const { bus } = useEventBus()
+
+watch(
+    () => bus.value.get("new-map-event"),
+    (id) => {
+        getMapsFromBackend()
+    }
+)
+
 /** Variablen: */
 const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
 const isEmpty = ref(true)
@@ -150,8 +159,7 @@ function cardClickedDeleteAction(clickedCard: any) {
 
 async function getMapsFromBackend() {
     console.log("search maps")
-    const url = "api/map"
-
+    const url = "api/map/player/" + userId.value
     try {
         const response = await fetch(url, {
             method: "GET",
@@ -165,8 +173,12 @@ async function getMapsFromBackend() {
         }
 
         const jsondata: IGetMapsByPlayerResponseDTO[] = await response.json()
+        while (cardList.length > 0) {
+            cardList.pop()
+        }
         jsondata.forEach(function (value) {
-            cardList.push({ id: value.mapId, name: value.mapName, date: new Date(value.creationDate) })
+            var newCard: ICardElement = { id: value.mapId, name: value.mapName, date: new Date(value.creationDate) }
+            cardList.push(newCard)
         })
         //mapsState.mapslist = jsondata
         mapsState.errormsg = ""
