@@ -1,22 +1,6 @@
 <script lang="ts">
-import {
-    Box,
-    Camera,
-    Renderer,
-    Scene,
-    GltfModel,
-    AmbientLight,
-    Plane,
-    PhongMaterial,
-} from "troisjs"
-import {
-    computed,
-    defineComponent,
-    onMounted,
-    ref,
-    toRaw,
-    watch,
-} from "vue"
+import { Box, Camera, Renderer, Scene, GltfModel, AmbientLight, Plane, PhongMaterial } from "troisjs"
+import { computed, defineComponent, onMounted, ref, toRaw, watch } from "vue"
 import { MovmentInputController } from "../../models/MovementInputController"
 import { usePlayerList } from "../../services/usePlayerList"
 import useUser from "../../services/UserStore"
@@ -24,6 +8,9 @@ import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
 import { MultiplayerCarlistService } from "../../services/3DGameView/MultiplayerCarlistService"
+import { BoundingBoxService } from "../../services/3DGameView/BoundingBoxService"
+import { CollisionService } from "../../services/3DGameView/CollisionService"
+import { CollisionResetService } from "../../services/3DGameView/CollisionResetService"
 
 export default defineComponent({
     components: {
@@ -42,10 +29,7 @@ export default defineComponent({
         const box = ref()
         const camera = ref()
         const scene = ref()
-        // allows the manipulation of object through key input and sets camera as first person
         const movableObject = new MovmentInputController(box, camera)
-        //const fpsCamera = new FirstPersonCamera(camera, box)
-
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
         const {
             createMessage,
@@ -58,10 +42,9 @@ export default defineComponent({
         } = useCarMultiplayer()
         const { user, userId, activeLobby, setActiveLobby } = useUser()
         const { playerListState, playerList, fetchPlayerList } = usePlayerList()
-
-        console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
-        console.log(gameState.sizeX * gameState.fieldSize)
-        console.log(gameState.sizeY * gameState.fieldSize)
+        const boundingBoxService = new BoundingBoxService()
+        const collisionService = new CollisionService(box)
+        const collisionResetService = new CollisionResetService(movableObject)
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
         const scene3DobjectMap = new Map()
@@ -197,15 +180,18 @@ export default defineComponent({
         )
 
         onMounted(() => {
-            console.log(
-                `Gamestate ON MOUNTED sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`
-            )
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
 
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
                 multiplayerCarlistService.updatePlayerCars(playerCarList, positionState, uid)
+                collisionService.updateCarBoundingBox()
+                collisionService.checkCollision(
+                    boundingBoxService.getBoundingBoxes(),
+                    multiplayerCarlistService.getPlayerObjectMap(),
+                    collisionResetService
+                )
             })
 
             /**
@@ -214,8 +200,10 @@ export default defineComponent({
             setInterval(() => fillPayload(), 25)
             setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
             setTimeout(() => createMessage(payload), 5000)
-            setInterval(() => {
-               multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
+            setTimeout(() => {
+                multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
+                boundingBoxService.setObjects(scene)
+                collisionResetService.setResetCarPosition(box)
             }, 8000)
         })
 

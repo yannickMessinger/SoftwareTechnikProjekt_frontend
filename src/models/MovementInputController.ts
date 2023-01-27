@@ -99,6 +99,17 @@ export class MovmentInputController {
         this.camera.value.camera.setRotationFromEuler(this.objects.value.mesh.rotation)
     }
 
+    resetCarAndCameraPosition(resetPosition: any, resetRotation: any) {
+        this.objects.value.mesh.position.x = resetPosition.x
+        this.objects.value.mesh.position.y = 0.75
+        this.objects.value.mesh.position.z = resetPosition.z
+        this.objects.value.mesh.setRotationFromEuler(
+            new THREE.Euler(resetPosition._x, resetPosition._y, resetPosition._z, resetPosition.order)
+        )
+        this.updateCamera()
+        this.moveVelocity = 0
+    }
+
     getPositionX() {
         return this.objects.value.mesh.position.x
     }
@@ -109,7 +120,6 @@ export class MovmentInputController {
         return this.objects.value.mesh.position.z
     }
     getRotation() {
-        // console.log("Rot:", this.objects.value.mesh.rotation)
         return this.objects.value.mesh.rotation
     }
 }
