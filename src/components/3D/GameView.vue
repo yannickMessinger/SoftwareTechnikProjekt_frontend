@@ -170,35 +170,6 @@ export default defineComponent({
         const playerCarList = computed(() => playerCarState.playerCarMap)
         const npcEles = computed(() => npcCarState.npcCarMap)
 
-        /*Models position are saved from the Backend counting from 0 upwards.
-      x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
-      On the 3d Game View the coordinates x:0, z:0 describes the center of our Grid. The upper left corner would be x:-50, z:-50.
-      The following two methods calculate the Models position bades on the backend memory structure and adapts it to the frontend structure.*/
-
-        /**
-         * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-            let originX = xCoordCenter - fieldSize / 2
-            let x = originX + xCoordAsset * fieldSize
-
-            return x
-        }
-
-        /**
-         * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-            let originZ = zCoordCenter - fieldSize / 2
-            let z = originZ + yCoordAsset * fieldSize
-
-            return z
-        }
-
         /**
          * Fills the payload with userId and movableObject-data for x,z and takes the y element out of quaternion
          * Is used for create and updating messages for the websocket
@@ -367,8 +338,6 @@ export default defineComponent({
             renderer,
             camera,
             box,
-            calcAssetCoordinateX,
-            calcAssetCoordinateZ,
             scene,
             movableObject,
             loadTrafficLight,
