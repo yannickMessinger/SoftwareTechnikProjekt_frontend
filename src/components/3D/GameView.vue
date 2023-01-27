@@ -130,10 +130,11 @@ export default defineComponent({
         buildingIDMap.set(31, "/../../../src/assets/3D_Models/Vehicles/car_green.gltf")
         buildingIDMap.set(32, "/../../../src/assets/3D_Models/Vehicles/car_orange.gltf")
         buildingIDMap.set(33, "/../../../src/assets/3D_Models/Vehicles/car_white.gltf")
+
         buildingIDMap.set(50, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeBlack.gltf")
         buildingIDMap.set(51, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeBlue.gltf")
         buildingIDMap.set(52, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrowneBlue.gltf")
-        buildingIDMap.set(53, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBlondeRed.gltf")
+        buildingIDMap.set(53, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrowneRed.gltf")
         buildingIDMap.set(54, "/../../../src/assets/3D_Models/Pedestrians/pedestrianBrownPink.gltf")
         buildingIDMap.set(55, "/../../../src/assets/3D_Models/Pedestrians/pedestrianOrangeGreen.gltf")
         buildingIDMap.set(56, "/../../../src/assets/3D_Models/Pedestrians/pedestrianOrangeWhite.gltf")
