@@ -83,7 +83,7 @@ export default defineComponent({
             pauseEngineFromNPC,
             stopAllEnginesNPC,
         } = useSound(activeLobby.value.lobbyId, payload)
-        
+
         const scene3DobjectMap = new Map()
 
         const uid = userId.value
@@ -252,7 +252,7 @@ export default defineComponent({
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
-            if (distance < 20) {
+            if (distance < 30) {
                 playEngineFromOtherCar(carId, distance)
             } else {
                 pauseEngineFromOtherCar(carId)
@@ -265,7 +265,7 @@ export default defineComponent({
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
-            if (distance < 20) {
+            if (distance < 30) {
                 playEngineFromNPC(carId, distance, objectTypeId)
             } else {
                 pauseEngineFromNPC(carId)
@@ -299,7 +299,7 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
                 npcEles.value.forEach((ele) => {
-                    checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId )
+                    checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
                     if (ele.driving) {
                         ele.drive()
                     }

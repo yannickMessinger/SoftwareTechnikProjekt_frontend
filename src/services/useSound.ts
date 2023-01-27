@@ -49,10 +49,10 @@ function playHornFromFromOtherCar(distance: number) {
 }
 
 function playYourEngine() {
-    let buffer = 0.09
-    audioEngine.volume = 0.04
+    audioEngine.volume = 0.2
+    let buffer = 4
     if (audioEngine.currentTime > audioEngine.duration - buffer) {
-        audioEngine.currentTime = 0.03
+        audioEngine.currentTime = 3
     }
     if (audioEngine.paused) {
         audioEngine.play()
@@ -82,8 +82,8 @@ function playEngineFromOtherCar(carId: number, distance: number) {
     }
 }
 
-function playEngineFromNPC(carId: number, distance: number, objectTypeId : number ) {
-    let volume = calculateSoundVolume(distance, 20)
+function playEngineFromNPC(carId: number, distance: number, objectTypeId: number) {
+    let volume = calculateSoundVolume(distance, 30)
     let engine
     if (audioEnginesOtherCarsNPC.has(carId)) {
         engine = audioEnginesOtherCarsNPC.get(carId)
@@ -94,9 +94,9 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId : numbe
             }
         }
     } else {
-        if(objectTypeId === 14) {
+        if (objectTypeId === 14) {
             engine = new Audio("/../../src/sound/train_sound.mp3")
-        }else {
+        } else {
             engine = new Audio("/../../src/sound/engine-sound_other.mp3")
         }
         audioEnginesOtherCarsNPC.set(carId, engine)
