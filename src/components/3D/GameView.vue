@@ -126,14 +126,12 @@ export default defineComponent({
         /*Calculates X coordinates position of loaded Model */
         function calcCoordinateX(n: number) {
             let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-            //console.log(`GameObj x: ${x}`)
             return x
         }
 
         /*Calculates Z coordinates position of loaded Model */
         function calcCoordinateZ(n: number) {
             let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-            //console.log(`GameObj z: ${z}`)
             return z
         }
 

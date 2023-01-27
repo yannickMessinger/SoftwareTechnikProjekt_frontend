@@ -15,7 +15,6 @@ export class CollisionService {
     updateCarBoundingBox() {
         if (this.car.value != null) {
             this.carBB.setFromObject(this.car.value.mesh)
-            console.log("Bounding box: ", this.carBB)
         }
     }
 

@@ -144,7 +144,6 @@ function updateMessage(message: IPosition) {
  * @param payload message as IStompMessage containing type and content (object position)
  */
 function onMessageReceived(payload: IStompMessage) {
-    //console.log("payload",payload.content)
     if (positionState.mapId === payload.id) {
         const index = positionState.mapObjects.indexOf(payload.content)
         if (payload.type === "CREATE") {
@@ -160,7 +159,6 @@ function onMessageReceived(payload: IStompMessage) {
         if (payload.type === "UPDATE") {
             // let tempcar = playerCarState.playerCarMap.get(payload.content.id)
             // tempcar?.playerCarPosUpdate(payload.content.x,payload.content.z,payload.content.rotation)
-            //console.log("Playercarmap",playerCarState.playerCarMap)
             fillPosition(payload)
 
             if (index > -1) {
@@ -217,14 +215,10 @@ function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
 }
 
 function calcCoordinateX(n: number) {
-    let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj x: ${x}`)
-    return x
+    return gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
 }
 
 /*Calculates Z coordinates position of loaded Model */
 function calcCoordinateZ(n: number) {
-    let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj z: ${z}`)
-    return z
+    return gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
 }

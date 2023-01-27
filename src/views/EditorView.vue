@@ -86,8 +86,6 @@ watch(
     (val) => {
         elementBarVisible.value = !elementBarVisible.value
         header.value == headerText_tool ? (header.value = headerText_elements) : undefined
-        //console.log(elementBarVisible.value)
-        //console.log(val)
     }
 )
 </script>
