@@ -198,7 +198,7 @@ export default defineComponent({
         }
 
         function loadSceneChildrenWithKey(sceneObjChildren: Map<any, any>) {
-            console.log("anfangfunction", scene3DobjectMap)
+            // console.log("anfangfunction", scene3DobjectMap)
             sceneObjChildren.forEach((ele) => {
                 rawPlayerList.forEach((player) => {
                     if (ele.name === `player_${player.userId}`) {
@@ -278,9 +278,9 @@ export default defineComponent({
 
             setInterval(() => {
                 npcEles.value.forEach((ele) => {
-                    console.log(ele.reachedMapEleLimit())
+                    // console.log(ele.reachedMapEleLimit())
                     if (ele.reachedMapEleLimit()) {
-                        console.log(`ele mit ${ele.npcId} braucht POS Update!`)
+                        // console.log(`ele mit ${ele.npcId} braucht POS Update!`)
                         updatePosMessage(ele.npcId)
                     }
                 })

@@ -88,7 +88,7 @@ function fillNpcCars() {
                         )
                     } else {
                         if (gameAsset.objectTypeId === 14) {
-                            console.log("THOMAS IST DAAAA")
+                            // console.log("THOMAS IST DAAAA")
                             npcCarState.npcCarMap.set(
                                 gameAsset.assetId!,
                                 new NpcCar(
@@ -127,16 +127,16 @@ function initNpcSocket() {
     npcStompClient = new Client({
         brokerURL: ws_url,
     })
-    stompClient.onWebSocketError = (error) => {
+    npcStompClient.onWebSocketError = (error) => {
         console.log("error", error.message)
     }
-    stompClient.onStompError = (frame) => {
+    npcStompClient.onStompError = (frame) => {
         console.log("error", frame.body)
     }
 
-    stompClient.onConnect = (frame) => {
+    npcStompClient.onConnect = (frame) => {
         console.log(`___NPC WEBSOCKET SUCCESS`)
-        stompClient.subscribe(NPC_DEST, (message) => {
+        npcStompClient.subscribe(NPC_DEST, (message) => {
             const npcUpdate: INpcStompMessage = JSON.parse(message.body)
             if (npcCarState.npcCarMap.get(npcUpdate.npcInfoResponseDTO!.npcId)!.needsMapEleUpdate) {
                 onNpcMessageReceived(npcUpdate)
@@ -144,17 +144,17 @@ function initNpcSocket() {
         })
     }
 
-    stompClient.onDisconnect = () => {
+    npcStompClient.onDisconnect = () => {
         console.log("npc ws disconnected")
     }
 
-    stompClient.activate()
+    npcStompClient.activate()
 }
 
 //emits event to backend with current information, so that next map element can be calculated.
 function updatePosMessage(npcId: number) {
-    console.log("sende Update pos anfrage an backend")
-    if (stompClient) {
+    // console.log("sende Update pos anfrage an backend")
+    if (npcStompClient) {
         let tempCar = npcCarState.npcCarMap.get(npcId)!
         //console.log("vurUpdate", tempCar.nextMapObj)
         const updatePosMsg: INpcStompMessage = {
@@ -168,22 +168,22 @@ function updatePosMessage(npcId: number) {
             type: "POSITION_UPDATE",
         }
 
-        stompClient.publish({
+        npcStompClient.publish({
             destination: UPDATE_POS_MSG,
             headers: {},
             body: JSON.stringify(updatePosMsg),
         })
         //gameState.npcCarMapFromuseGameview.get(npcId)!.needsMapEleUpdate = false
-        console.log(updatePosMsg)
+        // console.log(updatePosMsg)
     }
 }
 
 //on update from backend set new values of current mapobj and updated position for corresponding npc car
 async function onNpcMessageReceived(payload: INpcStompMessage) {
-    console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
+    // console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
 
     if (payload.type === "NEW_POSITION_RECEIVED") {
-        console.log(payload)
+        // console.log(payload)
 
         const updateNpcCar = npcCarState.npcCarMap.get(payload.npcInfoResponseDTO!.npcId)
 
@@ -228,13 +228,13 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
                 //get traffic light with rot 1
                 rotationOfSearchedTrafficLight = 1
             }
-            console.log("AMPEL")
-            console.log(`Ampel mit Rot: ${rotationOfSearchedTrafficLight} muss abgefragt werden`)
-            console.log(
+            // console.log("AMPEL")
+            // console.log(`Ampel mit Rot: ${rotationOfSearchedTrafficLight} muss abgefragt werden`)
+            /*console.log(
                 Array.from(crossroadMap.get(updateNpcCar!.curMapObj.objectId!)!.trafficLights.values())[
                     rotationOfSearchedTrafficLight
                 ]
-            )
+            )*/
 
             //check status of this traffic light!
         }
@@ -403,8 +403,8 @@ function fillPlayerCarState() {
                         game_asset.userId!,
                         new CreatePlayerCars({
                             id: game_asset.userId!,
-                            x: calcAssetCoordinateX(calcCoordinateX(mapObject.y), game_asset.x),
-                            z: calcAssetCoordinateZ(calcCoordinateZ(mapObject.x), game_asset.y),
+                            x: game_asset.x3d!,
+                            z: game_asset.z3d!,
                             rotation: [0, 1, 0],
                         })
                     )
