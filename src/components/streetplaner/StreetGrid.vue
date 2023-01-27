@@ -163,15 +163,15 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
     for (let ele of changedElements) {
         updateMessage(ele)
     }
-    return changedElements;
+    return changedElements
 }
 
 function placeRandomPedestrians(amount: number) {
-    let counter = 0;
-    while(counter < amount) {
+    let counter = 0
+    while (counter < amount) {
         let randomPedestrianObjectTypeId = Math.floor(Math.random() * pedestrianAmount + firstPedestrianId) // different objectTypeIds due to different pedestrian models
-        placeAssetOnRandomElement(1, randomPedestrianObjectTypeId);
-        counter++;
+        placeAssetOnRandomElement(1, randomPedestrianObjectTypeId)
+        counter++
     }
 }
 
@@ -292,10 +292,10 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         randomPosElements = getRandomSpawnsCar(element)
     }
     // if (50 <= assetId < 60), then asset = pedestrian
-    else if (assetObjectTypeId >= firstPedestrianId && assetObjectTypeId < firstPedestrianId+pedestrianAmount) {
+    else if (assetObjectTypeId >= firstPedestrianId && assetObjectTypeId < firstPedestrianId + pedestrianAmount) {
         randomPosElements = getRandomSpawnsPedestrian(element)
     }
-    
+
     // check if the max capacity is reached
     if (element.game_assets.length === randomPosElements.length) {
         return false
@@ -316,7 +316,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
                     x: randomPosElements[randomPos].x,
                     y: randomPosElements[randomPos].y,
                     rotation: randomPosElements[randomPos].rotation,
-                    texture: blockList[assetObjectTypeId].texture,
+                    texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
                 })
                 return true
             }
@@ -329,7 +329,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
             x: randomPosElements[randomPos].x,
             y: randomPosElements[randomPos].y,
             rotation: randomPosElements[randomPos].rotation,
-            texture:  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+            texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
         })
         return true
     }
