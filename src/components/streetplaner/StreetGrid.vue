@@ -216,16 +216,16 @@ function getRandomSpawnsPedestrian(element: IMapObject) {
                     let pedRotation = 0
                     randomPosElements.push(
                         ...[
-                            { x: 0.2, y: i, rotation: pedRotation },
-                            { x: 0.9, y: i, rotation: pedRotation },
+                            { x: 0.15, y: i, rotation: pedRotation },
+                            { x: 0.95, y: i, rotation: pedRotation },
                         ]
                     )
                     // rotation 2
                     pedRotation = 2
                     randomPosElements.push(
                         ...[
-                            { x: 0.1, y: i, rotation: pedRotation },
-                            { x: 0.8, y: i, rotation: pedRotation },
+                            { x: 0.05, y: i, rotation: pedRotation },
+                            { x: 0.85, y: i, rotation: pedRotation },
                         ]
                     )
                 }
@@ -235,16 +235,16 @@ function getRandomSpawnsPedestrian(element: IMapObject) {
                     let pedRotation = 1
                     randomPosElements.push(
                         ...[
-                            { x: i, y: 0.2, rotation: pedRotation },
-                            { x: i, y: 0.9, rotation: pedRotation },
+                            { x: i, y: 0.15, rotation: pedRotation },
+                            { x: i, y: 0.95, rotation: pedRotation },
                         ]
                     )
                     // rotation 3
                     pedRotation = 3
                     randomPosElements.push(
                         ...[
-                            { x: i, y: 0.1, rotation: pedRotation },
-                            { x: i, y: 0.8, rotation: pedRotation },
+                            { x: i, y: 0.05, rotation: pedRotation },
+                            { x: i, y: 0.85, rotation: pedRotation },
                         ]
                     )
                 }
@@ -316,7 +316,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
                     x: randomPosElements[randomPos].x,
                     y: randomPosElements[randomPos].y,
                     rotation: randomPosElements[randomPos].rotation,
-                    texture: blockList[assetObjectTypeId].texture,
+                    texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
                 })
                 return true
             }

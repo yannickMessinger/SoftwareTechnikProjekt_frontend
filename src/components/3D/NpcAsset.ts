@@ -92,7 +92,7 @@ export class NpcAsset {
         this.calcNpcMapLimit()
     }
 
-    drive() {
+    move() {
         if (this.curMapObj.objectTypeId === 0 || this.curMapObj.objectTypeId === 12 || this.curMapObj.objectTypeId === 9 || this.curMapObj.objectTypeId === 11) {
             this.moveStraight()
         } else if (this.curMapObj.objectTypeId === 1 || this.curMapObj.objectTypeId === 10) {

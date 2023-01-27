@@ -300,7 +300,7 @@ export default defineComponent({
                 npcEles.value.forEach((ele) => {
                     checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
                     if (ele.driving) {
-                        ele.drive()
+                        ele.move()
                     }
                 })
                 if (movableObject.hornPlayed) {
