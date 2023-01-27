@@ -58,25 +58,22 @@ export default defineComponent({
         const movableObject = new MovmentInputController(box, camera)
         //const fpsCamera = new FirstPersonCamera(camera, box)
 
-        const {
-            gameState,
-            setMapWidthAndMapHeight,
-            resetGameMapObjects,
-            updateMapObjsFromGameState,
-            updatePosMessage,
-            receiveNpcUpdates,
-            randomNumber,
-        } = useGameView()
+        const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState, randomNumber } =
+            useGameView()
+
         const {
             createMessage,
-            deleteMessage,
             updateMessage,
             initCarUpdateWebsocket,
             positionState,
             fillPlayerCarState,
             playerCarState,
+            initNpcSocket,
+            updatePosMessage,
+            npcCarState,
+            fillNpcCars,
         } = useCarMultiplayer()
-        receiveNpcUpdates()
+
         const { user, userId, activeLobby, setActiveLobby } = useUser()
         const { playerListState, playerList, fetchPlayerList } = usePlayerList()
         const { loadTrafficLight } = useCrossroadData()
@@ -159,32 +156,16 @@ export default defineComponent({
         rotationMap.set(3, Math.PI / 2)
 
         resetGameMapObjects()
-        gameState.npcCarMapFromuseGameview.clear()
 
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
-        const npcEles = computed(() => gameState.npcCarMapFromuseGameview)
-
         const playerCarList = computed(() => playerCarState.playerCarMap)
+        const npcEles = computed(() => npcCarState.npcCarMap)
 
         /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
       On the 3d Game View the coordinates x:0, z:0 describes the center of our Grid. The upper left corner would be x:-50, z:-50.
       The following two methods calculate the Models position bades on the backend memory structure and adapts it to the frontend structure.*/
-
-        /*Calculates X coordinates position of loaded Model */
-        function calcCoordinateX(n: number) {
-            let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-            //console.log(`GameObj x: ${x}`)
-            return x
-        }
-
-        /*Calculates Z coordinates position of loaded Model */
-        function calcCoordinateZ(n: number) {
-            let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-            //console.log(`GameObj z: ${z}`)
-            return z
-        }
 
         /**
          * Fills the payload with userId and movableObject-data for x,z and takes the y element out of quaternion
@@ -292,6 +273,11 @@ export default defineComponent({
             () => fillPlayerCarState()
         )
 
+        watch(
+            () => gameState.mapObjsFromBackEnd,
+            () => fillNpcCars()
+        )
+
         onBeforeUnmount(() => {
             disconnectSound()
             stopAmbientSound()
@@ -303,13 +289,12 @@ export default defineComponent({
         onMounted(() => {
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
+            initNpcSocket()
 
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
                 movePlayerCars()
                 npcEles.value.forEach((ele) => {
-                    //console.log(ele.positions.npcPosX)
-                    //console.log(ele.positions.npcPosZ)
                     checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
                     if (ele.driving) {
                         ele.drive()
@@ -350,16 +335,6 @@ export default defineComponent({
                 })
             })
 
-            setInterval(() => {
-                npcEles.value.forEach((ele) => {
-                    //console.log(ele.reachedMapEleLimit())
-                    if (ele.reachedMapEleLimit()) {
-                        //console.log(`ele mit ${ele.npcId} braucht POS Update!`)
-                        updatePosMessage(ele.npcId)
-                    }
-                })
-            }, 500)
-
             /*
             setInterval(() => {
                 console.log(sceneRef.value.scene)
@@ -373,8 +348,6 @@ export default defineComponent({
             box,
             scene,
             movableObject,
-            calcCoordinateX,
-            calcCoordinateZ,
             loadTrafficLight,
             buildingIDMap,
             mapElements,

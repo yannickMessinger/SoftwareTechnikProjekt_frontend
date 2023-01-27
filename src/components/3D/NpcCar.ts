@@ -1,10 +1,12 @@
 import { reactive, ref } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
+import { IMapObjCenterCoordinates } from "../../typings/IMapObjCenterCoordinates"
+import { INpcPosition } from "../../typings/INpcPosition"
 
 export class NpcCar {
     public npcId: number
-    public positions: any
-    public curMapObjCenterCoords: any
+    public positions: INpcPosition
+    public curMapObjCenterCoords: IMapObjCenterCoordinates
     public curMapObj: IMapObject
     public nextMapObj: IMapObject
     public fieldSize: number
@@ -45,7 +47,12 @@ export class NpcCar {
             [3, (3 * Math.PI) / 2],
         ])
 
-        this.positions = reactive({ npcPosX: gameAssetX, npcPosY: 0, npcPosZ: gameAssetZ, npcRotation: npcRotation })
+        this.positions = reactive({
+            npcId: this.npcId,
+            npcPosX: gameAssetX,
+            npcPosZ: gameAssetZ,
+            npcRotation: npcRotation,
+        })
 
         this.curMapObj = reactive({
             objectId: curMapObj.objectId,
@@ -65,7 +72,10 @@ export class NpcCar {
             game_assets: [],
         })
 
-        this.curMapObjCenterCoords = reactive({ centerX: this.curMapObj.centerX3d, centerZ: this.curMapObj.centerX3d })
+        this.curMapObjCenterCoords = reactive({
+            centerX: this.curMapObj.centerX3d!,
+            centerZ: this.curMapObj.centerX3d!,
+        })
 
         this.velocity = 0.05
         this.objectTypeId = objectTypeId
