@@ -1,7 +1,7 @@
 import { reactive } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
-import {INpcPosition} from "../../typings/INpcPosition";
-import {IMapObjCenterCoordinates} from "../../typings/IMapObjCenterCoordinates";
+import { INpcPosition } from "../../typings/INpcPosition"
+import { IMapObjCenterCoordinates } from "../../typings/IMapObjCenterCoordinates"
 
 export class NpcAsset {
     public npcId: number
@@ -52,7 +52,7 @@ export class NpcAsset {
         })
         this.curMapObjCenterCoords = reactive({
             centerX: 0,
-            centerZ: 0
+            centerZ: 0,
         })
         this.curMapObj = reactive({
             objectId: curMapObj.objectId,
@@ -60,7 +60,7 @@ export class NpcAsset {
             x: curMapObj.x,
             y: curMapObj.y,
             rotation: curMapObj.rotation,
-            game_assets: curMapObj.game_assets
+            game_assets: curMapObj.game_assets,
         })
         this.nextMapObj = reactive({
             objectId: -1,
@@ -92,8 +92,13 @@ export class NpcAsset {
         this.calcNpcMapLimit()
     }
 
-    drive() {
-        if (this.curMapObj.objectTypeId === 0 || this.curMapObj.objectTypeId === 12 || this.curMapObj.objectTypeId === 9 || this.curMapObj.objectTypeId === 11) {
+    move() {
+        if (
+            this.curMapObj.objectTypeId === 0 ||
+            this.curMapObj.objectTypeId === 12 ||
+            this.curMapObj.objectTypeId === 9 ||
+            this.curMapObj.objectTypeId === 11
+        ) {
             this.moveStraight()
         } else if (this.curMapObj.objectTypeId === 1 || this.curMapObj.objectTypeId === 10) {
             this.moveCurve()
@@ -345,5 +350,10 @@ export class NpcAsset {
                 console.log("Fehler bei driveCurve 3")
             }
         }
+    }
+
+    setClientNpcPosition(npcPosX: number, npcPosZ: number) {
+        this.positions.npcPosX = npcPosX
+        this.positions.npcPosZ = npcPosZ
     }
 }
