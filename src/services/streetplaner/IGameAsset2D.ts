@@ -3,6 +3,8 @@ export interface IGameAsset2D {
     objectTypeId: number
     x: number
     y: number
+    x3d?: number
+    z3d?: number
     rotation: number
     texture: string
     userId?: number

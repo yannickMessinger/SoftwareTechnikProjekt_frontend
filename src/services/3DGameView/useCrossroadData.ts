@@ -22,14 +22,14 @@ function loadTrafficLight(object: IMapObject, scene: Scene, x: number, y: number
         model.rotation.set(0, rotationMap.get(0), 0)
         console.log(`North TrafficLight Id is: ${model.id}`)
 
-        if (!crossroadMap.has(object.objectId)) {
+        if (!crossroadMap.has(object.objectId!)) {
             console.log(object)
-            crossroadMap.set(object.objectId, {
-                id: object.objectId,
+            crossroadMap.set(object.objectId!, {
+                id: object.objectId!,
                 trafficLights: new Map<number, {}>(),
             })
         }
-        crossroadMap.get(object.objectId)?.trafficLights.set(model.id, model)
+        crossroadMap.get(object.objectId!)?.trafficLights.set(model.id, model)
         scene.add(model)
     })
 
@@ -40,13 +40,13 @@ function loadTrafficLight(object: IMapObject, scene: Scene, x: number, y: number
         model.rotation.set(0, rotationMap.get(3), 0)
         console.log(`East TrafficLight Id is: ${model.id}`)
 
-        if (!crossroadMap.has(object.objectId)) {
-            crossroadMap.set(object.objectId, {
-                id: object.objectId,
+        if (!crossroadMap.has(object.objectId!)) {
+            crossroadMap.set(object.objectId!, {
+                id: object.objectId!,
                 trafficLights: new Map<number, {}>(),
             })
         }
-        crossroadMap.get(object.objectId)?.trafficLights.set(model.id, model)
+        crossroadMap.get(object.objectId!)?.trafficLights.set(model.id, model)
         scene.add(model)
     })
 
@@ -57,13 +57,13 @@ function loadTrafficLight(object: IMapObject, scene: Scene, x: number, y: number
         model.rotation.set(0, rotationMap.get(2), 0)
         console.log(`South TrafficLight Id is: ${model.id}`)
 
-        if (!crossroadMap.has(object.objectId)) {
-            crossroadMap.set(object.objectId, {
-                id: object.objectId,
+        if (!crossroadMap.has(object.objectId!)) {
+            crossroadMap.set(object.objectId!, {
+                id: object.objectId!,
                 trafficLights: new Map<number, {}>(),
             })
         }
-        crossroadMap.get(object.objectId)?.trafficLights.set(model.id, model)
+        crossroadMap.get(object.objectId!)?.trafficLights.set(model.id, model)
         scene.add(model)
     })
 
@@ -74,13 +74,13 @@ function loadTrafficLight(object: IMapObject, scene: Scene, x: number, y: number
         model.rotation.set(0, rotationMap.get(1), 0)
         console.log(`West TrafficLight Id is: ${model.id}`)
 
-        if (!crossroadMap.has(object.objectId)) {
-            crossroadMap.set(object.objectId, {
-                id: object.objectId,
+        if (!crossroadMap.has(object.objectId!)) {
+            crossroadMap.set(object.objectId!, {
+                id: object.objectId!,
                 trafficLights: new Map<number, {}>(),
             })
         }
-        crossroadMap.get(object.objectId)?.trafficLights.set(model.id, model)
+        crossroadMap.get(object.objectId!)?.trafficLights.set(model.id, model)
         scene.add(model)
     })
     console.log(crossroadMap)

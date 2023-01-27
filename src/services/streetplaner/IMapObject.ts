@@ -5,6 +5,8 @@ export interface IMapObject {
     objectTypeId: number
     x: number
     y: number
+    centerX3d?: number
+    centerZ3d?: number
     rotation: number
     game_assets: IGameAsset2D[]
 }

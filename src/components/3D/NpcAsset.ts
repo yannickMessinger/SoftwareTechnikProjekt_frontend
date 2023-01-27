@@ -1,14 +1,14 @@
 import { reactive } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
+import {INpcPosition} from "../../typings/INpcPosition";
+import {IMapObjCenterCoordinates} from "../../typings/IMapObjCenterCoordinates";
 
 export class NpcAsset {
     public npcId: number
-    public positions: any
-    public curMapObjCenterCoords: any
+    public positions: INpcPosition
+    public curMapObjCenterCoords: IMapObjCenterCoordinates
     public curMapObj: IMapObject
     public nextMapObj: IMapObject
-    public gridSizeX: number
-    public gridSizeY: number
     public fieldSize: number
     public mapLimit: number
     public gameAssetX: number
@@ -16,7 +16,6 @@ export class NpcAsset {
     public driving: boolean
     public needsMapEleUpdate: boolean
     public lastCarRotation: number
-    //public curveStepSize: number
     public viewRotation: number
     public rotationMap: Map<number, number>
     public velocity: number
@@ -33,11 +32,8 @@ export class NpcAsset {
         npcId: number,
         objectTypeId: number,
         gameAssetX: number,
-        posY: number,
         gameAssetZ: number,
         npcRotation: number,
-        gridSizeX: number,
-        gridSizeY: number,
         fieldSize: number,
         curMapObj: IMapObject
     ) {
@@ -49,10 +45,10 @@ export class NpcAsset {
             [3, (3 * Math.PI) / 2],
         ])
         this.positions = reactive({
-            npcPosX: 0,
-            npcPosY: posY,
-            npcPosZ: 0,
-            npcRotation: npcRotation
+            npcId: this.npcId,
+            npcPosX: gameAssetX,
+            npcPosZ: gameAssetZ,
+            npcRotation: npcRotation,
         })
         this.curMapObjCenterCoords = reactive({
             centerX: 0,
@@ -76,8 +72,6 @@ export class NpcAsset {
         })
         this.velocity = 0.05
         this.objectTypeId = objectTypeId
-        this.gridSizeX = gridSizeX
-        this.gridSizeY = gridSizeY
         this.fieldSize = fieldSize
         this.mapLimit = 0
         this.gameAssetX = gameAssetX
@@ -94,6 +88,8 @@ export class NpcAsset {
         this.driveCurveRight = false
         this.currCurveAngle = 0.5
         this.curveAngleInc = 0.5
+
+        this.calcNpcMapLimit()
     }
 
     drive() {
@@ -148,21 +144,6 @@ export class NpcAsset {
         } else {
             this.viewRotation += 0.5 * (Math.PI / 180)
         }
-    }
-
-    calcMapEleCenter(): void {
-        this.curMapObjCenterCoords.centerX =
-            this.gridSizeX * -0.5 + this.curMapObj.y * this.fieldSize + this.fieldSize / 2
-        this.curMapObjCenterCoords.centerZ =
-            this.gridSizeY * -0.5 + this.curMapObj.x * this.fieldSize + this.fieldSize / 2
-    }
-
-    calcPixelPosNpc(): void {
-        let originX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-        this.positions.npcPosX = originX + this.gameAssetX * this.fieldSize
-
-        let originZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
-        this.positions.npcPosZ = originZ + this.gameAssetZ * this.fieldSize
     }
 
     calcNpcMapLimit(): void {
@@ -298,7 +279,6 @@ export class NpcAsset {
     }
 
     calculateCurve(): void {
-        this.calcMapEleCenter()
         if (this.curMapObj.rotation === 0) {
             this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
             this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2

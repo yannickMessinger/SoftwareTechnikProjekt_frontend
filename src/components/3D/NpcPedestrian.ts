@@ -6,11 +6,8 @@ export class NpcPedestrian extends NpcAsset{
         npcId: number,
         objectTypeId: number,
         gameAssetX: number,
-        posY: number,
         gameAssetZ: number,
         npcRotation: number,
-        gridSizeX: number,
-        gridSizeY: number,
         fieldSize: number,
         curMapObj: IMapObject
     ) {
@@ -18,17 +15,12 @@ export class NpcPedestrian extends NpcAsset{
             npcId,
             objectTypeId,
             gameAssetX,
-            posY,
             gameAssetZ,
             npcRotation,
-            gridSizeX,
-            gridSizeY,
             fieldSize,
             curMapObj
         )
         this.velocity = 0.025
-        this.calcMapEleCenter()
-        this.calcPixelPosNpc()
         this.calcNpcMapLimit()
     }
 }

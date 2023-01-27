@@ -1,17 +1,16 @@
 import { reactive, ref } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
 import { NpcAsset } from "./NpcAsset"
+import { IMapObjCenterCoordinates } from "../../typings/IMapObjCenterCoordinates"
+import { INpcPosition } from "../../typings/INpcPosition"
 
 export class NpcCar extends NpcAsset{
     constructor(
         npcId: number,
         objectTypeId: number,
         gameAssetX: number,
-        posY: number,
         gameAssetZ: number,
         npcRotation: number,
-        gridSizeX: number,
-        gridSizeY: number,
         fieldSize: number,
         curMapObj: IMapObject
     ) {
@@ -19,17 +18,11 @@ export class NpcCar extends NpcAsset{
             npcId,
             objectTypeId,
             gameAssetX,
-            posY,
             gameAssetZ,
             npcRotation,
-            gridSizeX,
-            gridSizeY,
             fieldSize,
             curMapObj
-        )
-
-        this.calcMapEleCenter()
-        this.calcPixelPosNpc()
+        );
         this.calcNpcMapLimit()
     }
 }

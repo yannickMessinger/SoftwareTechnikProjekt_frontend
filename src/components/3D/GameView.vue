@@ -11,30 +11,19 @@ import {
     Plane,
     PhongMaterial,
 } from "troisjs"
-import {
-    computed,
-    defineComponent,
-    onBeforeMount,
-    onBeforeUnmount,
-    onMounted,
-    reactive,
-    ref,
-    toRaw,
-    getCurrentInstance,
-    watch,
-} from "vue"
-import { FirstPersonCamera } from "../../models/FirstPersonCamera"
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref, toRaw, watch } from "vue"
+
 import { MovmentInputController } from "../../models/MovementInputController"
 import { usePlayerList } from "../../services/usePlayerList"
 import useUser from "../../services/UserStore"
-import { CreatePlayerCars } from "../../models/CreatePlayerCars"
+
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
 import { useSound } from "../../services/useSound"
 import { on } from "events"
 import * as THREE from "three"
-import { useCarMap } from "../../services/3DGameView/useCarMap"
+
 import useCrossroadData from "../../services/3DGameView/useCrossroadData"
 
 export default defineComponent({
@@ -54,31 +43,27 @@ export default defineComponent({
         const box = ref()
         const camera = ref()
         const scene = ref()
-        // allows the manipulation of object through key input and sets camera as first person
+
         const movableObject = new MovmentInputController(box, camera)
-        //const fpsCamera = new FirstPersonCamera(camera, box)
+
+        const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState, randomNumber } =
+            useGameView()
 
         const {
-            gameState,
-            setMapWidthAndMapHeight,
-            resetGameMapObjects,
-            updateMapObjsFromGameState,
-            updatePosMessage,
-            receiveNpcUpdates,
-            randomNumber,
-        } = useGameView()
-        const {
             createMessage,
-            deleteMessage,
             updateMessage,
             initCarUpdateWebsocket,
             positionState,
             fillPlayerCarState,
             playerCarState,
+            initNpcSocket,
+            updatePosMessage,
+            npcCarState,
+            fillNpcCars,
         } = useCarMultiplayer()
-        receiveNpcUpdates()
-        const { user, userId, activeLobby, setActiveLobby } = useUser()
-        const { playerListState, playerList, fetchPlayerList } = usePlayerList()
+
+        const { userId, activeLobby } = useUser()
+        const { playerList } = usePlayerList()
         const { loadTrafficLight } = useCrossroadData()
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
@@ -116,7 +101,6 @@ export default defineComponent({
 
         setMapWidthAndMapHeight(mapWidth, mapHeight)
 
-        /*Map of 3d-model paths*/
         const buildingIDMap = new Map()
         buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
         buildingIDMap.set(1, "/../../../src/assets/3D_Models/Streets/curved_road.gltf")
@@ -157,44 +141,27 @@ export default defineComponent({
         buildingIDMap.set(58, "/../../../src/assets/3D_Models/Pedestrians/PoliceOfficer.gltf")
         buildingIDMap.set(59, "/../../../src/assets/3D_Models/Pedestrians/Firefighter.gltf")
 
-        /*Riadians is used to rotate Models. The following map set the radians for the passed rotation value from backend*/
         const rotationMap = new Map()
-        /*No rotation*/
+
         rotationMap.set(0, 0)
-        /*90 degree rotation*/
+
         rotationMap.set(1, (3 * Math.PI) / 2)
-        /*180 degree rotation*/
+
         rotationMap.set(2, Math.PI)
-        /*270 degree rotation*/
+
         rotationMap.set(3, Math.PI / 2)
 
         resetGameMapObjects()
-        gameState.npcCarMapFromuseGameview.clear()
 
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
-        const npcEles = computed(() => gameState.npcCarMapFromuseGameview)
-
         const playerCarList = computed(() => playerCarState.playerCarMap)
+        const npcEles = computed(() => npcCarState.npcCarMap)
 
         /*Models position are saved from the Backend counting from 0 upwards.
       x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
       On the 3d Game View the coordinates x:0, z:0 describes the center of our Grid. The upper left corner would be x:-50, z:-50.
       The following two methods calculate the Models position bades on the backend memory structure and adapts it to the frontend structure.*/
-
-        /*Calculates X coordinates position of loaded Model */
-        function calcCoordinateX(n: number) {
-            let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-            //console.log(`GameObj x: ${x}`)
-            return x
-        }
-
-        /*Calculates Z coordinates position of loaded Model */
-        function calcCoordinateZ(n: number) {
-            let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-            //console.log(`GameObj z: ${z}`)
-            return z
-        }
 
         /**
          * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
@@ -242,13 +209,12 @@ export default defineComponent({
             playerCarList.value.forEach((ele) => {
                 positionState.mapObjects.forEach((positionEle) => {
                     if (ele.playerCarId !== uid && positionEle.id === ele.playerCarId) {
-                        //let rotationValue = positionEle.rotation * Math.PI
                         ele.playerCarX = positionEle.x
                         ele.playerCarZ = positionEle.z
                         ele.playerCarRotation
-                        //scene3DobjectMap.get(positionEle.id).setRotationFromEuler(new THREE.Euler( positionEle.rotation ))
+
                         let x = scene3DobjectMap.get(positionEle.id)
-                        //x.rotation = positionEle.rotation
+
                         checkPlayerCarDistance(ele.playerCarX, ele.playerCarZ, ele.playerCarId)
                         if (x != undefined) {
                             x.setRotationFromEuler(
@@ -259,19 +225,6 @@ export default defineComponent({
                                     positionEle.rotation.order
                                 )
                             )
-                            //scene3DobjectMap.set(positionEle.id,x)
-                            //console.log("ele.playerCarRotation",ele.playerCarRotation)
-
-                            /*console.log(
-                                "positionEle.rotation",
-                                new THREE.Euler(
-                                    positionEle.rotation._x,
-                                    positionEle.rotation._y,
-                                    positionEle.rotation._z,
-                                    positionEle.rotation.order
-                                )
-                            )
-                            console.log("x", x)*/
                         }
                     }
                 })
@@ -279,7 +232,7 @@ export default defineComponent({
         }
 
         function loadSceneChildrenWithKey(sceneObjChildren: Map<any, any>) {
-            console.log("anfangfunction", scene3DobjectMap)
+            // console.log("anfangfunction", scene3DobjectMap)
             sceneObjChildren.forEach((ele) => {
                 rawPlayerList.forEach((player) => {
                     if (ele.name === `player_${player.userId}`) {
@@ -295,8 +248,6 @@ export default defineComponent({
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
-            //console.log("X" + distanceX)
-            //console.log("Y:" + distanceZ)
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < 20) {
@@ -310,8 +261,6 @@ export default defineComponent({
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
-            // console.log("X" + posX)
-            //console.log("Y:" + posZ)
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < 20) {
@@ -326,6 +275,11 @@ export default defineComponent({
             () => fillPlayerCarState()
         )
 
+        watch(
+            () => gameState.mapObjsFromBackEnd,
+            () => fillNpcCars()
+        )
+
         onBeforeUnmount(() => {
             disconnectSound()
             stopAmbientSound()
@@ -337,13 +291,12 @@ export default defineComponent({
         onMounted(() => {
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
+            initNpcSocket()
 
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
                 movePlayerCars()
                 npcEles.value.forEach((ele) => {
-                    //console.log(ele.positions.npcPosX)
-                    //console.log(ele.positions.npcPosZ)
                     checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
                     if (ele.driving) {
                         ele.drive()
@@ -359,9 +312,9 @@ export default defineComponent({
 
             setInterval(() => {
                 npcEles.value.forEach((ele) => {
-                    console.log(ele.reachedMapEleLimit())
+                    // console.log(ele.reachedMapEleLimit())
                     if (ele.reachedMapEleLimit()) {
-                        console.log(`ele mit ${ele.npcId} braucht POS Update!`)
+                        // console.log(`ele mit ${ele.npcId} braucht POS Update!`)
                         updatePosMessage(ele.npcId)
                     }
                 })
@@ -378,26 +331,6 @@ export default defineComponent({
             setTimeout(() => console.log("scene:", scene.value.scene.children), 7500)
             setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 8000)
             setTimeout(() => console.log("map:", scene3DobjectMap), 7500)
-            setInterval(() => {
-                scene3DobjectMap.forEach((player) => {
-                    //console.log(player.setRotationFromEuler(new THREE.Vector3(0, 1, 0),10))
-                })
-            })
-
-            setInterval(() => {
-                npcEles.value.forEach((ele) => {
-                    //console.log(ele.reachedMapEleLimit())
-                    if (ele.reachedMapEleLimit()) {
-                        //console.log(`ele mit ${ele.npcId} braucht POS Update!`)
-                        updatePosMessage(ele.npcId)
-                    }
-                })
-            }, 500)
-
-            /*
-            setInterval(() => {
-                console.log(sceneRef.value.scene)
-            },1000)*/
         })
 
         return {
@@ -409,8 +342,6 @@ export default defineComponent({
             calcAssetCoordinateZ,
             scene,
             movableObject,
-            calcCoordinateX,
-            calcCoordinateZ,
             loadTrafficLight,
             buildingIDMap,
             mapElements,
@@ -450,22 +381,16 @@ export default defineComponent({
                 <GltfModel
                     v-bind:src="buildingIDMap.get(ele.objectTypeId)"
                     :position="{
-                        x: calcCoordinateX(ele.y),
+                        x: ele.centerX3d,
                         y: 0,
-                        z: calcCoordinateZ(ele.x),
+                        z: ele.centerZ3d,
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
                     :props="{ name: ele.objectId }"
                     v-on:load="
                         ele.objectTypeId === 2
-                            ? loadTrafficLight(
-                                  ele,
-                                  scene.scene,
-                                  calcCoordinateX(ele.y),
-                                  calcCoordinateZ(ele.x),
-                                  rotationMap
-                              )
+                            ? loadTrafficLight(ele, scene.scene, ele.centerX3d!, ele.centerZ3d!, rotationMap)
                             : null
                     "
                 />
