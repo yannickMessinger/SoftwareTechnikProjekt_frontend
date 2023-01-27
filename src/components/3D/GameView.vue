@@ -80,21 +80,20 @@ export default defineComponent({
 
         const {
             playHorn,
-            playEngine,
-            stopEngine,
+            playYourEngine,
+            stopYourEngine,
             playEngineFromOtherCar,
             pauseEngineFromOtherCar,
-            connectSound,
+            connectHornSound,
             initAmbientSound,
             stopAmbientSound,
-            disconnectSound,
+            disconnectHornSound,
             stopAllEngines,
-            pauseEngineFromOtherCarNPC,
-            playEngineFromOtherCarNPC,
+            playEngineFromNPC,
+            pauseEngineFromNPC,
             stopAllEnginesNPC,
         } = useSound(activeLobby.value.lobbyId, payload)
-        connectSound()
-
+        
         const scene3DobjectMap = new Map()
 
         const uid = userId.value
@@ -163,6 +162,8 @@ export default defineComponent({
         rotationMap.set(3, Math.PI / 2)
 
         resetGameMapObjects()
+
+        connectHornSound()
 
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
@@ -268,16 +269,16 @@ export default defineComponent({
             }
         }
 
-        function checkPlayerCarDistanceNPC(posX: number, posZ: number, carId: number) {
+        function checkPlayerNPCDistance(posX: number, posZ: number, carId: number, objectTypeId: number) {
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < 20) {
-                playEngineFromOtherCarNPC(carId, distance)
+                playEngineFromNPC(carId, distance, objectTypeId)
             } else {
-                pauseEngineFromOtherCarNPC(carId)
+                pauseEngineFromNPC(carId)
             }
         }
 
@@ -292,11 +293,11 @@ export default defineComponent({
         )
 
         onBeforeUnmount(() => {
-            disconnectSound()
+            disconnectHornSound()
             stopAmbientSound()
             stopAllEngines()
             stopAllEnginesNPC()
-            stopEngine()
+            stopYourEngine()
         })
 
         onMounted(() => {
@@ -310,7 +311,7 @@ export default defineComponent({
                 movePlayerCars()
 
                 npcEles.value.forEach((ele) => {
-                    checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
+                    checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId )
                     if (ele.driving) {
                         ele.move()
                     }
@@ -336,7 +337,7 @@ export default defineComponent({
                     playHorn()
                 }
                 if (movableObject.enginePlayed) {
-                    playEngine()
+                    playYourEngine()
                 }
             })
 
