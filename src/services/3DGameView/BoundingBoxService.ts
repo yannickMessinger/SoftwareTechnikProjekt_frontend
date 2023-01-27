@@ -16,7 +16,6 @@ export class BoundingBoxService {
     }
 
     setObjects(scene: any): void {
-        console.log(scene.value.scene)
         this.objects.push(...scene.value.scene.children)
         this.init()
         this.createBoundingBox()
@@ -26,10 +25,10 @@ export class BoundingBoxService {
         this.relevantIds.push(3)
         this.relevantIds.push(4)
         this.relevantIds.push(5)
-        this.relevantIds.push(17)
-        this.relevantIds.push(18)
-        this.relevantIds.push(19)
-        this.relevantIds.push(20)
+        // this.relevantIds.push(17) - environment
+        // this.relevantIds.push(18) - environment
+        // this.relevantIds.push(19) - environment
+        // this.relevantIds.push(20) - environment
         this.relevantIds.push(21)
         this.relevantIds.push(22)
     }
