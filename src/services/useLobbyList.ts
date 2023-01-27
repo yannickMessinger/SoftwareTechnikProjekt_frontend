@@ -21,6 +21,8 @@ const DEST = "/topic/lobby"
 const SWITCHMODE_MSG = "/app/lobby.switchMode"
 const JOIN_MSG = "/app/lobby.join"
 const LEAVE_MSG = "/app/lobby.leave"
+const CREATE_MSG = "/app/lobby.create"
+const CLOSE_MSG = "/app/lobby.close"
 
 let stompClient: Client
 const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
@@ -45,11 +47,13 @@ export function useLobbyList() {
         joinMessage,
         changeLobbyModeMessage,
         leaveLobbyMessage,
+        closeLobbyMessage,
     }
 }
 
 //functions to fetch and update List of available lobbys from backend
 export async function updateLobbyList(): Promise<void> {
+    console.log("lobbyupdate")
     const url = "/api/lobby"
 
     try {
@@ -103,6 +107,7 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
         }
         setActiveLobby(lobby)
         postActiveLobby(lobby)
+        createLobbyMessage()
         joinMessage()
         router.push("/lobbyview")
     } catch (error) {
@@ -184,6 +189,69 @@ function leaveLobbyMessage() {
     })
 }
 
+function createLobbyMessage() {
+    console.log("CREATE")
+    const createLobbyMessage: IStompMessage = {
+        playerContent: {
+            userId: user.userId,
+            userName: user.userName,
+            activeLobby: {
+                lobbyId: user.activeLobby.lobbyId,
+                mapId: user.activeLobby.mapId,
+                lobbyName: user.activeLobby.lobbyName,
+                numOfPlayers: user.activeLobby.numOfPlayers,
+                lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+            },
+        },
+        lobbyContent: {
+            lobbyId: user.activeLobby.lobbyId,
+            hostId: user.activeLobby.hostId,
+            mapId: user.activeLobby.mapId,
+            lobbyName: user.activeLobby.lobbyName,
+            numOfPlayers: user.activeLobby.numOfPlayers,
+            lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+        },
+        type: "CREATE",
+    }
+    stompClient.publish({
+        destination: CREATE_MSG,
+        headers: {},
+        body: JSON.stringify(createLobbyMessage),
+    })
+}
+
+function closeLobbyMessage() {
+    console.log("CLOSE")
+    const closeLobbyMessage: IStompMessage = {
+        playerContent: {
+            userId: user.userId,
+            userName: user.userName,
+            activeLobby: {
+                lobbyId: user.activeLobby.lobbyId,
+                mapId: user.activeLobby.mapId,
+                lobbyName: user.activeLobby.lobbyName,
+                numOfPlayers: user.activeLobby.numOfPlayers,
+                lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+            },
+        },
+        lobbyContent: {
+            lobbyId: user.activeLobby.lobbyId,
+            hostId: user.activeLobby.hostId,
+            mapId: user.activeLobby.mapId,
+            lobbyName: user.activeLobby.lobbyName,
+            numOfPlayers: user.activeLobby.numOfPlayers,
+            lobbyModeEnum: user.activeLobby.lobbyModeEnum,
+        },
+        type: "CLOSE",
+    }
+    disconnectLobbyChat(activeLobby.value.lobbyId)
+    stompClient.publish({
+        destination: CLOSE_MSG,
+        headers: {},
+        body: JSON.stringify(closeLobbyMessage),
+    })
+}
+
 function changeLobbyModeMessage() {
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
     }
@@ -254,6 +322,12 @@ If message is of type "SWITCH_MODE", the lobbymode is changed to the payload con
 */
 async function onMessageReceived(payload: IStompMessage) {
     console.log("MS recieved")
+    if (payload.type === "CLOSE") {
+        updateLobbyList()
+    }
+    if (payload.type === "CREATE") {
+        updateLobbyList()
+    }
     if (payload.lobbyContent.lobbyId === activeLobby.value.lobbyId) {
         if (payload.type === "JOIN") {
             await fetchPlayerList()
@@ -286,8 +360,6 @@ async function onMessageReceived(payload: IStompMessage) {
                         activeLobby.value.playerList?.splice(index, index)
                 }
             }
-        }
-        if (payload.type === "CLOSE") {
         }
     }
 }

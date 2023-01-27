@@ -61,7 +61,7 @@ import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
 
 const { name, userId, activeLobby, setActiveLobby } = useUser()
 const { connectLobbyChat, disconnectLobbyChat, activeLobbyID } = useChat(name.value, activeLobby.value)
-const { receiveLobbyUpdates, leaveLobbyMessage } = useLobbyList()
+const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage } = useLobbyList()
 
 const mapName = ref("")
 getMapName().then((value) => {
@@ -96,6 +96,7 @@ function goDrive() {
 
 function closeLobbyClicked() {
     //TODO: Messaage to Backend that Host Closed the lobby (delete lobby, all lobbyuser return to lobby overview)
+    closeLobbyMessage()
     disconnectLobbyChat(activeLobbyID.value)
     deletePlayerFromLobby()
     setActiveLobby({
