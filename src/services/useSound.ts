@@ -5,10 +5,16 @@ import { IPosition } from "../typings/IPosition"
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/sound/"
 const SEND_MSG = "/app/sound.horn/"
+const AMBIENT_SOUND_PATH = "/../../../src/sound/ambient_bird_sound.mp3"
+const AUDIO_HORN_PATH = "/../../src/sound/honk-sound.wav"
+const AUDIO_ENGINE_PATH = "/../../src/sound/engine-sound.mp3"
+const AUDIO_ENGINE_OTHER_PATH = "/../../src/sound/engine-sound_other.mp3"
+const AUDIO_TRAIN_PATH = "/../../src/sound/train_sound.mp3"
 
 let ambientSound: HTMLAudioElement
-let audioHorn = new Audio("/../../src/sound/honk-sound.wav")
-let audioEngine = new Audio("/../../src/sound/engine-sound.mp3")
+let audioHorn = new Audio(AUDIO_HORN_PATH)
+let audioEngine = new Audio(AUDIO_ENGINE_PATH)
+
 const audioEnginesOtherCars = new Map<number, HTMLAudioElement>()
 const audioEnginesOtherCarsNPC = new Map<number, HTMLAudioElement>()
 
@@ -25,7 +31,7 @@ interface ISoundMessage {
 }
 
 function initAmbientSound() {
-    ambientSound = new Audio("/../../../src/sound/ambient_bird_sound.mp3")
+    ambientSound = new Audio(AMBIENT_SOUND_PATH)
     ambientSound.volume = 0.5
     ambientSound.play()
     ambientSound.addEventListener("ended", (e) => {
@@ -75,7 +81,7 @@ function playEngineFromOtherCar(carId: number, distance: number) {
             }
         }
     } else {
-        engine = new Audio("/../../src/sound/engine-sound_other.mp3")
+        engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
         audioEnginesOtherCars.set(carId, engine)
         engine.volume = volume
         engine.play
@@ -95,9 +101,9 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId: number
         }
     } else {
         if (objectTypeId === 14) {
-            engine = new Audio("/../../src/sound/train_sound.mp3")
+            engine = new Audio(AUDIO_TRAIN_PATH)
         } else {
-            engine = new Audio("/../../src/sound/engine-sound_other.mp3")
+            engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
         }
         audioEnginesOtherCarsNPC.set(carId, engine)
         engine.volume = volume
@@ -106,7 +112,6 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId: number
 }
 
 function calculateSoundVolume(distance: number, factor: number) {
-    //console.log(distance)
     distance -= factor
     return Math.abs(distance) / 100
 }
