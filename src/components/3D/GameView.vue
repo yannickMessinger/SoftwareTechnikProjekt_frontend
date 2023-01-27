@@ -43,6 +43,7 @@ export default defineComponent({
         const box = ref()
         const camera = ref()
         const scene = ref()
+        const isHost = ref(false)
 
         const movableObject = new MovmentInputController(box, camera)
 
@@ -60,11 +61,20 @@ export default defineComponent({
             updatePosMessage,
             npcCarState,
             fillNpcCars,
+            setClientPosMessage,
+            initNpcPositionSocket,
         } = useCarMultiplayer()
 
-        const { userId, activeLobby } = useUser()
+        const { user, userId, activeLobby } = useUser()
         const { playerList } = usePlayerList()
         const { loadTrafficLight } = useCrossroadData()
+
+        if (user.userId === activeLobby.value.hostId) {
+            console.log("User ist Host!!!")
+            isHost.value = true
+        } else {
+            console.log("___User ist KEIN host!")
+        }
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
 
@@ -293,16 +303,35 @@ export default defineComponent({
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
             initNpcSocket()
+            //initNpcPositionSocket()
 
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
                 movePlayerCars()
+
                 npcEles.value.forEach((ele) => {
                     checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
                     if (ele.driving) {
-                        ele.drive()
+                        ele.move()
                     }
                 })
+
+                /*
+                if(isHost){
+                    setInterval(() =>{
+                        npcEles.value.forEach((ele) => {
+                            checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
+                            if (ele.driving) {
+                                ele.move()
+                                setClientPosMessage({npcId:ele.npcId, npcPosX:ele.positions.npcPosX, npcPosZ:ele.positions.npcPosZ, npcRotation:ele.positions.npcRotation})
+                              
+                            }
+                        })
+
+                    },1000)
+
+                }*/
+
                 if (movableObject.hornPlayed) {
                     playHorn()
                 }
@@ -313,9 +342,7 @@ export default defineComponent({
 
             setInterval(() => {
                 npcEles.value.forEach((ele) => {
-                    // console.log(ele.reachedMapEleLimit())
                     if (ele.reachedMapEleLimit()) {
-                        // console.log(`ele mit ${ele.npcId} braucht POS Update!`)
                         updatePosMessage(ele.npcId)
                     }
                 })
@@ -329,9 +356,9 @@ export default defineComponent({
             setInterval(() => fillPayload(), 25)
             setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
             setTimeout(() => createMessage(payload), 5000)
-            setTimeout(() => console.log("scene:", scene.value.scene.children), 7500)
+            //setTimeout(() => console.log("scene:", scene.value.scene.children), 7500)
             setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 8000)
-            setTimeout(() => console.log("map:", scene3DobjectMap), 7500)
+            //setTimeout(() => console.log("map:", scene3DobjectMap), 7500)
         })
 
         return {

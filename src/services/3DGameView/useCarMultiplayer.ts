@@ -8,10 +8,11 @@ import useUser from "../UserStore"
 import useCrossroadData from "./useCrossroadData"
 import { IMapObject } from "../streetplaner/IMapObject"
 import { NpcCar } from "../../components/3D/NpcCar"
-import {NpcPedestrian} from "../../components/3D/NpcPedestrian";
+import { NpcPedestrian } from "../../components/3D/NpcPedestrian"
+import { INpcPosition } from "../../typings/INpcPosition"
 
 const { gameState } = useGameView()
-const { activeLobby } = useUser()
+const { activeLobby, user } = useUser()
 const { crossroadMap } = useCrossroadData()
 
 const ws_url = `ws://${window.location.host}/stomp`
@@ -21,18 +22,17 @@ const DELETE_MSG = "/app/position.delete"
 const UPDATE_MSG = "/app/position.update"
 
 const NPC_DEST = "/topic/npc"
+const NPC_SET_CLIENT_POS_TOPIC = "/topic/npc/setclientpos"
 const UPDATE_POS_MSG = "/app/npc.updatepos"
+const SET_CLIENT_POS_MSG = "/app/npc.setclientpos"
 
 const fieldSize = 10
 
-/*Defines the Grid Size in length by the number ob fields*/
-let gridSizeX = fieldSize * 30
-/*Defines the Grid Size in height by the number ob fields*/
-let gridSizeY = fieldSize * 20
 /*Map of 3d-model paths*/
 
 let stompClient: Client
 let npcStompClient: Client
+let npcPositionClient: Client
 
 interface NpcInfoResponseDTO {
     npcId: number
@@ -51,6 +51,12 @@ interface NpcInfoRequestDTO {
 interface INpcStompMessage {
     npcInfoRequestDTO: NpcInfoRequestDTO
     npcInfoResponseDTO?: NpcInfoResponseDTO
+    npcPositionContent?: INpcPosition
+    type: string
+}
+
+interface INpcPositionMsg {
+    npcPositionContent: INpcPosition
     type: string
 }
 
@@ -102,7 +108,7 @@ function fillNpcCars() {
                                     mapObj
                                 )
                             )
-                        } else if (gameAsset.objectTypeId >= 50 && gameAsset.objectTypeId < 60){
+                        } else if (gameAsset.objectTypeId >= 50 && gameAsset.objectTypeId < 60) {
                             npcCarState.npcCarMap.set(
                                 gameAsset.assetId!,
                                 new NpcPedestrian(
@@ -152,6 +158,7 @@ function initNpcSocket() {
         console.log(`___NPC WEBSOCKET SUCCESS`)
         npcStompClient.subscribe(NPC_DEST, (message) => {
             const npcUpdate: INpcStompMessage = JSON.parse(message.body)
+
             if (npcCarState.npcCarMap.get(npcUpdate.npcInfoResponseDTO!.npcId)!.needsMapEleUpdate) {
                 onNpcMessageReceived(npcUpdate)
             }
@@ -163,6 +170,35 @@ function initNpcSocket() {
     }
 
     npcStompClient.activate()
+}
+
+function initNpcPositionSocket() {
+    npcPositionClient = new Client({
+        brokerURL: ws_url,
+    })
+    npcPositionClient.onWebSocketError = (error) => {
+        console.log("error", error.message)
+    }
+    npcPositionClient.onStompError = (frame) => {
+        console.log("error", frame.body)
+    }
+
+    npcPositionClient.onConnect = (frame) => {
+        console.log(`___NPC POSITION WEBSOCKET SUCCESS`)
+        npcStompClient.subscribe(NPC_SET_CLIENT_POS_TOPIC, (message) => {
+            const npcPosUpdate: INpcStompMessage = JSON.parse(message.body)
+            console.log("___Response POS UPDATE", npcPosUpdate)
+            if (user.userId !== activeLobby.value.hostId) {
+                onNpcPositionMessageReceived(npcPosUpdate)
+            }
+        })
+    }
+
+    npcPositionClient.onDisconnect = () => {
+        console.log("npc ws disconnected")
+    }
+
+    npcPositionClient.activate()
 }
 
 //emits event to backend with current information, so that next map element can be calculated.
@@ -187,14 +223,34 @@ function updatePosMessage(npcId: number) {
             headers: {},
             body: JSON.stringify(updatePosMsg),
         })
-        //gameState.npcCarMapFromuseGameview.get(npcId)!.needsMapEleUpdate = false
-        // console.log(updatePosMsg)
+    }
+}
+
+function setClientPosMessage(position: INpcPosition) {
+    // console.log("sende Update pos anfrage an backend")
+    if (npcStompClient) {
+        const setClientPosMsg: INpcPositionMsg = {
+            npcPositionContent: {
+                npcId: position.npcId,
+                npcPosX: position.npcPosX,
+                npcPosZ: position.npcPosZ,
+                npcRotation: position.npcRotation,
+            },
+
+            type: "SET_CLIENT_POS",
+        }
+
+        npcStompClient.publish({
+            destination: SET_CLIENT_POS_MSG,
+            headers: {},
+            body: JSON.stringify(setClientPosMsg),
+        })
     }
 }
 
 //on update from backend set new values of current mapobj and updated position for corresponding npc car
 async function onNpcMessageReceived(payload: INpcStompMessage) {
-    // console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
+    console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
 
     if (payload.type === "NEW_POSITION_RECEIVED") {
         // console.log(payload)
@@ -255,6 +311,16 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
 
         updateNpcCar!.driving = true
         updateNpcCar!.needsMapEleUpdate = false
+    }
+}
+
+function onNpcPositionMessageReceived(payload: INpcStompMessage) {
+    if (payload.type === "SET_CLIENT_POS") {
+        if (user.userId !== activeLobby.value.hostId) {
+            console.log("neue SET_CLIENT_POS")
+            const updateNpcCar = npcCarState.npcCarMap.get(payload.npcPositionContent!.npcId)
+            updateNpcCar!.setClientNpcPosition(payload.npcPositionContent!.npcPosX, payload.npcPositionContent!.npcPosZ)
+        }
     }
 }
 
@@ -426,35 +492,6 @@ function fillPlayerCarState() {
             })
         }
     })
-    //playerCarState.playerCarMap.set(1, new CreatePlayerCars({ id: 1, x: 0, z: 1, rotation: [0,1,0] })) // remove l8er :D will be later filled with data from set playercars in the editor
-    //playerCarState.playerCarMap.set(2, new CreatePlayerCars({ id: 2, x: 1, z: 1, rotation: [0,1,0] }))
-}
-
-function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-    let originX = xCoordCenter - fieldSize / 2
-    let x = originX + xCoordAsset * fieldSize
-
-    return x
-}
-
-function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-    let originZ = zCoordCenter - fieldSize / 2
-    let z = originZ + yCoordAsset * fieldSize
-
-    return z
-}
-
-function calcCoordinateX(n: number) {
-    let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj x: ${x}`)
-    return x
-}
-
-/*Calculates Z coordinates position of loaded Model */
-function calcCoordinateZ(n: number) {
-    let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj z: ${z}`)
-    return z
 }
 
 export function useCarMultiplayer() {
@@ -471,5 +508,7 @@ export function useCarMultiplayer() {
         updatePosMessage,
         npcCarState,
         onNpcMessageReceived,
+        setClientPosMessage,
+        initNpcPositionSocket,
     }
 }
