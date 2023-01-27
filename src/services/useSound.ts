@@ -12,7 +12,6 @@ let audioEngine = new Audio("/../../src/sound/engine-sound.mp3")
 const audioEnginesOtherCars = new Map<number, HTMLAudioElement>()
 const audioEnginesOtherCarsNPC = new Map<number, HTMLAudioElement>()
 
-audioEngine.volume = 0.1
 let lobbyId: number
 let payloadObject: IPosition
 
@@ -27,7 +26,7 @@ interface ISoundMessage {
 
 function initAmbientSound() {
     ambientSound = new Audio("/../../../src/sound/ambient_bird_sound.mp3")
-    ambientSound.volume = 0.03
+    ambientSound.volume = 0.5
     ambientSound.play()
     ambientSound.addEventListener("ended", (e) => {
         ambientSound.play()
@@ -39,7 +38,6 @@ function stopAmbientSound() {
 }
 
 function playHorn() {
-    audioHorn.play()
     sendHornMessage()
 }
 
@@ -52,7 +50,7 @@ function playHornFromFromOtherCar(distance: number) {
 
 function playEngine() {
     let buffer = 0.09
-    audioEngine.volume = 0.009
+    audioEngine.volume = 0.04
     if (audioEngine.currentTime > audioEngine.duration - buffer) {
         audioEngine.currentTime = 0.03
     }
@@ -84,7 +82,7 @@ function playEngineFromOtherCar(carId: number, distance: number) {
     }
 }
 
-function playEngineFromOtherCarNPC(carId: number, distance: number) {
+function playEngineFromOtherCarNPC(carId: number, distance: number, objectTypeId : number ) {
     let volume = calculateSoundVolume(distance, 20)
     let engine
     if (audioEnginesOtherCarsNPC.has(carId)) {
@@ -96,7 +94,11 @@ function playEngineFromOtherCarNPC(carId: number, distance: number) {
             }
         }
     } else {
-        engine = new Audio("/../../src/sound/engine-sound_other.mp3")
+        if(objectTypeId === 14) {
+            engine = new Audio("/../../src/sound/train_sound.mp3")
+        }else {
+            engine = new Audio("/../../src/sound/engine-sound_other.mp3")
+        }
         audioEnginesOtherCarsNPC.set(carId, engine)
         engine.volume = volume
         engine.play
@@ -106,7 +108,7 @@ function playEngineFromOtherCarNPC(carId: number, distance: number) {
 function calculateSoundVolume(distance: number, factor: number) {
     //console.log(distance)
     distance -= factor
-    return Math.abs(distance) / 1000
+    return Math.abs(distance) / 100
 }
 
 function pauseEngineFromOtherCar(carId: number) {

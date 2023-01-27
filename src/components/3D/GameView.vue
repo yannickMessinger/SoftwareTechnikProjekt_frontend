@@ -258,14 +258,14 @@ export default defineComponent({
             }
         }
 
-        function checkPlayerCarDistanceNPC(posX: number, posZ: number, carId: number) {
+        function checkPlayerCarDistanceNPC(posX: number, posZ: number, carId: number, objectTypeId: number) {
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < 20) {
-                playEngineFromOtherCarNPC(carId, distance)
+                playEngineFromOtherCarNPC(carId, distance, objectTypeId)
             } else {
                 pauseEngineFromOtherCarNPC(carId)
             }
@@ -298,7 +298,7 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
                 npcEles.value.forEach((ele) => {
-                    checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
+                    checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId )
                     if (ele.driving) {
                         ele.drive()
                     }
