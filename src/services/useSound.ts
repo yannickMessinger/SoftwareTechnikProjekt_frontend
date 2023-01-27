@@ -48,7 +48,7 @@ function playHornFromFromOtherCar(distance: number) {
     }
 }
 
-function playEngine() {
+function playYourEngine() {
     let buffer = 0.09
     audioEngine.volume = 0.04
     if (audioEngine.currentTime > audioEngine.duration - buffer) {
@@ -59,7 +59,7 @@ function playEngine() {
     }
 }
 
-function stopEngine() {
+function stopYourEngine() {
     audioEngine.pause()
 }
 
@@ -82,7 +82,7 @@ function playEngineFromOtherCar(carId: number, distance: number) {
     }
 }
 
-function playEngineFromOtherCarNPC(carId: number, distance: number, objectTypeId : number ) {
+function playEngineFromNPC(carId: number, distance: number, objectTypeId : number ) {
     let volume = calculateSoundVolume(distance, 20)
     let engine
     if (audioEnginesOtherCarsNPC.has(carId)) {
@@ -120,19 +120,19 @@ function pauseEngineFromOtherCar(carId: number) {
     }
 }
 
-function stopAllEngines() {
-    audioEnginesOtherCars.forEach((engine) => {
-        engine.pause()
-    })
-}
-
-function pauseEngineFromOtherCarNPC(carId: number) {
+function pauseEngineFromNPC(carId: number) {
     if (audioEnginesOtherCarsNPC.has(carId)) {
         let engine = audioEnginesOtherCarsNPC.get(carId)
         if (engine !== undefined) {
             engine.pause()
         }
     }
+}
+
+function stopAllEngines() {
+    audioEnginesOtherCars.forEach((engine) => {
+        engine.pause()
+    })
 }
 
 function stopAllEnginesNPC() {
@@ -146,32 +146,32 @@ export function useSound(activeLobbyId: number, payload: IPosition) {
     payloadObject = payload
     return {
         playHorn,
-        playEngine,
-        stopEngine,
+        playYourEngine,
+        stopYourEngine,
         pauseEngineFromOtherCar,
         playEngineFromOtherCar,
-        connectSound,
         initAmbientSound,
         stopAmbientSound,
-        disconnectSound,
+        connectHornSound,
+        disconnectHornSound,
         stopAllEngines,
-        pauseEngineFromOtherCarNPC,
-        playEngineFromOtherCarNPC,
+        pauseEngineFromNPC,
+        playEngineFromNPC,
         stopAllEnginesNPC,
     }
 }
 
-function connectSound() {
+function connectHornSound() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
     stompClient.connect({}, onConnected, onError)
 }
 
 function onConnected() {
-    subscription = stompClient.subscribe(DEST + lobbyId, onMessageReceived)
+    subscription = stompClient.subscribe(DEST + lobbyId, onHornMessageReceived)
 }
 
-function disconnectSound() {
+function disconnectHornSound() {
     subscription.unsubscribe()
 }
 
@@ -188,7 +188,7 @@ function sendHornMessage() {
 
 function onError(error: Error) {}
 
-function onMessageReceived(payload: { body: string }) {
+function onHornMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
     console.log(message)
     if ((message.type = "HORN")) {
