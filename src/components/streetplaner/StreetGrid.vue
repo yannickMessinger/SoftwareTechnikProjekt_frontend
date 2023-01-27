@@ -291,8 +291,8 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
     if (assetObjectTypeId === 7) {
         randomPosElements = getRandomSpawnsCar(element)
     }
-    // if (49 < assetId < 60), then asset = pedestrian
-    else if (assetObjectTypeId > 49 && assetObjectTypeId < 60) {
+    // if (50 <= assetId < 60), then asset = pedestrian
+    else if (assetObjectTypeId >= firstPedestrianId && assetObjectTypeId < firstPedestrianId+pedestrianAmount) {
         randomPosElements = getRandomSpawnsPedestrian(element)
     }
     
