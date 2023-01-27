@@ -60,16 +60,8 @@ import router from "../../router/router"
 import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
 
 const { name, userId, activeLobby, setActiveLobby } = useUser()
-const { connectLobbyWs, disconnectLobby, activeLobbyID } = useChat(name.value, activeLobby.value)
+const { connectLobbyChat, disconnectLobbyChat, activeLobbyID } = useChat(name.value, activeLobby.value)
 const { receiveLobbyUpdates, leaveLobbyMessage } = useLobbyList()
-/*
-watch(activeLobbyID, (newValue, oldValue): void => {
-    console.log(oldValue)
-    if (oldValue !== -1) {
-        disconnectLobby(oldValue)
-    }
-    connectLobbyWs()
-})*/
 
 const mapName = ref("")
 getMapName().then((value) => {
@@ -104,6 +96,7 @@ function goDrive() {
 
 function closeLobbyClicked() {
     //TODO: Messaage to Backend that Host Closed the lobby (delete lobby, all lobbyuser return to lobby overview)
+    disconnectLobbyChat(activeLobbyID.value)
     deletePlayerFromLobby()
     setActiveLobby({
         lobbyId: -1,

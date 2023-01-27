@@ -24,7 +24,7 @@ const LEAVE_MSG = "/app/lobby.leave"
 
 let stompClient: Client
 const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
-const { disconnectLobby, connectLobbyWs } = useChat(user.userName, activeLobby.value)
+const { disconnectLobbyChat, connectLobbyChat } = useChat(user.userName, activeLobby.value)
 
 interface IStompMessage {
     playerContent: IUser
@@ -105,7 +105,6 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
         postActiveLobby(lobby)
         joinMessage()
         router.push("/lobbyview")
-        connectLobbyWs()
     } catch (error) {
         console.log(error)
         return -1
@@ -116,9 +115,10 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
 purpose to update playerlist of active lobby for all players that joined that particullar lobby.
 */
 function joinMessage() {
+    connectLobbyChat()
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
         //if(activeLobby.value)
-        connectLobbyWs()
+        console.log("join message methode wurde aufgerufen")
         const lobbyMessage: IStompMessage = {
             playerContent: {
                 userId: user.userId,
@@ -154,7 +154,6 @@ function joinMessage() {
 Purpose to update Lobbymode of current active Lobby for all players who joined that lobby. */
 function leaveLobbyMessage() {
     console.log("LEAVE")
-    disconnectLobby(activeLobby.value.lobbyId)
     const leaveLobbyMessage: IStompMessage = {
         playerContent: {
             userId: user.userId,
@@ -177,7 +176,7 @@ function leaveLobbyMessage() {
         },
         type: "LEAVE",
     }
-
+    disconnectLobbyChat(activeLobby.value.lobbyId)
     stompClient.publish({
         destination: LEAVE_MSG,
         headers: {},
