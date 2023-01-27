@@ -203,10 +203,9 @@ function initNpcPositionSocket() {
 
 //emits event to backend with current information, so that next map element can be calculated.
 function updatePosMessage(npcId: number) {
-    // console.log("sende Update pos anfrage an backend")
     if (npcStompClient) {
         let tempCar = npcCarState.npcCarMap.get(npcId)!
-        //console.log("vurUpdate", tempCar.nextMapObj)
+
         const updatePosMsg: INpcStompMessage = {
             npcInfoRequestDTO: {
                 mapId: activeLobby.value.mapId,
@@ -227,7 +226,6 @@ function updatePosMessage(npcId: number) {
 }
 
 function setClientPosMessage(position: INpcPosition) {
-    // console.log("sende Update pos anfrage an backend")
     if (npcStompClient) {
         const setClientPosMsg: INpcPositionMsg = {
             npcPositionContent: {
@@ -253,8 +251,6 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
     console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
 
     if (payload.type === "NEW_POSITION_RECEIVED") {
-        // console.log(payload)
-
         const updateNpcCar = npcCarState.npcCarMap.get(payload.npcInfoResponseDTO!.npcId)
 
         updateNpcCar!.lastCarRotation = updateNpcCar!.positions.npcRotation
@@ -383,10 +379,10 @@ function initCarUpdateWebsocket() {
 function createMessage(message: IPosition) {
     if (message && stompClient) {
         const carMessage: IStompMessage = {
-            id: positionState.mapId, // MappID
+            id: positionState.mapId,
             type: "CREATE",
             author: positionState.userName,
-            content: message, //information des autos
+            content: message,
         }
 
         stompClient.publish({
@@ -436,7 +432,6 @@ function updateMessage(message: IPosition) {
  * @param payload message as IStompMessage containing type and content (object position)
  */
 function onMessageReceived(payload: IStompMessage) {
-    //console.log("payload",payload.content)
     if (positionState.mapId === payload.id) {
         const index = positionState.mapObjects.indexOf(payload.content)
         if (payload.type === "CREATE") {
@@ -450,9 +445,6 @@ function onMessageReceived(payload: IStompMessage) {
             }
         }
         if (payload.type === "UPDATE") {
-            // let tempcar = playerCarState.playerCarMap.get(payload.content.id)
-            // tempcar?.playerCarPosUpdate(payload.content.x,payload.content.z,payload.content.rotation)
-            //console.log("Playercarmap",playerCarState.playerCarMap)
             fillPosition(payload)
 
             if (index > -1) {
