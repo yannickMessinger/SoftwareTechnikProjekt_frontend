@@ -1,11 +1,23 @@
 import { reactive, ref } from "vue"
 import { IMapObject } from "../streetplaner/IMapObject"
 import useUser from "../UserStore"
+import { Client } from "@stomp/stompjs"
+import useCrossroadData from "./useCrossroadData"
+
+const ws_url = `ws://${window.location.host}/stomp`
+const DEST = "/topic/npc"
+const UPDATE_POS_MSG = "/app/npc.updatepos"
+const INIT_NEXT_MAP_ELE_MSG = "/app/npc.initpos"
 
 const { activeLobby } = useUser()
 
 const mapWidth = ref()
 const mapHeight = ref()
+console.log("GAME VIEW INIT")
+/*hardcoded values from GameView need modifying*/
+let gridSizeX = 300
+let gridSizeY = 200
+const fieldSize = 10
 
 /**
  * Gamestate obj with two lists containing necessary MapObjects
@@ -16,9 +28,6 @@ const mapHeight = ref()
 interface IGameState {
     gameMapObjects: IMapObject[]
     mapObjsFromBackEnd: IMapObject[]
-    sizeX: number
-    sizeY: number
-    fieldSize: number
     mapId: number
 }
 
@@ -30,9 +39,6 @@ interface IGameState {
 const gameState = reactive<IGameState>({
     gameMapObjects: Array<IMapObject>(),
     mapObjsFromBackEnd: Array<IMapObject>(),
-    sizeX: -1,
-    sizeY: -1,
-    fieldSize: -1,
     mapId: -1,
 })
 
@@ -46,6 +52,7 @@ export function useGameView() {
         setMapWidthAndMapHeight,
         setGameStateSizes,
         setGameStateMapId,
+        randomNumber,
     }
 }
 
@@ -55,11 +62,7 @@ export function useGameView() {
  * @param sizeY height
  * @param fieldSize size of a single map tile (square)
  */
-function setGameStateSizes(sizeX: number, sizeY: number, fieldSize: number) {
-    gameState.sizeX = sizeX
-    gameState.sizeY = sizeY
-    gameState.fieldSize = fieldSize
-}
+function setGameStateSizes(sizeX: number, sizeY: number, fieldSize: number) {}
 
 /**
  *
@@ -69,6 +72,7 @@ function setGameStateSizes(sizeX: number, sizeY: number, fieldSize: number) {
  */
 
 function setGameStateMapId(mapId: number) {
+    console.log(`setze gameState Mapid auf ${mapId}`)
     gameState.mapId = mapId
 }
 
@@ -118,18 +122,32 @@ export function resetMapObjsFromBackEnd() {
     gameState.mapObjsFromBackEnd.splice(0, gameState.mapObjsFromBackEnd.length)
 }
 
+/*Calculates X coordinates position of loaded Model */
+function calcCoordinateX(n: number) {
+    let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
+    //console.log(`GameObj x: ${x}`)
+    return x
+}
+
+/*Calculates Z coordinates position of loaded Model */
+function calcCoordinateZ(n: number) {
+    let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
+    //console.log(`GameObj z: ${z}`)
+    return z
+}
+
 /**
  * function to generate random numbers between the given min and max values
  * @param min min value for random number
  * @param max value for random numbwer
  * @returns random number
  */
-function randomNumer(min: number, max: number) {
+export function randomNumber(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 /**
  * first fills gameMapObjects list with dummy environment elements with random rotation, each ele is initially equipped with an empty game assets array
- * then for each element of the mapObject from backend, the corresponding index in the gameMapObject list is calculated and the element
+ * then for each element of the mapObject from backend, the corresponding index in the gameMapObject list is calculated and the elementwwwww
  * on this index gets replaced with the object from backend.
  */
 export function fillGameState(): void {
@@ -137,10 +155,13 @@ export function fillGameState(): void {
     for (let i = 0; i < mapHeight.value; i++) {
         for (let j = 0; j < mapWidth.value; j++) {
             gameState.gameMapObjects[counter] = {
-                objectTypeId: randomNumer(17, 20),
-                x: i,
-                y: j,
-                rotation: randomNumer(0, 3),
+                objectId: -1,
+                objectTypeId: randomNumber(17, 20),
+                x: -1,
+                y: -1,
+                centerX3d: calcCoordinateX(j),
+                centerZ3d: calcCoordinateZ(i),
+                rotation: randomNumber(0, 3),
                 game_assets: [],
             }
             counter += 1
@@ -148,6 +169,6 @@ export function fillGameState(): void {
     }
 
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
-        gameState.gameMapObjects[mapObj.x * mapWidth.value + mapObj.y] = mapObj
+        gameState.gameMapObjects[mapObj.x * 30 + mapObj.y] = mapObj
     })
 }

@@ -1,7 +1,3 @@
-<!--
-    author: Sean Dittmann
-    date: 11.11.2022 
--->
 <script setup lang="ts">
 /**Imports: */
 import { onMounted, reactive, ref, watch } from "vue"
