@@ -361,5 +361,9 @@ async function onMessageReceived(payload: IStompMessage) {
                 }
             }
         }
+        if (payload.type === "CLOSE") {
+            console.log("LEAVE 2")
+            router.push("/lobby")
+        }
     }
 }
