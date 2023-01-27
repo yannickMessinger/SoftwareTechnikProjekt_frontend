@@ -4,6 +4,7 @@ import { IMapObject } from "../streetplaner/IMapObject"
 import useUser from "../UserStore"
 import { Client } from "@stomp/stompjs"
 import useCrossroadData from "./useCrossroadData"
+import { NpcPedestrian } from "../../components/3D/NpcPedestrian"
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/npc"
@@ -32,7 +33,7 @@ const fieldSize = 10
 interface IGameState {
     gameMapObjects: IMapObject[]
     mapObjsFromBackEnd: IMapObject[]
-    npcCarMapFromuseGameview: Map<number, NpcCar>
+    npcCarMapFromuseGameview: Map<number, NpcCar | NpcPedestrian>
     mapId: number
 }
 
@@ -235,11 +236,11 @@ export function fillGameState(): void {
                             console.log("Fussgaenger sind da")
                             gameState.npcCarMapFromuseGameview.set(
                                 gameAsset.assetId!,
-                                new NpcCar(
+                                new NpcPedestrian(
                                     gameAsset.assetId!,
                                     gameAsset.objectTypeId,
                                     gameAsset.x,
-                                    0,
+                                    0.2,
                                     gameAsset.y,
                                     gameAsset.rotation,
                                     gridSizeX,

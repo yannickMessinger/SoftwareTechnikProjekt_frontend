@@ -34,6 +34,8 @@ const npcCarObjTypeId = 7
 const trainStationObjTypeId = 11
 const trainObjTypeId = 14
 const playerSpawnObjTypeId = 13
+const firstPedestrianId = 50
+const pedestrianAmount = 10
 
 const {
     editorState,
@@ -166,8 +168,6 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
 
 function placeRandomPedestrians(amount: number) {
     let counter = 0;
-    const pedestrianAmount = 10;
-    const firstPedestrianId = 50
     while(counter < amount) {
         let randomPedestrianObjectTypeId = Math.floor(Math.random() * pedestrianAmount + firstPedestrianId) // different objectTypeIds due to different pedestrian models
         placeAssetOnRandomElement(1, randomPedestrianObjectTypeId);
