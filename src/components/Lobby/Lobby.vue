@@ -34,6 +34,8 @@ const { receiveLobbyUpdates, joinMessage } = useLobbyList()
 //for later purposes to link to selected lobby via Vue Router
 async function selectLobby() {
     //set ActiveLoppy property to the selected Lobby
+    console.log("Pl-List")
+    console.log(props.lobby.playerList)
     setActiveLobby(props.lobby)
 
     //fires JOINED event to backend to trigger persistence operations and inform other players on channel and update data

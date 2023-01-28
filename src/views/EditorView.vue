@@ -1,5 +1,5 @@
 <template>
-    <Header text="World of eMobility" :displayHomebutton="true"></Header>
+    <Header :displayHomebutton="true"></Header>
     <button class="reset-button" @click="emit('grid-save-event', true)">Save</button>
     <!-- Remove before merge with dev -->
     <DialogsWrapper />

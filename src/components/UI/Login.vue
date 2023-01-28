@@ -70,7 +70,7 @@ import router from "../../router/router"
 import BasicButton from "../Buttons/BasicButton.vue"
 import { useChat } from "../../services/Chat/useChat"
 const { login, register, logindata, activeLobby, name } = useUser()
-const { connectGlobalWs } = useChat(name.value, activeLobby.value)
+const { connectGlobalChat } = useChat(name.value, activeLobby.value)
 
 const username = ref("")
 const password = ref("")
@@ -79,13 +79,13 @@ const registrationMode = ref(false)
 const headline = ref("Login")
 const usernameError = ref("")
 const passwordError = ref("")
-connectGlobalWs()
+connectGlobalChat()
 
 async function loginCheck() {
     let responseBody = await login(username.value, password.value)
 
     if (responseBody?.hasOwnProperty("userId") && responseBody?.hasOwnProperty("userName")) {
-        router.push("/")
+        router.push("/lobby")
     } else {
         usernameError.value = "Username und Passwort Kombination gibt es nicht"
         console.log("Status 400")

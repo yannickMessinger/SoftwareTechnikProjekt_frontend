@@ -1,8 +1,8 @@
 <template>
-    <Header text="World of eMobility" :displayHomebutton="true"></Header>
+    <Header :displayHomebutton="true"></Header>
     <div class="container">
         <div class="content">
-            <MyMaps :liste="mapsList.mapslist"></MyMaps>
+            <MyMaps :liste="mapsList.mapslist" v-bind:popupTrigger="false"></MyMaps>
         </div>
         <div class="content">
             <div>
@@ -10,9 +10,12 @@
             </div>
         </div>
     </div>
+    <Chat />
 </template>
 
 <script setup lang="ts">
+import Chat from "../components/UI/Chat.vue"
+
 import Header from "../components/Header.vue"
 import { useLobbyList } from "../services/useLobbyList"
 import { useMyMaps } from "../services/useMyMaps"
@@ -22,7 +25,7 @@ import MyMaps from "../components/Lobby/MyMaps.vue"
 import { onMounted } from "vue"
 
 const { lobbyList, updateLobbyList } = useLobbyList()
-const { mapsList } = useMyMaps()
+const { mapsList, updateMapsList } = useMyMaps()
 
 onMounted(async () => {
     await updateLobbyList()

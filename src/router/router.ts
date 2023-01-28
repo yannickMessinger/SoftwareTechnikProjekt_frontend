@@ -60,4 +60,19 @@ router.beforeEach((to, from, next) => {
     }
 })
 
+router.beforeEach((to, from, next) => {
+    if (logindata.loggedIn && to.path === "/") {
+        console.warn(" '/' path detected")
+        if (logindata.activeLobby.lobbyId == -1) {
+            console.log("redirect to lobby")
+            next("/lobby")
+        } else {
+            console.log("redirect to lobbyview")
+            next("/lobbyview")
+        }
+    } else {
+        next()
+    }
+})
+
 export default router
