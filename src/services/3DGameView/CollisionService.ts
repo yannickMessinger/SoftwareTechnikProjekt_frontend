@@ -1,7 +1,9 @@
 import * as THREE from "three"
+import { useCrashSound } from "../useSound"
 import { useCarMultiplayer } from "./useCarMultiplayer"
 
 const { positionState } = useCarMultiplayer()
+const { playCrashSound } = useCrashSound()
 
 export class CollisionService {
     public car: any
@@ -28,6 +30,7 @@ export class CollisionService {
         } else {
             for (let i = 0; i < objects.length; i++) {
                 if (this.carBB.intersectsBox(objects[i].box)) {
+                    playCrashSound()
                     collisionResetService.resetCar()
                     return true
                 }
@@ -35,6 +38,7 @@ export class CollisionService {
             playerObjectMap.forEach((player) => {
                 let playerBB: THREE.Box3 = new THREE.Box3().setFromObject(player)
                 if (this.carBB.intersectsBox(playerBB)) {
+                    playCrashSound()
                     collisionResetService.resetCar()
                     return true
                 }
