@@ -352,8 +352,10 @@ export class NpcAsset {
         }
     }
 
-    setClientNpcPosition(npcPosX: number, npcPosZ: number) {
+    setClientNpcPosition(npcPosX: number, npcPosZ: number, npcRotation: number, viewRotation: number) {
         this.positions.npcPosX = npcPosX
         this.positions.npcPosZ = npcPosZ
+        this.positions.npcRotation = npcRotation
+        this.viewRotation = viewRotation
     }
 }

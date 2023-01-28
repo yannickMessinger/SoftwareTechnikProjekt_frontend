@@ -233,6 +233,7 @@ function setClientPosMessage(position: INpcPosition) {
                 npcPosX: position.npcPosX,
                 npcPosZ: position.npcPosZ,
                 npcRotation: position.npcRotation,
+                npcViewRotation: position.npcViewRotation,
             },
 
             type: "SET_CLIENT_POS",
@@ -315,7 +316,12 @@ function onNpcPositionMessageReceived(payload: INpcStompMessage) {
         if (user.userId !== activeLobby.value.hostId) {
             console.log("neue SET_CLIENT_POS")
             const updateNpcCar = npcCarState.npcCarMap.get(payload.npcPositionContent!.npcId)
-            updateNpcCar!.setClientNpcPosition(payload.npcPositionContent!.npcPosX, payload.npcPositionContent!.npcPosZ)
+            updateNpcCar!.setClientNpcPosition(
+                payload.npcPositionContent!.npcPosX,
+                payload.npcPositionContent!.npcPosZ,
+                payload.npcPositionContent!.npcRotation,
+                payload.npcPositionContent!.npcViewRotation!
+            )
         }
     }
 }

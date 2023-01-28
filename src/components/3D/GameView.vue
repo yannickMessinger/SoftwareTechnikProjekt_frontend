@@ -70,7 +70,7 @@ export default defineComponent({
         const { loadTrafficLight } = useCrossroadData()
 
         if (user.userId === activeLobby.value.hostId) {
-            console.log("User ist Host!!!")
+            console.log("User ist Host!")
             isHost.value = true
         } else {
             console.log("___User ist KEIN host!")
@@ -214,6 +214,15 @@ export default defineComponent({
             })
         }
 
+        function moveNpcCars() {
+            npcEles.value.forEach((ele) => {
+                checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
+                if (ele.driving) {
+                    ele.move()
+                }
+            })
+        }
+
         function loadSceneChildrenWithKey(sceneObjChildren: Map<any, any>) {
             // console.log("anfangfunction", scene3DobjectMap)
             sceneObjChildren.forEach((ele) => {
@@ -281,28 +290,22 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
 
-                npcEles.value.forEach((ele) => {
-                    checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
-                    if (ele.driving) {
-                        ele.move()
-                    }
-                })
-
-                /*
-                if(isHost){
-                    setInterval(() =>{
-                        npcEles.value.forEach((ele) => {
-                            checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
-                            if (ele.driving) {
-                                ele.move()
-                                setClientPosMessage({npcId:ele.npcId, npcPosX:ele.positions.npcPosX, npcPosZ:ele.positions.npcPosZ, npcRotation:ele.positions.npcRotation})
-                              
-                            }
-                        })
-
-                    },1000)
-
-                }*/
+                if (isHost.value === true) {
+                    console.log("ich darf bewege")
+                    npcEles.value.forEach((ele) => {
+                        checkPlayerNPCDistance(
+                            ele.positions.npcPosX,
+                            ele.positions.npcPosZ,
+                            ele.npcId,
+                            ele.objectTypeId
+                        )
+                        if (ele.driving) {
+                            ele.move()
+                        }
+                    })
+                } else {
+                    console.log("ich darf net bewege")
+                }
 
                 if (movableObject.hornPlayed) {
                     playHorn()
@@ -311,6 +314,22 @@ export default defineComponent({
                     playYourEngine()
                 }
             })
+
+            /*
+            if(isHost.value === true){
+                setInterval(() => {
+                    moveNpcCars()
+                },200)
+            }*/
+
+            /*
+            if(isHost.value === true){
+                setInterval(() => {
+                    npcEles.value.forEach((npc) => {
+                        setClientPosMessage({npcId:npc.npcId, npcPosX:npc.positions.npcPosX, npcPosZ:npc.positions.npcPosZ, npcRotation:npc.positions.npcRotation, npcViewRotation: npc.viewRotation})
+                    })
+                },200)
+            }*/
 
             setInterval(() => {
                 npcEles.value.forEach((ele) => {

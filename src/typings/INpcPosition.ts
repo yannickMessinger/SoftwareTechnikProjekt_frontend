@@ -3,4 +3,5 @@ export interface INpcPosition {
     npcPosX: number
     npcPosZ: number
     npcRotation: number
+    npcViewRotation?: number
 }
