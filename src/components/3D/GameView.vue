@@ -16,7 +16,7 @@ import { MultiplayerCarlistService } from "../../services/3DGameView/Multiplayer
 import { BoundingBoxService } from "../../services/3DGameView/BoundingBoxService"
 import { CollisionService } from "../../services/3DGameView/CollisionService"
 import { CollisionResetService } from "../../services/3DGameView/CollisionResetService"
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref, toRaw, watch } from "vue"
+import { computed, defineComponent, onBeforeUnmount, onMounted, onUnmounted, ref, toRaw, watch } from "vue"
 
 export default defineComponent({
     components: {
@@ -61,6 +61,7 @@ export default defineComponent({
         const boundingBoxService = new BoundingBoxService()
         const collisionService = new CollisionService(box)
         const collisionResetService = new CollisionResetService(movableObject)
+        const intervalArray: any = []
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
 
@@ -297,28 +298,34 @@ export default defineComponent({
                 )
             })
 
-            setInterval(() => {
-                npcEles.value.forEach((ele) => {
-                    if (ele.reachedMapEleLimit()) {
-                        updatePosMessage(ele.npcId)
-                    }
-                })
-            }, 500)
+            intervalArray.push(
+                setInterval(() => {
+                    npcEles.value.forEach((ele) => {
+                        if (ele.reachedMapEleLimit()) {
+                            updatePosMessage(ele.npcId)
+                        }
+                    })
+                }, 500)
+            )
 
             initAmbientSound()
 
             /**
              * delayed: waiting for socket connection
              */
-            setInterval(() => fillPayload(), 25)
-            setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
-            setTimeout(() => createMessage(payload), 5000)
+            intervalArray.push(setInterval(() => fillPayload(), 25))
+            setTimeout(() => intervalArray.push(setInterval(() => updateMessage(payload), 25)), 2000)
+            setTimeout(() => createMessage(payload), 2000)
             setTimeout(() => {
                 multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
                 boundingBoxService.setObjects(scene)
                 collisionResetService.setResetCarPosition(box)
-            }, 8000)
-            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 8000)
+            }, 3000)
+            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 3000)
+        })
+
+        onUnmounted(() => {
+            intervalArray.forEach((interval: any) => clearInterval(interval))
         })
 
         return {
@@ -338,6 +345,7 @@ export default defineComponent({
             playerCarList,
             uid,
             randomNumber,
+            intervalArray,
         }
     },
 })
@@ -345,7 +353,7 @@ export default defineComponent({
 
 <template>
     <Renderer resize="window" ref="renderer">
-        <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
+        <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }" :far="80"> </Camera>
         <Box
             ref="box"
             :position="{ x: playerCarList.get(uid)?.playerCarX, y: 0.75, z: playerCarList.get(uid)?.playerCarZ }"
@@ -376,7 +384,7 @@ export default defineComponent({
                     :props="{ name: ele.objectId }"
                     v-on:load="
                         ele.objectTypeId === 2
-                            ? loadTrafficLight(ele, scene.scene, ele.centerX3d, ele.centerZ3d, rotationMap)
+                            ? loadTrafficLight(ele, scene.scene, ele.centerX3d!, ele.centerZ3d!, rotationMap)
                             : null
                     "
                 />

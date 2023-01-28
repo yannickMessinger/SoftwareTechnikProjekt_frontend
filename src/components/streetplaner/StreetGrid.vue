@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "@vue/reactivity"
-import { onMounted, reactive, watch } from "vue"
+import { onMounted, onUnmounted, reactive, watch } from "vue"
 import type { IGridElement } from "../../services/streetplaner/IGridElement"
 import useEventBus from "../../services/eventBus"
 import ToolEnum from "../../services/streetplaner/ToolEnum"
@@ -30,6 +30,7 @@ const toolState = reactive({
 })
 const lobbyState = useUser().activeLobby
 const { gridSize } = useGridSize()
+
 const npcCarObjTypeId = 7
 const trainStationObjTypeId = 11
 const trainObjTypeId = 14
@@ -77,7 +78,7 @@ watch(
 watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
-        placeAssetOnRandomElement(val[0].car, 7)
+        placeAssetOnRandomElement(val[0].car, npcCarObjTypeId)
         placeRandomPedestrians(val[0].pedestrian)
     }
 )
@@ -120,7 +121,21 @@ onMounted(() => {
     updateMap()
 })
 
+onUnmounted(() => {
+    let playerSpawnMapObject = editorState.mapObjects.filter((mapObject) => {
+        return (
+            mapObject.game_assets.filter((asset) => {
+                return asset.userId === userId.value
+            }).length > 0
+        )
+    })
+    if (playerSpawnMapObject.length === 0) {
+        placeAssetOnRandomElement(1, playerSpawnObjTypeId)
+    }
+})
+
 function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) {
+    debugger
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
@@ -284,7 +299,7 @@ function getRandomSpawnsPedestrian(element: IMapObject) {
 
 function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
-    if (assetObjectTypeId === 7) {
+    if (assetObjectTypeId === npcCarObjTypeId || assetObjectTypeId === playerSpawnObjTypeId) {
         randomPosElements = getRandomSpawnsCar(element)
     } else if (assetObjectTypeId >= firstPedestrianId && assetObjectTypeId < firstPedestrianId + pedestrianAmount) {
         randomPosElements = getRandomSpawnsPedestrian(element)
@@ -301,26 +316,48 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
             if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
                 randomPos++
             } else {
-                streetGrid[element.x][element.y].game_assets.push({
-                    objectTypeId: assetObjectTypeId,
-                    x: randomPosElements[randomPos].x,
-                    y: randomPosElements[randomPos].y,
-                    rotation: randomPosElements[randomPos].rotation,
-                    texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                })
+                if (assetObjectTypeId === playerSpawnObjTypeId) {
+                    streetGrid[element.x][element.y].game_assets.push({
+                        objectTypeId: assetObjectTypeId,
+                        userId: userId.value,
+                        x: randomPosElements[randomPos].x,
+                        y: randomPosElements[randomPos].y,
+                        rotation: randomPosElements[randomPos].rotation,
+                        texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                    })
+                } else {
+                    streetGrid[element.x][element.y].game_assets.push({
+                        objectTypeId: assetObjectTypeId,
+                        x: randomPosElements[randomPos].x,
+                        y: randomPosElements[randomPos].y,
+                        rotation: randomPosElements[randomPos].rotation,
+                        texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                    })
+                }
                 return true
             }
         }
     } else {
         // spawnpoint is free, so place car there
         // console.log("TEXTURE ELEMENT: ", assetObjectTypeId,  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId));
-        streetGrid[element.x][element.y].game_assets.push({
-            objectTypeId: assetObjectTypeId,
-            x: randomPosElements[randomPos].x,
-            y: randomPosElements[randomPos].y,
-            rotation: randomPosElements[randomPos].rotation,
-            texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-        })
+        if (assetObjectTypeId === playerSpawnObjTypeId) {
+            streetGrid[element.x][element.y].game_assets.push({
+                objectTypeId: assetObjectTypeId,
+                userId: userId.value,
+                x: randomPosElements[randomPos].x,
+                y: randomPosElements[randomPos].y,
+                rotation: randomPosElements[randomPos].rotation,
+                texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+            })
+        } else {
+            streetGrid[element.x][element.y].game_assets.push({
+                objectTypeId: assetObjectTypeId,
+                x: randomPosElements[randomPos].x,
+                y: randomPosElements[randomPos].y,
+                rotation: randomPosElements[randomPos].rotation,
+                texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+            })
+        }
         return true
     }
 
