@@ -61,7 +61,7 @@ import Chat from "../UI/Chat.vue"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
 import { useChat } from "../../services/Chat/useChat"
-import { onMounted, watch, ref } from "vue"
+import { onMounted, ref, watch } from "vue"
 import router from "../../router/router"
 import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
 import useEventBus from "../../services/eventBus"
@@ -192,7 +192,6 @@ onMounted(() => {
     //activate websockets connection to listen for incoming updates
     receiveLobbyUpdates()
     activeLobbyID.value = activeLobby.value.lobbyId
-    console.log(activeLobbyID.value)
 })
 </script>
 

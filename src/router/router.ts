@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router"
-import Home from "../views/Home.vue"
 import EditorView from "../views/EditorView.vue"
 import Game from "../views/Game.vue"
 import HomepageView from "../views/HomepageView.vue"
@@ -64,10 +63,8 @@ router.beforeEach((to, from, next) => {
     if (logindata.loggedIn && to.path === "/") {
         console.warn(" '/' path detected")
         if (logindata.activeLobby.lobbyId == -1) {
-            console.log("redirect to lobby")
             next("/lobby")
         } else {
-            console.log("redirect to lobbyview")
             next("/lobbyview")
         }
     } else {

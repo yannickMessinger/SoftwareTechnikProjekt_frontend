@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { computed } from "@vue/reactivity"
-import { ref, reactive, watch, onMounted } from "vue"
+import { onMounted, reactive, watch } from "vue"
 import type { IGridElement } from "../../services/streetplaner/IGridElement"
 import useEventBus from "../../services/eventBus"
 import ToolEnum from "../../services/streetplaner/ToolEnum"
 import { useGridSize } from "../../services/useGridSize"
 
-import { useBlockList, updateBlockList } from "../../services/streetplaner/useBlockList"
-import { useStreetGridList, updateStreetGridList, postStreetGrid } from "../../services/streetplaner/useStreetGridList"
+import { useBlockList } from "../../services/streetplaner/useBlockList"
+import { postStreetGrid } from "../../services/streetplaner/useStreetGridList"
 import { IBlockElement } from "../../services/streetplaner/IBlockElement"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
 import { StreetGridDTO } from "../../services/streetplaner/StreetGridDTO"
 import useUser from "../../services/UserStore"
+import UserStore from "../../services/UserStore"
 import { useEditor } from "../../services/Editor/useEditor"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
-import UserStore from "../../services/UserStore"
 
 const { userId } = UserStore()
 const { bus } = useEventBus()

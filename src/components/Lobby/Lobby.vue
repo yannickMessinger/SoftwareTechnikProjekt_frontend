@@ -16,12 +16,10 @@
 
 <script setup lang="ts">
 import { ILobby } from "../../typings/ILobby"
-import BasicButton from "../Buttons/BasicButton.vue"
 import useUser from "../../services/UserStore"
 import router from "../../router/router"
 import { useLobbyList } from "../../services/useLobbyList"
 import { onMounted } from "vue"
-import { useChat } from "../../services/Chat/useChat"
 
 const props = defineProps<{
     lobby: ILobby
@@ -34,8 +32,6 @@ const { receiveLobbyUpdates, joinMessage } = useLobbyList()
 //for later purposes to link to selected lobby via Vue Router
 async function selectLobby() {
     //set ActiveLoppy property to the selected Lobby
-    console.log("Pl-List")
-    console.log(props.lobby.playerList)
     setActiveLobby(props.lobby)
 
     //fires JOINED event to backend to trigger persistence operations and inform other players on channel and update data

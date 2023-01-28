@@ -4,7 +4,7 @@ import { onMounted, reactive, ref, watch } from "vue"
 import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
 import useEventBus from "../../services/eventBus"
 import ToolEnum from "../../services/streetplaner/ToolEnum"
-import { useBlockList, IBlockListState } from "../../services/streetplaner/useBlockList"
+import { IBlockListState, useBlockList } from "../../services/streetplaner/useBlockList"
 import { computed } from "@vue/reactivity"
 
 /**Variables: */

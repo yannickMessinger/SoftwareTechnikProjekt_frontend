@@ -1,5 +1,4 @@
-import { reactive, readonly } from "vue"
-import { IMyMapsListItem } from "../typings/IMyMapsListitem"
+import { reactive } from "vue"
 import { IMyMapsState } from "../typings/IMyMapsState"
 import { IAddMyMapsRequestDTO } from "../typings/IAddMyMapsRequestDTO"
 import { IMapDTO } from "../typings/IMapDTO"

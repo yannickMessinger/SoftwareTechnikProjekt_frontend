@@ -77,11 +77,8 @@
 </template>
 
 <script setup lang="ts">
-//import { IMyMapsListItem } from "../../typings/IMyMapsListitem"
-//import { useMyMaps } from "../../services/useMyMaps"
 import AddMapPopup from "./AddMapPopup.vue"
-/** Imports: */
-import { reactive, watch, ref, defineEmits } from "vue"
+import { onMounted, reactive, ref, watch } from "vue"
 import type { ICardElement } from "../../services/Lobby/ICardElement"
 import useEventBus from "../../services/eventBus"
 import router from "../../router/router"
@@ -92,7 +89,6 @@ import { IGetMapsByPlayerResponseDTO } from "../../typings/IGetMapsByPlayerRespo
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import { useLobbyList } from "../../services/useLobbyList"
 
-import { onMounted } from "vue"
 const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage } = useLobbyList()
 onMounted(() => {
     //activate websockets connection to listen for incoming updates
@@ -137,9 +133,7 @@ watch(
 
 /** button functions: */
 function createLobbyAction(clickedCard: ICardElement) {
-    console.log("clicked")
     activeLobby.value.mapId = clickedCard.id
-    console.log(activeLobby.value.mapId)
     router.push("/create")
 }
 function changeMapAction(clickedCard: ICardElement) {
@@ -167,13 +161,11 @@ function cardClickedDeleteAction(clickedCard: any) {
         isEmpty.value = true
     }
     if (removedCard != null) {
-        console.log("Removed Item: " + clickedCard.id)
         deleteMapByGivenId(clickedCard.id)
     }
 }
 
 async function changeMapInBackend(mapId: number) {
-    console.log("CHANGE map")
     const url = "api/lobby/" + activeLobby.value.lobbyId + "/" + mapId
     try {
         const response = await fetch(url, {
@@ -194,7 +186,6 @@ async function changeMapInBackend(mapId: number) {
 }
 
 async function getMapsFromBackend() {
-    console.log("search maps")
     const url = "api/map/player/" + userId.value
     try {
         const response = await fetch(url, {

@@ -12,7 +12,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent } from "vue"
 import SkelletonTrois from "../components/3D/GameView.vue"
 import HUD from "../components/3D/HUD.vue"
 import Header from "../components/Header.vue"

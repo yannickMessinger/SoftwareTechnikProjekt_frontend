@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // inspired from https://dev.to/garmideroman/the-simplest-way-to-deal-with-modal-dialogs-in-vue-3-59hl
-import { defineProps, defineEmits } from "vue"
+import { defineEmits } from "vue"
 
 const props = defineProps(["question"])
 const emit = defineEmits(["confirm", "cancel"])

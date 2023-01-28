@@ -1,5 +1,4 @@
-import * as THREE from "three"
-import { reactive, ref } from "vue"
+import { reactive } from "vue"
 import { IPosition } from "../typings/IPosition"
 
 export class CreatePlayerCars {

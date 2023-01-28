@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Box, Camera, Renderer, Scene, GltfModel, AmbientLight, Plane, PhongMaterial } from "troisjs"
+import { AmbientLight, Box, Camera, GltfModel, PhongMaterial, Plane, Renderer, Scene } from "troisjs"
 import { computed, defineComponent, onMounted, ref, toRaw, watch } from "vue"
 import { MovmentInputController } from "../../models/MovementInputController"
 import { usePlayerList } from "../../services/usePlayerList"

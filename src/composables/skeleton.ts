@@ -1,6 +1,6 @@
 // example from https://vuejs.org/guide/reusability/composables.html
 
-import { ref, onMounted, onUnmounted } from "vue"
+import { onMounted, onUnmounted, ref } from "vue"
 
 // by convention, composable function names start with "use"
 export function useMouse() {

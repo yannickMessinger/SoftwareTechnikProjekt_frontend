@@ -1,9 +1,8 @@
 import { Client } from "@stomp/stompjs"
-import { reactive, readonly } from "vue"
+import { reactive } from "vue"
 import { IPosition } from "../../typings/IPosition"
 import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "./useGameView"
-import { routeLocationKey } from "vue-router"
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/position"
@@ -73,7 +72,6 @@ function initCarUpdateWebsocket() {
     }
 
     stompClient.onConnect = (frame) => {
-        console.log("connected")
         stompClient.subscribe(DEST, (message) => {
             const payload: IStompMessage = JSON.parse(message.body)
             if (payload) {
@@ -81,9 +79,7 @@ function initCarUpdateWebsocket() {
             }
         })
     }
-    stompClient.onDisconnect = () => {
-        console.log("disconnected")
-    }
+    stompClient.onDisconnect = () => {}
 
     stompClient.activate()
 }

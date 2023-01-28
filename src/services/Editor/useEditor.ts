@@ -1,4 +1,4 @@
-import { reactive, readonly } from "vue"
+import { reactive } from "vue"
 import { Client } from "@stomp/stompjs"
 import { IMapObject } from "../streetplaner/IMapObject"
 
@@ -88,9 +88,7 @@ function receiveEditorUpdates() {
             onMessageReceived(editorUpdate)
         })
     }
-    stompClient.onDisconnect = () => {
-        console.log("disconnected")
-    }
+    stompClient.onDisconnect = () => {}
 
     stompClient.activate()
 }

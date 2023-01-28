@@ -17,8 +17,6 @@
 </template>
 
 <script setup lang="ts">
-import Chat from "../components/UI/Chat.vue"
-
 import { onMounted, reactive } from "vue"
 import Header from "../components/Header.vue"
 import PlayerList from "../components/Lobby/PlayerList.vue"

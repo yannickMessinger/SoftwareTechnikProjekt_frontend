@@ -13,7 +13,6 @@ import { Client } from "@stomp/stompjs"
 import { fetchPlayerList } from "./usePlayerList"
 import { useChat } from "./Chat/useChat"
 import IUser from "../typings/IUser"
-import { resolve } from "path"
 import router from "../router/router"
 import useEventBus from "./eventBus"
 
@@ -59,7 +58,6 @@ export function useLobbyList() {
 
 //functions to fetch and update List of available lobbys from backend
 export async function updateLobbyList(): Promise<void> {
-    console.log("lobbyupdate")
     const url = "/api/lobby"
 
     try {
@@ -128,7 +126,6 @@ function joinMessage() {
     connectLobbyChat()
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
         //if(activeLobby.value)
-        console.log("join message methode wurde aufgerufen")
         const lobbyMessage: IStompMessage = {
             playerContent: {
                 userId: user.userId,
@@ -450,6 +447,7 @@ async function onMessageReceived(payload: IStompMessage) {
         if (payload.type === "SWITCH_MAP") {
             activeLobby.value.mapId = payload.lobbyContent.mapId
             emit("change-map-event", payload.lobbyContent.mapId)
+            router.push("/lobbyview")
         }
         if (payload.type === "LEAVE") {
             console.log("LEAVE 2")

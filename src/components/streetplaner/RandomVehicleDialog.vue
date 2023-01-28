@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, computed } from "vue"
+import { defineEmits, ref } from "vue"
 
 const emit = defineEmits(["confirm", "cancel"])
 const amountCars = ref(0)

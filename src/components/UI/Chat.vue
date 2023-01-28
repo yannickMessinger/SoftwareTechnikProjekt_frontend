@@ -63,19 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-    computed,
-    nextTick,
-    onBeforeMount,
-    onBeforeUpdate,
-    onMounted,
-    onUpdated,
-    reactive,
-    ref,
-    toRef,
-    unref,
-    watch,
-} from "vue"
+import { onUpdated, reactive, ref, toRef, unref } from "vue"
 import BasicButton from "../Buttons/BasicButton.vue"
 import { useChat } from "../../services/Chat/useChat"
 import useUser from "../../services/UserStore"

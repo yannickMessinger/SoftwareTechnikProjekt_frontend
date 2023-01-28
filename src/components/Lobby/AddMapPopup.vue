@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import { ref } from "vue"
-import App from "../../App.vue"
+
 const mapNameInput = ref("")
 export default {
     props: ["TogglePopup"],

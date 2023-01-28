@@ -69,6 +69,7 @@ import useUser from "../../services/UserStore"
 import router from "../../router/router"
 import BasicButton from "../Buttons/BasicButton.vue"
 import { useChat } from "../../services/Chat/useChat"
+
 const { login, register, logindata, activeLobby, name } = useUser()
 const { connectGlobalChat } = useChat(name.value, activeLobby.value)
 
@@ -88,8 +89,6 @@ async function loginCheck() {
         router.push("/lobby")
     } else {
         usernameError.value = "Username und Passwort Kombination gibt es nicht"
-        console.log("Status 400")
-        console.log(logindata.errormessage)
     }
 }
 
