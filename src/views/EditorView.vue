@@ -1,7 +1,5 @@
 <template>
     <Header :displayHomebutton="true"></Header>
-    <button class="reset-button" @click="emit('grid-save-event', true)">Save</button>
-    <!-- Remove before merge with dev -->
     <DialogsWrapper />
     <div class="selected-block">
         <SelectedBlockComponent />
