@@ -18,6 +18,8 @@ let audioEngine = new Audio(AUDIO_ENGINE_PATH)
 const audioEnginesOtherCars = new Map<number, HTMLAudioElement>()
 const audioEnginesOtherCarsNPC = new Map<number, HTMLAudioElement>()
 
+const carObjectTypeIds = [7, 21, 30, 31, 32, 33]
+
 let lobbyId: number
 let payloadObject: IPosition
 
@@ -48,8 +50,9 @@ function playHorn() {
 }
 
 function playHornFromFromOtherCar(distance: number) {
-    if (distance <= 100) {
-        audioHorn.volume = calculateSoundVolume(distance, 100)
+    const MAX_HEARING_HORN_DISTANCE = 100
+    if (distance <= MAX_HEARING_HORN_DISTANCE) {
+        audioHorn.volume = calculateSoundVolume(distance, MAX_HEARING_HORN_DISTANCE)
         audioHorn.play()
     }
 }
@@ -100,14 +103,25 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId: number
             }
         }
     } else {
-        if (objectTypeId === 14) {
+        const TRAIN_OBJECT_TYPE_ID = 14
+        if (objectTypeId === TRAIN_OBJECT_TYPE_ID) {
             engine = new Audio(AUDIO_TRAIN_PATH)
+
+            audioEnginesOtherCarsNPC.set(carId, engine)
+            engine.volume = volume
+            engine.play
         } else {
-            engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
+            carObjectTypeIds.forEach((carObjectTypeId) => {
+                if (carObjectTypeId === objectTypeId) {
+                    console.log("Car erkannt")
+                    engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
+
+                    audioEnginesOtherCarsNPC.set(carId, engine)
+                    engine.volume = volume
+                    engine.play
+                }
+            })
         }
-        audioEnginesOtherCarsNPC.set(carId, engine)
-        engine.volume = volume
-        engine.play
     }
 }
 
