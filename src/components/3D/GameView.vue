@@ -1,17 +1,5 @@
 <script lang="ts">
-import {
-    PointLight,
-    Box,
-    Camera,
-    Renderer,
-    Scene,
-    LambertMaterial,
-    GltfModel,
-    AmbientLight,
-    Plane,
-    PhongMaterial,
-} from "troisjs"
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref, toRaw, watch } from "vue"
+import { AmbientLight, Box, Camera, GltfModel, PhongMaterial, Plane, Renderer, Scene } from "troisjs"
 
 import { MovmentInputController } from "../../models/MovementInputController"
 import { usePlayerList } from "../../services/usePlayerList"
@@ -21,10 +9,14 @@ import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
 import { IPosition } from "../../typings/IPosition"
 import { useSound } from "../../services/useSound"
-import { on } from "events"
 import * as THREE from "three"
 
 import useCrossroadData from "../../services/3DGameView/useCrossroadData"
+import { MultiplayerCarlistService } from "../../services/3DGameView/MultiplayerCarlistService"
+import { BoundingBoxService } from "../../services/3DGameView/BoundingBoxService"
+import { CollisionService } from "../../services/3DGameView/CollisionService"
+import { CollisionResetService } from "../../services/3DGameView/CollisionResetService"
+import { computed, defineComponent, onBeforeUnmount, onMounted, onUnmounted, ref, toRaw, watch } from "vue"
 
 export default defineComponent({
     components: {
@@ -43,6 +35,7 @@ export default defineComponent({
         const box = ref()
         const camera = ref()
         const scene = ref()
+        const isHost = ref(false)
 
         const movableObject = new MovmentInputController(box, camera)
 
@@ -50,45 +43,49 @@ export default defineComponent({
             useGameView()
 
         const {
+            positionState,
+            initCarUpdateWebsocket,
             createMessage,
             updateMessage,
-            initCarUpdateWebsocket,
-            positionState,
             fillPlayerCarState,
             playerCarState,
             initNpcSocket,
+            fillNpcCars,
             updatePosMessage,
             npcCarState,
-            fillNpcCars,
         } = useCarMultiplayer()
 
-        const { userId, activeLobby } = useUser()
-        const { playerList } = usePlayerList()
+        const { user, userId, activeLobby } = useUser()
         const { loadTrafficLight } = useCrossroadData()
+        const { playerListState, playerList, fetchPlayerList } = usePlayerList()
+        const boundingBoxService = new BoundingBoxService()
+        const collisionService = new CollisionService(box)
+        const collisionResetService = new CollisionResetService(movableObject)
+        const intervalArray: any = []
 
         let payload: IPosition = { id: 0, x: 0, z: 0, rotation: [0, 0, 0] }
 
         const {
             playHorn,
-            playEngine,
-            stopEngine,
+            playYourEngine,
+            stopYourEngine,
             playEngineFromOtherCar,
             pauseEngineFromOtherCar,
-            connectSound,
+            connectHornSound,
             initAmbientSound,
             stopAmbientSound,
-            disconnectSound,
+            disconnectHornSound,
             stopAllEngines,
-            pauseEngineFromOtherCarNPC,
-            playEngineFromOtherCarNPC,
+            playEngineFromNPC,
+            pauseEngineFromNPC,
             stopAllEnginesNPC,
         } = useSound(activeLobby.value.lobbyId, payload)
-        connectSound()
 
         const scene3DobjectMap = new Map()
 
         const uid = userId.value
         const rawPlayerList = toRaw(playerList.value)
+        const multiplayerCarlistService = new MultiplayerCarlistService(rawPlayerList)
         //counter variables for loops to prefill map with dummy data
         const fieldSize = 10
         let mapWidth = 30
@@ -154,39 +151,12 @@ export default defineComponent({
 
         resetGameMapObjects()
 
+        connectHornSound()
+
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
         const playerCarList = computed(() => playerCarState.playerCarMap)
         const npcEles = computed(() => npcCarState.npcCarMap)
-
-        /*Models position are saved from the Backend counting from 0 upwards.
-      x:0, z:0 describes the upper left corner. On a 100 x 100 Field the lower right corner would be x:99, z: 99.
-      On the 3d Game View the coordinates x:0, z:0 describes the center of our Grid. The upper left corner would be x:-50, z:-50.
-      The following two methods calculate the Models position bades on the backend memory structure and adapts it to the frontend structure.*/
-
-        /**
-         * Calculates the X Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param xCoordCenter x coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param xCoordAsset x coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-            let originX = xCoordCenter - fieldSize / 2
-            let x = originX + xCoordAsset * fieldSize
-
-            return x
-        }
-
-        /**
-         * Calculates the Z Coordinate of the game asset (e.g. car / vehicle) which is placed in the current street element
-         * @param zCoordCenter z coordinate of the center point of street element, necessary to calculate upper left origin
-         * @param yCoordAsset y coordinate of the asset to be placed, between 0 and 1
-         */
-        function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-            let originZ = zCoordCenter - fieldSize / 2
-            let z = originZ + yCoordAsset * fieldSize
-
-            return z
-        }
 
         /**
          * Fills the payload with userId and movableObject-data for x,z and takes the y element out of quaternion
@@ -232,6 +202,15 @@ export default defineComponent({
             })
         }
 
+        function moveNpcCars() {
+            npcEles.value.forEach((ele) => {
+                checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
+                if (ele.driving) {
+                    ele.move()
+                }
+            })
+        }
+
         function loadSceneChildrenWithKey(sceneObjChildren: Map<any, any>) {
             sceneObjChildren.forEach((ele) => {
                 rawPlayerList.forEach((player) => {
@@ -250,23 +229,23 @@ export default defineComponent({
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
-            if (distance < 20) {
+            if (distance < 30) {
                 playEngineFromOtherCar(carId, distance)
             } else {
                 pauseEngineFromOtherCar(carId)
             }
         }
 
-        function checkPlayerCarDistanceNPC(posX: number, posZ: number, carId: number) {
+        function checkPlayerNPCDistance(posX: number, posZ: number, carId: number, objectTypeId: number) {
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
-            if (distance < 20) {
-                playEngineFromOtherCarNPC(carId, distance)
+            if (distance < 30) {
+                playEngineFromNPC(carId, distance, objectTypeId)
             } else {
-                pauseEngineFromOtherCarNPC(carId)
+                pauseEngineFromNPC(carId)
             }
         }
 
@@ -281,11 +260,11 @@ export default defineComponent({
         )
 
         onBeforeUnmount(() => {
-            disconnectSound()
+            disconnectHornSound()
             stopAmbientSound()
             stopAllEngines()
             stopAllEnginesNPC()
-            stopEngine()
+            stopYourEngine()
         })
 
         onMounted(() => {
@@ -296,37 +275,57 @@ export default defineComponent({
             renderer.value.onBeforeRender(() => {
                 movableObject.update()
                 movePlayerCars()
+
                 npcEles.value.forEach((ele) => {
-                    checkPlayerCarDistanceNPC(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId)
+                    checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
                     if (ele.driving) {
                         ele.move()
                     }
                 })
+
                 if (movableObject.hornPlayed) {
                     playHorn()
                 }
                 if (movableObject.enginePlayed) {
-                    playEngine()
+                    playYourEngine()
                 }
+                multiplayerCarlistService.updatePlayerCars(playerCarList, positionState, uid)
+                collisionService.updateCarBoundingBox()
+                collisionService.checkCollision(
+                    boundingBoxService.getBoundingBoxes(),
+                    multiplayerCarlistService.getPlayerObjectMap(),
+                    collisionResetService
+                )
             })
 
-            setInterval(() => {
-                npcEles.value.forEach((ele) => {
-                    if (ele.reachedMapEleLimit()) {
-                        updatePosMessage(ele.npcId)
-                    }
-                })
-            }, 500)
+            intervalArray.push(
+                setInterval(() => {
+                    npcEles.value.forEach((ele) => {
+                        if (ele.reachedMapEleLimit()) {
+                            updatePosMessage(ele.npcId)
+                        }
+                    })
+                }, 500)
+            )
 
             initAmbientSound()
 
             /**
              * delayed: waiting for socket connection
              */
-            setInterval(() => fillPayload(), 25)
-            setTimeout(() => setInterval(() => updateMessage(payload), 25), 5000)
-            setTimeout(() => createMessage(payload), 5000)
-            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 8000)
+            intervalArray.push(setInterval(() => fillPayload(), 25))
+            setTimeout(() => intervalArray.push(setInterval(() => updateMessage(payload), 25)), 2000)
+            setTimeout(() => createMessage(payload), 2000)
+            setTimeout(() => {
+                multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
+                boundingBoxService.setObjects(scene)
+                collisionResetService.setResetCarPosition(box)
+            }, 3000)
+            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 3000)
+        })
+
+        onUnmounted(() => {
+            intervalArray.forEach((interval: any) => clearInterval(interval))
         })
 
         return {
@@ -334,8 +333,6 @@ export default defineComponent({
             renderer,
             camera,
             box,
-            calcAssetCoordinateX,
-            calcAssetCoordinateZ,
             scene,
             movableObject,
             loadTrafficLight,
@@ -348,6 +345,7 @@ export default defineComponent({
             playerCarList,
             uid,
             randomNumber,
+            intervalArray,
         }
     },
 })
@@ -355,7 +353,7 @@ export default defineComponent({
 
 <template>
     <Renderer resize="window" ref="renderer">
-        <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }"> </Camera>
+        <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }" :far="80"> </Camera>
         <Box
             ref="box"
             :position="{ x: playerCarList.get(uid)?.playerCarX, y: 0.75, z: playerCarList.get(uid)?.playerCarZ }"

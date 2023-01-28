@@ -1,14 +1,3 @@
-<!-- Component that represents a single player in the player list-->
-<!--Only the name is displayed-->
-
-<!--
-<template>
-    <tr>
-        <td>{{props.player.name}}</td>
-    </tr>
-
-</template>
--->
 <template>
     <div class="cell">
         <table>
@@ -16,10 +5,6 @@
                 <div class="cellone">
                     <td style="width: 100%">{{ props.player.userName }}</td>
                 </div>
-                <td style="width: 10%"><button>Nachricht</button></td>
-                <td style="width: 10%">
-                    <button class="deleteButton">X</button>
-                </td>
             </tr>
         </table>
     </div>

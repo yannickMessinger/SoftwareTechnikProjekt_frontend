@@ -1,7 +1,5 @@
 <template>
-    <Header text="World of eMobility" :displayHomebutton="true"></Header>
-    <button class="reset-button" @click="emit('grid-save-event', true)">Save</button>
-    <!-- Remove before merge with dev -->
+    <Header :displayHomebutton="true"></Header>
     <DialogsWrapper />
     <div class="selected-block">
         <SelectedBlockComponent />
@@ -40,11 +38,8 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import useEventBus from "../services/eventBus"
-import router from "../router/router"
-import BuildingBlocksComponent from "../components/streetplaner/BuildingBlocksComponent.vue"
 import ListToolsComponent from "../components/streetplaner/ListToolsComponent.vue"
 import ListBlocksComponent from "../components/streetplaner/ListBlocksComponent.vue"
-import ListAssetsComponent from "../components/streetplaner/ListAssetsComponent.vue"
 import SelectedBlockComponent from "../components/streetplaner/SelectedBlockComponent.vue"
 import StreetGrid from "../components/streetplaner/StreetGrid.vue"
 import { createConfirmDialog } from "vuejs-confirm-dialog"
@@ -52,7 +47,6 @@ import SimpleDialog from "../components/SimpleDialog.vue"
 import Header from "../components/Header.vue"
 import Chat from "../components/UI/Chat.vue"
 import BasicButton from "../components/Buttons/BasicButton.vue"
-import useUser from "../services/UserStore"
 import { useGridSize } from "../services/useGridSize"
 import Slider from "../components/Slider.vue"
 

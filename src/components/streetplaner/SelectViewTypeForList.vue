@@ -1,6 +1,7 @@
 <script>
 import ListBlocksComponent from "../streetplaner/ListBlocksComponent.vue"
 import BuildingBlocksComponent from "../streetplaner/BuildingBlocksComponent.vue"
+
 export default {
     components: {
         ListBlocksComponent: ListBlocksComponent,

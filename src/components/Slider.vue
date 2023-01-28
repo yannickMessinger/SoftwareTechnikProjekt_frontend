@@ -6,7 +6,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
 import { useGridSize } from "../services/useGridSize"
 
 const { gridSize } = useGridSize()

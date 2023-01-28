@@ -1,13 +1,10 @@
 <template>
     <div class="header">
-        <span>AktUser: {{ logindata.userName }}</span>
-        <span>ActiveLobby: {{ logindata.activeLobby.lobbyName }}</span>
-        <span>AktMap: {{ logindata.activeLobby.mapId }}</span>
-        <span>AktLobbyM: {{ logindata.activeLobby.lobbyModeEnum }}</span>
-        <span>{{ text }}</span>
+        <span>World of eMobility</span>
+        <span class="right"> {{ logindata.userName }}</span>
         <div class="right">
             <BasicButton
-                v-if="logindata.loggedIn"
+                v-if="logindata.loggedIn && activeLobby.lobbyId < 0"
                 class="cncl btn red"
                 display="Logout"
                 :btn_click="
@@ -23,7 +20,8 @@
                 display=""
                 :btn_click="
                     () => {
-                        router.push('/')
+                        if (logindata.activeLobby.lobbyId == -1) router.push('/lobby')
+                        else router.push('/lobbyview')
                     }
                 "
             />
@@ -36,7 +34,7 @@ import router from "../router/router"
 import BasicButton from "./Buttons/BasicButton.vue"
 import useUser from "../services/UserStore"
 
-const { logout, logindata } = useUser()
+const { logout, activeLobby, logindata } = useUser()
 
 const props = defineProps({
     text: {

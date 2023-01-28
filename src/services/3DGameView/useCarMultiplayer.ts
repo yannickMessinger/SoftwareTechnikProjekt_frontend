@@ -1,17 +1,17 @@
 import { Client } from "@stomp/stompjs"
-import { reactive, readonly } from "vue"
+import { reactive } from "vue"
 import { IPosition } from "../../typings/IPosition"
 import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "./useGameView"
-import { routeLocationKey } from "vue-router"
 import useUser from "../UserStore"
 import useCrossroadData from "./useCrossroadData"
 import { IMapObject } from "../streetplaner/IMapObject"
 import { NpcCar } from "../../components/3D/NpcCar"
 import { NpcPedestrian } from "../../components/3D/NpcPedestrian"
+import { INpcPosition } from "../../typings/INpcPosition"
 
 const { gameState } = useGameView()
-const { activeLobby } = useUser()
+const { activeLobby, user } = useUser()
 const { crossroadMap } = useCrossroadData()
 
 const ws_url = `ws://${window.location.host}/stomp`
@@ -21,18 +21,17 @@ const DELETE_MSG = "/app/position.delete"
 const UPDATE_MSG = "/app/position.update"
 
 const NPC_DEST = "/topic/npc"
+const NPC_SET_CLIENT_POS_TOPIC = "/topic/npc/setclientpos"
 const UPDATE_POS_MSG = "/app/npc.updatepos"
+const SET_CLIENT_POS_MSG = "/app/npc.setclientpos"
 
 const fieldSize = 10
 
-/*Defines the Grid Size in length by the number ob fields*/
-let gridSizeX = fieldSize * 30
-/*Defines the Grid Size in height by the number ob fields*/
-let gridSizeY = fieldSize * 20
 /*Map of 3d-model paths*/
 
 let stompClient: Client
 let npcStompClient: Client
+let npcPositionClient: Client
 
 interface NpcInfoResponseDTO {
     npcId: number
@@ -51,6 +50,12 @@ interface NpcInfoRequestDTO {
 interface INpcStompMessage {
     npcInfoRequestDTO: NpcInfoRequestDTO
     npcInfoResponseDTO?: NpcInfoResponseDTO
+    npcPositionContent?: INpcPosition
+    type: string
+}
+
+interface INpcPositionMsg {
+    npcPositionContent: INpcPosition
     type: string
 }
 
@@ -148,9 +153,9 @@ function initNpcSocket() {
     }
 
     npcStompClient.onConnect = (frame) => {
-        console.log(`___NPC WEBSOCKET SUCCESS`)
         npcStompClient.subscribe(NPC_DEST, (message) => {
             const npcUpdate: INpcStompMessage = JSON.parse(message.body)
+
             if (npcCarState.npcCarMap.get(npcUpdate.npcInfoResponseDTO!.npcId)!.needsMapEleUpdate) {
                 onNpcMessageReceived(npcUpdate)
             }
@@ -164,10 +169,38 @@ function initNpcSocket() {
     npcStompClient.activate()
 }
 
+function initNpcPositionSocket() {
+    npcPositionClient = new Client({
+        brokerURL: ws_url,
+    })
+    npcPositionClient.onWebSocketError = (error) => {
+        console.log("error", error.message)
+    }
+    npcPositionClient.onStompError = (frame) => {
+        console.log("error", frame.body)
+    }
+
+    npcPositionClient.onConnect = (frame) => {
+        npcStompClient.subscribe(NPC_SET_CLIENT_POS_TOPIC, (message) => {
+            const npcPosUpdate: INpcStompMessage = JSON.parse(message.body)
+            if (user.userId !== activeLobby.value.hostId) {
+                onNpcPositionMessageReceived(npcPosUpdate)
+            }
+        })
+    }
+
+    npcPositionClient.onDisconnect = () => {
+        console.log("npc ws disconnected")
+    }
+
+    npcPositionClient.activate()
+}
+
 //emits event to backend with current information, so that next map element can be calculated.
 function updatePosMessage(npcId: number) {
     if (npcStompClient) {
         let tempCar = npcCarState.npcCarMap.get(npcId)!
+
         const updatePosMsg: INpcStompMessage = {
             npcInfoRequestDTO: {
                 mapId: activeLobby.value.mapId,
@@ -183,6 +216,28 @@ function updatePosMessage(npcId: number) {
             destination: UPDATE_POS_MSG,
             headers: {},
             body: JSON.stringify(updatePosMsg),
+        })
+    }
+}
+
+function setClientPosMessage(position: INpcPosition) {
+    if (npcStompClient) {
+        const setClientPosMsg: INpcPositionMsg = {
+            npcPositionContent: {
+                npcId: position.npcId,
+                npcPosX: position.npcPosX,
+                npcPosZ: position.npcPosZ,
+                npcRotation: position.npcRotation,
+                npcViewRotation: position.npcViewRotation,
+            },
+
+            type: "SET_CLIENT_POS",
+        }
+
+        npcStompClient.publish({
+            destination: SET_CLIENT_POS_MSG,
+            headers: {},
+            body: JSON.stringify(setClientPosMsg),
         })
     }
 }
@@ -216,27 +271,33 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
         } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 2) {
             updateNpcCar!.calculateIntersection()
             let rotationOfSearchedTrafficLight = -1
-            //check Traffic light statussssssss etwas zu knapp,
-            //besser bei nextMapObj abfrageN??
             if (updateNpcCar!.lastCarRotation === 0) {
-                //get trafficlight with rotation 2
                 rotationOfSearchedTrafficLight = 2
-                //check trafficlight status
             } else if (updateNpcCar!.lastCarRotation === 1) {
-                //get traffic light with rot 3
                 rotationOfSearchedTrafficLight = 3
-                //check trafficlight status
             } else if (updateNpcCar!.lastCarRotation === 2) {
-                //get traffic light with rot 0
                 rotationOfSearchedTrafficLight = 0
             } else if (updateNpcCar!.lastCarRotation === 3) {
-                //get traffic light with rot 1
                 rotationOfSearchedTrafficLight = 1
             }
         }
 
         updateNpcCar!.driving = true
         updateNpcCar!.needsMapEleUpdate = false
+    }
+}
+
+function onNpcPositionMessageReceived(payload: INpcStompMessage) {
+    if (payload.type === "SET_CLIENT_POS") {
+        if (user.userId !== activeLobby.value.hostId) {
+            const updateNpcCar = npcCarState.npcCarMap.get(payload.npcPositionContent!.npcId)
+            updateNpcCar!.setClientNpcPosition(
+                payload.npcPositionContent!.npcPosX,
+                payload.npcPositionContent!.npcPosZ,
+                payload.npcPositionContent!.npcRotation,
+                payload.npcPositionContent!.npcViewRotation!
+            )
+        }
     }
 }
 
@@ -281,7 +342,6 @@ function initCarUpdateWebsocket() {
     }
 
     stompClient.onConnect = (frame) => {
-        console.log("connected")
         stompClient.subscribe(DEST, (message) => {
             const payload: IStompMessage = JSON.parse(message.body)
             if (payload) {
@@ -289,9 +349,7 @@ function initCarUpdateWebsocket() {
             }
         })
     }
-    stompClient.onDisconnect = () => {
-        console.log("disconnected")
-    }
+    stompClient.onDisconnect = () => {}
 
     stompClient.activate()
 }
@@ -299,10 +357,10 @@ function initCarUpdateWebsocket() {
 function createMessage(message: IPosition) {
     if (message && stompClient) {
         const carMessage: IStompMessage = {
-            id: positionState.mapId, // MappID
+            id: positionState.mapId,
             type: "CREATE",
             author: positionState.userName,
-            content: message, //information des autos
+            content: message,
         }
 
         stompClient.publish({
@@ -415,24 +473,6 @@ function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
     return x
 }
 
-function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-    let originZ = zCoordCenter - fieldSize / 2
-    let z = originZ + yCoordAsset * fieldSize
-
-    return z
-}
-
-function calcCoordinateX(n: number) {
-    let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-    return x
-}
-
-/*Calculates Z coordinates position of loaded Model */
-function calcCoordinateZ(n: number) {
-    let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-    return z
-}
-
 export function useCarMultiplayer() {
     return {
         positionState,
@@ -447,5 +487,14 @@ export function useCarMultiplayer() {
         updatePosMessage,
         npcCarState,
         onNpcMessageReceived,
+        setClientPosMessage,
+        initNpcPositionSocket,
     }
+}
+
+function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
+    let originZ = zCoordCenter - fieldSize / 2
+    let z = originZ + yCoordAsset * fieldSize
+
+    return z
 }

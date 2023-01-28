@@ -1,5 +1,5 @@
 <template>
-    <Header text="World of eMobility" :displayHomebutton="false"></Header>
+    <Header :displayHomebutton="false"></Header>
     <h1>Startseite</h1>
     <BasicButton
         class="prim btn green"

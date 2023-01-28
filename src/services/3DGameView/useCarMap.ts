@@ -1,6 +1,3 @@
-import { reactive } from "vue"
-import { ISceneMap } from "../../typings/ISceneMapItem"
-
 export function useCarMap() {
     return loadSceneChildrenWithKey
 }

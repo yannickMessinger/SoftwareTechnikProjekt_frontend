@@ -1,7 +1,7 @@
 import { reactive } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
-import {INpcPosition} from "../../typings/INpcPosition";
-import {IMapObjCenterCoordinates} from "../../typings/IMapObjCenterCoordinates";
+import { INpcPosition } from "../../typings/INpcPosition"
+import { IMapObjCenterCoordinates } from "../../typings/IMapObjCenterCoordinates"
 
 export class NpcAsset {
     public npcId: number
@@ -52,7 +52,7 @@ export class NpcAsset {
         })
         this.curMapObjCenterCoords = reactive({
             centerX: 0,
-            centerZ: 0
+            centerZ: 0,
         })
         this.curMapObj = reactive({
             objectId: curMapObj.objectId,
@@ -60,7 +60,7 @@ export class NpcAsset {
             x: curMapObj.x,
             y: curMapObj.y,
             rotation: curMapObj.rotation,
-            game_assets: curMapObj.game_assets
+            game_assets: curMapObj.game_assets,
         })
         this.nextMapObj = reactive({
             objectId: -1,
@@ -93,7 +93,12 @@ export class NpcAsset {
     }
 
     move() {
-        if (this.curMapObj.objectTypeId === 0 || this.curMapObj.objectTypeId === 12 || this.curMapObj.objectTypeId === 9 || this.curMapObj.objectTypeId === 11) {
+        if (
+            this.curMapObj.objectTypeId === 0 ||
+            this.curMapObj.objectTypeId === 12 ||
+            this.curMapObj.objectTypeId === 9 ||
+            this.curMapObj.objectTypeId === 11
+        ) {
             this.moveStraight()
         } else if (this.curMapObj.objectTypeId === 1 || this.curMapObj.objectTypeId === 10) {
             this.moveCurve()
@@ -187,8 +192,6 @@ export class NpcAsset {
                 this.needsMapEleUpdate = true
                 return true
             }
-        } else {
-            console.log("fehler reachedMapEle limit")
         }
     }
 
@@ -285,8 +288,6 @@ export class NpcAsset {
                 this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
                 this.currCurveAngle = 90.5
                 this.curveAngleInc = 0.5
-            } else {
-                console.log("Fehler bei driveCurve 0")
             }
         } else if (this.curMapObj.rotation === 1) {
             this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
@@ -301,8 +302,6 @@ export class NpcAsset {
                 this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
                 this.currCurveAngle = 0.5
                 this.curveAngleInc = 0.5
-            } else {
-                console.log("Fehler bei driveCurve 1")
             }
         } else if (this.curMapObj.rotation === 2) {
             this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
@@ -317,8 +316,6 @@ export class NpcAsset {
                 this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
                 this.currCurveAngle = 270.5
                 this.curveAngleInc = 0.5
-            } else {
-                console.log("Fehler bei driveCurve 2")
             }
         } else if (this.curMapObj.rotation === 3) {
             this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
@@ -333,9 +330,14 @@ export class NpcAsset {
                 this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
                 this.currCurveAngle = 180.5
                 this.curveAngleInc = 0.5
-            } else {
-                console.log("Fehler bei driveCurve 3")
             }
         }
+    }
+
+    setClientNpcPosition(npcPosX: number, npcPosZ: number, npcRotation: number, viewRotation: number) {
+        this.positions.npcPosX = npcPosX
+        this.positions.npcPosZ = npcPosZ
+        this.positions.npcRotation = npcRotation
+        this.viewRotation = viewRotation
     }
 }

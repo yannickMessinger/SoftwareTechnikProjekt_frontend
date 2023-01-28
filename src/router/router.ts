@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router"
-import Home from "../views/Home.vue"
 import EditorView from "../views/EditorView.vue"
 import Game from "../views/Game.vue"
 import HomepageView from "../views/HomepageView.vue"
@@ -55,6 +54,19 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     if (!logindata.loggedIn && to.path !== "/login") {
         next("/login")
+    } else {
+        next()
+    }
+})
+
+router.beforeEach((to, from, next) => {
+    if (logindata.loggedIn && to.path === "/") {
+        console.warn(" '/' path detected")
+        if (logindata.activeLobby.lobbyId == -1) {
+            next("/lobby")
+        } else {
+            next("/lobbyview")
+        }
     } else {
         next()
     }

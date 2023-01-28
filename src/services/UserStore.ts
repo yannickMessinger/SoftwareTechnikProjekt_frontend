@@ -1,10 +1,11 @@
-import { computed, reactive, readonly, ref } from "vue"
+import { computed, reactive, readonly } from "vue"
 import IUser from "../typings/IUser"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { ILobby } from "../typings/ILobby"
 import { ILoginStateDTO } from "../typings/ILoginStateDTO"
+import { IGetPlayerWALResponseDTO } from "../typings/IGetPlayerWALResponseDTO"
 import router from "../router/router"
-import { stat } from "fs"
+import { ILobbyDTO } from "../typings/ILobbyDTO"
 
 let reloginTried = false
 
@@ -30,7 +31,12 @@ async function retrieveUserFromLocalStorage() {
         const data = JSON.parse(userString)
         const loginResponse = await login(data.username, data.password)
         if (loginResponse?.hasOwnProperty("userId") && loginResponse?.hasOwnProperty("userName")) {
-            router.push("/")
+            await getActiveLobbyOfPlayerDB()
+            if (state.activeLobby.lobbyId != -1) {
+                router.push("/lobbyview")
+            } else {
+                router.push("/lobby")
+            }
         }
     }
 }
@@ -117,6 +123,21 @@ async function login(username: string, password: string): Promise<{ userId: numb
         .catch((err) => console.log(err))
 }
 
+async function removePlayerFromLobby() {
+    const url = "/api/lobby/get_players/" + state.activeLobby.lobbyId + "?player_id=" + state.userId
+    try {
+        const response = await fetch(url, {
+            method: "DELETE",
+        })
+
+        if (!response.ok) {
+            throw new Error(response.statusText)
+        }
+    } catch (error) {
+        console.log(" error in remove player from Lobby: " + error)
+    }
+}
+
 function logout() {
     localStorage.removeItem("user-e-mobility")
     state.loggedIn = false
@@ -149,6 +170,52 @@ async function postActiveLobby(lobby: ILobby) {
     })
 }
 
+async function getActiveLobbyOfPlayerDB() {
+    const url = "/api/player/wal/" + state.userId
+    var activeLobbyId = -1
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+        })
+
+        if (!response.ok) {
+            console.log("error in getting active Lobby Id")
+            throw new Error(response.statusText)
+        }
+
+        const jsondata: IGetPlayerWALResponseDTO = await response.json()
+        activeLobbyId = jsondata.activeLobbyId
+    } catch (error) {
+        console.log(" error in getting active Lobby ID")
+    }
+    if (activeLobbyId != -1) {
+        const url2 = "/api/lobby/" + activeLobbyId
+        try {
+            const response = await fetch(url2, {
+                method: "GET",
+            })
+
+            if (!response.ok) {
+                console.log("error in getting Lobby Data with active Lobby ID")
+                throw new Error(response.statusText)
+            }
+
+            const jsondata: ILobbyDTO = await response.json()
+            const lobbydata: ILobby = {
+                lobbyId: jsondata.lobbyId,
+                hostId: jsondata.hostId,
+                mapId: jsondata.mapId,
+                lobbyName: jsondata.lobbyName,
+                numOfPlayers: jsondata.numOfPlayers,
+                lobbyModeEnum: jsondata.lobbyModeEnum,
+            }
+            setActiveLobby(lobbydata)
+        } catch (error) {
+            console.log(" error in getting Lobby Data with active Lobby ID")
+        }
+    }
+}
+
 export default function useUser() {
     if (!state.loggedIn && !reloginTried) {
         reloginTried = true
@@ -169,5 +236,6 @@ export default function useUser() {
         register,
         logout,
         updateActiveLobbyPlayerList,
+        postActiveLobby,
     }
 }

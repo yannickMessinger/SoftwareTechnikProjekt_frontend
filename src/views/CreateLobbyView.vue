@@ -1,11 +1,10 @@
 <template>
-    <Header text="World of eMobility" :displayHomebutton="true"></Header>
-    <h1>Create Lobby</h1>
+    <Header :displayHomebutton="true"></Header>
 
     <div class="container">
         <div class="content">
             <div class="head">
-                <p><b>Lobby erstellen</b></p>
+                <h2>Lobby erstellen</h2>
             </div>
 
             <div class="formWrapper">
@@ -20,42 +19,6 @@
                         />
                     </div>
 
-                    <div class="field-wrap">
-                        <label for="lobby_mode"> <b>Lobby-Mode</b></label>
-                        <select v-model="lobbyModeSelect" @change="switchSelect()">
-                            <option disabled value="Lobby Modus auswaehlen">Lobby Modus auswaehlen</option>
-                            <option value="build">BuildMode</option>
-                            <option value="play">PlayMode</option>
-                        </select>
-                    </div>
-
-                    <div class="field-wrap">
-                        <label for="map"><b>Karte</b></label>
-                        <select v-model="mapSelect" @change="switchMapSelect()">
-                            <option disabled value="Karte auswaehlen">Karte auswaehlen</option>
-                            <option value="+">+ neue Karte anlegen</option>
-                            <option v-for="map in mapList" :value="map.name">
-                                {{ map.name }}
-                            </option>
-                        </select>
-                    </div>
-
-                    <div v-if="showAddNewMap" class="mapWrap">
-                        <label for="add_map"><b>+ Karte</b></label>
-                        <input type="text" name="add_map" v-model="addNewMapInput" placeholder="Kartenname" />
-                        <button @click="addMap()">+</button>
-                    </div>
-
-                    <div class="field-wrap">
-                        <label for="last_name"><b>Passwort</b></label>
-                        <input
-                            type="password"
-                            name="password"
-                            v-model="passwordInput"
-                            placeholder="Passwort eingeben"
-                        />
-                    </div>
-
                     <div class="buttonBox">
                         <div class="button1">
                             <BasicButton
@@ -64,7 +27,6 @@
                                 :btn_click="
                                     () => {
                                         createNewLobby(lobbyNameInput, 0, lobbyModeInput)
-                                        router.push('/')
                                     }
                                 "
                             />
@@ -76,7 +38,7 @@
                                 display="Abbrechen"
                                 :btn_click="
                                     () => {
-                                        router.push('/')
+                                        router.push('/lobby')
                                     }
                                 "
                             />
@@ -89,51 +51,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
 import BasicButton from "../components/Buttons/BasicButton.vue"
 import Header from "../components/Header.vue"
 import router from "../router/router"
 import { E_LobbyMode } from "../typings/E_LobbyMode"
-import { createNewLobby } from "../services/useLobbyList"
-import { useMyMaps } from "../services/useMyMaps"
+import { createNewLobby, useLobbyList } from "../services/useLobbyList"
+import { onMounted, ref } from "vue"
 
+const { receiveLobbyUpdates } = useLobbyList()
 const lobbyNameInput = ref("")
-const passwordInput = ref("")
 const lobbyModeInput = ref(E_LobbyMode.BUILD_MODE)
-const lobbyModeSelect = ref("")
-const mapSelect = ref("")
-const addNewMapInput = ref("")
-const showAddNewMap = ref(false)
-const mapList = useMyMaps().test_list
 
-function setPlayMode() {
-    lobbyModeInput.value = E_LobbyMode.PLAY_MODE
-}
-
-function setBuildMode() {
-    lobbyModeInput.value = E_LobbyMode.BUILD_MODE
-}
-
-function addMap() {
-    mapList.push({ name: addNewMapInput.value, datum: "test" })
-    showAddNewMap.value = false
-    addNewMapInput.value = ""
-    mapSelect.value = ""
-}
-
-function switchSelect() {
-    if (lobbyModeSelect.value === "play") {
-        setPlayMode()
-    } else if (lobbyModeSelect.value === "build") {
-        setBuildMode()
-    }
-}
-
-function switchMapSelect() {
-    if (mapSelect.value === "+") {
-        showAddNewMap.value = true
-    }
-}
+onMounted(() => {
+    //activate websockets connection to listen for incoming updates
+    receiveLobbyUpdates()
+})
 </script>
 
 <style scoped>
@@ -147,8 +79,8 @@ function switchMapSelect() {
 }
 
 .content {
-    border-radius: 15px;
-    border: 1px solid black;
+    border-radius: 8px;
+
     display: grid;
     grid-template-columns: 1fr 2fr;
     grid-template-rows: 0.5fr 2fr 1fr;
@@ -159,6 +91,7 @@ function switchMapSelect() {
         ". Button";
     height: 90%;
     width: 29em;
+    background-color: var(--woe-gray-30);
 }
 
 .mapWrap {
@@ -173,15 +106,16 @@ function switchMapSelect() {
 }
 
 .head {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    font-style: italic;
+    display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid black;
+    margin-top: 10px;
+    margin-left: 30px;
+    margin-bottom: 10px;
+    font-size: 20px;
 
     grid-area: Header;
     padding-left: 1em;
-    height: 3em;
+    height: 2em;
 }
 
 .lobbyInput {
@@ -243,5 +177,13 @@ label {
     width: 400px;
 
     grid-area: Form;
+}
+
+input {
+    width: auto;
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid var(--woe-gray-40);
+    border-radius: 5px;
 }
 </style>

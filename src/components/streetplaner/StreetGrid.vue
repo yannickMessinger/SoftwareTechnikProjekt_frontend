@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { computed } from "@vue/reactivity"
-import { ref, reactive, watch, onMounted } from "vue"
+import { onMounted, onUnmounted, reactive, watch } from "vue"
 import type { IGridElement } from "../../services/streetplaner/IGridElement"
 import useEventBus from "../../services/eventBus"
 import ToolEnum from "../../services/streetplaner/ToolEnum"
 import { useGridSize } from "../../services/useGridSize"
 
-import { useBlockList, updateBlockList } from "../../services/streetplaner/useBlockList"
-import { useStreetGridList, updateStreetGridList, postStreetGrid } from "../../services/streetplaner/useStreetGridList"
+import { useBlockList } from "../../services/streetplaner/useBlockList"
+import { postStreetGrid } from "../../services/streetplaner/useStreetGridList"
 import { IBlockElement } from "../../services/streetplaner/IBlockElement"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
 import { StreetGridDTO } from "../../services/streetplaner/StreetGridDTO"
 import useUser from "../../services/UserStore"
+import UserStore from "../../services/UserStore"
 import { useEditor } from "../../services/Editor/useEditor"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
-import UserStore from "../../services/UserStore"
 
 const { userId } = UserStore()
 const { bus } = useEventBus()
@@ -30,6 +30,7 @@ const toolState = reactive({
 })
 const lobbyState = useUser().activeLobby
 const { gridSize } = useGridSize()
+
 const npcCarObjTypeId = 7
 const trainStationObjTypeId = 11
 const trainObjTypeId = 14
@@ -119,6 +120,19 @@ onMounted(() => {
     updateMapId(lobbyState.value.mapId)
     setGameStateMapId(lobbyState.value.mapId)
     updateMap()
+})
+
+onUnmounted(() => {
+    let playerSpawnMapObject = editorState.mapObjects.filter((mapObject) => {
+        return (
+            mapObject.game_assets.filter((asset) => {
+                return asset.userId === userId.value
+            }).length > 0
+        )
+    })
+    if (playerSpawnMapObject.length === 0) {
+        placeAssetOnRandomElement(1, playerSpawnObjTypeId)
+    }
 })
 
 function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number): IMapObject[] {
@@ -273,8 +287,7 @@ function getRandomSpawnsPedestrian(element: IMapObject) {
 // tries to place random asset on an elment, returns true if asset was placed, else false
 function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
-    // if assetId = 7, then asset = car
-    if (assetObjectTypeId === 7) {
+    if (assetObjectTypeId === npcCarObjTypeId || assetObjectTypeId === playerSpawnObjTypeId) {
         randomPosElements = getRandomSpawnsCar(element)
     }
     // if (50 <= assetId < 60), then asset = pedestrian
@@ -287,35 +300,55 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         return false
     }
 
-    // pick random spawnpoint
     let randomPos = Math.floor(Math.random() * randomPosElements.length)
-    // check if spawnpoint is taken
     if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
         randomPos = 0
-        // spawnpoint is taken so try to place car on the other spawnpoints
         while (randomPos < randomPosElements.length) {
             if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
                 randomPos++
             } else {
-                streetGrid[element.x][element.y].game_assets.push({
-                    objectTypeId: assetObjectTypeId,
-                    x: randomPosElements[randomPos].x,
-                    y: randomPosElements[randomPos].y,
-                    rotation: randomPosElements[randomPos].rotation,
-                    texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                })
+                if (assetObjectTypeId === playerSpawnObjTypeId) {
+                    streetGrid[element.x][element.y].game_assets.push({
+                        objectTypeId: assetObjectTypeId,
+                        userId: userId.value,
+                        x: randomPosElements[randomPos].x,
+                        y: randomPosElements[randomPos].y,
+                        rotation: randomPosElements[randomPos].rotation,
+                        texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                    })
+                } else {
+                    streetGrid[element.x][element.y].game_assets.push({
+                        objectTypeId: assetObjectTypeId,
+                        x: randomPosElements[randomPos].x,
+                        y: randomPosElements[randomPos].y,
+                        rotation: randomPosElements[randomPos].rotation,
+                        texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                    })
+                }
                 return true
             }
         }
     } else {
         // spawnpoint is free, so place car there
-        streetGrid[element.x][element.y].game_assets.push({
-            objectTypeId: assetObjectTypeId,
-            x: randomPosElements[randomPos].x,
-            y: randomPosElements[randomPos].y,
-            rotation: randomPosElements[randomPos].rotation,
-            texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-        })
+        // console.log("TEXTURE ELEMENT: ", assetObjectTypeId,  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId));
+        if (assetObjectTypeId === playerSpawnObjTypeId) {
+            streetGrid[element.x][element.y].game_assets.push({
+                objectTypeId: assetObjectTypeId,
+                userId: userId.value,
+                x: randomPosElements[randomPos].x,
+                y: randomPosElements[randomPos].y,
+                rotation: randomPosElements[randomPos].rotation,
+                texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+            })
+        } else {
+            streetGrid[element.x][element.y].game_assets.push({
+                objectTypeId: assetObjectTypeId,
+                x: randomPosElements[randomPos].x,
+                y: randomPosElements[randomPos].y,
+                rotation: randomPosElements[randomPos].rotation,
+                texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+            })
+        }
         return true
     }
 
@@ -478,6 +511,33 @@ function onClick(cell: any, e: any) {
         streetGrid[cell.posX][cell.posY].rotation = 0
         streetGrid[cell.posX][cell.posY].texture = ""
         deleteMessage(payload)
+        if (e.target.classList.contains("asset-img")) {
+            let clickedAsset = currCellContent.game_assets[e.target.__vnode.key]
+            if (clickedAsset.userId === userId.value || clickedAsset.userId === 0) {
+                let newGameAssets = streetGrid[cell.posX][cell.posY].game_assets
+                newGameAssets.splice(e.target.__vnode.key, 1)
+                payload = {
+                    objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
+                    x: cell.posX,
+                    y: cell.posY,
+                    rotation: streetGrid[cell.posX][cell.posY].rotation,
+                    game_assets: newGameAssets,
+                }
+                updateMessage(payload)
+            }
+        } else {
+            payload = {
+                objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
+                x: cell.posX,
+                y: cell.posY,
+                rotation: streetGrid[cell.posX][cell.posY].rotation,
+                game_assets: [],
+            }
+            streetGrid[cell.posX][cell.posY].objectTypeId = -1
+            streetGrid[cell.posX][cell.posY].rotation = 0
+            streetGrid[cell.posX][cell.posY].texture = ""
+            deleteMessage(payload)
+        }
     }
 }
 
@@ -637,11 +697,12 @@ window.addEventListener(
                 draggable="false"
                 :style="{ transform: 'rotate(' + ele.rotation * 90 + 'deg)', zIndex: 0 }"
             />
-            <div v-for="asset in ele.game_assets">
+            <div v-for="(asset, index) in ele.game_assets">
                 <!-- if asset is npc (asset.userId not present or 0) or asset is our spawnpoint (asset.userId === our userId) use given asset.texture -->
                 <img
                     v-if="!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()"
                     :src="asset.texture"
+                    :key="index"
                     class="no-drag asset-img"
                     draggable="false"
                     :style="{

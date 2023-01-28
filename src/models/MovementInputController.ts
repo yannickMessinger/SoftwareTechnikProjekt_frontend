@@ -103,6 +103,17 @@ export class MovmentInputController {
         this.camera.value.camera.setRotationFromEuler(this.objects.value.mesh.rotation)
     }
 
+    resetCarAndCameraPosition(resetPosition: any, resetRotation: any) {
+        this.objects.value.mesh.position.x = resetPosition.x
+        this.objects.value.mesh.position.y = 0.75
+        this.objects.value.mesh.position.z = resetPosition.z
+        this.objects.value.mesh.setRotationFromEuler(
+            new THREE.Euler(resetPosition._x, resetPosition._y, resetPosition._z, resetPosition.order)
+        )
+        this.updateCamera()
+        this.moveVelocity = 0
+    }
+
     updateSound() {
         if (this.keyboard.pressed("Y")) {
             this.hornPlayed = true

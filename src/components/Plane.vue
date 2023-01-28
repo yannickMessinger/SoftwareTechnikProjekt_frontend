@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-import { Plane, PhongMaterial } from "troisjs"
+import { PhongMaterial, Plane } from "troisjs"
 </script>

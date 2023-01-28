@@ -1,7 +1,6 @@
-import * as THREE from "three"
+import { Scene } from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { IMapObject } from "../streetplaner/IMapObject"
-import { Scene } from "three"
 
 interface ICrossroad {
     id: number
@@ -78,7 +77,6 @@ function loadTrafficLight(object: IMapObject, scene: Scene, x: number, y: number
         crossroadMap.get(object.objectId!)?.trafficLights.set(model.id, model)
         scene.add(model)
     })
-    console.log(crossroadMap)
 }
 
 export default function useCrossroadData() {

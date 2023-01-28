@@ -1,18 +1,22 @@
 import { CompatClient, Stomp, StompSubscription } from "@stomp/stompjs"
-import {} from "vue"
 import { IPosition } from "../typings/IPosition"
 
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/sound/"
 const SEND_MSG = "/app/sound.horn/"
+const AMBIENT_SOUND_PATH = "/../../../src/sound/ambient_bird_sound.mp3"
+const AUDIO_HORN_PATH = "/../../src/sound/honk-sound.wav"
+const AUDIO_ENGINE_PATH = "/../../src/sound/engine-sound.mp3"
+const AUDIO_ENGINE_OTHER_PATH = "/../../src/sound/engine-sound_other.mp3"
+const AUDIO_TRAIN_PATH = "/../../src/sound/train_sound.mp3"
 
 let ambientSound: HTMLAudioElement
-let audioHorn = new Audio("/../../src/sound/honk-sound.wav")
-let audioEngine = new Audio("/../../src/sound/engine-sound.mp3")
+let audioHorn = new Audio(AUDIO_HORN_PATH)
+let audioEngine = new Audio(AUDIO_ENGINE_PATH)
+
 const audioEnginesOtherCars = new Map<number, HTMLAudioElement>()
 const audioEnginesOtherCarsNPC = new Map<number, HTMLAudioElement>()
 
-audioEngine.volume = 0.1
 let lobbyId: number
 let payloadObject: IPosition
 
@@ -26,8 +30,8 @@ interface ISoundMessage {
 }
 
 function initAmbientSound() {
-    ambientSound = new Audio("/../../../src/sound/ambient_bird_sound.mp3")
-    ambientSound.volume = 0.03
+    ambientSound = new Audio(AMBIENT_SOUND_PATH)
+    ambientSound.volume = 0.5
     ambientSound.play()
     ambientSound.addEventListener("ended", (e) => {
         ambientSound.play()
@@ -39,7 +43,6 @@ function stopAmbientSound() {
 }
 
 function playHorn() {
-    audioHorn.play()
     sendHornMessage()
 }
 
@@ -50,18 +53,18 @@ function playHornFromFromOtherCar(distance: number) {
     }
 }
 
-function playEngine() {
-    let buffer = 0.09
-    audioEngine.volume = 0.009
+function playYourEngine() {
+    audioEngine.volume = 0.2
+    let buffer = 4
     if (audioEngine.currentTime > audioEngine.duration - buffer) {
-        audioEngine.currentTime = 0.03
+        audioEngine.currentTime = 3
     }
     if (audioEngine.paused) {
         audioEngine.play()
     }
 }
 
-function stopEngine() {
+function stopYourEngine() {
     audioEngine.pause()
 }
 
@@ -77,15 +80,15 @@ function playEngineFromOtherCar(carId: number, distance: number) {
             }
         }
     } else {
-        engine = new Audio("/../../src/sound/engine-sound_other.mp3")
+        engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
         audioEnginesOtherCars.set(carId, engine)
         engine.volume = volume
         engine.play
     }
 }
 
-function playEngineFromOtherCarNPC(carId: number, distance: number) {
-    let volume = calculateSoundVolume(distance, 20)
+function playEngineFromNPC(carId: number, distance: number, objectTypeId: number) {
+    let volume = calculateSoundVolume(distance, 30)
     let engine
     if (audioEnginesOtherCarsNPC.has(carId)) {
         engine = audioEnginesOtherCarsNPC.get(carId)
@@ -96,7 +99,11 @@ function playEngineFromOtherCarNPC(carId: number, distance: number) {
             }
         }
     } else {
-        engine = new Audio("/../../src/sound/engine-sound_other.mp3")
+        if (objectTypeId === 14) {
+            engine = new Audio(AUDIO_TRAIN_PATH)
+        } else {
+            engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
+        }
         audioEnginesOtherCarsNPC.set(carId, engine)
         engine.volume = volume
         engine.play
@@ -105,7 +112,7 @@ function playEngineFromOtherCarNPC(carId: number, distance: number) {
 
 function calculateSoundVolume(distance: number, factor: number) {
     distance -= factor
-    return Math.abs(distance) / 1000
+    return Math.abs(distance) / 100
 }
 
 function pauseEngineFromOtherCar(carId: number) {
@@ -117,19 +124,19 @@ function pauseEngineFromOtherCar(carId: number) {
     }
 }
 
-function stopAllEngines() {
-    audioEnginesOtherCars.forEach((engine) => {
-        engine.pause()
-    })
-}
-
-function pauseEngineFromOtherCarNPC(carId: number) {
+function pauseEngineFromNPC(carId: number) {
     if (audioEnginesOtherCarsNPC.has(carId)) {
         let engine = audioEnginesOtherCarsNPC.get(carId)
         if (engine !== undefined) {
             engine.pause()
         }
     }
+}
+
+function stopAllEngines() {
+    audioEnginesOtherCars.forEach((engine) => {
+        engine.pause()
+    })
 }
 
 function stopAllEnginesNPC() {
@@ -143,32 +150,32 @@ export function useSound(activeLobbyId: number, payload: IPosition) {
     payloadObject = payload
     return {
         playHorn,
-        playEngine,
-        stopEngine,
+        playYourEngine,
+        stopYourEngine,
         pauseEngineFromOtherCar,
         playEngineFromOtherCar,
-        connectSound,
         initAmbientSound,
         stopAmbientSound,
-        disconnectSound,
+        connectHornSound,
+        disconnectHornSound,
         stopAllEngines,
-        pauseEngineFromOtherCarNPC,
-        playEngineFromOtherCarNPC,
+        pauseEngineFromNPC,
+        playEngineFromNPC,
         stopAllEnginesNPC,
     }
 }
 
-function connectSound() {
+function connectHornSound() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
     stompClient.connect({}, onConnected, onError)
 }
 
 function onConnected() {
-    subscription = stompClient.subscribe(DEST + lobbyId, onMessageReceived)
+    subscription = stompClient.subscribe(DEST + lobbyId, onHornMessageReceived)
 }
 
-function disconnectSound() {
+function disconnectHornSound() {
     subscription.unsubscribe()
 }
 
@@ -185,7 +192,7 @@ function sendHornMessage() {
 
 function onError(error: Error) {}
 
-function onMessageReceived(payload: { body: string }) {
+function onHornMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
     if ((message.type = "HORN")) {
         let distance = Math.abs(payloadObject.x - message.posX) + Math.abs(payloadObject.z - message.posY)

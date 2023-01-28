@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, computed } from "vue"
+import { ref } from "vue"
 import { useEditor } from "../../services/Editor/useEditor"
 import useUser from "../../services/UserStore"
 import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
+
 const emit = defineEmits(["confirm", "cancel"])
 const { editorState } = useEditor(useUser().activeLobby.value.mapId)
 const maxAmountCars = 100

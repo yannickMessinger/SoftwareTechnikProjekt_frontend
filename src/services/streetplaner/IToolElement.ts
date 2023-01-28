@@ -5,9 +5,6 @@
  * name - name of the tool which is displayed in the list
  * texture - path for the displayed picture
  */
-
-import { TypesConfig } from "vue-router"
-import ToolEnum from "./ToolEnum"
 export interface IToolElement {
     tool: string
     id: number

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 /**Imports: */
-import { reactive } from "vue"
+import { reactive, watch } from "vue"
 import type { IToolElement } from "../../services/streetplaner/IToolElement"
-import { watch } from "vue"
 import useEventBus from "../../services/eventBus"
 import ToolEnum from "../../services/streetplaner/ToolEnum"
 

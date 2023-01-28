@@ -1,5 +1,4 @@
 import { computed, reactive, readonly } from "vue"
-import { E_LobbyMode } from "../typings/E_LobbyMode"
 import { IPlayerListState } from "../typings/IPlayerListState"
 import IUser from "../typings/IUser"
 import useUser from "./UserStore"
@@ -18,7 +17,6 @@ export async function fetchPlayerList(): Promise<void> {
         method: "GET",
     })
     const result = await response.json()
-    console.log("fetch playerlist response", result)
     playerState.playerlist = result
 }
 

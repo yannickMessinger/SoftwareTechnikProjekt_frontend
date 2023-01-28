@@ -3,7 +3,7 @@
     <div class="headline">
         <h2>Spieler</h2>
         <h3 v-if="playerListState.errormsg">{{ playerListState.errormsg }}</h3>
-        <h4 v-else>{{ props.liste.length }}/anzMaxSpielerEinfügen</h4>
+        <h4 v-else>Spieler Online: {{ props.liste.length }}</h4>
     </div>
     <div class="playerList">
         <table>
@@ -19,7 +19,6 @@ import PlayerListItem from "./PlayerListItem.vue"
 import IUser from "../../typings/IUser"
 import { usePlayerList } from "../../services/usePlayerList"
 import { onMounted } from "vue"
-import { useLobbyList } from "../../services/useLobbyList"
 
 //PlayerList passed from backend
 const props = defineProps<{

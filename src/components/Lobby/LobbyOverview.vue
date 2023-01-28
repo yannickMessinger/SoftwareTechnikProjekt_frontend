@@ -13,7 +13,7 @@
     </div>
 
     <div>
-        <MyMaps :liste="mapsList.mapslist"></MyMaps>
+        <MyMaps :liste="mapsList.mapslist" v-bind:popupTrigger="false"></MyMaps>
     </div>
     <div v-if="lobbyList.lobbylist.length > 0">
         <LobbyList :liste="lobbyList.lobbylist"></LobbyList>
@@ -30,13 +30,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
-import { useLobbyList, updateLobbyList, createNewLobby } from "../../services/useLobbyList"
+import { createNewLobby, updateLobbyList, useLobbyList } from "../../services/useLobbyList"
 import { useMyMaps } from "../../services/useMyMaps"
-import { usePlayerList } from "../../services/usePlayerList"
 import { E_LobbyMode } from "../../typings/E_LobbyMode"
 import LobbyList from "./LobbyList.vue"
 import MyMaps from "./MyMaps.vue"
-import PlayerList from "./PlayerList.vue"
 
 onMounted(async () => {
     await updateLobbyList()

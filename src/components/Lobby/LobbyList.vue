@@ -2,16 +2,6 @@
 <template>
     <div class="headline">
         <h2>Lobbys</h2>
-
-        <BasicButton
-            class="sec btn blue"
-            display="Lobby erstellen"
-            :btn_click="
-                () => {
-                    router.push('/create')
-                }
-            "
-        />
     </div>
 
     <div class="content">
@@ -23,8 +13,6 @@
 <script setup lang="ts">
 import Lobby from "./Lobby.vue"
 import { ILobby } from "../../typings/ILobby"
-import BasicButton from "../Buttons/BasicButton.vue"
-import router from "../../router/router"
 
 //Lobbylist passed from backend
 const props = defineProps<{
@@ -43,7 +31,6 @@ th {
     height: 20px;
     text-align: left;
     background-color: white;
-    display: fixed;
 }
 
 .headline {
@@ -52,13 +39,6 @@ th {
     margin-top: 10px;
     margin-left: 30px;
     margin-bottom: 10px;
-}
-
-.lobbyList {
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
 }
 
 button {

@@ -16,12 +16,10 @@
 
 <script setup lang="ts">
 import { ILobby } from "../../typings/ILobby"
-import BasicButton from "../Buttons/BasicButton.vue"
 import useUser from "../../services/UserStore"
 import router from "../../router/router"
 import { useLobbyList } from "../../services/useLobbyList"
 import { onMounted } from "vue"
-import { useChat } from "../../services/Chat/useChat"
 
 const props = defineProps<{
     lobby: ILobby
