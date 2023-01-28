@@ -237,12 +237,13 @@ export default defineComponent({
         }
 
         function checkPlayerCarDistance(posX: number, posZ: number, carId: number) {
+            const MAX_HEARING_DISTANCE = 30
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
-            if (distance < 30) {
+            if (distance < MAX_HEARING_DISTANCE) {
                 playEngineFromOtherCar(carId, distance)
             } else {
                 pauseEngineFromOtherCar(carId)
@@ -264,12 +265,13 @@ export default defineComponent({
         }
 
         function checkPlayerNPCDistance(posX: number, posZ: number, carId: number, objectTypeId: number) {
+            const MAX_HEARING_DISTANCE = 30
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
-            if (distance < 30) {
+            if (distance < MAX_HEARING_DISTANCE) {
                 playEngineFromNPC(carId, distance, objectTypeId)
             } else {
                 pauseEngineFromNPC(carId)
