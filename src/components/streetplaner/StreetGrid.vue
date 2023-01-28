@@ -77,8 +77,11 @@ watch(
 watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
-        placeAssetOnRandomElement(val[0].car, 7)
-        placeRandomPedestrians(val[0].pedestrian)
+        let changedElements: Array<IMapObject> = []
+        changedElements.push(...placeAssetOnRandomElement(val[0].car, 7))
+        changedElements.push(...placeAssetOnRandomElement(val[0].pedestrian, 50))
+        changedElements = [...new Set(changedElements.filter((ele) => ele !== undefined))]
+        changedElements.forEach((ele) => updateMessage(ele))
     }
 )
 
@@ -118,7 +121,7 @@ onMounted(() => {
     updateMap()
 })
 
-function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) {
+function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number): IMapObject[] {
     let counter = 0
     let errorCounter = 0
     let changedElements: Array<IMapObject> = []
@@ -156,20 +159,7 @@ function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number) 
             }
         }
     }
-    // send all changed elements via stomp broker to backend and other clients
-    for (let ele of changedElements) {
-        updateMessage(ele)
-    }
-    return changedElements;
-}
-
-function placeRandomPedestrians(amount: number) {
-    let counter = 0;
-    while(counter < amount) {
-        let randomPedestrianObjectTypeId = Math.floor(Math.random() * pedestrianAmount + firstPedestrianId) // different objectTypeIds due to different pedestrian models
-        placeAssetOnRandomElement(1, randomPedestrianObjectTypeId);
-        counter++;
-    }
+    return changedElements
 }
 
 function getRandomSpawnsCar(element: IMapObject) {
@@ -288,10 +278,10 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         randomPosElements = getRandomSpawnsCar(element)
     }
     // if (50 <= assetId < 60), then asset = pedestrian
-    else if (assetObjectTypeId >= firstPedestrianId && assetObjectTypeId < firstPedestrianId+pedestrianAmount) {
+    else if (assetObjectTypeId >= firstPedestrianId && assetObjectTypeId < firstPedestrianId + pedestrianAmount) {
         randomPosElements = getRandomSpawnsPedestrian(element)
     }
-    
+
     // check if the max capacity is reached
     if (element.game_assets.length === randomPosElements.length) {
         return false
@@ -324,7 +314,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
             x: randomPosElements[randomPos].x,
             y: randomPosElements[randomPos].y,
             rotation: randomPosElements[randomPos].rotation,
-            texture:  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+            texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
         })
         return true
     }

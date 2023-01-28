@@ -8,7 +8,7 @@ import useUser from "../UserStore"
 import useCrossroadData from "./useCrossroadData"
 import { IMapObject } from "../streetplaner/IMapObject"
 import { NpcCar } from "../../components/3D/NpcCar"
-import {NpcPedestrian} from "../../components/3D/NpcPedestrian";
+import { NpcPedestrian } from "../../components/3D/NpcPedestrian"
 
 const { gameState } = useGameView()
 const { activeLobby } = useUser()
@@ -101,12 +101,12 @@ function fillNpcCars() {
                                     mapObj
                                 )
                             )
-                        } else if (gameAsset.objectTypeId >= 50 && gameAsset.objectTypeId < 60){
+                        } else if (gameAsset.objectTypeId >= 50 && gameAsset.objectTypeId < 60) {
                             npcCarState.npcCarMap.set(
                                 gameAsset.assetId!,
                                 new NpcPedestrian(
                                     gameAsset.assetId!,
-                                    gameAsset.objectTypeId,
+                                    randomNumber(50, 59),
                                     gameAsset.x3d!,
                                     gameAsset.z3d!,
                                     gameAsset.rotation,
