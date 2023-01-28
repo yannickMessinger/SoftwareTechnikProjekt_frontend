@@ -158,7 +158,6 @@ async function deletePlayerFromLobby() {
         })
 
         if (!response.ok) {
-            console.log("error in remove player from Lobby I")
             throw new Error(response.statusText)
         }
     } catch (error) {

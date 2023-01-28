@@ -31,6 +31,5 @@ export async function updateBlockList(): Promise<void> {
         blockListState.list = data
     } catch (error: any) {
         blockListState.error = error.message
-        console.log("failed to fetch blocks from backend")
     }
 }

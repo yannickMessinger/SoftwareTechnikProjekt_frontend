@@ -29,8 +29,8 @@ export class BoundingBoxService {
         // this.relevantIds.push(18) - environment
         // this.relevantIds.push(19) - environment
         // this.relevantIds.push(20) - environment
-        this.relevantIds.push(21)
-        this.relevantIds.push(22)
+        //this.relevantIds.push(21) - NPC car
+        //this.relevantIds.push(22) - NPC car
     }
 
     createBoundingBox() {

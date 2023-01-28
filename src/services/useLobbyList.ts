@@ -148,7 +148,6 @@ function joinMessage() {
             },
             type: "JOIN",
         }
-        console.log(lobbyMessage.lobbyContent)
         stompClient.publish({
             destination: JOIN_MSG,
             headers: {},
@@ -195,8 +194,6 @@ function createLobbyMessage() {
     console.log("CREATE")
     connectLobbyChat()
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
-        //if(activeLobby.value)
-        console.log("join message methode wurde aufgerufen")
         const lobbyMessage: IStompMessage = {
             playerContent: {
                 userId: user.userId,
@@ -219,7 +216,6 @@ function createLobbyMessage() {
             },
             type: "JOIN",
         }
-        console.log(lobbyMessage.lobbyContent)
         stompClient.publish({
             destination: JOIN_MSG,
             headers: {},
@@ -322,7 +318,6 @@ function changeLobbyModeMessage() {
 }
 
 function changeMapMessage() {
-    console.log("change Message send")
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
     }
     const changeMapMessage: IStompMessage = {
@@ -424,7 +419,6 @@ If message tpye if of type "JOIN", the playerlist of this current lobby is updat
 If message is of type "SWITCH_MODE", the lobbymode is changed to the payload content of the message for all players of the lobby.
 */
 async function onMessageReceived(payload: IStompMessage) {
-    console.log("MS recieved")
     if (payload.type === "CLOSE") {
         updateLobbyList()
     }
@@ -450,7 +444,6 @@ async function onMessageReceived(payload: IStompMessage) {
             router.push("/lobbyview")
         }
         if (payload.type === "LEAVE") {
-            console.log("LEAVE 2")
             await fetchPlayerList()
             var index = activeLobby.value.playerList?.findIndex(
                 (element) => element.userId == payload.playerContent.userId

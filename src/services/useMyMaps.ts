@@ -1,11 +1,11 @@
 import { reactive } from "vue"
+import { IMyMapsListItem } from "../typings/IMyMapsListItem"
 import { IMyMapsState } from "../typings/IMyMapsState"
 import { IAddMyMapsRequestDTO } from "../typings/IAddMyMapsRequestDTO"
-import { IMapDTO } from "../typings/IMapDTO"
 import useEventBus from "./eventBus"
 
 const mapsState = reactive<IMyMapsState>({
-    mapslist: Array<IMapDTO>(),
+    mapslist: Array<IMyMapsListItem>(),
     errormsg: "",
 })
 
@@ -14,7 +14,7 @@ const { emit } = useEventBus()
 export function useMyMaps() {
     //let date: Date = new Date(500000);
     for (let i = 0; i < 4; i++) {
-        mapsState.mapslist.push({ userId: 1, lobbyName: "Karte " + i, date: "hallo" })
+        mapsState.mapslist.push({ name: "Karte " + i, datum: "hallo" })
     }
 
     return {
@@ -39,9 +39,7 @@ export async function updateMapsList(): Promise<void> {
             throw new Error(response.statusText)
         }
 
-        const jsondata: IMapDTO[] = await response.json()
-
-        mapsState.mapslist = jsondata
+        mapsState.mapslist = await response.json()
         mapsState.errormsg = ""
     } catch (error) {
         console.log("error in updateMapsList")

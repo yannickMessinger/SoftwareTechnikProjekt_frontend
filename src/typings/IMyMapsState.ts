@@ -1,6 +1,6 @@
-import { IMapDTO } from "./IMapDTO"
+import { IMyMapsListItem } from "./IMyMapsListItem"
 
 export interface IMyMapsState {
-    mapslist: IMapDTO[]
+    mapslist: IMyMapsListItem[]
     errormsg: string
 }
