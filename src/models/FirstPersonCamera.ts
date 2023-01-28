@@ -113,8 +113,6 @@ export class FirstPersonCamera {
     }
 
     updateEngineSound() {
-        console.log(this.audio.currentTime)
-
         if (
             this.input.key(this.KEYS.a) ||
             this.input.key(this.KEYS.w) ||

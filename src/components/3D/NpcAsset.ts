@@ -163,36 +163,28 @@ export class NpcAsset {
             if (this.positions.npcPosZ > this.mapLimit) {
                 return false
             } else {
-                //this.driving = false
                 this.needsMapEleUpdate = true
-                //console.log("fahre nicht 0")
                 return true
             }
         } else if (this.positions.npcRotation === 1) {
             if (this.positions.npcPosX < this.mapLimit) {
                 return false
             } else {
-                //this.driving = false
                 this.needsMapEleUpdate = true
-                //console.log("fahre nicht 1")
                 return true
             }
         } else if (this.positions.npcRotation === 2) {
             if (this.positions.npcPosZ < this.mapLimit) {
                 return false
             } else {
-                //this.driving = false
                 this.needsMapEleUpdate = true
-                //console.log("fahre nicht 2")
                 return true
             }
         } else if (this.positions.npcRotation === 3) {
             if (this.positions.npcPosX > this.mapLimit) {
                 return false
             } else {
-                //this.driving = false
                 this.needsMapEleUpdate = true
-                //console.log("fahre nicht 3")
                 return true
             }
         } else {

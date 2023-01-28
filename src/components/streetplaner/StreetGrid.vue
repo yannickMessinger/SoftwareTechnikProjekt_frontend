@@ -77,7 +77,6 @@ watch(
 watch(
     () => bus.value.get("random-asset-event"),
     (val) => {
-        //Todo: liste leeren
         placeAssetOnRandomElement(val[0].car, 7)
         placeRandomPedestrians(val[0].pedestrian)
     }
@@ -91,8 +90,6 @@ const streetGrid: IGridElement[][] = reactive(
 )
 fillGridEmpty()
 
-// initialize gridSize
-//const gridSize = ref(40)
 // initialize gridSizePx used in css
 const gridSizePx = computed(() => gridSize.size.toString() + "px")
 const assetSize = computed(() => gridSize.size / 4)
@@ -283,10 +280,9 @@ function getRandomSpawnsPedestrian(element: IMapObject) {
     return randomPosElements
 }
 
-// tries to place random car on an elment, returns true if car was placed, else false
+// tries to place random asset on an elment, returns true if asset was placed, else false
 function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: number): boolean {
     let randomPosElements: Array<{ x: number; y: number; rotation: number }> = []
-    console.log("RANDOM EVENT ASSET: ", assetObjectTypeId, element)
     // if assetId = 7, then asset = car
     if (assetObjectTypeId === 7) {
         randomPosElements = getRandomSpawnsCar(element)
@@ -323,7 +319,6 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         }
     } else {
         // spawnpoint is free, so place car there
-        // console.log("TEXTURE ELEMENT: ", assetObjectTypeId,  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId));
         streetGrid[element.x][element.y].game_assets.push({
             objectTypeId: assetObjectTypeId,
             x: randomPosElements[randomPos].x,
@@ -368,7 +363,6 @@ function checkAssetPlacedNearElement(
 // onClick handles click on specific cell
 function onClick(cell: any, e: any) {
     let currCellContent = streetGrid[cell.posX][cell.posY]
-    console.log(`x: ${cell.posX} y:${cell.posY}`)
     let payload: IMapObject
     if (toolState.tool === ToolEnum.CREATE && toolState.block.objectTypeId !== -1) {
         // if toolState block = asset
@@ -495,7 +489,6 @@ function onClick(cell: any, e: any) {
         streetGrid[cell.posX][cell.posY].texture = ""
         deleteMessage(payload)
     }
-    console.log(streetGrid)
 }
 
 // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed

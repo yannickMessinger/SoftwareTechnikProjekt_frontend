@@ -57,7 +57,6 @@ export class MovmentInputController {
         if (this.keyboard.pressed("W")) {
             if (this.moveVelocity < 0.2) {
                 this.moveVelocity += movespeed / 20
-                // console.log("w velocity" + this.moveVelocity)
             }
             this.objects.value.mesh.translateZ(-this.moveVelocity)
         }
@@ -92,7 +91,6 @@ export class MovmentInputController {
             if (this.moveVelocity > 0) {
                 this.moveVelocity -= movespeed / 30
                 this.objects.value.mesh.translateZ(-this.moveVelocity)
-                //console.log(this.moveVelocity)
             }
         }
     }
@@ -107,7 +105,6 @@ export class MovmentInputController {
 
     updateSound() {
         if (this.keyboard.pressed("Y")) {
-            console.log("pressed Y")
             this.hornPlayed = true
         } else {
             this.hornPlayed = false
@@ -135,7 +132,6 @@ export class MovmentInputController {
         return this.objects.value.mesh.position.z
     }
     getRotation() {
-        //console.log("Rot:", this.objects.value.mesh.rotation)
         return this.objects.value.mesh.rotation
     }
 }

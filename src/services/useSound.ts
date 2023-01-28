@@ -104,7 +104,6 @@ function playEngineFromOtherCarNPC(carId: number, distance: number) {
 }
 
 function calculateSoundVolume(distance: number, factor: number) {
-    //console.log(distance)
     distance -= factor
     return Math.abs(distance) / 1000
 }
@@ -188,7 +187,6 @@ function onError(error: Error) {}
 
 function onMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
-    console.log(message)
     if ((message.type = "HORN")) {
         let distance = Math.abs(payloadObject.x - message.posX) + Math.abs(payloadObject.z - message.posY)
         playHornFromFromOtherCar(distance)

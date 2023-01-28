@@ -119,7 +119,6 @@ function joinMessage() {
             },
             type: "JOIN",
         }
-        console.log(lobbyMessage.lobbyContent)
         stompClient.publish({
             destination: JOIN_MSG,
             headers: {},

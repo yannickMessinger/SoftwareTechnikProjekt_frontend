@@ -13,7 +13,6 @@ const { activeLobby } = useUser()
 
 const mapWidth = ref()
 const mapHeight = ref()
-console.log("GAME VIEW INIT")
 /*hardcoded values from GameView need modifying*/
 let gridSizeX = 300
 let gridSizeY = 200
@@ -72,7 +71,6 @@ function setGameStateSizes(sizeX: number, sizeY: number, fieldSize: number) {}
  */
 
 function setGameStateMapId(mapId: number) {
-    console.log(`setze gameState Mapid auf ${mapId}`)
     gameState.mapId = mapId
 }
 
@@ -125,14 +123,12 @@ export function resetMapObjsFromBackEnd() {
 /*Calculates X coordinates position of loaded Model */
 function calcCoordinateX(n: number) {
     let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj x: ${x}`)
     return x
 }
 
 /*Calculates Z coordinates position of loaded Model */
 function calcCoordinateZ(n: number) {
     let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj z: ${z}`)
     return z
 }
 

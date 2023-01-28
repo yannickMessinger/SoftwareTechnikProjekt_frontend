@@ -89,7 +89,6 @@ function fillNpcCars() {
                         )
                     } else {
                         if (gameAsset.objectTypeId === 14) {
-                            // console.log("THOMAS IST DAAAA")
                             npcCarState.npcCarMap.set(
                                 gameAsset.assetId!,
                                 new NpcCar(
@@ -167,10 +166,8 @@ function initNpcSocket() {
 
 //emits event to backend with current information, so that next map element can be calculated.
 function updatePosMessage(npcId: number) {
-    // console.log("sende Update pos anfrage an backend")
     if (npcStompClient) {
         let tempCar = npcCarState.npcCarMap.get(npcId)!
-        //console.log("vurUpdate", tempCar.nextMapObj)
         const updatePosMsg: INpcStompMessage = {
             npcInfoRequestDTO: {
                 mapId: activeLobby.value.mapId,
@@ -187,18 +184,12 @@ function updatePosMessage(npcId: number) {
             headers: {},
             body: JSON.stringify(updatePosMsg),
         })
-        //gameState.npcCarMapFromuseGameview.get(npcId)!.needsMapEleUpdate = false
-        // console.log(updatePosMsg)
     }
 }
 
 //on update from backend set new values of current mapobj and updated position for corresponding npc car
 async function onNpcMessageReceived(payload: INpcStompMessage) {
-    // console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
-
     if (payload.type === "NEW_POSITION_RECEIVED") {
-        // console.log(payload)
-
         const updateNpcCar = npcCarState.npcCarMap.get(payload.npcInfoResponseDTO!.npcId)
 
         updateNpcCar!.lastCarRotation = updateNpcCar!.positions.npcRotation
@@ -242,15 +233,6 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
                 //get traffic light with rot 1
                 rotationOfSearchedTrafficLight = 1
             }
-            // console.log("AMPEL")
-            // console.log(`Ampel mit Rot: ${rotationOfSearchedTrafficLight} muss abgefragt werden`)
-            /*console.log(
-                Array.from(crossroadMap.get(updateNpcCar!.curMapObj.objectId!)!.trafficLights.values())[
-                    rotationOfSearchedTrafficLight
-                ]
-            )*/
-
-            //check status of this traffic light!
         }
 
         updateNpcCar!.driving = true
@@ -370,7 +352,6 @@ function updateMessage(message: IPosition) {
  * @param payload message as IStompMessage containing type and content (object position)
  */
 function onMessageReceived(payload: IStompMessage) {
-    //console.log("payload",payload.content)
     if (positionState.mapId === payload.id) {
         const index = positionState.mapObjects.indexOf(payload.content)
         if (payload.type === "CREATE") {
@@ -384,9 +365,6 @@ function onMessageReceived(payload: IStompMessage) {
             }
         }
         if (payload.type === "UPDATE") {
-            // let tempcar = playerCarState.playerCarMap.get(payload.content.id)
-            // tempcar?.playerCarPosUpdate(payload.content.x,payload.content.z,payload.content.rotation)
-            //console.log("Playercarmap",playerCarState.playerCarMap)
             fillPosition(payload)
 
             if (index > -1) {
@@ -446,14 +424,12 @@ function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
 
 function calcCoordinateX(n: number) {
     let x = gridSizeX * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj x: ${x}`)
     return x
 }
 
 /*Calculates Z coordinates position of loaded Model */
 function calcCoordinateZ(n: number) {
     let z = gridSizeY * -0.5 + n * fieldSize + fieldSize / 2
-    //console.log(`GameObj z: ${z}`)
     return z
 }
 

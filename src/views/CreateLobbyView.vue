@@ -133,7 +133,6 @@ function switchMapSelect() {
     if (mapSelect.value === "+") {
         showAddNewMap.value = true
     }
-    console.log(showAddNewMap.value)
 }
 </script>
 

@@ -30,8 +30,5 @@ export class CreatePlayerCars {
     public playerCarPosUpdate(x: number, z: number, rotation: number) {
         this.playerCarX = x
         this.playerCarZ = z
-        //this.positions.playerCarX = x
-        //this.positions.playerCarZ = z
-        //this.positions.playerCarX = rotation
     }
 }

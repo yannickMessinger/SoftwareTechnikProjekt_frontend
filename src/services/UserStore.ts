@@ -141,14 +141,12 @@ function updateActiveLobbyPlayerList(players: IUser[]) {
     for (let p of players) {
         state.activeLobby.playerList?.push(p)
     }
-    console.log(state.activeLobby.playerList)
 }
 
 async function postActiveLobby(lobby: ILobby) {
     const response = await fetch(`/api/lobby/get_players/${lobby.lobbyId}?player_id=${state.userId}`, {
         method: "POST",
     })
-    console.log("setActiveLobby() -> post player to lobby - response", response)
 }
 
 export default function useUser() {
