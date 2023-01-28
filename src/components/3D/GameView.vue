@@ -199,6 +199,7 @@ export default defineComponent({
                         let x = scene3DobjectMap.get(positionEle.id)
 
                         checkPlayerCarDistance(ele.playerCarX, ele.playerCarZ, ele.playerCarId)
+
                         if (x != undefined) {
                             x.setRotationFromEuler(
                                 new THREE.Euler(
@@ -224,7 +225,6 @@ export default defineComponent({
         }
 
         function loadSceneChildrenWithKey(sceneObjChildren: Map<any, any>) {
-            // console.log("anfangfunction", scene3DobjectMap)
             sceneObjChildren.forEach((ele) => {
                 rawPlayerList.forEach((player) => {
                     if (ele.name === `player_${player.userId}`) {
@@ -246,6 +246,20 @@ export default defineComponent({
                 playEngineFromOtherCar(carId, distance)
             } else {
                 pauseEngineFromOtherCar(carId)
+            }
+        }
+
+        function checkPassengerPickUp(posX: number, posZ: number, objectTypeIdNear: number, npcId: number) {
+            let distanceX = movableObject.getPositionX() - posX
+            let distanceZ = movableObject.getPositionZ() - posZ
+
+            let distance = Math.abs(distanceX) + Math.abs(distanceZ)
+
+            if (distance < 5 && objectTypeIdNear >= 50 && objectTypeIdNear < 60) {
+                console.log(`obj id: ${objectTypeIdNear}`)
+                npcEles.value.get(npcId)!.positions.npcPosX = movableObject.getPositionX()
+                npcEles.value.get(npcId)!.positions.npcPosZ = movableObject.getPositionZ()
+                console.log(npcEles.value)
             }
         }
 
@@ -290,22 +304,21 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
 
-                if (isHost.value === true) {
-                    console.log("ich darf bewege")
-                    npcEles.value.forEach((ele) => {
-                        checkPlayerNPCDistance(
+                //console.log("ich darf bewege")
+                npcEles.value.forEach((ele) => {
+                    checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
+
+                    /*
+                        checkPassengerPickUp( 
                             ele.positions.npcPosX,
                             ele.positions.npcPosZ,
-                            ele.npcId,
-                            ele.objectTypeId
-                        )
-                        if (ele.driving) {
-                            ele.move()
-                        }
-                    })
-                } else {
-                    console.log("ich darf net bewege")
-                }
+                            ele.objectTypeId,
+                            ele.npcId)*/
+
+                    if (ele.driving) {
+                        ele.move()
+                    }
+                })
 
                 if (movableObject.hornPlayed) {
                     playHorn()
@@ -320,9 +333,9 @@ export default defineComponent({
                 setInterval(() => {
                     moveNpcCars()
                 },200)
-            }*/
+            }
 
-            /*
+            
             if(isHost.value === true){
                 setInterval(() => {
                     npcEles.value.forEach((npc) => {

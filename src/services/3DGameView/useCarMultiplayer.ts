@@ -249,7 +249,7 @@ function setClientPosMessage(position: INpcPosition) {
 
 //on update from backend set new values of current mapobj and updated position for corresponding npc car
 async function onNpcMessageReceived(payload: INpcStompMessage) {
-    console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
+    //console.log(`Npc ${payload.npcInfoResponseDTO!.npcId} hat neues POSITIONSUpdate Message erhalten`)
 
     if (payload.type === "NEW_POSITION_RECEIVED") {
         const updateNpcCar = npcCarState.npcCarMap.get(payload.npcInfoResponseDTO!.npcId)
@@ -314,7 +314,7 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
 function onNpcPositionMessageReceived(payload: INpcStompMessage) {
     if (payload.type === "SET_CLIENT_POS") {
         if (user.userId !== activeLobby.value.hostId) {
-            console.log("neue SET_CLIENT_POS")
+            //console.log("neue SET_CLIENT_POS")
             const updateNpcCar = npcCarState.npcCarMap.get(payload.npcPositionContent!.npcId)
             updateNpcCar!.setClientNpcPosition(
                 payload.npcPositionContent!.npcPosX,
