@@ -131,7 +131,7 @@ onUnmounted(() => {
         )
     })
     if (playerSpawnMapObject.length === 0) {
-        placeAssetOnRandomElement(1, playerSpawnObjTypeId)
+        placeAssetOnRandomElement(1, playerSpawnObjTypeId).forEach((ele) => updateMessage(ele))
     }
 })
 
