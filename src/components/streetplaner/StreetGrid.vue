@@ -650,24 +650,18 @@ function onMouseMove(cell: any, event: MouseEvent) {
         toolState.block.objectTypeId !== -1 &&
         toolState.block.groupId !== 2
     ) {
-        if (
-            currCellContent.objectTypeId !== toolState.block.objectTypeId ||
-            (currCellContent.objectTypeId !== toolState.block.objectTypeId &&
-                currCellContent.rotation !== toolState.block.rotation)
-        ) {
-            streetGrid[cell.posX][cell.posY].objectTypeId = toolState.block.objectTypeId
-            streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
-            streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
-            payload = {
-                objectId: -1,
-                objectTypeId: toolState.block.objectTypeId,
-                x: cell.posX,
-                y: cell.posY,
-                rotation: toolState.block.rotation,
-                game_assets: [],
-            }
-            createMessage(payload)
+        streetGrid[cell.posX][cell.posY].objectTypeId = toolState.block.objectTypeId
+        streetGrid[cell.posX][cell.posY].rotation = toolState.block.rotation
+        streetGrid[cell.posX][cell.posY].texture = toolState.block.texture
+        payload = {
+            objectId: -1,
+            objectTypeId: toolState.block.objectTypeId,
+            x: cell.posX,
+            y: cell.posY,
+            rotation: toolState.block.rotation,
+            game_assets: [],
         }
+        createMessage(payload)
     }
     if (event.buttons === 1 && toolState.tool === ToolEnum.DELETE) {
         if (currCellContent.objectTypeId !== -1) {
