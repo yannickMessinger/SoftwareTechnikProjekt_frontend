@@ -166,7 +166,7 @@ function initNpcSocket() {
 
     npcStompClient.activate()
 }
-
+/*
 function initNpcPositionSocket() {
     npcPositionClient = new Client({
         brokerURL: ws_url,
@@ -192,7 +192,7 @@ function initNpcPositionSocket() {
     }
 
     npcPositionClient.activate()
-}
+}*/
 
 //emits event to backend with current information, so that next map element can be calculated.
 function updatePosMessage(npcId: number) {
@@ -218,7 +218,7 @@ function updatePosMessage(npcId: number) {
     }
 }
 
-function setClientPosMessage(position: INpcPosition) {
+/*function setClientPosMessage(position: INpcPosition) {
     if (npcStompClient) {
         const setClientPosMsg: INpcPositionMsg = {
             npcPositionContent: {
@@ -238,7 +238,7 @@ function setClientPosMessage(position: INpcPosition) {
             body: JSON.stringify(setClientPosMsg),
         })
     }
-}
+}*/
 
 //on update from backend set new values of current mapobj and updated position for corresponding npc car
 async function onNpcMessageReceived(payload: INpcStompMessage) {
@@ -483,8 +483,6 @@ export function useCarMultiplayer() {
         updatePosMessage,
         npcCarState,
         onNpcMessageReceived,
-        setClientPosMessage,
-        initNpcPositionSocket,
     }
 }
 

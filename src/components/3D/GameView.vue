@@ -56,7 +56,7 @@ export default defineComponent({
         } = useCarMultiplayer()
 
         const { user, userId, activeLobby } = useUser()
-        const { loadTrafficLight, addCrossroad } = useCrossroadData()
+        const { addCrossroad } = useCrossroadData()
         const { playerListState, playerList, fetchPlayerList } = usePlayerList()
         const boundingBoxService = new BoundingBoxService()
         const collisionService = new CollisionService(box)
@@ -360,7 +360,6 @@ export default defineComponent({
             box,
             scene,
             movableObject,
-            loadTrafficLight,
             addCrossroad,
             buildingIDMap,
             mapElements,
