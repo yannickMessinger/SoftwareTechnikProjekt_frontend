@@ -50,73 +50,38 @@ stompClient.onStompError = (event) => { console.log("Stomp Fehler") }
 
 stompClient.onConnect = (frame) => {
     stompClient.subscribe(DEST, (message) => {
-        const json = JSON.parse(message.body)
-        Object.entries(json).forEach(([key, value]) => {
-            console.log(`Key: ${key}`)
-            console.log(`Value: ${value}`)
-            switch (value) {
-                case 'GREEN':
-                    trafficLights.get(Number(key))!.currentState = 'GREEN'
-                    trafficLights.get(Number(key))!.object3d.getObjectByName("sphere").material.color.setHex(0x77dd77);
-                    break;
-                case 'YELLOW':
-                    trafficLights.get(Number(key))!.currentState = 'YELLOW'
-                    trafficLights.get(Number(key))!.object3d.getObjectByName("sphere").material.color.setHex(0xdddd77);
-                    break;
-                case 'REDYELLOW':
-                    trafficLights.get(Number(key))!.currentState = 'REDYELLOW'
-                    trafficLights.get(Number(key))!.object3d.getObjectByName("sphere").material.color.setHex(0xdddd77);
-                    break;
-                case 'RED':
-                    trafficLights.get(Number(key))!.currentState = 'RED'
-                    trafficLights.get(Number(key))!.object3d.getObjectByName("sphere").material.color.setHex(0xdd7777);
-                    break;
-                default:
-                    throw new Error(`Invalid light value: ${value}`);
-            }
-            console.log(trafficLights.get(Number(key))!.currentState)
-        });
-        console.log(trafficLights)
+        if (message.body) {
+            const json = JSON.parse(message.body)
+            Object.entries(json).forEach(([key, value]) => {
+                if (trafficLights.get(Number(key)) != undefined) {
+                    switch (value) {
+                        case 'GREEN':
+                            trafficLights.get(Number(key))!.currentState = 'GREEN'
+                            trafficLights.get(Number(key))!.object3d.getObjectByName("sphere").material.color.setHex(0x77dd77);
+                            break;
+                        case 'YELLOW':
+                            trafficLights.get(Number(key))!.currentState = 'YELLOW'
+                            trafficLights.get(Number(key))!.object3d.getObjectByName("sphere").material.color.setHex(0xdddd77);
+                            break;
+                        case 'REDYELLOW':
+                            trafficLights.get(Number(key))!.currentState = 'REDYELLOW'
+                            trafficLights.get(Number(key))!.object3d.getObjectByName("sphere").material.color.setHex(0xdddd77);
+                            break;
+                        case 'RED':
+                            trafficLights.get(Number(key))!.currentState = 'RED'
+                            trafficLights.get(Number(key))!.object3d.getObjectByName("sphere").material.color.setHex(0xdd7777);
+                            break;
+                        default:
+                            throw new Error(`Invalid light value: ${value}`);
+                    }
+                } 
+            });
+        }
     })
 }
 
 stompClient.onDisconnect = () => { console.log("Verbindung abgebaut") }
 stompClient.activate()
-
-/*
-function loadGLTF(path: string, scene: Scene, xParent: number, yParent: number, xOffset: number, yOffset: number, rotation: any, objectId: number) {
-    loader.load(path, (gltf) => {
-        const model = gltf.scene
-        model.position.set(xParent + xOffset, 0, yParent + yOffset)
-        model.scale.set(0.5, 0.5, 0.5)
-        model.rotation.set(0, rotation, 0)
-
-        //crossroadMap.get(objectId)?.trafficLights.set(model.id, { tlId: model.id, currentState: "", object3d: model } as ITrafficLight);
-        scene.add(model)
-
-        const light = new THREE.SpotLight(0xff0040, 5, 10, 0.2);
-        light.add(new THREE.Mesh(new THREE.SphereGeometry(0.3, 16, 8), new THREE.MeshBasicMaterial({ color: 0xff0040 })));
-        light.position.set(xParent + xOffset, 3, yParent + yOffset)
-        scene.add(light)
-
-    })
-}
-
-function loadTrafficLight(crossroadObject: IMapObject, scene: Scene, x: number, y: number, rotationMap: Map<any, any>) {
-    const path = "/../../../public/3D_Models/TrafficLight/Traffic_Light.gltf"
-
-
-    loadGLTF(path, scene, x, y, 3, 3, rotationMap.get(0), crossroadObject.objectId)
-    loadGLTF(path, scene, x, y, 3, -3, rotationMap.get(3), crossroadObject.objectId)
-    loadGLTF(path, scene, x, y, -3, -3, rotationMap.get(2), crossroadObject.objectId)
-    loadGLTF(path, scene, x, y, -3, 3, rotationMap.get(1), crossroadObject.objectId)
-} */
-
-function toggle() {
-    //addCrossroad(4)
-    console.log(trafficLights)
-
-}
 
 async function addCrossroad(tlAmount: number, scene: Scene, x: number, y: number, rotationMap: Map<any, any>) {
     fetch(`/api/crossroad?tlAmount=${tlAmount}`, {
@@ -124,8 +89,6 @@ async function addCrossroad(tlAmount: number, scene: Scene, x: number, y: number
     })
         .then(response => response.json())
         .then(id => {
-            let xOffset = 3
-            let yOffset = 3
             let newCrossroad: ICrossroad = {
                 crId: id,
                 trafficLights: new Map<number, ITrafficLight>()
@@ -200,8 +163,8 @@ async function deleteCrossroad(crId: number) {
 
 export default function useCrossroadData() {
     return {
-        toggle,
         crossroadMap,
+        trafficLights,
         addCrossroad,
         getCrossroad,
         deleteCrossroad
