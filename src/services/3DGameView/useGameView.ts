@@ -2,11 +2,6 @@ import { reactive, ref } from "vue"
 import { IMapObject } from "../streetplaner/IMapObject"
 import useUser from "../UserStore"
 
-const ws_url = `ws://${window.location.host}/stomp`
-const DEST = "/topic/npc"
-const UPDATE_POS_MSG = "/app/npc.updatepos"
-const INIT_NEXT_MAP_ELE_MSG = "/app/npc.initpos"
-
 const { activeLobby } = useUser()
 
 const mapWidth = ref()
