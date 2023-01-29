@@ -108,12 +108,12 @@ function changeGamemode() {
 }
 
 function goBuild() {
-    const url = "/edit/" + { gameId }
+    const url = "/edit"
     router.push(url)
 }
 
 function goDrive() {
-    const url = "/game/" + { gameId }
+    const url = "/game"
     driveMessage()
     router.push(url)
 }

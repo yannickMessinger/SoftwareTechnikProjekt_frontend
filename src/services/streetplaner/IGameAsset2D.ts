@@ -7,5 +7,6 @@ export interface IGameAsset2D {
     z3d?: number
     rotation: number
     texture: string
+    isValid: boolean
     userId?: number
 }

@@ -7,7 +7,9 @@
                 <td style="width: 25%">{{ props.lobby.lobbyName }}</td>
                 <td style="width: 15%">{{ props.lobby.lobbyModeEnum }}</td>
                 <td style="width: 30%">
-                    <button @click="selectLobby()">Beitreten</button>
+                    <button @click="selectLobby()" v-if="props.lobby.lobbyModeEnum !== E_LobbyMode.PLAY_MODE">
+                        Beitreten
+                    </button>
                 </td>
             </tr>
         </table>
@@ -20,12 +22,13 @@ import useUser from "../../services/UserStore"
 import router from "../../router/router"
 import { useLobbyList } from "../../services/useLobbyList"
 import { onMounted } from "vue"
+import { E_LobbyMode } from "../../typings/E_LobbyMode"
 
 const props = defineProps<{
     lobby: ILobby
 }>()
 
-const { setActiveLobby, name } = useUser()
+const { setActiveLobby, name, activeLobby } = useUser()
 const { receiveLobbyUpdates, joinMessage } = useLobbyList()
 //const { updateActiveChatLobbyId } = useChat(name.value, )
 
