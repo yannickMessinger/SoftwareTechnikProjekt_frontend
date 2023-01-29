@@ -608,18 +608,6 @@ function onClick(cell: any, e: any) {
         updateMessage(payload)
     }
     if (toolState.tool === ToolEnum.DELETE) {
-        payload = {
-            objectId: -1,
-            objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
-            x: cell.posX,
-            y: cell.posY,
-            rotation: streetGrid[cell.posX][cell.posY].rotation,
-            game_assets: [],
-        }
-        streetGrid[cell.posX][cell.posY].objectTypeId = -1
-        streetGrid[cell.posX][cell.posY].rotation = 0
-        streetGrid[cell.posX][cell.posY].texture = ""
-        deleteMessage(payload)
         if (e.target.classList.contains("asset-img")) {
             let clickedAsset = currCellContent.game_assets[e.target.__vnode.key]
             if (clickedAsset.userId === userId.value || clickedAsset.userId === 0) {

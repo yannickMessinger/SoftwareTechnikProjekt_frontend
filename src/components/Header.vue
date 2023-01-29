@@ -24,6 +24,9 @@
                             emit('validate-grid-event', true)
                         }
                         if (logindata.activeLobby.lobbyId == -1) router.push('/lobby')
+                        else if (router.currentRoute.value.name?.toString() === 'Game') {
+                            router.push('/lobbyview')
+                        }
                     }
                 "
             />
