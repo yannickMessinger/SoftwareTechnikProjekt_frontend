@@ -6,7 +6,6 @@ import { IMapObjCenterCoordinates } from "../../typings/IMapObjCenterCoordinates
 export class NpcAsset {
     public npcId: number
     public positions: INpcPosition
-    public curMapObjCenterCoords: IMapObjCenterCoordinates
     public curMapObj: IMapObject
     public nextMapObj: IMapObject
     public fieldSize: number
@@ -44,32 +43,36 @@ export class NpcAsset {
             [2, 0],
             [3, (3 * Math.PI) / 2],
         ])
+
         this.positions = reactive({
             npcId: this.npcId,
             npcPosX: gameAssetX,
             npcPosZ: gameAssetZ,
             npcRotation: npcRotation,
         })
-        this.curMapObjCenterCoords = reactive({
-            centerX: 0,
-            centerZ: 0,
-        })
+
         this.curMapObj = reactive({
             objectId: curMapObj.objectId,
             objectTypeId: curMapObj.objectTypeId,
             x: curMapObj.x,
             y: curMapObj.y,
+            centerX3d: curMapObj.centerX3d,
+            centerZ3d: curMapObj.centerZ3d,
             rotation: curMapObj.rotation,
             game_assets: curMapObj.game_assets,
         })
+
         this.nextMapObj = reactive({
             objectId: -1,
             objectTypeId: -1,
             x: -1,
             y: -1,
+            centerX3d: -1,
+            centerZ3d: -1,
             rotation: -1,
             game_assets: [],
         })
+
         this.velocity = 0.05
         this.objectTypeId = objectTypeId
         this.fieldSize = fieldSize
@@ -153,13 +156,13 @@ export class NpcAsset {
 
     calcNpcMapLimit(): void {
         if (this.positions.npcRotation === 0) {
-            this.mapLimit = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+            this.mapLimit = this.curMapObj.centerZ3d! - this.fieldSize / 2
         } else if (this.positions.npcRotation === 1) {
-            this.mapLimit = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
+            this.mapLimit = this.curMapObj.centerX3d! + this.fieldSize / 2
         } else if (this.positions.npcRotation === 2) {
-            this.mapLimit = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+            this.mapLimit = this.curMapObj.centerZ3d! + this.fieldSize / 2
         } else if (this.positions.npcRotation === 3) {
-            this.mapLimit = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
+            this.mapLimit = this.curMapObj.centerX3d! - this.fieldSize / 2
         }
     }
 
@@ -200,8 +203,8 @@ export class NpcAsset {
             (this.lastCarRotation === 0 && this.positions.npcRotation === 1) ||
             (this.lastCarRotation === 3 && this.positions.npcRotation === 2)
         ) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+            this.curveCenterX = this.curMapObj.centerX3d! + this.fieldSize / 2
+            this.curveCenterZ = this.curMapObj.centerZ3d! + this.fieldSize / 2
 
             if (this.lastCarRotation === 0) {
                 this.driveCurveRight = true
@@ -218,8 +221,8 @@ export class NpcAsset {
             (this.lastCarRotation === 0 && this.positions.npcRotation === 3) ||
             (this.lastCarRotation === 1 && this.positions.npcRotation === 2)
         ) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+            this.curveCenterX = this.curMapObj.centerX3d! - this.fieldSize / 2
+            this.curveCenterZ = this.curMapObj.centerZ3d! + this.fieldSize / 2
 
             if (this.lastCarRotation === 0) {
                 this.driveCurveRight = false
@@ -236,8 +239,8 @@ export class NpcAsset {
             (this.lastCarRotation === 1 && this.positions.npcRotation === 0) ||
             (this.lastCarRotation === 2 && this.positions.npcRotation === 3)
         ) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+            this.curveCenterX = this.curMapObj.centerX3d! - this.fieldSize / 2
+            this.curveCenterZ = this.curMapObj.centerZ3d! - this.fieldSize / 2
 
             if (this.lastCarRotation === 2) {
                 this.driveCurveRight = true
@@ -254,8 +257,8 @@ export class NpcAsset {
             (this.lastCarRotation === 2 && this.positions.npcRotation === 1) ||
             (this.lastCarRotation === 3 && this.positions.npcRotation === 0)
         ) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+            this.curveCenterX = this.curMapObj.centerX3d! + this.fieldSize / 2
+            this.curveCenterZ = this.curMapObj.centerZ3d! - this.fieldSize / 2
 
             if (this.lastCarRotation === 3) {
                 this.driveCurveRight = true
@@ -275,8 +278,8 @@ export class NpcAsset {
 
     calculateCurve(): void {
         if (this.curMapObj.rotation === 0) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+            this.curveCenterX = this.curMapObj.centerX3d! + this.fieldSize / 2
+            this.curveCenterZ = this.curMapObj.centerZ3d! + this.fieldSize / 2
 
             if (this.lastCarRotation === 0) {
                 this.driveCurveRight = true
@@ -290,8 +293,8 @@ export class NpcAsset {
                 this.curveAngleInc = 0.5
             }
         } else if (this.curMapObj.rotation === 1) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ + this.fieldSize / 2
+            this.curveCenterX = this.curMapObj.centerX3d! - this.fieldSize / 2
+            this.curveCenterZ = this.curMapObj.centerZ3d! + this.fieldSize / 2
             if (this.lastCarRotation === 1) {
                 this.driveCurveRight = true
                 this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)
@@ -304,8 +307,8 @@ export class NpcAsset {
                 this.curveAngleInc = 0.5
             }
         } else if (this.curMapObj.rotation === 2) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX - this.fieldSize / 2
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+            this.curveCenterX = this.curMapObj.centerX3d! - this.fieldSize / 2
+            this.curveCenterZ = this.curMapObj.centerZ3d! - this.fieldSize / 2
             if (this.lastCarRotation === 2) {
                 this.driveCurveRight = true
                 this.curveRadius = Math.abs(this.curveCenterX - this.positions.npcPosX)
@@ -318,8 +321,8 @@ export class NpcAsset {
                 this.curveAngleInc = 0.5
             }
         } else if (this.curMapObj.rotation === 3) {
-            this.curveCenterX = this.curMapObjCenterCoords.centerX + this.fieldSize / 2
-            this.curveCenterZ = this.curMapObjCenterCoords.centerZ - this.fieldSize / 2
+            this.curveCenterX = this.curMapObj.centerX3d! + this.fieldSize / 2
+            this.curveCenterZ = this.curMapObj.centerZ3d! - this.fieldSize / 2
             if (this.lastCarRotation === 3) {
                 this.driveCurveRight = true
                 this.curveRadius = Math.abs(this.curveCenterZ - this.positions.npcPosZ)

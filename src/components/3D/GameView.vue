@@ -91,13 +91,14 @@ export default defineComponent({
         let mapWidth = 30
         let mapHeight = 20
 
-        /*Defines the Grid Size in length by the number ob fields*/
+        /*Defines the Map Size in length by the number ob fields*/
         let gridSizeX = 300
-        /*Defines the Grid Size in height by the number ob fields*/
+        /*Defines the Map Size in height by the number ob fields*/
         let gridSizeY = 200
 
         setMapWidthAndMapHeight(mapWidth, mapHeight)
 
+        /*Map of 3d-model paths*/
         const buildingIDMap = new Map()
         buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
         buildingIDMap.set(1, "/../../../src/assets/3D_Models/Streets/curved_road.gltf")

@@ -27,8 +27,6 @@ const SET_CLIENT_POS_MSG = "/app/npc.setclientpos"
 
 const fieldSize = 10
 
-/*Map of 3d-model paths*/
-
 let stompClient: Client
 let npcStompClient: Client
 let npcPositionClient: Client
@@ -252,8 +250,6 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
         updateNpcCar!.nextMapObj = payload.npcInfoResponseDTO!.nextnextUpperMapObject
         updateNpcCar!.positions.npcRotation = payload.npcInfoResponseDTO!.newGameAssetRotation
 
-        updateNpcCar!.curMapObjCenterCoords.centerX = updateNpcCar!.curMapObj.centerX3d!
-        updateNpcCar!.curMapObjCenterCoords.centerZ = updateNpcCar!.curMapObj.centerZ3d!
         updateNpcCar!.calcNpcMapLimit()
 
         if (
