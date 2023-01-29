@@ -1,6 +1,8 @@
 import { CompatClient, Stomp, StompSubscription } from "@stomp/stompjs"
 import { IPosition } from "../typings/IPosition"
+import useUser from "./UserStore"
 
+const { user } = useUser()
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/sound/"
 const SEND_MSG = "/app/sound.horn/"
@@ -9,6 +11,7 @@ const AUDIO_HORN_PATH = "/../../src/sound/honk-sound.wav"
 const AUDIO_ENGINE_PATH = "/../../src/sound/engine-sound.mp3"
 const AUDIO_ENGINE_OTHER_PATH = "/../../src/sound/engine-sound_other.mp3"
 const AUDIO_TRAIN_PATH = "/../../src/sound/train_sound.mp3"
+const AUDIO_THOMAS_TRAIN_PATH = "/../../src/sound/thomas_sound.mp3"
 const CRASH_SOUND = "/../../src/sound/crash_sound.mp3"
 
 let ambientSound: HTMLAudioElement
@@ -108,7 +111,8 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId: number
         }
     } else {
         if (objectTypeId === 14) {
-            engine = new Audio(AUDIO_TRAIN_PATH)
+            if (user.userName.toUpperCase() === "THOMAS") engine = new Audio(AUDIO_THOMAS_TRAIN_PATH)
+            else engine = new Audio(AUDIO_TRAIN_PATH)
         } else {
             engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
         }
