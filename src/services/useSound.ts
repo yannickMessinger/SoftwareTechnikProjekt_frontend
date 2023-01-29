@@ -1,6 +1,8 @@
 import { CompatClient, Stomp, StompSubscription } from "@stomp/stompjs"
 import { IPosition } from "../typings/IPosition"
+import useUser from "./UserStore"
 
+const { user } = useUser()
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/sound/"
 const SEND_MSG = "/app/sound.horn/"
@@ -9,10 +11,13 @@ const AUDIO_HORN_PATH = "/../../src/sound/honk-sound.wav"
 const AUDIO_ENGINE_PATH = "/../../src/sound/engine-sound.mp3"
 const AUDIO_ENGINE_OTHER_PATH = "/../../src/sound/engine-sound_other.mp3"
 const AUDIO_TRAIN_PATH = "/../../src/sound/train_sound.mp3"
+const AUDIO_THOMAS_TRAIN_PATH = "/../../src/sound/thomas_sound.mp3"
+const CRASH_SOUND = "/../../src/sound/crash_sound.mp3"
 
 let ambientSound: HTMLAudioElement
 let audioHorn = new Audio(AUDIO_HORN_PATH)
 let audioEngine = new Audio(AUDIO_ENGINE_PATH)
+let crashSound = new Audio(CRASH_SOUND)
 
 const audioEnginesOtherCars = new Map<number, HTMLAudioElement>()
 const audioEnginesOtherCarsNPC = new Map<number, HTMLAudioElement>()
@@ -23,6 +28,7 @@ let payloadObject: IPosition
 let stompClient: CompatClient
 let subscription: StompSubscription
 
+crashSound.volume = 0.2
 interface ISoundMessage {
     type: string
     posX: number
@@ -36,6 +42,11 @@ function initAmbientSound() {
     ambientSound.addEventListener("ended", (e) => {
         ambientSound.play()
     })
+}
+
+function playCrashSound() {
+    crashSound.currentTime = 1
+    crashSound.play()
 }
 
 function stopAmbientSound() {
@@ -100,7 +111,8 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId: number
         }
     } else {
         if (objectTypeId === 14) {
-            engine = new Audio(AUDIO_TRAIN_PATH)
+            if (user.userName.toUpperCase() === "THOMAS") engine = new Audio(AUDIO_THOMAS_TRAIN_PATH)
+            else engine = new Audio(AUDIO_TRAIN_PATH)
         } else {
             engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
         }
@@ -145,26 +157,6 @@ function stopAllEnginesNPC() {
     })
 }
 
-export function useSound(activeLobbyId: number, payload: IPosition) {
-    lobbyId = activeLobbyId
-    payloadObject = payload
-    return {
-        playHorn,
-        playYourEngine,
-        stopYourEngine,
-        pauseEngineFromOtherCar,
-        playEngineFromOtherCar,
-        initAmbientSound,
-        stopAmbientSound,
-        connectHornSound,
-        disconnectHornSound,
-        stopAllEngines,
-        pauseEngineFromNPC,
-        playEngineFromNPC,
-        stopAllEnginesNPC,
-    }
-}
-
 function connectHornSound() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
@@ -197,5 +189,32 @@ function onHornMessageReceived(payload: { body: string }) {
     if ((message.type = "HORN")) {
         let distance = Math.abs(payloadObject.x - message.posX) + Math.abs(payloadObject.z - message.posY)
         playHornFromFromOtherCar(distance)
+    }
+}
+
+export function useSound(activeLobbyId: number, payload: IPosition) {
+    lobbyId = activeLobbyId
+    payloadObject = payload
+    return {
+        playHorn,
+        playYourEngine,
+        stopYourEngine,
+        pauseEngineFromOtherCar,
+        playEngineFromOtherCar,
+        initAmbientSound,
+        stopAmbientSound,
+        connectHornSound,
+        disconnectHornSound,
+        stopAllEngines,
+        pauseEngineFromNPC,
+        playEngineFromNPC,
+        stopAllEnginesNPC,
+        playCrashSound,
+    }
+}
+
+export function useCrashSound() {
+    return {
+        playCrashSound,
     }
 }
