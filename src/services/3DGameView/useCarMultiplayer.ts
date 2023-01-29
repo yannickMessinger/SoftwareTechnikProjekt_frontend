@@ -179,7 +179,7 @@ function initNpcPositionSocket() {
     }
 
     npcPositionClient.onConnect = (frame) => {
-        npcStompClient.subscribe(NPC_SET_CLIENT_POS_TOPIC, (message) => {
+        npcPositionClient.subscribe(NPC_SET_CLIENT_POS_TOPIC, (message) => {
             const npcPosUpdate: INpcStompMessage = JSON.parse(message.body)
             if (user.userId !== activeLobby.value.hostId) {
                 onNpcPositionMessageReceived(npcPosUpdate)
