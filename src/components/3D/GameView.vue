@@ -37,7 +37,7 @@ export default defineComponent({
         const fpsCamera = new FirstPersonCamera(camera, box)
         const { gameState, setMapWidthAndMapHeight, resetGameMapObjects, updateMapObjsFromGameState } = useGameView()
         console.log(`Gamestate sizex ${gameState.sizeX}, sizey: ${gameState.sizeY}, fieldSize: ${gameState.fieldSize}`)
-        const { loadTrafficLight } = useCrossroadData()
+        const { loadTrafficLight, addCrossroad } = useCrossroadData()
         console.log(gameState.sizeX * gameState.fieldSize)
         console.log(gameState.sizeY * gameState.fieldSize)
 
@@ -166,6 +166,7 @@ export default defineComponent({
             calcAssetCoordinateX,
             calcAssetCoordinateZ,
             loadTrafficLight,
+            addCrossroad,
             buildingIDMap,
             mapElements,
             rotationMap,
@@ -204,7 +205,7 @@ export default defineComponent({
                     }"
                     :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                     :rotation="{ x: 0, y: rotationMap.get(ele.rotation), z: 0 }"
-                    v-on:load="ele.objectTypeId === 2 ? loadTrafficLight(ele, sceneRef.scene, calcCoordinateX(ele.y), calcCoordinateZ(ele.x), rotationMap) : null"
+                    v-on:load="ele.objectTypeId === 2 ? addCrossroad(4, sceneRef.scene, calcCoordinateX(ele.y), calcCoordinateZ(ele.x), rotationMap) : null"
                 /> 
                 
                 <!-- places all game assets of the current element-->
