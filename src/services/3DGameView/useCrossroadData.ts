@@ -130,7 +130,7 @@ async function getCrossroad(crId: number, scene: Scene, x: number, y: number, ro
             const tl = crData.tl[i]
             try {
                 const object3d = await new Promise((resolve) => {
-                    loader.load("/../../../public/3D_Models/TrafficLight/Traffic_Light.gltf", (gltf) => {
+                    loader.load("/../../../3D_Models/TrafficLight/Traffic_Light.gltf", (gltf) => {
                         const model = gltf.scene
                         model.position.set(x + position[i].x, 0, y + position[i].y)
                         model.scale.set(0.5, 0.5, 0.5)
