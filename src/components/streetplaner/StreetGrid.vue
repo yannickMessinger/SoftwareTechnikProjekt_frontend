@@ -329,8 +329,6 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
             }
         }
     } else {
-        // spawnpoint is free, so place car there
-        // console.log("TEXTURE ELEMENT: ", assetObjectTypeId,  blockList.find((ele) => ele.objectTypeId === assetObjectTypeId));
         if (assetObjectTypeId === playerSpawnObjTypeId) {
             streetGrid[element.x][element.y].game_assets.push({
                 objectTypeId: assetObjectTypeId,
