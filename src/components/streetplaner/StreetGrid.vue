@@ -16,27 +16,51 @@ import UserStore from "../../services/UserStore"
 import { useEditor } from "../../services/Editor/useEditor"
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
-
-const { userId } = UserStore()
-const { bus } = useEventBus()
-const { setGameStateSizes, setGameStateMapId } = useGameView()
-const { blockListState, updateBlockList } = useBlockList()
+import { useValidation } from "../../services/streetplaner/useValidation"
 
 var gridSizeX = 20
 var gridSizeY = 30
+
+const straightObjTypeId = 0
+const curveObjTypeId = 1
+const intersectionObjTypeId = 2
+const straightRailObjTypeId = 9
+const curveRailObjTypeId = 10
+const trainStationObjTypeId = 11
+const railRoadCrossObjTypeId = 12
+const pedestrianCrossingObjTypeId = 8
+const npcCarObjTypeId = 7
+const trainObjTypeId = 14
+const playerSpawnObjTypeId = 13
+const firstPedestrianId = 50
+const pedestrianAmount = 10
+
+// initialize gridSize
+const { gridSize } = useGridSize()
+// initialize gridSizePx used in css
+const gridSizePx = computed(() => gridSize.size.toString() + "px")
+const assetSize = computed(() => gridSize.size / 4)
+const assetSizePx = computed(() => assetSize.value.toString() + "px")
+
+const { userId } = UserStore()
+const { bus, emit } = useEventBus()
+const { setGameStateSizes, setGameStateMapId } = useGameView()
+const { blockListState, updateBlockList } = useBlockList()
+const {
+    initValidator,
+    checkStraightValid,
+    checkCurveValid,
+    checkIntersectionValid,
+    checkStraightRailValid,
+    checkCurveRailValid,
+    checkRailRoadCrossingValid,
+} = useValidation()
+
 const toolState = reactive({
     tool: ToolEnum.EMPTY,
     block: { objectTypeId: -1, groupId: -1, rotation: 0, texture: "" },
 })
 const lobbyState = useUser().activeLobby
-const { gridSize } = useGridSize()
-
-const npcCarObjTypeId = 7
-const trainStationObjTypeId = 11
-const trainObjTypeId = 14
-const playerSpawnObjTypeId = 13
-const firstPedestrianId = 50
-const pedestrianAmount = 10
 
 const {
     editorState,
@@ -47,7 +71,15 @@ const {
     updateMap,
     receiveEditorUpdates,
     updateMapId,
-} = useEditor(lobbyState.value.mapId)
+} = useEditor(lobbyState.value!.mapId)
+
+// create and initialize streetGrid
+const streetGrid: IGridElement[][] = reactive(
+    Array(gridSizeX)
+        .fill([])
+        .map(() => Array(gridSizeY).fill(null))
+)
+fillGridEmpty()
 
 watch(
     () => bus.value.get("tool-select-event"),
@@ -85,19 +117,22 @@ watch(
         changedElements.forEach((ele) => updateMessage(ele))
     }
 )
-
-// create and initialize streetGrid
-const streetGrid: IGridElement[][] = reactive(
-    Array(gridSizeX)
-        .fill([])
-        .map(() => Array(gridSizeY).fill(null))
+watch(
+    () => bus.value.get("grid-is-valid-event"),
+    (val) => {
+        if (val) {
+            checkValidation()
+        }
+    }
 )
-fillGridEmpty()
+watch(
+    () => bus.value.get("validate-grid-event"),
+    () => {
+        let isValid = checkValidation()
+        emit("is-valid-event", isValid)
+    }
+)
 
-// initialize gridSizePx used in css
-const gridSizePx = computed(() => gridSize.size.toString() + "px")
-const assetSize = computed(() => gridSize.size / 4)
-const assetSizePx = computed(() => assetSize.value.toString() + "px")
 // declare blockList
 var blockList: Array<IBlockElement>
 watch(
@@ -114,11 +149,12 @@ onMounted(() => {
     // get streetgrid from backend via mapID
 
     setGameStateSizes(gridSizeY, gridSizeX, gridSize.size)
+    initValidator(streetGrid, gridSizeX, gridSizeY)
 
     updateBlockList()
     receiveEditorUpdates()
-    updateMapId(lobbyState.value.mapId)
-    setGameStateMapId(lobbyState.value.mapId)
+    updateMapId(lobbyState.value!.mapId)
+    setGameStateMapId(lobbyState.value!.mapId)
     updateMap()
 })
 
@@ -134,6 +170,74 @@ onUnmounted(() => {
         placeAssetOnRandomElement(1, playerSpawnObjTypeId).forEach((ele) => updateMessage(ele))
     }
 })
+
+function checkValidation(): boolean {
+    debugger
+    let isValid: boolean = true
+    if (!validateStreetGrid()) isValid = false
+    if (!validateRailGrid()) isValid = false
+    return isValid
+}
+
+function validateStreetGrid(): boolean {
+    let isValid: boolean = true
+    let streetElements = editorState.mapObjects.filter((ele) => blockList[ele.objectTypeId].type === "STREET")
+    for (let streetEle of streetElements) {
+        switch (streetEle.objectTypeId) {
+            case straightObjTypeId:
+            case pedestrianCrossingObjTypeId:
+                if (!checkStraightValid(streetEle)) {
+                    streetGrid[streetEle.x][streetEle.y].isValid = false
+                    isValid = false
+                }
+                break
+            case intersectionObjTypeId:
+                if (!checkIntersectionValid(streetEle)) {
+                    streetGrid[streetEle.x][streetEle.y].isValid = false
+                    isValid = false
+                }
+                break
+            case curveObjTypeId:
+                if (!checkCurveValid(streetEle)) {
+                    streetGrid[streetEle.x][streetEle.y].isValid = false
+                    isValid = false
+                }
+                break
+        }
+    }
+    return isValid
+}
+
+function validateRailGrid(): boolean {
+    let isValid: boolean = true
+    let railElements = editorState.mapObjects.filter(
+        (ele) => blockList[ele.objectTypeId].type === "RAIL" || blockList[ele.objectTypeId].type === "STREET_RAIL"
+    )
+    for (let railEle of railElements) {
+        switch (railEle.objectTypeId) {
+            case straightRailObjTypeId:
+            case trainStationObjTypeId:
+                if (!checkStraightRailValid(railEle)) {
+                    streetGrid[railEle.x][railEle.y].isValid = false
+                    isValid = false
+                }
+                break
+            case curveRailObjTypeId:
+                if (!checkCurveRailValid(railEle)) {
+                    streetGrid[railEle.x][railEle.y].isValid = false
+                    isValid = false
+                }
+                break
+            case railRoadCrossObjTypeId:
+                if (!checkRailRoadCrossingValid(railEle)) {
+                    streetGrid[railEle.x][railEle.y].isValid = false
+                    isValid = false
+                }
+                break
+        }
+    }
+    return isValid
+}
 
 function placeAssetOnRandomElement(amountAssets: number, assetObjectId: number): IMapObject[] {
     let counter = 0
@@ -315,6 +419,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
                         y: randomPosElements[randomPos].y,
                         rotation: randomPosElements[randomPos].rotation,
                         texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                        isValid: true,
                     })
                 } else {
                     streetGrid[element.x][element.y].game_assets.push({
@@ -323,6 +428,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
                         y: randomPosElements[randomPos].y,
                         rotation: randomPosElements[randomPos].rotation,
                         texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                        isValid: true,
                     })
                 }
                 return true
@@ -337,6 +443,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
                 y: randomPosElements[randomPos].y,
                 rotation: randomPosElements[randomPos].rotation,
                 texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                isValid: true,
             })
         } else {
             streetGrid[element.x][element.y].game_assets.push({
@@ -345,6 +452,7 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
                 y: randomPosElements[randomPos].y,
                 rotation: randomPosElements[randomPos].rotation,
                 texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                isValid: true,
             })
         }
         return true
@@ -392,7 +500,7 @@ function onClick(cell: any, e: any) {
                 return
             }
             // only place asset if it's placed on a straight road
-            if (currCellContent.objectTypeId === 0) {
+            if (currCellContent.objectTypeId === straightObjTypeId) {
                 let rect = e.target.getBoundingClientRect()
                 let x = (e.clientX - rect.left) / gridSize.size
                 let y = (e.clientY - rect.top) / gridSize.size
@@ -428,6 +536,7 @@ function onClick(cell: any, e: any) {
                         rotation: toolState.block.rotation,
                         texture: toolState.block.texture,
                         userId: userId.value,
+                        isValid: true,
                     })
                 } else {
                     streetGrid[cell.posX][cell.posY].game_assets.push({
@@ -436,6 +545,7 @@ function onClick(cell: any, e: any) {
                         y: y,
                         rotation: toolState.block.rotation,
                         texture: toolState.block.texture,
+                        isValid: true,
                     })
                 }
 
@@ -462,6 +572,7 @@ function onClick(cell: any, e: any) {
                     rotation: toolState.block.rotation,
                     texture: blockList[trainObjTypeId].texture,
                     userId: 0,
+                    isValid: true,
                 })
                 payload = {
                     objectId: -1,
@@ -497,18 +608,6 @@ function onClick(cell: any, e: any) {
         updateMessage(payload)
     }
     if (toolState.tool === ToolEnum.DELETE) {
-        payload = {
-            objectId: -1,
-            objectTypeId: streetGrid[cell.posX][cell.posY].objectTypeId,
-            x: cell.posX,
-            y: cell.posY,
-            rotation: streetGrid[cell.posX][cell.posY].rotation,
-            game_assets: [],
-        }
-        streetGrid[cell.posX][cell.posY].objectTypeId = -1
-        streetGrid[cell.posX][cell.posY].rotation = 0
-        streetGrid[cell.posX][cell.posY].texture = ""
-        deleteMessage(payload)
         if (e.target.classList.contains("asset-img")) {
             let clickedAsset = currCellContent.game_assets[e.target.__vnode.key]
             if (clickedAsset.userId === userId.value || clickedAsset.userId === 0) {
@@ -537,6 +636,7 @@ function onClick(cell: any, e: any) {
             deleteMessage(payload)
         }
     }
+    console.log(editorState.mapObjects)
 }
 
 // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
@@ -605,13 +705,16 @@ function saveStreetGrid() {
             }
         }
     }
-    postStreetGrid(lobbyState.value.mapId, dto)
+    postStreetGrid(lobbyState.value!.mapId, dto)
 }
 
 // load StreetGrid from backend dto
 function loadStreetGrid(dto: StreetGridDTO) {
     fillGridEmpty()
     for (let ele of dto.mapObjects) {
+        ele.game_assets.forEach((gameAsset) => {
+            gameAsset.isValid = true
+        })
         streetGrid[ele.x][ele.y] = {
             objectTypeId: ele.objectTypeId,
             groupId: blockList[ele.objectTypeId].groupId,
@@ -620,6 +723,7 @@ function loadStreetGrid(dto: StreetGridDTO) {
             rotation: ele.rotation,
             texture: blockList[ele.objectTypeId].texture,
             game_assets: ele.game_assets,
+            isValid: true,
         }
     }
 }
@@ -634,6 +738,7 @@ function fillGridEmpty() {
                 posX: row,
                 posY: col,
                 rotation: 0,
+                isValid: true,
                 texture: "",
                 game_assets: [],
             }
@@ -689,7 +794,18 @@ window.addEventListener(
             @mousemove="onMouseMove(ele, $event)"
         >
             <img
-                v-if="ele.texture != ''"
+                v-if="!ele.isValid"
+                :src="ele.texture"
+                class="no-drag grid-img"
+                draggable="false"
+                :style="{
+                    transform: 'rotate(' + ele.rotation * 90 + 'deg)',
+                    zIndex: 0,
+                    filter: 'brightness(0.5) sepia(1) saturate(2000%)',
+                }"
+            />
+            <img
+                v-if="ele.texture != '' && ele.isValid"
                 :src="ele.texture"
                 class="no-drag grid-img"
                 draggable="false"
@@ -698,7 +814,19 @@ window.addEventListener(
             <div v-for="(asset, index) in ele.game_assets">
                 <!-- if asset is npc (asset.userId not present or 0) or asset is our spawnpoint (asset.userId === our userId) use given asset.texture -->
                 <img
-                    v-if="!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()"
+                    v-if="(!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()) && !asset.isValid"
+                    :src="asset.texture"
+                    class="no-drag asset-img"
+                    draggable="false"
+                    :style="{
+                        transform: 'rotate(' + asset.rotation * 90 + 'deg)',
+                        left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
+                        top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
+                        backgroundColor: 'red',
+                    }"
+                />
+                <img
+                    v-if="(!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()) && asset.isValid"
                     :src="asset.texture"
                     :key="index"
                     class="no-drag asset-img"
@@ -711,7 +839,7 @@ window.addEventListener(
                 />
                 <!-- else the asset is not our spawnpoint nor a npc car, so asset is another players car -->
                 <img
-                    v-else
+                    v-if="!(!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()) && asset.isValid"
                     src="/img/streetplaner/object-icons/car-top-view-green.svg"
                     class="no-drag asset-img"
                     draggable="false"
@@ -719,6 +847,20 @@ window.addEventListener(
                         transform: 'rotate(' + asset.rotation * 90 + 'deg)',
                         left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
                         top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
+                    }"
+                />
+                <img
+                    v-if="
+                        !(!asset.userId || asset.userId === 0 || asset.userId === userId?.valueOf()) && !asset.isValid
+                    "
+                    src="/img/streetplaner/object-icons/car-top-view-green.svg"
+                    class="no-drag asset-img"
+                    draggable="false"
+                    :style="{
+                        transform: 'rotate(' + asset.rotation * 90 + 'deg)',
+                        left: `${calcCoordAssetX(`cell_${ele.posX}_${ele.posY}`, asset.x)}px`,
+                        top: `${calcCoordAssetY(`cell_${ele.posX}_${ele.posY}`, asset.y)}px`,
+                        backgroundColor: 'red',
                     }"
                 />
             </div>

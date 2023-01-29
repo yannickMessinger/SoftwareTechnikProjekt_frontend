@@ -15,6 +15,16 @@
                 }
             "
         ></BasicButton>
+        <BasicButton
+            class="valid-btn"
+            display="Ist Straßenplaner valide?"
+            :btn_click="
+                () => {
+                    validGrid()
+                    disableResetButtonForValidation = true
+                }
+            "
+        ></BasicButton>
         <div class="tools">
             <p id="header">
                 <BasicButton v-if="elementBarVisible" class="tools-back-btn" display=" " :btn_click="switchMode" />
@@ -49,6 +59,7 @@ import Chat from "../components/UI/Chat.vue"
 import BasicButton from "../components/Buttons/BasicButton.vue"
 import { useGridSize } from "../services/useGridSize"
 import Slider from "../components/Slider.vue"
+import { useValidConfirmBeforeAction } from "../services/streetplaner/ValidConfirmDialog"
 
 const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, {
     question: "Möchtest du die gesamte Karte zurücksetzen? Die Aktion ist unwiderruflich.",
@@ -56,6 +67,7 @@ const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, {
 const { emit, bus } = useEventBus()
 const disableResetButton = ref(false)
 const disableStreetGrid = ref(false)
+const disableResetButtonForValidation = ref(false)
 const { gridSize } = useGridSize()
 const headerText_tool = "Werkzeuge"
 const headerText_elements = "Elemente"
@@ -69,6 +81,15 @@ onConfirm(() => {
 onCancel(() => {
     disableResetButton.value = false
 })
+const validGrid = () => {
+    useValidConfirmBeforeAction(
+        () => {
+            emit("grid-is-valid-event", true)
+            disableResetButtonForValidation.value = false
+        },
+        { question: "Wollen Sie die Karte prüfen?" }
+    )
+}
 
 function switchMode() {
     elementBarVisible.value = !elementBarVisible.value
@@ -128,6 +149,11 @@ span {
 }
 
 .reset-btn {
+    position: fixed;
+}
+.valid-btn {
+    position: fixed;
+    top: 150px;
     position: fixed;
 }
 

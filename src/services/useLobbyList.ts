@@ -476,7 +476,7 @@ async function onMessageReceived(payload: IStompMessage) {
             router.push("/lobby")
         }
         if (payload.type === "DRIVE") {
-            router.push("/game/20")
+            router.push("/game")
         }
     }
 }

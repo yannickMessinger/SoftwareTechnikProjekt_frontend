@@ -20,8 +20,13 @@
                 display=""
                 :btn_click="
                     () => {
+                        if (router.currentRoute.value.name?.toString() === 'Edit') {
+                            emit('validate-grid-event', true)
+                        }
                         if (logindata.activeLobby.lobbyId == -1) router.push('/lobby')
-                        else router.push('/lobbyview')
+                        else if (router.currentRoute.value.name?.toString() === 'Game') {
+                            router.push('/lobbyview')
+                        }
                     }
                 "
             />
@@ -33,8 +38,11 @@
 import router from "../router/router"
 import BasicButton from "./Buttons/BasicButton.vue"
 import useUser from "../services/UserStore"
+import useEventBus from "../services/eventBus"
+import { ref, watch } from "vue"
 
 const { logout, activeLobby, logindata } = useUser()
+const { bus, emit } = useEventBus()
 
 const props = defineProps({
     text: {
@@ -48,6 +56,14 @@ const props = defineProps({
         default: true,
     },
 })
+watch(
+    () => bus.value.get("is-valid-event"),
+    (val) => {
+        if (val[0]) {
+            router.push("/lobbyview")
+        }
+    }
+)
 </script>
 
 <style scoped>

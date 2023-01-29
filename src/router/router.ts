@@ -34,12 +34,12 @@ const router = createRouter({
             component: EditorView,
         },
         {
-            path: "/game/:gameId",
+            path: "/game",
             component: Game,
             name: "Game",
         },
         {
-            path: "/edit/:gameId",
+            path: "/edit",
             component: EditorView,
             name: "Edit",
         },

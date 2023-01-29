@@ -393,7 +393,7 @@ export default defineComponent({
                     :props="{ name: ele.objectId }"
                     v-on:load="
                         ele.objectTypeId === 2
-                            ? addCrossroad(4, scene, ele.centerX3d, ele.centerZ3d, rotationMap)
+                            ? addCrossroad(4, scene, ele.centerX3d!, ele.centerZ3d!, rotationMap)
                             : null
                     "
                 />
@@ -420,27 +420,21 @@ export default defineComponent({
             <!-- creates and sets taxi bassed on playerCarList sets car for each playerId !== userId-->
             <div v-for="player in playerCarList">
                 <div v-if="player[1].playerCarId !== uid">
-                    v-on:load="ele.objectTypeId === 2 ? addCrossroad(4, sceneRef.scene, calcCoordinateX(ele.y),
-                    calcCoordinateZ(ele.x), rotationMap) : null" />
-
-                    <!-- places all game assets of the current element-->
-                    <div v-for="(asset, index) in ele.game_assets" :key="index">
-                        <GltfModel
-                            v-bind:src="buildingIDMap.get(21)"
-                            :position="{
-                                x: player[1].playerCarX,
-                                y: 0,
-                                z: player[1].playerCarZ,
-                            }"
-                            :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
-                            :rotation="{
-                                x: 0,
-                                y: 0, //player[1].playerCarRotation[1],
-                                z: 0,
-                            }"
-                            :props="{ name: `player_${player[1].playerCarId}` }"
-                        />
-                    </div>
+                    <GltfModel
+                        v-bind:src="buildingIDMap.get(21)"
+                        :position="{
+                            x: player[1].playerCarX,
+                            y: 0,
+                            z: player[1].playerCarZ,
+                        }"
+                        :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
+                        :rotation="{
+                            x: 0,
+                            y: 0, //player[1].playerCarRotation[1],
+                            z: 0,
+                        }"
+                        :props="{ name: `player_${player[1].playerCarId}` }"
+                    />
                 </div>
             </div>
         </Scene>

@@ -7,5 +7,6 @@ export interface IGridElement {
     posY: number
     rotation: number
     texture: string
+    isValid: boolean
     game_assets: IGameAsset2D[]
 }
