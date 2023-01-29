@@ -195,6 +195,7 @@ export default defineComponent({
                         let x = scene3DobjectMap.get(positionEle.id)
 
                         checkPlayerCarDistance(ele.playerCarX, ele.playerCarZ, ele.playerCarId)
+
                         if (x != undefined) {
                             x.setRotationFromEuler(
                                 new THREE.Euler(
@@ -232,25 +233,41 @@ export default defineComponent({
         }
 
         function checkPlayerCarDistance(posX: number, posZ: number, carId: number) {
+            const MAX_HEARING_DISTANCE = 30
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
-            if (distance < 30) {
+            if (distance < MAX_HEARING_DISTANCE) {
                 playEngineFromOtherCar(carId, distance)
             } else {
                 pauseEngineFromOtherCar(carId)
             }
         }
 
-        function checkPlayerNPCDistance(posX: number, posZ: number, carId: number, objectTypeId: number) {
+        function checkPassengerPickUp(posX: number, posZ: number, objectTypeIdNear: number, npcId: number) {
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
 
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
-            if (distance < 30) {
+            if (distance < 5 && objectTypeIdNear >= 50 && objectTypeIdNear < 60) {
+                console.log(`obj id: ${objectTypeIdNear}`)
+                npcEles.value.get(npcId)!.positions.npcPosX = movableObject.getPositionX()
+                npcEles.value.get(npcId)!.positions.npcPosZ = movableObject.getPositionZ()
+                console.log(npcEles.value)
+            }
+        }
+
+        function checkPlayerNPCDistance(posX: number, posZ: number, carId: number, objectTypeId: number) {
+            const MAX_HEARING_DISTANCE = 30
+            let distanceX = movableObject.getPositionX() - posX
+            let distanceZ = movableObject.getPositionZ() - posZ
+
+            let distance = Math.abs(distanceX) + Math.abs(distanceZ)
+
+            if (distance < MAX_HEARING_DISTANCE) {
                 playEngineFromNPC(carId, distance, objectTypeId)
             } else {
                 pauseEngineFromNPC(carId)
