@@ -113,10 +113,17 @@ export default defineComponent({
         buildingIDMap.set(11, "/../../../src/assets/3D_Models/Railroad/trainstation.gltf")
         buildingIDMap.set(12, "/../../../src/assets/3D_Models/Railroad/road_train_crossing.gltf")
 
-        buildingIDMap.set(17, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
-        buildingIDMap.set(18, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
-        buildingIDMap.set(19, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
-        buildingIDMap.set(20, "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf")
+        buildingIDMap.set(15, "/../../../src/assets/3D_Models/Building/skyscraper1.gltf")
+        buildingIDMap.set(16, "/../../../src/assets/3D_Models/Building/skyscraper2.gltf")
+        buildingIDMap.set(17, "/../../../src/assets/3D_Models/Building/skyscraper3.gltf")
+        buildingIDMap.set(18, "/../../../src/assets/3D_Models/Building/citybuilding1.gltf")
+        buildingIDMap.set(19, "/../../../src/assets/3D_Models/Building/citybuilding2.gltf")
+        buildingIDMap.set(20, "/../../../src/assets/3D_Models/Building/citybuilding3.gltf")
+
+        buildingIDMap.set(60, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
+        buildingIDMap.set(61, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
+        buildingIDMap.set(62, "/../../../src/assets/3D_Models/Enviroment/enviroment_3.gltf")
+        buildingIDMap.set(63, "/../../../src/assets/3D_Models/Enviroment/enviroment_4.gltf")
 
         buildingIDMap.set(21, "/../../../src/assets/3D_Models/Vehicles/taxi.gltf")
 

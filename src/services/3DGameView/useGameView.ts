@@ -142,7 +142,7 @@ export function fillGameState(): void {
     for (let i = 0; i < mapHeight.value; i++) {
         for (let j = 0; j < mapWidth.value; j++) {
             gameState.gameMapObjects[counter] = {
-                objectTypeId: randomNumber(17, 20),
+                objectTypeId: randomNumber(60, 63),
                 x: -1,
                 y: -1,
                 centerX3d: calcCoordinateX(j),
