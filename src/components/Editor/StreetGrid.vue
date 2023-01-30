@@ -666,13 +666,11 @@ function onClick(cell: any, e: any) {
             deleteMessage(payload)
         }
     }
-    console.log(editorState.mapObjects)
 }
 
 // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
 function onMouseMove(cell: any, event: MouseEvent) {
     let currCellContent = streetGrid[cell.posX][cell.posY]
-    // Todo, add check so stomp message will only send when a change is made
     let payload: IMapObject
     if (
         event.buttons === 1 &&

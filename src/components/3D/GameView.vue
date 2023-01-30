@@ -269,10 +269,8 @@ export default defineComponent({
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < 5 && objectTypeIdNear >= 50 && objectTypeIdNear < 60) {
-                console.log(`obj id: ${objectTypeIdNear}`)
                 npcEles.value.get(npcId)!.positions.npcPosX = movableObject.getPositionX()
                 npcEles.value.get(npcId)!.positions.npcPosZ = movableObject.getPositionZ()
-                console.log(npcEles.value)
             }
         }
 

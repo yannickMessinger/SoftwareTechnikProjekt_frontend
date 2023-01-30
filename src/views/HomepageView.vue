@@ -49,7 +49,7 @@ import Header from "../components/UI/Header.vue"
 import router from "../router/router"
 import Chat from "../components/UI/Chat.vue"
 
-let gameId = ref(20) //TODO: gameId must refers to the id in the backend
+let gameId = ref(20)
 </script>
 
 <style scoped>
