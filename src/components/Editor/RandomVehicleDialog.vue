@@ -1,31 +1,38 @@
 <script setup lang="ts">
+// imports
 import { ref } from "vue"
 import { IGameAsset2D } from "../../models/Editor/IGameAsset2D"
 import { useEditor } from "../../services/Editor/useEditor"
 import useUser from "../../services/User/UserStore"
 
+// define variables and constants
 const emit = defineEmits(["confirm", "cancel"])
 const { editorState } = useEditor(useUser().activeLobby.value.mapId)
 const maxAmountCars = 100
 const maxAmountPedestrians = 100
-const mapObjects = editorState.mapObjects
-const gameAssets = mapObjects.map((ele) => ele.game_assets)
-const filledGameAssetArrays = gameAssets.filter((arr) => arr.length > 0)
 const amountAssets = Array<IGameAsset2D>()
-filledGameAssetArrays.forEach((arr) => amountAssets.push(...arr))
-const currentAmountPedestrians = amountAssets.filter((ele) => ele.objectTypeId > 49 && ele.objectTypeId < 60).length
-const currentAmountCars = amountAssets.filter((ele) => ele.objectTypeId === 7).length
 const amountCars = ref(0)
 const amountPedestrians = ref(0)
+
+// fill gameAssets with game_assets from current map
+const gameAssets = editorState.mapObjects.map((ele) => ele.game_assets)
+const filledGameAssetArrays = gameAssets.filter((arr) => arr.length > 0)
+filledGameAssetArrays.forEach((arr) => amountAssets.push(...arr))
+// filter gameAssets to get current amount of assets of a type
+const currentAmountPedestrians = amountAssets.filter((ele) => ele.objectTypeId > 49 && ele.objectTypeId < 60).length
+const currentAmountCars = amountAssets.filter((ele) => ele.objectTypeId === 7).length
 </script>
 
 <template>
     <div class="modal-container">
         <div class="modal-body">
             <span class="modal-close" @click="emit('cancel')">X</span>
+            <!-- Display current amount of assets -->
             <p>Aktuelle Anzahl: {{ currentAmountCars }} Autos und {{ currentAmountPedestrians }} Fussgaenger</p>
+            <!-- Input for cars -->
             <h2 class="question">Wie viele weitere Fahrzeuge sollen platziert werden?</h2>
             <p>Auto: <input type="number" :min="0" :max="maxAmountCars" v-model="amountCars" /></p>
+            <!-- Input for pedestrians -->
             <h2 class="question">Wie viele weitere Fussgaenger sollen platziert werden?</h2>
             <p>
                 Fussgaengeranzahl:

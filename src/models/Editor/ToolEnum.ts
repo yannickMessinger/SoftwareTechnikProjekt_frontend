@@ -1,3 +1,6 @@
+/**
+ * Enum of available tools
+ */
 enum ToolEnum {
     CREATE = "create",
     EDIT = "edit",
