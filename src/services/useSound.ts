@@ -120,12 +120,13 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId: number
             carObjectTypeIds.forEach((carObjectTypeId) => {
                 if (carObjectTypeId === objectTypeId) {
                     engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
-
-                    audioEnginesOtherCarsNPC.set(carId, engine)
-                    engine.volume = volume
-                    engine.play
                 }
             })
+        }
+        if (engine) {
+            audioEnginesOtherCarsNPC.set(carId, engine)
+            engine.volume = volume
+            engine.play
         }
     }
 }
