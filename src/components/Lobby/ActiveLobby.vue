@@ -96,8 +96,6 @@ watch(
     }
 )
 
-let gameId = ref(20) //TODO: gameId must refers to the id in the backend
-
 function changeGamemode() {
     if (activeLobby.value.lobbyModeEnum == E_LobbyMode.PLAY_MODE) {
         activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE

@@ -113,12 +113,12 @@ export default defineComponent({
         buildingIDMap.set(11, "/../../../src/assets/3D_Models/Railroad/trainstation.gltf")
         buildingIDMap.set(12, "/../../../src/assets/3D_Models/Railroad/road_train_crossing.gltf")
 
-        buildingIDMap.set(15, "/../../../src/assets/3D_Models/Building/skyscraper1.gltf")
-        buildingIDMap.set(16, "/../../../src/assets/3D_Models/Building/skyscraper2.gltf")
-        buildingIDMap.set(17, "/../../../src/assets/3D_Models/Building/skyscraper3.gltf")
-        buildingIDMap.set(18, "/../../../src/assets/3D_Models/Building/citybuilding1.gltf")
-        buildingIDMap.set(19, "/../../../src/assets/3D_Models/Building/citybuilding2.gltf")
-        buildingIDMap.set(20, "/../../../src/assets/3D_Models/Building/citybuilding3.gltf")
+        buildingIDMap.set(6, "/../../../src/assets/3D_Models/Building/skyscraper1.gltf")
+        buildingIDMap.set(15, "/../../../src/assets/3D_Models/Building/skyscraper2.gltf")
+        buildingIDMap.set(16, "/../../../src/assets/3D_Models/Building/skyscraper3.gltf")
+        buildingIDMap.set(17, "/../../../src/assets/3D_Models/Building/citybuilding1.gltf")
+        buildingIDMap.set(18, "/../../../src/assets/3D_Models/Building/citybuilding2.gltf")
+        buildingIDMap.set(19, "/../../../src/assets/3D_Models/Building/citybuilding3.gltf")
 
         buildingIDMap.set(60, "/../../../src/assets/3D_Models/Enviroment/enviroment_1.gltf")
         buildingIDMap.set(61, "/../../../src/assets/3D_Models/Enviroment/enviroment_2.gltf")
@@ -269,10 +269,8 @@ export default defineComponent({
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < 5 && objectTypeIdNear >= 50 && objectTypeIdNear < 60) {
-                console.log(`obj id: ${objectTypeIdNear}`)
                 npcEles.value.get(npcId)!.positions.npcPosX = movableObject.getPositionX()
                 npcEles.value.get(npcId)!.positions.npcPosZ = movableObject.getPositionZ()
-                console.log(npcEles.value)
             }
         }
 
@@ -370,8 +368,8 @@ export default defineComponent({
                 multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
                 boundingBoxService.setObjects(scene)
                 collisionResetService.setResetCarPosition(box)
-            }, 3000)
-            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 3000)
+            }, 6000)
+            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 6000)
         })
 
         onUnmounted(() => {

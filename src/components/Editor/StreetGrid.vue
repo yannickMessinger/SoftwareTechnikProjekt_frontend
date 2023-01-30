@@ -423,63 +423,65 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         randomPosElements = getRandomSpawnsPedestrian(element)
     }
 
-    // check if the max capacity is reached
-    if (element.game_assets.length === randomPosElements.length) {
-        return false
-    }
+    if (element) {
+        // check if the max capacity is reached
+        if (element.game_assets.length === randomPosElements.length) {
+            return false
+        }
 
-    let randomPos = Math.floor(Math.random() * randomPosElements.length)
-    if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
-        randomPos = 0
-        while (randomPos < randomPosElements.length) {
-            if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
-                randomPos++
-            } else {
-                if (assetObjectTypeId === playerSpawnObjTypeId) {
-                    streetGrid[element.x][element.y].game_assets.push({
-                        objectTypeId: assetObjectTypeId,
-                        userId: userId.value,
-                        x: randomPosElements[randomPos].x,
-                        y: randomPosElements[randomPos].y,
-                        rotation: randomPosElements[randomPos].rotation,
-                        texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                        isValid: true,
-                    })
+        let randomPos = Math.floor(Math.random() * randomPosElements.length)
+        if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
+            randomPos = 0
+            while (randomPos < randomPosElements.length) {
+                if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
+                    randomPos++
                 } else {
-                    streetGrid[element.x][element.y].game_assets.push({
-                        objectTypeId: assetObjectTypeId,
-                        x: randomPosElements[randomPos].x,
-                        y: randomPosElements[randomPos].y,
-                        rotation: randomPosElements[randomPos].rotation,
-                        texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                        isValid: true,
-                    })
+                    if (assetObjectTypeId === playerSpawnObjTypeId) {
+                        streetGrid[element.x][element.y].game_assets.push({
+                            objectTypeId: assetObjectTypeId,
+                            userId: userId.value,
+                            x: randomPosElements[randomPos].x,
+                            y: randomPosElements[randomPos].y,
+                            rotation: randomPosElements[randomPos].rotation,
+                            texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                            isValid: true,
+                        })
+                    } else {
+                        streetGrid[element.x][element.y].game_assets.push({
+                            objectTypeId: assetObjectTypeId,
+                            x: randomPosElements[randomPos].x,
+                            y: randomPosElements[randomPos].y,
+                            rotation: randomPosElements[randomPos].rotation,
+                            texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                            isValid: true,
+                        })
+                    }
+                    return true
                 }
-                return true
             }
-        }
-    } else {
-        if (assetObjectTypeId === playerSpawnObjTypeId) {
-            streetGrid[element.x][element.y].game_assets.push({
-                objectTypeId: assetObjectTypeId,
-                userId: userId.value,
-                x: randomPosElements[randomPos].x,
-                y: randomPosElements[randomPos].y,
-                rotation: randomPosElements[randomPos].rotation,
-                texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                isValid: true,
-            })
         } else {
-            streetGrid[element.x][element.y].game_assets.push({
-                objectTypeId: assetObjectTypeId,
-                x: randomPosElements[randomPos].x,
-                y: randomPosElements[randomPos].y,
-                rotation: randomPosElements[randomPos].rotation,
-                texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                isValid: true,
-            })
+            if (assetObjectTypeId === playerSpawnObjTypeId) {
+                streetGrid[element.x][element.y].game_assets.push({
+                    objectTypeId: assetObjectTypeId,
+                    userId: userId.value,
+                    x: randomPosElements[randomPos].x,
+                    y: randomPosElements[randomPos].y,
+                    rotation: randomPosElements[randomPos].rotation,
+                    texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                    isValid: true,
+                })
+            } else {
+                streetGrid[element.x][element.y].game_assets.push({
+                    objectTypeId: assetObjectTypeId,
+                    x: randomPosElements[randomPos].x,
+                    y: randomPosElements[randomPos].y,
+                    rotation: randomPosElements[randomPos].rotation,
+                    texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                    isValid: true,
+                })
+            }
+            return true
         }
-        return true
     }
 
     return false
@@ -664,13 +666,11 @@ function onClick(cell: any, e: any) {
             deleteMessage(payload)
         }
     }
-    console.log(editorState.mapObjects)
 }
 
 // onMouseMove sets texture to all cells over which the mouse is moved while the mouse button is pressed
 function onMouseMove(cell: any, event: MouseEvent) {
     let currCellContent = streetGrid[cell.posX][cell.posY]
-    // Todo, add check so stomp message will only send when a change is made
     let payload: IMapObject
     if (
         event.buttons === 1 &&
