@@ -1,11 +1,14 @@
 import { reactive } from "vue"
 import type { IBlockElement } from "../../models/Editor/IBlockElement"
-
+/**
+ * blockList is a list of blocks which are placeable in the Editor
+ */
 export interface IBlockListState {
     list: Array<IBlockElement>
     error: string
 }
 
+// state in which blockList is saved
 const blockListState = reactive({
     list: [],
     error: "",

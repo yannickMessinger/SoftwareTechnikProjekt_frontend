@@ -1,7 +1,13 @@
+/**
+ * imports
+ */
 import { reactive } from "vue"
 import { IMapObject } from "../../models/Editor/IMapObject"
 import { StreetGridDTO } from "../../models/Editor/StreetGridDTO"
 
+/**
+ * define reactive streetGridDTO
+ */
 const streetGridDTO = reactive({ mapObjects: Array<IMapObject>() })
 
 export function useStreetGridList() {
@@ -12,7 +18,9 @@ export function useStreetGridList() {
     }
 }
 
-// updates streetGridDTO with map objects of map with mapID
+/**
+ * updates streetGridDTO with map objects of map with mapID
+ */
 export async function updateStreetGridList(mapId: number) {
     const url = "/api/map/objects"
 
@@ -34,7 +42,9 @@ export async function updateStreetGridList(mapId: number) {
     }
 }
 
-// posts map objects of dto (StreetGridDTO of map with mapID) to backend
+/**
+ * posts map objects of dto (StreetGridDTO of map with mapID) to backend
+ */
 export async function postStreetGrid(mapId: number, dto: StreetGridDTO) {
     const url = "/api/mapobject"
     let jsonstring = JSON.stringify(dto)
@@ -52,6 +62,9 @@ export async function postStreetGrid(mapId: number, dto: StreetGridDTO) {
     }
 }
 
+/**
+ * removes all mapObjects from streetGridDTO
+ */
 export function resetMapEles() {
     streetGridDTO.mapObjects.splice(0, streetGridDTO.mapObjects.length)
 }

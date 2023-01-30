@@ -1,7 +1,9 @@
+// imports
 import { reactive } from "vue"
 import { Client } from "@stomp/stompjs"
 import { IMapObject } from "../../models/Editor/IMapObject"
 
+// define url and paths for stompClient
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/editor"
 const CREATE_MSG = "/app/editor.create"
@@ -10,8 +12,15 @@ const UPDATE_MSG = "/app/editor.update"
 const RESET_MSG = "/app/editor.reset"
 const MAP_API = "/api/map/objects/"
 
+// define stompClient
 let stompClient: Client
 
+/**
+ * mapObjects - List of IMapObjects of the current map
+ * errormessage - contains the errormessage
+ * mapId - mapId of the current map
+ * userName - userName of the current user
+ */
 interface IEditorState {
     mapObjects: IMapObject[]
     errormessage: string
@@ -19,6 +28,12 @@ interface IEditorState {
     userName: string
 }
 
+/**
+ * id - mapId of the current map
+ * type - type of the update
+ * author - username of the user which sends the message
+ * content - updated or new IMapObjects
+ */
 interface IStompMessage {
     id: number
     type: string
@@ -26,6 +41,10 @@ interface IStompMessage {
     content: IMapObject
 }
 
+/**
+ *
+ * create editorState and fill with default values
+ */
 const editorState = reactive<IEditorState>({
     mapObjects: Array<IMapObject>(),
     errormessage: "",
@@ -33,6 +52,11 @@ const editorState = reactive<IEditorState>({
     userName: "",
 })
 
+/**
+ * export all available functions
+ * @param mapId - mapId on which the Editor works
+ * @returns all availabel functions
+ */
 export function useEditor(mapId: number) {
     editorState.mapId = mapId
     return {
@@ -47,10 +71,17 @@ export function useEditor(mapId: number) {
     }
 }
 
+/**
+ * updates the map id, when the map is changed
+ * @param mapId - new mapId
+ */
 function updateMapId(mapId: number) {
     editorState.mapId = mapId
 }
 
+/**
+ * updates the mapObjects in the editorState
+ */
 function updateMap() {
     if (editorState.mapId === 0) {
         editorState.errormessage = "Invalid mapId"
@@ -71,6 +102,9 @@ function updateMap() {
     }
 }
 
+/**
+ * initializes the stompClient and defines it's reaction on errors and messages
+ */
 function receiveEditorUpdates() {
     updateMap()
 
@@ -93,6 +127,10 @@ function receiveEditorUpdates() {
     stompClient.activate()
 }
 
+/**
+ * sends an create message via the stompClient
+ * @param message - IMapObject which got created
+ */
 function createMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
@@ -109,6 +147,10 @@ function createMessage(message: IMapObject) {
     }
 }
 
+/**
+ * sends an delete message via the stompClient
+ * @param message - IMapObject which got deleted
+ */
 function deleteMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
@@ -126,6 +168,10 @@ function deleteMessage(message: IMapObject) {
     }
 }
 
+/**
+ * sends an update message via the stompClient
+ * @param message - IMapObject which got updated
+ */
 function updateMessage(message: IMapObject) {
     if (message && stompClient) {
         const editorMessage: IStompMessage = {
@@ -143,6 +189,9 @@ function updateMessage(message: IMapObject) {
     }
 }
 
+/**
+ * sends an reset message via the stompClient to reset the current map
+ */
 function resetMessage() {
     const message: IMapObject = {
         objectTypeId: -1,
@@ -167,23 +216,31 @@ function resetMessage() {
     }
 }
 
+/**
+ * function reactes on updates which are received via the stompbroker
+ * @param payload - received message
+ */
 function onMessageReceived(payload: IStompMessage) {
     if (editorState.mapId === payload.id) {
         if (payload.type === "CREATE") {
+            // replace old mapObject with new one
             editorState.mapObjects = editorState.mapObjects.filter(
                 (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y
             )
             editorState.mapObjects.push(payload.content)
         } else if (payload.type === "DELETE") {
+            // delete mapObject
             editorState.mapObjects = editorState.mapObjects.filter(
                 (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y
             )
         } else if (payload.type === "UPDATE") {
+            // replace old mapObject with updated one
             editorState.mapObjects = editorState.mapObjects.filter(
                 (obj) => obj.x !== payload.content.x || obj.y !== payload.content.y
             )
             editorState.mapObjects.push(payload.content)
         } else if (payload.type === "RESET") {
+            // fetch the map again
             updateMap()
         }
     }
