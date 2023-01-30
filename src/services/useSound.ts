@@ -119,7 +119,6 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId: number
         } else {
             carObjectTypeIds.forEach((carObjectTypeId) => {
                 if (carObjectTypeId === objectTypeId) {
-                    console.log("Car erkannt")
                     engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
 
                     audioEnginesOtherCarsNPC.set(carId, engine)

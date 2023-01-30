@@ -172,7 +172,6 @@ onUnmounted(() => {
 })
 
 function checkValidation(): boolean {
-    debugger
     let isValid: boolean = true
     if (!validateStreetGrid()) isValid = false
     if (!validateRailGrid()) isValid = false
