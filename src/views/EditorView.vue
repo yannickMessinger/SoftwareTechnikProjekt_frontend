@@ -48,17 +48,17 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import useEventBus from "../services/eventBus"
-import ListToolsComponent from "../components/streetplaner/ListToolsComponent.vue"
-import ListBlocksComponent from "../components/streetplaner/ListBlocksComponent.vue"
-import SelectedBlockComponent from "../components/streetplaner/SelectedBlockComponent.vue"
-import StreetGrid from "../components/streetplaner/StreetGrid.vue"
+import ListToolsComponent from "../components/Editor/ListToolsComponent.vue"
+import ListBlocksComponent from "../components/Editor/ListBlocksComponent.vue"
+import SelectedBlockComponent from "../components/Editor/SelectedBlockComponent.vue"
+import StreetGrid from "../components/Editor/StreetGrid.vue"
 import { createConfirmDialog } from "vuejs-confirm-dialog"
 import SimpleDialog from "../components/UI/SimpleDialog.vue"
 import Header from "../components/UI/Header.vue"
 import Chat from "../components/UI/Chat.vue"
 import BasicButton from "../components/Buttons/BasicButton.vue"
 import { useGridSize } from "../services/Editor/useGridSize"
-import Slider from "../components/streetplaner/Slider.vue"
+import Slider from "../components/Editor/Slider.vue"
 import { useValidConfirmBeforeAction } from "../services/Editor/ValidConfirmDialog"
 
 const { reveal, onConfirm, onCancel } = createConfirmDialog(SimpleDialog, {
