@@ -423,63 +423,65 @@ function placeRandomAssetOnElement(element: IMapObject, assetObjectTypeId: numbe
         randomPosElements = getRandomSpawnsPedestrian(element)
     }
 
-    // check if the max capacity is reached
-    if (element.game_assets.length === randomPosElements.length) {
-        return false
-    }
+    if (element) {
+        // check if the max capacity is reached
+        if (element.game_assets.length === randomPosElements.length) {
+            return false
+        }
 
-    let randomPos = Math.floor(Math.random() * randomPosElements.length)
-    if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
-        randomPos = 0
-        while (randomPos < randomPosElements.length) {
-            if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
-                randomPos++
-            } else {
-                if (assetObjectTypeId === playerSpawnObjTypeId) {
-                    streetGrid[element.x][element.y].game_assets.push({
-                        objectTypeId: assetObjectTypeId,
-                        userId: userId.value,
-                        x: randomPosElements[randomPos].x,
-                        y: randomPosElements[randomPos].y,
-                        rotation: randomPosElements[randomPos].rotation,
-                        texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                        isValid: true,
-                    })
+        let randomPos = Math.floor(Math.random() * randomPosElements.length)
+        if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
+            randomPos = 0
+            while (randomPos < randomPosElements.length) {
+                if (checkAssetPlacedNearElement(element.game_assets, randomPosElements[randomPos])) {
+                    randomPos++
                 } else {
-                    streetGrid[element.x][element.y].game_assets.push({
-                        objectTypeId: assetObjectTypeId,
-                        x: randomPosElements[randomPos].x,
-                        y: randomPosElements[randomPos].y,
-                        rotation: randomPosElements[randomPos].rotation,
-                        texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                        isValid: true,
-                    })
+                    if (assetObjectTypeId === playerSpawnObjTypeId) {
+                        streetGrid[element.x][element.y].game_assets.push({
+                            objectTypeId: assetObjectTypeId,
+                            userId: userId.value,
+                            x: randomPosElements[randomPos].x,
+                            y: randomPosElements[randomPos].y,
+                            rotation: randomPosElements[randomPos].rotation,
+                            texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                            isValid: true,
+                        })
+                    } else {
+                        streetGrid[element.x][element.y].game_assets.push({
+                            objectTypeId: assetObjectTypeId,
+                            x: randomPosElements[randomPos].x,
+                            y: randomPosElements[randomPos].y,
+                            rotation: randomPosElements[randomPos].rotation,
+                            texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                            isValid: true,
+                        })
+                    }
+                    return true
                 }
-                return true
             }
-        }
-    } else {
-        if (assetObjectTypeId === playerSpawnObjTypeId) {
-            streetGrid[element.x][element.y].game_assets.push({
-                objectTypeId: assetObjectTypeId,
-                userId: userId.value,
-                x: randomPosElements[randomPos].x,
-                y: randomPosElements[randomPos].y,
-                rotation: randomPosElements[randomPos].rotation,
-                texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                isValid: true,
-            })
         } else {
-            streetGrid[element.x][element.y].game_assets.push({
-                objectTypeId: assetObjectTypeId,
-                x: randomPosElements[randomPos].x,
-                y: randomPosElements[randomPos].y,
-                rotation: randomPosElements[randomPos].rotation,
-                texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
-                isValid: true,
-            })
+            if (assetObjectTypeId === playerSpawnObjTypeId) {
+                streetGrid[element.x][element.y].game_assets.push({
+                    objectTypeId: assetObjectTypeId,
+                    userId: userId.value,
+                    x: randomPosElements[randomPos].x,
+                    y: randomPosElements[randomPos].y,
+                    rotation: randomPosElements[randomPos].rotation,
+                    texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                    isValid: true,
+                })
+            } else {
+                streetGrid[element.x][element.y].game_assets.push({
+                    objectTypeId: assetObjectTypeId,
+                    x: randomPosElements[randomPos].x,
+                    y: randomPosElements[randomPos].y,
+                    rotation: randomPosElements[randomPos].rotation,
+                    texture: blockList.find((ele) => ele.objectTypeId === assetObjectTypeId)!.texture,
+                    isValid: true,
+                })
+            }
+            return true
         }
-        return true
     }
 
     return false
