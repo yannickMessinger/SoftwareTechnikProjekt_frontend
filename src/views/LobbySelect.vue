@@ -2,7 +2,7 @@
     <Header :displayHomebutton="true"></Header>
     <div class="container">
         <div class="content">
-            <MyMaps :liste="mapsList.mapslist" v-bind:popupTrigger="false"></MyMaps>
+            <MyMaps v-bind:popupTrigger="false"></MyMaps>
         </div>
         <div class="content">
             <div>

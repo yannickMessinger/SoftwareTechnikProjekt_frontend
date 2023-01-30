@@ -98,14 +98,8 @@ onMounted(() => {
 const { changeMapMessage } = useLobbyList()
 
 const props = defineProps<{
-    liste: Readonly<IMapDTO[]>
     popupTrigger: Boolean
 }>()
-
-const mapsState = reactive<IMyMapsState>({
-    mapslist: Array<IMapDTO>(),
-    errormsg: "",
-})
 
 const { bus, emit } = useEventBus()
 
@@ -173,8 +167,6 @@ async function changeMapInBackend(mapId: number) {
         })
 
         if (!response.ok) {
-            mapsState.errormsg = response.statusText
-            mapsState.mapslist = []
             console.log("error in changing map")
             throw new Error(response.statusText)
         }
@@ -193,8 +185,6 @@ async function getMapsFromBackend() {
         })
 
         if (!response.ok) {
-            mapsState.errormsg = response.statusText
-            mapsState.mapslist = []
             console.log("error in fetching maplist")
             throw new Error(response.statusText)
         }
@@ -208,7 +198,7 @@ async function getMapsFromBackend() {
             cardList.push(newCard)
         })
         //mapsState.mapslist = jsondata
-        mapsState.errormsg = ""
+        // mapsState.errormsg = ""
     } catch (error) {
         console.log("error in updateMapsList")
     }

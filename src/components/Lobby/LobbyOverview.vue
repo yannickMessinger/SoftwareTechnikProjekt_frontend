@@ -13,7 +13,7 @@
     </div>
 
     <div>
-        <MyMaps :liste="mapsList.mapslist" v-bind:popupTrigger="false"></MyMaps>
+        <MyMaps v-bind:popupTrigger="false"></MyMaps>
     </div>
     <div v-if="lobbyList.lobbylist.length > 0">
         <LobbyList :liste="lobbyList.lobbylist"></LobbyList>

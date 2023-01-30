@@ -11,7 +11,7 @@
     </div>
     <div class="container2">
         <div v-if="userId === hostId" class="content2">
-            <MyMaps :liste="mapsList.mapslist" v-bind:popupTrigger="false"></MyMaps>
+            <MyMaps v-bind:popupTrigger="false"></MyMaps>
         </div>
     </div>
 </template>
