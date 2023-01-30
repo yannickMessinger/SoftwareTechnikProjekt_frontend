@@ -9,6 +9,7 @@ const AMBIENT_SOUND_PATH = "/../../../src/sound/ambient_bird_sound.mp3"
 const AUDIO_HORN_PATH = "/../../src/sound/honk-sound.wav"
 const AUDIO_ENGINE_PATH = "/../../src/sound/engine-sound.mp3"
 const AUDIO_ENGINE_OTHER_PATH = "/../../src/sound/engine-sound_other.mp3"
+const AUDIO_ENGINE_NPC_PATH = "/../../src/sound/engine-sound_npc.mp3"
 const AUDIO_TRAIN_PATH = "/../../src/sound/train_sound.mp3"
 const AUDIO_THOMAS_TRAIN_PATH = "/../../src/sound/thomas_sound.mp3"
 const CRASH_SOUND = "/../../src/sound/crash_sound.mp3"
@@ -38,7 +39,7 @@ interface ISoundMessage {
 
 function initAmbientSound() {
     ambientSound = new Audio(AMBIENT_SOUND_PATH)
-    ambientSound.volume = 0.5
+    ambientSound.volume = 0.2
     ambientSound.play()
     ambientSound.addEventListener("ended", (e) => {
         ambientSound.play()
@@ -68,9 +69,9 @@ function playHornFromFromOtherCar(distance: number) {
 
 function playYourEngine() {
     audioEngine.volume = 0.2
-    let buffer = 4
+    let buffer = 3
     if (audioEngine.currentTime > audioEngine.duration - buffer) {
-        audioEngine.currentTime = 3
+        audioEngine.currentTime = 15
     }
     if (audioEngine.paused) {
         audioEngine.play()
@@ -78,7 +79,9 @@ function playYourEngine() {
 }
 
 function stopYourEngine() {
-    audioEngine.pause()
+    if (!audioEngine.paused) {
+        audioEngine.pause()
+    }
 }
 
 function playEngineFromOtherCar(carId: number, distance: number) {
@@ -96,7 +99,7 @@ function playEngineFromOtherCar(carId: number, distance: number) {
         engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
         audioEnginesOtherCars.set(carId, engine)
         engine.volume = volume
-        engine.play
+        engine.play()
     }
 }
 
@@ -118,14 +121,14 @@ function playEngineFromNPC(carId: number, distance: number, objectTypeId: number
         } else {
             carObjectTypeIds.forEach((carObjectTypeId) => {
                 if (carObjectTypeId === objectTypeId) {
-                    engine = new Audio(AUDIO_ENGINE_OTHER_PATH)
+                    engine = new Audio(AUDIO_ENGINE_NPC_PATH)
                 }
             })
         }
         if (engine) {
             audioEnginesOtherCarsNPC.set(carId, engine)
             engine.volume = volume
-            engine.play
+            engine.play()
         }
     }
 }

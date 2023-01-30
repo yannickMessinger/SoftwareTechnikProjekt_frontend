@@ -121,12 +121,7 @@ export class MovmentInputController {
             this.hornPlayed = false
         }
 
-        if (
-            this.keyboard.pressed("W") ||
-            this.keyboard.pressed("A") ||
-            this.keyboard.pressed("S") ||
-            this.keyboard.pressed("D")
-        ) {
+        if (this.moveVelocity != 0) {
             this.enginePlayed = true
         } else {
             this.enginePlayed = false

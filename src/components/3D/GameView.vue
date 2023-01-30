@@ -331,6 +331,8 @@ export default defineComponent({
                 }
                 if (movableObject.enginePlayed) {
                     playYourEngine()
+                } else {
+                    stopYourEngine()
                 }
                 multiplayerCarlistService.updatePlayerCars(playerCarList, positionState, uid)
                 collisionService.updateCarBoundingBox()
