@@ -66,7 +66,7 @@
 import { onUpdated, reactive, ref, toRef, unref } from "vue"
 import BasicButton from "../Buttons/BasicButton.vue"
 import { useChat } from "../../services/Chat/useChat"
-import useUser from "../../services/UserStore"
+import useUser from "../../services/User/UserStore"
 
 interface Message {
     name: string
@@ -125,7 +125,7 @@ function appendMessage() {
  * Toggles the visibility of the chat.
  * @function
  * @name hideChat
-*/
+ */
 function hideChat() {
     visible.value = !visible.value
 }

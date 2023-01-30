@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import useUser from "../../services/UserStore"
+import useUser from "../../services/User/UserStore"
 import router from "../../router/router"
 import BasicButton from "../Buttons/BasicButton.vue"
 import { useChat } from "../../services/Chat/useChat"

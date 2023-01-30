@@ -1,4 +1,4 @@
-import { MovmentInputController } from "../../models/MovementInputController"
+import { MovmentInputController } from "../../models/3D/MovementInputController"
 
 export class CollisionResetService {
     public playerResetPositions: any

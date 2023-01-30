@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import IUser from "../../typings/IUser"
+import IUser from "../../models/User/IUser"
 
 const props = defineProps<{
     player: IUser

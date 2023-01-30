@@ -1,14 +1,12 @@
 <script lang="ts">
 import { AmbientLight, Box, Camera, GltfModel, PhongMaterial, Plane, Renderer, Scene } from "troisjs"
 
-import { MovmentInputController } from "../../models/MovementInputController"
-import { usePlayerList } from "../../services/usePlayerList"
-import useUser from "../../services/UserStore"
+import { usePlayerList } from "../../services/User/usePlayerList"
+import useUser from "../../services/User/UserStore"
 
 import { useGameView } from "../../services/3DGameView/useGameView"
 import { useCarMultiplayer } from "../../services/3DGameView/useCarMultiplayer"
-import { IPosition } from "../../typings/IPosition"
-import { useSound } from "../../services/useSound"
+import { useSound } from "../../services/Sound/useSound"
 import * as THREE from "three"
 
 import useCrossroadData from "../../services/3DGameView/useCrossroadData"
@@ -17,6 +15,8 @@ import { BoundingBoxService } from "../../services/3DGameView/BoundingBoxService
 import { CollisionService } from "../../services/3DGameView/CollisionService"
 import { CollisionResetService } from "../../services/3DGameView/CollisionResetService"
 import { computed, defineComponent, onBeforeUnmount, onMounted, onUnmounted, ref, toRaw, watch } from "vue"
+import { IPosition } from "../../models/3D/IPosition"
+import { MovmentInputController } from "../../models/3D/MovementInputController"
 
 export default defineComponent({
     components: {
@@ -216,6 +216,9 @@ export default defineComponent({
             })
         }
 
+        /**
+         * method was created to be called external out of onBeforeRender
+         */
         function moveNpcCars() {
             npcEles.value.forEach((ele) => {
                 checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
@@ -227,7 +230,7 @@ export default defineComponent({
 
         function loadSceneChildrenWithKey(sceneObjChildren: Map<any, any>) {
             sceneObjChildren.forEach((ele) => {
-                rawPlayerList.forEach((player) => {
+                rawPlayerList.forEach((player: any) => {
                     if (ele.name === `player_${player.userId}`) {
                         if (!scene3DobjectMap.get(player.userId) && player.userId !== uid) {
                             scene3DobjectMap.set(player.userId, ele)
@@ -251,6 +254,14 @@ export default defineComponent({
             }
         }
 
+        /**
+         * method for testing to implement simple game logic where npc pedestrians could be picked up by player
+         * and be driven to random generated target point on map.
+         * @param posX x pos of player car
+         * @param posZ z pos of player car
+         * @param objectTypeIdNear objectTypeId of the object that is close to player car
+         * @param npcId id of near npc
+         */
         function checkPassengerPickUp(posX: number, posZ: number, objectTypeIdNear: number, npcId: number) {
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
@@ -307,7 +318,7 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
 
-                //creates npc movement through calling move method on every npc from npc list
+                /*creates npc movement through calling move method on every npc from npc list*/
                 npcEles.value.forEach((ele) => {
                     checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
                     if (ele.driving) {
@@ -331,7 +342,9 @@ export default defineComponent({
             })
 
             /**
-             *
+             *Method that checks every 500ms if npc element needs update of its map elements by checking,
+             *if npc element has reached the limit of its internal current map object.
+             *triggers service method if necessary.
              */
             intervalArray.push(
                 setInterval(() => {

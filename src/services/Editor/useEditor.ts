@@ -1,6 +1,6 @@
 import { reactive } from "vue"
 import { Client } from "@stomp/stompjs"
-import { IMapObject } from "../streetplaner/IMapObject"
+import { IMapObject } from "../../models/Editor/IMapObject"
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/editor"

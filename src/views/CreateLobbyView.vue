@@ -52,10 +52,10 @@
 
 <script setup lang="ts">
 import BasicButton from "../components/Buttons/BasicButton.vue"
-import Header from "../components/Header.vue"
+import Header from "../components/UI/Header.vue"
 import router from "../router/router"
-import { E_LobbyMode } from "../typings/E_LobbyMode"
-import { createNewLobby, useLobbyList } from "../services/useLobbyList"
+import { E_LobbyMode } from "../models/Lobby/E_LobbyMode"
+import { createNewLobby, useLobbyList } from "../services/Lobby/useLobbyList"
 import { onMounted, ref } from "vue"
 
 const { receiveLobbyUpdates } = useLobbyList()

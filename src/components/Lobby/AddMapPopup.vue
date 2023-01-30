@@ -37,9 +37,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { createNewMap } from "../../services/useMyMaps"
+import { createNewMap } from "../../services/Lobby/useMyMaps"
 import BasicButton from "../Buttons/BasicButton.vue"
-import useUser from "../../services/UserStore"
+import useUser from "../../services/User/UserStore"
 import watch from "vue"
 
 const { userId } = useUser()

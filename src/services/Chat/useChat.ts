@@ -1,6 +1,6 @@
 import { CompatClient, Stomp, StompSubscription } from "@stomp/stompjs"
 import { reactive, readonly, ref } from "vue"
-import { ILobby } from "../../typings/ILobby"
+import { ILobby } from "../../models/Lobby/ILobby"
 
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/chat"

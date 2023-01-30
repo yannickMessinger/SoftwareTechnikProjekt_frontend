@@ -6,22 +6,22 @@ import LoginView from "../views/LoginView.vue"
 import CreateLobbyView from "../views/CreateLobbyView.vue"
 import LobbySelect from "../views/LobbySelect.vue"
 import LobbyView from "../views/LobbyView.vue"
-import useUser from "../services/UserStore"
+import useUser from "../services/User/UserStore"
 
 /**
  * Custom hook to access user data.
  * @returns {IUser} Returns an object containing the login data of the user.
-*/
+ */
 const { logindata } = useUser()
 
 /**
  * Uses the createWebHistory function from the vue-router library.
-*/
+ */
 const history = createWebHistory()
 
 /**
  * Creates and configures the application's router.
-*/
+ */
 const router = createRouter({
     history,
     routes: [
@@ -72,7 +72,7 @@ const router = createRouter({
  * @param {Object} to - The target route object of navigation.
  * @param {Object} from - The current route object of navigation.
  * @param {Function} next - The callback function to move to the target route.
-*/
+ */
 router.beforeEach((to, from, next) => {
     if (!logindata.loggedIn && to.path !== "/login") {
         next("/login")
@@ -92,7 +92,7 @@ router.beforeEach((to, from, next) => {
  * @param {Object} to - The target location to be navigated.
  * @param {Object} from - The current location.
  * @param {Function} next - Callback function to proceed with the next navigation.
-*/
+ */
 router.beforeEach((to, from, next) => {
     if (logindata.loggedIn && to.path === "/") {
         console.warn(" '/' path detected")

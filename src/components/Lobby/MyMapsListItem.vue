@@ -25,9 +25,9 @@
 </template>
 
 <script setup lang="ts">
-import { IMyMapsListItem } from "../../typings/IMyMapsListItem"
 import BasicButton from "../Buttons/BasicButton.vue"
 import router from "../../router/router"
+import { IMyMapsListItem } from "../../models/Map/IMyMapsListItem"
 
 const props = defineProps<{
     map: IMyMapsListItem
