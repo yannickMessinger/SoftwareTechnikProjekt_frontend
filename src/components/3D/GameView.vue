@@ -368,8 +368,8 @@ export default defineComponent({
                 multiplayerCarlistService.loadPlayerObjectMap(scene.value.scene.children)
                 boundingBoxService.setObjects(scene)
                 collisionResetService.setResetCarPosition(box)
-            }, 3000)
-            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 3000)
+            }, 6000)
+            setTimeout(() => loadSceneChildrenWithKey(scene.value.scene.children), 6000)
         })
 
         onUnmounted(() => {
