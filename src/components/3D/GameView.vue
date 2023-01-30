@@ -216,6 +216,9 @@ export default defineComponent({
             })
         }
 
+        /**
+         * method was created to be called external out of onBeforeRender
+         */
         function moveNpcCars() {
             npcEles.value.forEach((ele) => {
                 checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
@@ -251,6 +254,14 @@ export default defineComponent({
             }
         }
 
+        /**
+         * method for testing to implement simple game logic where npc pedestrians could be picked up by player
+         * and be driven to random generated target point on map.
+         * @param posX x pos of player car
+         * @param posZ z pos of player car
+         * @param objectTypeIdNear objectTypeId of the object that is close to player car
+         * @param npcId id of near npc
+         */
         function checkPassengerPickUp(posX: number, posZ: number, objectTypeIdNear: number, npcId: number) {
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
@@ -307,7 +318,7 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
 
-                //creates npc movement through calling move method on every npc from npc list
+                /*creates npc movement through calling move method on every npc from npc list*/
                 npcEles.value.forEach((ele) => {
                     checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
                     if (ele.driving) {
@@ -331,7 +342,9 @@ export default defineComponent({
             })
 
             /**
-             *
+             *Method that checks every 500ms if npc element needs update of its map elements by checking,
+             *if npc element has reached the limit of its internal current map object.
+             *triggers service method if necessary.
              */
             intervalArray.push(
                 setInterval(() => {

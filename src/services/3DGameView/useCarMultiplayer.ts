@@ -4,14 +4,13 @@ import { IPosition } from "../../typings/IPosition"
 import { CreatePlayerCars } from "../../models/CreatePlayerCars"
 import { useGameView } from "./useGameView"
 import useUser from "../UserStore"
-import useCrossroadData from "./useCrossroadData"
 import { IMapObject } from "../streetplaner/IMapObject"
 import { NpcCar } from "../../components/3D/NpcCar"
 import { NpcPedestrian } from "../../components/3D/NpcPedestrian"
 import { INpcPosition } from "../../typings/INpcPosition"
 
 const { gameState } = useGameView()
-const { activeLobby, user } = useUser()
+const { activeLobby } = useUser()
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/position"
@@ -20,16 +19,24 @@ const DELETE_MSG = "/app/position.delete"
 const UPDATE_MSG = "/app/position.update"
 
 const NPC_DEST = "/topic/npc"
-const NPC_SET_CLIENT_POS_TOPIC = "/topic/npc/setclientpos"
 const UPDATE_POS_MSG = "/app/npc.updatepos"
-const SET_CLIENT_POS_MSG = "/app/npc.setclientpos"
-
 const fieldSize = 10
 
 let stompClient: Client
 let npcStompClient: Client
 //let npcPositionClient: Client
 
+/**
+ * Interfaces for DTO's tjat contain necessary info to communicate with backend
+ */
+
+/**
+ * interface for DTO that is received from backend and contains
+ * @param id id of the npc that requested update and new information is destined to
+ * @param newGameAssetRotation new rotation of npc
+ * @param nextUpperMapObject replaces current mapObject of npc
+ * @param nextnextUpperMapObject next upper mapObject based on current mapObject
+ */
 interface NpcInfoResponseDTO {
     npcId: number
     newGameAssetRotation: number
@@ -37,6 +44,13 @@ interface NpcInfoResponseDTO {
     nextnextUpperMapObject: IMapObject
 }
 
+/**
+ * interface to send navigation update request to backend
+ * @param mapId id of map that npc is currently moving on
+ * @param npcId id of the npc that requested update
+ * @param npcRotation current rotation of the npc
+ * @param currentMapObject current mapObject that npc is currently on and reached the limit of.
+ */
 interface NpcInfoRequestDTO {
     mapId: number
     npcId: number
@@ -44,6 +58,13 @@ interface NpcInfoRequestDTO {
     currentMapObject: IMapObject
 }
 
+/**
+ * interface for stomp message to be published via stompbroker.
+ * @param npcInfoRequestDTO please see description of interface for npcInfoRequestDTO
+ * @param npcInfoResponseDTO please see description of interface for npcInfoResponseDTO
+ * @param npcPositionContent object that contains infos of the current pixelposition of the npc
+ * @param type type of the broker msg
+ */
 interface INpcStompMessage {
     npcInfoRequestDTO: NpcInfoRequestDTO
     npcInfoResponseDTO?: NpcInfoResponseDTO
@@ -51,11 +72,19 @@ interface INpcStompMessage {
     type: string
 }
 
+/**
+ * interface for messages that contains infos of the current pixelposition of the npc
+ */
+
 interface INpcPositionMsg {
     npcPositionContent: INpcPosition
     type: string
 }
 
+/**
+ * interface for state object that contains all npc objects.
+ * @param npcMap datatype Map, key: id of the npc from backend, value: the instance of the Npc itself.
+ */
 interface INpcState {
     npcMap: Map<number, NpcCar>
 }
@@ -63,10 +92,21 @@ const npcState = reactive<INpcState>({
     npcMap: new Map<number, NpcCar>(),
 })
 
+/**
+ *
+ * @param min min value of random number
+ * @param max max value of given number
+ * @returns random number between the intervall of passed min and max value
+ */
 function randomNumber(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
+/**
+ * method to fill npcMap object of npcState. Iterates over each map Object of gameState mapObjects and
+ * checks if GameAsset arrays contain assets. If so, Array gets iterated and for each value, a new npc is
+ * instance is added to the npcMap object. Based on the objectTypeId, correct instance is choosen from npc subclass.
+ */
 function fillNpcState() {
     npcState.npcMap.clear()
 
@@ -137,7 +177,10 @@ function fillNpcState() {
     })
 }
 
-//activates Websocket for backend communication
+/**
+ * activates Websocket for backend communication
+ * with given parameters
+ */
 function initNpcSocket() {
     npcStompClient = new Client({
         brokerURL: ws_url,
@@ -165,35 +208,11 @@ function initNpcSocket() {
 
     npcStompClient.activate()
 }
-/*
-function initNpcPositionSocket() {
-    npcPositionClient = new Client({
-        brokerURL: ws_url,
-    })
-    npcPositionClient.onWebSocketError = (error) => {
-        console.log("error", error.message)
-    }
-    npcPositionClient.onStompError = (frame) => {
-        console.log("error", frame.body)
-    }
 
-    npcPositionClient.onConnect = (frame) => {
-        npcPositionClient.subscribe(NPC_SET_CLIENT_POS_TOPIC, (message) => {
-            const npcPosUpdate: INpcStompMessage = JSON.parse(message.body)
-            if (user.userId !== activeLobby.value.hostId) {
-                onNpcPositionMessageReceived(npcPosUpdate)
-            }
-        })
-    }
-
-    npcPositionClient.onDisconnect = () => {
-        console.log("npc ws disconnected")
-    }
-
-    npcPositionClient.activate()
-}*/
-
-//emits event to backend with current information, so that next map element can be calculated.
+/**
+ * emits event to backend with current npc information, so that next map element can be calculated
+ * @param npcId id of npc object that needs update of its informations.
+ */
 function updatePosMessage(npcId: number) {
     if (npcStompClient) {
         let tempCar = npcState.npcMap.get(npcId)!
@@ -217,33 +236,20 @@ function updatePosMessage(npcId: number) {
     }
 }
 
-/*function setClientPosMessage(position: INpcPosition) {
-    if (npcStompClient) {
-        const setClientPosMsg: INpcPositionMsg = {
-            npcPositionContent: {
-                npcId: position.npcId,
-                npcPosX: position.npcPosX,
-                npcPosZ: position.npcPosZ,
-                npcRotation: position.npcRotation,
-                npcViewRotation: position.npcViewRotation,
-            },
-
-            type: "SET_CLIENT_POS",
-        }
-
-        npcStompClient.publish({
-            destination: SET_CLIENT_POS_MSG,
-            headers: {},
-            body: JSON.stringify(setClientPosMsg),
-        })
-    }
-}*/
-
-//on update from backend set new values of current mapobj and updated position for corresponding npc car
+/**
+ * on update from backend set new values of current mapobj and updated position for corresponding npc car
+ * @param payload message that is received from backend and contains new position infos
+ * first the parameters of ne npc cars are set to the new received payload values
+ * then based on objectTypeId of reveived new MapObject, further actions are necessary.
+ * if new MapObject is curve or intersections, intern calculation methods of the npc are triggered to induce correct driving behaviour.
+ * In addition, if next mapObjects contains traffic lights the correct traffic light that is facing the npc is calculated and further actions could be
+ * taken based on the current state of the traffic light.
+ */
 async function onNpcMessageReceived(payload: INpcStompMessage) {
     if (payload.type === "NEW_POSITION_RECEIVED") {
         const updateNpcCar = npcState.npcMap.get(payload.npcInfoResponseDTO!.npcId)
 
+        //updating npc values with received info
         updateNpcCar!.lastCarRotation = updateNpcCar!.positions.npcRotation
         updateNpcCar!.curMapObj = payload.npcInfoResponseDTO!.nextUpperMapObject
         updateNpcCar!.nextMapObj = payload.npcInfoResponseDTO!.nextnextUpperMapObject
@@ -251,6 +257,7 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
 
         updateNpcCar!.calcNpcMapLimit()
 
+        //checking objectTapeId of new mapobject to induce correct driving behaviour
         if (
             payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 0 ||
             payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 12 ||
@@ -265,6 +272,8 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
             updateNpcCar!.calculateCurve()
         } else if (payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 2) {
             updateNpcCar!.calculateIntersection()
+
+            //calculate correct traffic light that is facing the npc
             let rotationOfSearchedTrafficLight = -1
             if (updateNpcCar!.lastCarRotation === 0) {
                 rotationOfSearchedTrafficLight = 2
@@ -476,3 +485,59 @@ export function useCarMultiplayer() {
         onNpcMessageReceived,
     }
 }
+
+/**
+ * methods that were designed to add additional websockets an distribute position informations of npcs.
+ */
+/*
+const SET_CLIENT_POS_MSG = "/app/npc.setclientpos"
+const NPC_SET_CLIENT_POS_TOPIC = "/topic/npc/setclientpos"
+
+function initNpcPositionSocket() {
+    npcPositionClient = new Client({
+        brokerURL: ws_url,
+    })
+    npcPositionClient.onWebSocketError = (error) => {
+        console.log("error", error.message)
+    }
+    npcPositionClient.onStompError = (frame) => {
+        console.log("error", frame.body)
+    }
+
+    npcPositionClient.onConnect = (frame) => {
+        npcPositionClient.subscribe(NPC_SET_CLIENT_POS_TOPIC, (message) => {
+            const npcPosUpdate: INpcStompMessage = JSON.parse(message.body)
+            if (user.userId !== activeLobby.value.hostId) {
+                onNpcPositionMessageReceived(npcPosUpdate)
+            }
+        })
+    }
+
+    npcPositionClient.onDisconnect = () => {
+        console.log("npc ws disconnected")
+    }
+
+    npcPositionClient.activate()
+}*/
+
+/*function setClientPosMessage(position: INpcPosition) {
+    if (npcStompClient) {
+        const setClientPosMsg: INpcPositionMsg = {
+            npcPositionContent: {
+                npcId: position.npcId,
+                npcPosX: position.npcPosX,
+                npcPosZ: position.npcPosZ,
+                npcRotation: position.npcRotation,
+                npcViewRotation: position.npcViewRotation,
+            },
+
+            type: "SET_CLIENT_POS",
+        }
+
+        npcStompClient.publish({
+            destination: SET_CLIENT_POS_MSG,
+            headers: {},
+            body: JSON.stringify(setClientPosMsg),
+        })
+    }
+}*/

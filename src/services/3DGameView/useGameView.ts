@@ -15,7 +15,6 @@ const fieldSize = 10
  * Gamestate obj with two lists containing necessary MapObjects
  * @param gameMapObjects : complete List of mapobjects, that is passed to Gameview to be rendered.
  * @param mapObjsFromBackEnd : list of mapobjects that have been placed in Editor, fetched from backend. List gameMapObjects is updated with these values
- *
  */
 interface IGameState {
     gameMapObjects: IMapObject[]
@@ -24,8 +23,7 @@ interface IGameState {
 }
 
 /**
- * GameState obj that which gameMapObjects are passed to the 3D view to be rendered.
- * Map Id is not used yet.
+ * GameState obj  which gameMapObjects are passed to the 3D view to be rendered.
  */
 
 const gameState = reactive<IGameState>({
@@ -42,30 +40,24 @@ export function useGameView() {
         fillGameState,
         updateMapObjsFromGameState,
         setMapWidthAndMapHeight,
-        setGameStateSizes,
+
         setGameStateMapId,
         randomNumber,
     }
 }
 
 /**
- * function to set different size properties of game state, maybe usefull for future purposes with variable map size.
- * @param sizeX width
- * @param sizeY height
- * @param fieldSize size of a single map tile (square)
+ * @param mapId sets the correct mapid to gameState obj.
  */
-function setGameStateSizes(sizeX: number, sizeY: number, fieldSize: number) {}
+function setGameStateMapId(mapId: number) {
+    gameState.mapId = mapId
+}
 
 /**
- *
  * @param width sets counter variable for loop of function fillGameState
  * @param height sets counter variable for loop of function fillGameState
  * coming from GameView
  */
-
-function setGameStateMapId(mapId: number) {
-    gameState.mapId = mapId
-}
 
 function setMapWidthAndMapHeight(width: number, height: number) {
     mapWidth.value = width

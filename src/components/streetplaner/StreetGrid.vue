@@ -44,7 +44,7 @@ const assetSizePx = computed(() => assetSize.value.toString() + "px")
 
 const { userId } = UserStore()
 const { bus, emit } = useEventBus()
-const { setGameStateSizes, setGameStateMapId } = useGameView()
+const { setGameStateMapId } = useGameView()
 const { blockListState, updateBlockList } = useBlockList()
 const {
     initValidator,
@@ -148,7 +148,6 @@ onMounted(() => {
     // get blockList from backend
     // get streetgrid from backend via mapID
 
-    setGameStateSizes(gridSizeY, gridSizeX, gridSize.size)
     initValidator(streetGrid, gridSizeX, gridSizeY)
 
     updateBlockList()
