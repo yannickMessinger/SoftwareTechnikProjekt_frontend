@@ -7,16 +7,35 @@ import { off } from "process"
 import { reactive } from "vue"
 import { SphereGeometry } from "troisjs"
 
+
+/**
+ * Interface to store the traffic light object.
+ * @property {any} currentState is the state of the traffic light.
+ * @property {THREE.Group | null | undefined} object3d 3d Object of the traffic light
+ * @property {number} crId ID of the crossroad the traffic light belongs to.
+ */
 interface ITrafficLight {
     currentState: any
     object3d: THREE.Group | null | undefined
     crId: number
 }
-
+/**
+ * Interface to store a crossroad object
+ * @property {number} crId ID of the crossroad
+ * @property {Map<number, ITrafficLight>} trafficLights Map of the traffic lights in the crossroad.
+ */
 interface ICrossroad {
     crId: number
     trafficLights: Map<number, ITrafficLight>
 }
+
+/**
+ * Describes the properties of a Traffic Light Response Data Transfer Object.
+ * @interface TrafficLightResponseDTO
+ * @property {number} tlId - The ID of the Traffic Light.
+ * @property {string} currentState - The current state of the Traffic Light.
+ * @property {number} crId - The ID of the Crossroad the Traffic Light belongs to.
+ */
 
 interface TrafficLightResponseDTO {
     tlId: number
@@ -24,32 +43,79 @@ interface TrafficLightResponseDTO {
     crId: number
 }
 
+/**
+ * @description Data Transfer Object to store the response of a crossroad.
+ * @typedef {Object} GetCrossroadResponseDTO
+ * @property {number} crId - ID of the crossroad.
+ * @property {Array<TrafficLightResponseDTO>} tl - Array of traffic light information.
+ */
 interface GetCrossroadResponseDTO {
     crId: number
     tl: Array<TrafficLightResponseDTO>
 }
 
+/**
+ * Enum class to store the different traffic light states.
+ */
 enum Light {
     GREEN,
     YELLOW,
     REDYELLOW,
     RED,
 }
-
+/**
+ * Map to store the crossroads.
+ */
 let crossroadMap = new Map<number, ICrossroad>()
+
+/**
+ * Reactive map to store the traffic lights.
+ */
 let trafficLights = reactive(new Map<number, ITrafficLight>())
+
+/**
+ * Loader to load 3D models in GLTF format.
+ */
 const loader = new GLTFLoader()
 
+/**
+ * URL of the WebSocket server.
+ */
 const ws_url = `ws://${window.location.host}/stomp`
+
+/**
+ * Destination for the messages from the WebSocket server.
+ */
 const DEST = "/topic/crossroad"
+
+/**
+ * STOMP client to connect to the WebSocket server.
+ */
 const stompClient = new Client({ brokerURL: ws_url })
+
+/**
+ * @description This function is used to log a message when a WebSocket error occurs in the stompClient.
+ * @function
+ * @param {Event} event - The event object triggered by the WebSocket error.
+ */
 stompClient.onWebSocketError = (event) => {
     console.log("WS Fehler")
 }
+
+/**
+ * @description This function is called when there is an error with the STOMP client.
+ * @function
+ * @param event - The event object for the error.
+ */
 stompClient.onStompError = (event) => {
     console.log("Stomp Fehler")
 }
 
+/**
+ * @description Callback function for when the stomp client connects. 
+ * The function subscribes to the DEST topic and sets the color of the traffic light objects based on the message body.
+ * @param frame - The frame returned from the stomp client connection.
+ */
 stompClient.onConnect = (frame) => {
     stompClient.subscribe(DEST, (message) => {
         if (message.body) {
@@ -94,11 +160,27 @@ stompClient.onConnect = (frame) => {
     })
 }
 
+/**
+ * Event handler for STOMP errors.
+ */
 stompClient.onDisconnect = () => {
     console.log("Verbindung abgebaut")
 }
+/**
+ * Activates the STOMP client connection.
+ */
 stompClient.activate()
 
+/**
+ * Adds a new crossroad to the scene
+ * @async
+ * @function addCrossroad
+ * @param {number} tlAmount - Number of traffic lights in the crossroad
+ * @param {Scene} scene - Scene to add the crossroad to
+ * @param {number} x - X coordinate for the crossroad
+ * @param {number} y - Y coordinate for the crossroad
+ * @param {Map<any, any>} rotationMap - Map containing rotation information
+ */
 async function addCrossroad(tlAmount: number, scene: Scene, x: number, y: number, rotationMap: Map<any, any>) {
     fetch(`/api/crossroad?tlAmount=${tlAmount}`, {
         method: "POST",
@@ -114,6 +196,18 @@ async function addCrossroad(tlAmount: number, scene: Scene, x: number, y: number
         })
 }
 
+/**
+ * Asynchronously fetch a crossroad from the server, load its associated traffic lights, and add them to the 3D scene.
+ *
+ * @async
+ * @function
+ * @param {number} crId - The ID of the crossroad to fetch.
+ * @param {Scene} scene - The THREE.js Scene object representing the 3D scene.
+ * @param {number} x - The x position of the crossroad in the scene.
+ * @param {number} y - The y position of the crossroad in the scene.
+ * @param {Map<any, any>} rotationMap - A map used to determine the rotation of each traffic light.
+ * @throws {Error} If an error occurs while fetching the crossroad or loading the 3D model for the traffic lights.
+ */
 async function getCrossroad(crId: number, scene: Scene, x: number, y: number, rotationMap: Map<any, any>) {
     try {
         const response = await fetch(`/api/crossroad/${crId}`)
@@ -160,6 +254,13 @@ async function getCrossroad(crId: number, scene: Scene, x: number, y: number, ro
     }
 }
 
+/**
+ * Asynchronously deletes a crossroad from the server.
+ * 
+ * @async
+ * @function
+ * @param {number} crId - The ID of the crossroad to be deleted.
+ */
 async function deleteCrossroad(crId: number) {
     fetch(`/api/crossroad/${crId}`, {
         method: "DELETE",
@@ -172,6 +273,11 @@ async function deleteCrossroad(crId: number) {
             console.error("Error:", error)
         })
 }
+
+/**
+ * @function useCrossroadData
+ * @returns An object containing the crossroadMap, trafficLights, and addCrossroad functions.
+ */
 
 export default function useCrossroadData() {
     return {
