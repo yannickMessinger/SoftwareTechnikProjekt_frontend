@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// imports
 import { computed } from "@vue/reactivity"
 import { onMounted, onUnmounted, reactive, watch } from "vue"
 import useEventBus from "../../services/eventBus"
@@ -17,9 +18,11 @@ import { IBlockElement } from "../../models/Editor/IBlockElement"
 import { IGameAsset2D } from "../../models/Editor/IGameAsset2D"
 import { StreetGridDTO } from "../../models/Editor/StreetGridDTO"
 
+// define grid size
 var gridSizeX = 20
 var gridSizeY = 30
 
+// define constants for objectTypeIds of the different elements
 const straightObjTypeId = 0
 const curveObjTypeId = 1
 const intersectionObjTypeId = 2
@@ -41,6 +44,7 @@ const gridSizePx = computed(() => gridSize.size.toString() + "px")
 const assetSize = computed(() => gridSize.size / 4)
 const assetSizePx = computed(() => assetSize.value.toString() + "px")
 
+// import variables and methods of services
 const { userId } = UserStore()
 const { bus, emit } = useEventBus()
 const { setGameStateMapId } = useGameView()
@@ -55,6 +59,7 @@ const {
     checkRailRoadCrossingValid,
 } = useValidation()
 
+// initialize states
 const toolState = reactive({
     tool: ToolEnum.EMPTY,
     block: { objectTypeId: -1, groupId: -1, rotation: 0, texture: "" },
@@ -80,6 +85,7 @@ const streetGrid: IGridElement[][] = reactive(
 )
 fillGridEmpty()
 
+// add watcher for different events
 watch(
     () => bus.value.get("tool-select-event"),
     (val) => {
@@ -157,6 +163,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+    // place random player spawn if non is set
     let playerSpawnMapObject = editorState.mapObjects.filter((mapObject) => {
         return (
             mapObject.game_assets.filter((asset) => {
@@ -760,6 +767,11 @@ function fillGridEmpty() {
     }
 }
 
+/**
+ * calculates the x coordinate of an asset
+ * @param id - html id of parent element
+ * @param relativeX - relative x coordinate of asset inside its parent
+ */
 function calcCoordAssetX(id: string, relativeX: number) {
     let bodyRect = document.body.getBoundingClientRect()
     let element = document.getElementById(id)
@@ -774,6 +786,11 @@ function calcCoordAssetX(id: string, relativeX: number) {
     return posX
 }
 
+/**
+ * calculates the y coordinate of an asset
+ * @param id - html id of parent element
+ * @param relativeY - relative y coordinate of asset inside its parent
+ */
 function calcCoordAssetY(id: string, relativeY: number) {
     let bodyRect = document.body.getBoundingClientRect()
     let element = document.getElementById(id)
