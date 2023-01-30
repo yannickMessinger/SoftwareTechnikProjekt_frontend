@@ -1,4 +1,4 @@
-//needs to be edited to Backend configuration
+//interface for DTO's to receive messages from backend
 
 export interface IAddMyMapsRequestDTO {
     mapName: string

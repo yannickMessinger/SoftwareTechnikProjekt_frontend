@@ -1,8 +1,11 @@
+<!--
+    Displays MyMaps component for Host Player.
+-->
+
 <template>
     <Header :displayHomebutton="true"></Header>
     <div class="container">
         <div class="content">
-            <!--<PlayerList :liste="playerList.playerlist"></PlayerList>-->
             <ActiveLobby></ActiveLobby>
         </div>
         <div class="content">
@@ -17,23 +20,23 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive } from "vue"
+import { onMounted } from "vue"
 import Header from "../components/UI/Header.vue"
 import PlayerList from "../components/Lobby/PlayerList.vue"
 import { usePlayerList } from "../services/User/usePlayerList"
 import ActiveLobby from "../components/Lobby/ActiveLobby.vue"
 import MyMaps from "../components/Lobby/MyMaps.vue"
 import useUser from "../services/User/UserStore"
-import { useMyMaps } from "../services/Lobby/useMyMaps"
+import { useChat } from "../services/Chat/useChat"
 
-const { mapsList, updateMapsList } = useMyMaps()
 const { playerList, fetchPlayerList } = usePlayerList()
-const { userId, hostId, activeLobby } = useUser()
-
-const players = reactive({ value: activeLobby.value.playerList })
+const { userId, hostId, activeLobby, name } = useUser()
+const { connectLobbyChat, disconnectLobbyChat } = useChat(name.value, activeLobby.value)
 
 onMounted(async () => {
     await fetchPlayerList()
+    disconnectLobbyChat()
+    connectLobbyChat()
 })
 </script>
 

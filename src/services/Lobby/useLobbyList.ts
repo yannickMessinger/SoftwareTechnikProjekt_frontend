@@ -29,7 +29,7 @@ const SWITCHMAP_MSG = "/app/lobby.switchMap"
 
 let stompClient: Client
 const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
-const { disconnectLobbyChat, connectLobbyChat } = useChat(user.userName, activeLobby.value)
+const { leaveLobbyChat, connectLobbyChat } = useChat(user.userName, activeLobby.value)
 
 interface IStompMessage {
     playerContent: IUser
@@ -81,7 +81,7 @@ export async function updateLobbyList(): Promise<void> {
     }
 }
 
-//adds new lobby and sends it to backend, then update of lobbylist
+//adds new lobby and sends it to backend, then update of lobbylist and set player as host directly in this lobby.
 export async function createNewLobby(addLobbyName: string, addNumOfPlayers: number, addLobbyMode: E_LobbyMode) {
     const url = "/api/lobby/map/" + activeLobby.value.mapId
 
@@ -123,7 +123,6 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
 purpose to update playerlist of active lobby for all players that joined that particullar lobby.
 */
 function joinMessage() {
-    connectLobbyChat()
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
         //if(activeLobby.value)
         const lobbyMessage: IStompMessage = {
@@ -156,8 +155,8 @@ function joinMessage() {
     }
 }
 
-/*method that fires a "SWITCH_MODE" message to path /app/lobby.switchMode in backend via Websocket connetction.
-Purpose to update Lobbymode of current active Lobby for all players who joined that lobby. */
+/*method that fires a "LEAVE" message to path /app/lobby.leave in backend via Websocket connetction.
+Purpose to inform all players of current active lobby that this player leaves the lobby */
 function leaveLobbyMessage() {
     console.log("LEAVE")
     const leaveLobbyMessage: IStompMessage = {
@@ -182,17 +181,17 @@ function leaveLobbyMessage() {
         },
         type: "LEAVE",
     }
-    disconnectLobbyChat(activeLobby.value.lobbyId)
+    leaveLobbyChat(activeLobby.value.lobbyId)
     stompClient.publish({
         destination: LEAVE_MSG,
         headers: {},
         body: JSON.stringify(leaveLobbyMessage),
     })
 }
-
+/*method that fires a "CREATE" message to path /app/lobby.create in backend via Websocket connetction.
+Purpose to inform all user about new available lobby */
 function createLobbyMessage() {
     console.log("CREATE")
-    connectLobbyChat()
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
         const lobbyMessage: IStompMessage = {
             playerContent: {
@@ -251,7 +250,8 @@ function createLobbyMessage() {
         })
     }
 }
-
+/*method that fires a "CLOSE" message to path /app/lobby.close in backend via Websocket connetction.
+Purpose to close active lobby for all players who joined that lobby. */
 function closeLobbyMessage() {
     console.log("CLOSE")
     const closeLobbyMessage: IStompMessage = {
@@ -276,7 +276,7 @@ function closeLobbyMessage() {
         },
         type: "CLOSE",
     }
-    disconnectLobbyChat(activeLobby.value.lobbyId)
+    leaveLobbyChat(activeLobby.value.lobbyId)
     stompClient.publish({
         destination: CLOSE_MSG,
         headers: {},
@@ -284,6 +284,8 @@ function closeLobbyMessage() {
     })
 }
 
+/*method that fires a "SWITCH_MODE" message to path /app/lobby.switchMode in backend via Websocket connetction.
+Purpose to update Lobbymode of current active Lobby for all players who joined that lobby. */
 function changeLobbyModeMessage() {
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
     }
@@ -316,7 +318,8 @@ function changeLobbyModeMessage() {
         body: JSON.stringify(switchModeMessage),
     })
 }
-
+/*method that fires a "SWITCH_MAP" message to path /app/lobby.switchMap in backend via Websocket connetction.
+Purpose to update map of current active lobby for all players who joined that lobby. */
 function changeMapMessage() {
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
     }
@@ -350,6 +353,8 @@ function changeMapMessage() {
     })
 }
 
+/*method that fires a "DRIVE" message to path /app/lobby.drive in backend via Websocket connetction.
+Purpose to start driving session of current active lobby for all players who joined that lobby. */
 function driveMessage() {
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
     }
@@ -417,6 +422,11 @@ is performing specific actions depending on message type.
 
 If message tpye if of type "JOIN", the playerlist of this current lobby is updated with the payload for all players that joined the lobby.
 If message is of type "SWITCH_MODE", the lobbymode is changed to the payload content of the message for all players of the lobby.
+If message is of type "CREATE", update local lobbylist.
+If message is of type "CLOSE", update local lobbylist with new data from backend, if its your current lobby, reset all local active lobby values to default and switch to lobby overview.
+If message is of type "LEAVE", updates displayed playerlist given from backend and removes player with given entry out of local active lobby playerlist if player is found there.
+If message is of type "DRIVE", pushes player to /game to start drive session for all players. 
+If message is of type "SWITCH_MAP", starts a card-changed event on event bus and pushes player back to /lobbyview
 */
 async function onMessageReceived(payload: IStompMessage) {
     if (payload.type === "CLOSE") {

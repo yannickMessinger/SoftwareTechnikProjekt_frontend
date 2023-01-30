@@ -3,8 +3,14 @@
     If User is host of Lobby, he is allowed to switch the Lobby Modes. If he is not the
     host, buttons that would change the lobby mode are not displayed.
 
-    By clicking on button "Fahren": Lobbymode is changed to playmode
-    By clicking on button "Planungsmodus": Lobbymode is changed to buildmode
+    Displays current lobby name and selected card name. 
+    Displays playerstatus in the lobby (Host or Player)
+    Displays lobby mode (drive mode or build mode)
+    As client displayed, by clicking on button "Lobby verlassen": Player leaves current lobby and return to lobby overview.
+    As host displayed, by clicking on button "Lobby schließen": Host close current lobby and return to lobby overview.
+    As host displayed, by clicking on button "Wechseln": Switches lobbymode for all players in lobby. All player return to lobby.
+    As host in drive mode displayed, by clicking on button "zur Fahransicht": Start drivemode for all players in lobby. All players are redirected to drive mode.
+    In build mode displayed, by clicking on button "zur Bauansicht": Redirect to editor view.
 -->
 
 <template>
@@ -67,12 +73,13 @@ import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
 import { IGetMapByMapIdDTO } from "../../models/Map/IGetMapByMapIdDTO"
 
 const { name, userId, activeLobby, setActiveLobby } = useUser()
-const { connectLobbyChat, disconnectLobbyChat, activeLobbyID } = useChat(name.value, activeLobby.value)
+const { activeLobbyID } = useChat(name.value, activeLobby.value)
 const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage, driveMessage } = useLobbyList()
 const { bus } = useEventBus()
 
 const mapName = ref("")
 
+/**  Update const mapName with current mapName from Backend*/
 getMapName().then((value) => {
     if (value != undefined) {
         const str: string = value
@@ -82,6 +89,7 @@ getMapName().then((value) => {
     }
 })
 
+/** Wait for map change event to update map name when map is changed */
 watch(
     () => bus.value.get("change-map-event"),
     (id) => {
@@ -96,6 +104,7 @@ watch(
     }
 )
 
+/** Switches LobbyModeEnum in active Lobby and sends a Message to all clients to change LobbyMode for all*/
 function changeGamemode() {
     if (activeLobby.value.lobbyModeEnum == E_LobbyMode.PLAY_MODE) {
         activeLobby.value.lobbyModeEnum = E_LobbyMode.BUILD_MODE
@@ -105,22 +114,25 @@ function changeGamemode() {
     useLobbyList().changeLobbyModeMessage()
 }
 
+/** contains the push information for the build mode destination  */
 function goBuild() {
     const url = "/edit"
     router.push(url)
 }
 
+/** contains the push information for the drive mode destination */
 function goDrive() {
     const url = "/game"
     driveMessage()
     router.push(url)
 }
 
+/** deactivate chat, removes player from current lobby in backend, sends closeLobbymessage and set local activeLobby data to default
+ * returns player to'/lobby' view.
+ */
 function closeLobbyClicked() {
-    //TODO: Messaage to Backend that Host Closed the lobby (delete lobby, all lobbyuser return to lobby overview)
     deletePlayerFromLobby()
     closeLobbyMessage()
-    disconnectLobbyChat(activeLobbyID.value)
     setActiveLobby({
         lobbyId: -1,
         hostId: -1,
@@ -133,6 +145,9 @@ function closeLobbyClicked() {
     router.push("/lobby")
 }
 
+/** removes player from current lobby in backend, sends leaveLobbymessage and set local activeLobby data to default
+ *  returns player to'/lobby' view.
+ */
 function leaveLobbyClicked() {
     leaveLobbyMessage()
     deletePlayerFromLobby()
@@ -147,7 +162,7 @@ function leaveLobbyClicked() {
     })
     router.push("/lobby")
 }
-
+/** deletes current player from current lobby in backend */
 async function deletePlayerFromLobby() {
     const url = "/api/lobby/get_players/" + activeLobby.value.lobbyId + "?player_id=" + userId.value
     try {
@@ -159,11 +174,12 @@ async function deletePlayerFromLobby() {
             throw new Error(response.statusText)
         }
     } catch (error) {
-        console.log(" error in remove player from Lobby: " + error)
+        console.warn(" error in remove player from Lobby: " + error)
     }
     useLobbyList().updateLobbyList()
 }
 
+/* recieves name of current map from backend*/
 async function getMapName() {
     const url = "/api/map/" + activeLobby.value.mapId
     try {
@@ -172,7 +188,7 @@ async function getMapName() {
         })
 
         if (!response.ok) {
-            console.log("error in remove player from Lobby I")
+            console.warn("error in remove player from Lobby I")
             throw new Error(response.statusText)
         }
         const result: IGetMapByMapIdDTO = await response.json()
@@ -181,7 +197,7 @@ async function getMapName() {
         }
         return "no name found"
     } catch (error) {
-        console.log(" error in remove player from Lobby: " + error)
+        console.warn(" error in remove player from Lobby: " + error)
     }
 }
 
