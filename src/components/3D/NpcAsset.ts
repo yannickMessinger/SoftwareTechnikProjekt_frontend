@@ -1,8 +1,10 @@
 import { reactive } from "vue"
 import { IMapObject } from "../../services/streetplaner/IMapObject"
 import { INpcPosition } from "../../typings/INpcPosition"
-import { IMapObjCenterCoordinates } from "../../typings/IMapObjCenterCoordinates"
 
+/**
+ * parentclass for npc objects. contains logic for driving straight, driving curves and drive intersections.
+ */
 export class NpcAsset {
     public npcId: number
     public positions: INpcPosition
@@ -95,6 +97,10 @@ export class NpcAsset {
         this.calcNpcMapLimit()
     }
 
+    /**
+     * method to move the npc character. Differs between different mapobjects, such as straights, curves, intersections, traincrossings and
+     * calls correct move method.
+     */
     move() {
         if (
             this.curMapObj.objectTypeId === 0 ||
@@ -114,6 +120,10 @@ export class NpcAsset {
         }
     }
 
+    /**
+     * method to move the npc on straights, depending on the orientation of the npc, velocity value gehts added on the
+     * corresponding coordinate to simulate movement.
+     */
     moveStraight(): void {
         if (this.positions.npcRotation === 0) {
             this.positions.npcPosZ -= this.velocity
@@ -126,6 +136,11 @@ export class NpcAsset {
         }
     }
 
+    /**
+     * method to move npc through curved street elements. Calls method to calculate coordinates (curve points) on the curve that
+     * npc needs to be moved to and the corresponding angle of rotation that is passed to GameView. If npc passed the curve, it
+     * needs a little push to cross mapObject limit and trigger update for the next one.
+     */
     moveCurve(): void {
         if (
             !(
@@ -142,6 +157,10 @@ export class NpcAsset {
         }
     }
 
+    /**
+     * method to calculate coordinates for points that the npc has to be moved to to drive through curve.
+     * viewRotation is calculated accordingly and passed to GameView to show npc car turning through curve.
+     */
     calculateCurvePoints(): void {
         this.positions.npcPosX = this.curveCenterX + Math.cos((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
         this.positions.npcPosZ = this.curveCenterZ - Math.sin((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
@@ -154,6 +173,10 @@ export class NpcAsset {
         }
     }
 
+    /**
+     * Method that calculates the value of the map limit / border of the current mapObject that the npc is currently on.
+     * If npc crosses that border, update is triggered for next mapObject.
+     */
     calcNpcMapLimit(): void {
         if (this.positions.npcRotation === 0) {
             this.mapLimit = this.curMapObj.centerZ3d! - this.fieldSize / 2
@@ -166,6 +189,11 @@ export class NpcAsset {
         }
     }
 
+    /**
+     *
+     * @returns if npc has reached mapObject limit and needs position updare from backend.
+     * is called in a certain intervall of milliseconds to see if npc needs position update.
+     */
     reachedMapEleLimit(): boolean | undefined {
         if (this.positions.npcRotation === 0) {
             if (this.positions.npcPosZ > this.mapLimit) {
@@ -198,6 +226,10 @@ export class NpcAsset {
         }
     }
 
+    /**
+     * method that calculates curve center and curve radius for driving curve of intersection and sets correct parameters
+     * that are necessary to calculate correct curve points / coordinates.
+     */
     calculateIntersection(): void {
         if (
             (this.lastCarRotation === 0 && this.positions.npcRotation === 1) ||
@@ -276,6 +308,11 @@ export class NpcAsset {
         }
     }
 
+    /**
+     * Method to calculate coordinates of positions in curve that npc has to be moved to.
+     * calculates curve center point that rotation is executed around and radius of the curve.
+     * also sets necessary parameters like curve angle and if angle needs to be increased or decreased.
+     */
     calculateCurve(): void {
         if (this.curMapObj.rotation === 0) {
             this.curveCenterX = this.curMapObj.centerX3d! + this.fieldSize / 2
@@ -337,6 +374,13 @@ export class NpcAsset {
         }
     }
 
+    /**
+     *
+     * @param npcPosX new x position that npc needs to be set to
+     * @param npcPosZ new z position that npc needs to be set to
+     * @param npcRotation rotation of the npc for intern logic
+     * @param viewRotation rotation thst is passed to GameView and is displayed in 3d
+     */
     setClientNpcPosition(npcPosX: number, npcPosZ: number, npcRotation: number, viewRotation: number) {
         this.positions.npcPosX = npcPosX
         this.positions.npcPosZ = npcPosZ

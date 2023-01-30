@@ -50,9 +50,9 @@ export default defineComponent({
             fillPlayerCarState,
             playerCarState,
             initNpcSocket,
-            fillNpcCars,
+            fillNpcState,
             updatePosMessage,
-            npcCarState,
+            npcState,
         } = useCarMultiplayer()
 
         const { user, userId, activeLobby } = useUser()
@@ -98,7 +98,7 @@ export default defineComponent({
 
         setMapWidthAndMapHeight(mapWidth, mapHeight)
 
-        /*Map of 3d-model paths*/
+        /*Map of 3d-models and corresponding file paths to load correct gltf model*/
         const buildingIDMap = new Map()
         buildingIDMap.set(0, "/../../../src/assets/3D_Models/Streets/straight_road.gltf")
         buildingIDMap.set(1, "/../../../src/assets/3D_Models/Streets/curved_road.gltf")
@@ -147,6 +147,9 @@ export default defineComponent({
         buildingIDMap.set(58, "/../../../src/assets/3D_Models/Pedestrians/PoliceOfficer.gltf")
         buildingIDMap.set(59, "/../../../src/assets/3D_Models/Pedestrians/Firefighter.gltf")
 
+        /**
+         * Map that translates rotation values for correct rotation values of MapObjects
+         */
         const rotationMap = new Map()
 
         rotationMap.set(0, 0)
@@ -164,7 +167,9 @@ export default defineComponent({
         /*Array of Buildings and Streets passed from 2D Planner*/
         const mapElements = computed(() => gameState.gameMapObjects)
         const playerCarList = computed(() => playerCarState.playerCarMap)
-        const npcEles = computed(() => npcCarState.npcCarMap)
+
+        /*list of all npc's from backend*/
+        const npcEles = computed(() => npcState.npcMap)
 
         /**
          * Fills the payload with userId and movableObject-data for x,z and takes the y element out of quaternion
@@ -281,7 +286,7 @@ export default defineComponent({
 
         watch(
             () => gameState.mapObjsFromBackEnd,
-            () => fillNpcCars()
+            () => fillNpcState()
         )
 
         onBeforeUnmount(() => {
@@ -293,6 +298,7 @@ export default defineComponent({
         })
 
         onMounted(() => {
+            //activates necessary Websocket connections from logic classes.
             updateMapObjsFromGameState()
             initCarUpdateWebsocket()
             initNpcSocket()
@@ -301,6 +307,7 @@ export default defineComponent({
                 movableObject.update()
                 movePlayerCars()
 
+                //creates npc movement through calling move method on every npc from npc list
                 npcEles.value.forEach((ele) => {
                     checkPlayerNPCDistance(ele.positions.npcPosX, ele.positions.npcPosZ, ele.npcId, ele.objectTypeId)
                     if (ele.driving) {
@@ -323,6 +330,9 @@ export default defineComponent({
                 )
             })
 
+            /**
+             *
+             */
             intervalArray.push(
                 setInterval(() => {
                     npcEles.value.forEach((ele) => {
@@ -414,8 +424,7 @@ export default defineComponent({
                     "
                 />
             </div>
-            <!-- places all game assets of the current element-->
-            <!--randomNumber(randomCar)-->
+            <!-- places all game assets of asset list-->
             <div v-for="asset in npcEles">
                 <GltfModel
                     v-bind:src="buildingIDMap.get(asset[1].objectTypeId)"
@@ -446,7 +455,7 @@ export default defineComponent({
                         :scale="{ x: 0.5, y: 0.5, z: 0.5 }"
                         :rotation="{
                             x: 0,
-                            y: 0, //player[1].playerCarRotation[1],
+                            y: 0,
                             z: 0,
                         }"
                         :props="{ name: `player_${player[1].playerCarId}` }"

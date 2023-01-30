@@ -12,7 +12,6 @@ import { INpcPosition } from "../../typings/INpcPosition"
 
 const { gameState } = useGameView()
 const { activeLobby, user } = useUser()
-const { crossroadMap } = useCrossroadData()
 
 const ws_url = `ws://${window.location.host}/stomp`
 const DEST = "/topic/position"
@@ -29,7 +28,7 @@ const fieldSize = 10
 
 let stompClient: Client
 let npcStompClient: Client
-let npcPositionClient: Client
+//let npcPositionClient: Client
 
 interface NpcInfoResponseDTO {
     npcId: number
@@ -57,19 +56,19 @@ interface INpcPositionMsg {
     type: string
 }
 
-interface INpcCarState {
-    npcCarMap: Map<number, NpcCar>
+interface INpcState {
+    npcMap: Map<number, NpcCar>
 }
-const npcCarState = reactive<INpcCarState>({
-    npcCarMap: new Map<number, NpcCar>(),
+const npcState = reactive<INpcState>({
+    npcMap: new Map<number, NpcCar>(),
 })
 
 function randomNumber(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
-function fillNpcCars() {
-    npcCarState.npcCarMap.clear()
+function fillNpcState() {
+    npcState.npcMap.clear()
 
     //adds NpcCar instances to Map for each gameasset from backend
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
@@ -78,7 +77,7 @@ function fillNpcCars() {
                 if (gameAsset.userId === 0) {
                     if (gameAsset.assetId === null) {
                         let tempId = -1
-                        npcCarState.npcCarMap.set(
+                        npcState.npcMap.set(
                             tempId,
                             new NpcCar(
                                 tempId,
@@ -92,7 +91,7 @@ function fillNpcCars() {
                         )
                     } else {
                         if (gameAsset.objectTypeId === 14) {
-                            npcCarState.npcCarMap.set(
+                            npcState.npcMap.set(
                                 gameAsset.assetId!,
                                 new NpcCar(
                                     gameAsset.assetId!,
@@ -105,7 +104,7 @@ function fillNpcCars() {
                                 )
                             )
                         } else if (gameAsset.objectTypeId >= 50 && gameAsset.objectTypeId < 60) {
-                            npcCarState.npcCarMap.set(
+                            npcState.npcMap.set(
                                 gameAsset.assetId!,
                                 new NpcPedestrian(
                                     gameAsset.assetId!,
@@ -118,7 +117,7 @@ function fillNpcCars() {
                                 )
                             )
                         } else {
-                            npcCarState.npcCarMap.set(
+                            npcState.npcMap.set(
                                 gameAsset.assetId!,
                                 new NpcCar(
                                     gameAsset.assetId!,
@@ -154,7 +153,7 @@ function initNpcSocket() {
         npcStompClient.subscribe(NPC_DEST, (message) => {
             const npcUpdate: INpcStompMessage = JSON.parse(message.body)
 
-            if (npcCarState.npcCarMap.get(npcUpdate.npcInfoResponseDTO!.npcId)!.needsMapEleUpdate) {
+            if (npcState.npcMap.get(npcUpdate.npcInfoResponseDTO!.npcId)!.needsMapEleUpdate) {
                 onNpcMessageReceived(npcUpdate)
             }
         })
@@ -197,7 +196,7 @@ function initNpcPositionSocket() {
 //emits event to backend with current information, so that next map element can be calculated.
 function updatePosMessage(npcId: number) {
     if (npcStompClient) {
-        let tempCar = npcCarState.npcCarMap.get(npcId)!
+        let tempCar = npcState.npcMap.get(npcId)!
 
         const updatePosMsg: INpcStompMessage = {
             npcInfoRequestDTO: {
@@ -243,7 +242,7 @@ function updatePosMessage(npcId: number) {
 //on update from backend set new values of current mapobj and updated position for corresponding npc car
 async function onNpcMessageReceived(payload: INpcStompMessage) {
     if (payload.type === "NEW_POSITION_RECEIVED") {
-        const updateNpcCar = npcCarState.npcCarMap.get(payload.npcInfoResponseDTO!.npcId)
+        const updateNpcCar = npcState.npcMap.get(payload.npcInfoResponseDTO!.npcId)
 
         updateNpcCar!.lastCarRotation = updateNpcCar!.positions.npcRotation
         updateNpcCar!.curMapObj = payload.npcInfoResponseDTO!.nextUpperMapObject
@@ -283,6 +282,7 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
     }
 }
 
+/*
 function onNpcPositionMessageReceived(payload: INpcStompMessage) {
     if (payload.type === "SET_CLIENT_POS") {
         if (user.userId !== activeLobby.value.hostId) {
@@ -295,7 +295,7 @@ function onNpcPositionMessageReceived(payload: INpcStompMessage) {
             )
         }
     }
-}
+}*/
 
 //------------------------------------------------------------------------------------------------------------------>
 
@@ -458,15 +458,6 @@ function fillPlayerCarState() {
             })
         }
     })
-    //playerCarState.playerCarMap.set(1, new CreatePlayerCars({ id: 1, x: 0, z: 1, rotation: [0,1,0] })) // remove l8er :D will be later filled with data from set playercars in the editor
-    //playerCarState.playerCarMap.set(2, new CreatePlayerCars({ id: 2, x: 1, z: 1, rotation: [0,1,0] }))
-}
-
-function calcAssetCoordinateX(xCoordCenter: number, xCoordAsset: number) {
-    let originX = xCoordCenter - fieldSize / 2
-    let x = originX + xCoordAsset * fieldSize
-
-    return x
 }
 
 export function useCarMultiplayer() {
@@ -479,16 +470,9 @@ export function useCarMultiplayer() {
         fillPlayerCarState,
         playerCarState,
         initNpcSocket,
-        fillNpcCars,
+        fillNpcState,
         updatePosMessage,
-        npcCarState,
+        npcState,
         onNpcMessageReceived,
     }
-}
-
-function calcAssetCoordinateZ(zCoordCenter: number, yCoordAsset: number) {
-    let originZ = zCoordCenter - fieldSize / 2
-    let z = originZ + yCoordAsset * fieldSize
-
-    return z
 }
