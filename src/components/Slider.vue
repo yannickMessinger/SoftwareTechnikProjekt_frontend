@@ -8,8 +8,12 @@
 <script setup lang="ts">
 import { useGridSize } from "../services/useGridSize"
 
-const { gridSize } = useGridSize()
 const { changeSize } = useGridSize()
+
+/**
+ * Event handler function for handling input changes to grid size.
+ * @param {object} event - Event object triggered by the input change event.
+*/
 function onInput(event: any) {
     changeSize(event.target.value)
 }

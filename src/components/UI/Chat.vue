@@ -85,6 +85,11 @@ let test = unref(activeLobby)
 const test2 = reactive(test)
 const test3 = toRef(test2, "lobbyId")
 
+/**
+ * Scroll the element with ID "msg-chat" to the bottom when the component updates.
+ * @function
+ * @name onUpdated
+ */
 onUpdated(() => {
     let a = document.getElementById("msg-chat")
     if (a) {
@@ -92,6 +97,16 @@ onUpdated(() => {
     }
 })
 
+/**
+ * Append a new message to the chat.
+ * The message will be sent either to the lobby or to a specific chat room,
+ * depending on the value of chatMode.value. The message will be sent using
+ * either sendLobbyMessage or sendMessage function.
+ * If the input value is truthy and the msg-chat element exists, the message will be appended.
+ * The chat history will be limited to chatLength by shifting the oldest messages.
+ * @function
+ * @name appendMessage
+ */
 function appendMessage() {
     let a = document.getElementById("msg-chat")
     if (input.value && a) {
@@ -105,6 +120,12 @@ function appendMessage() {
         input.value = ""
     }
 }
+
+/**
+ * Toggles the visibility of the chat.
+ * @function
+ * @name hideChat
+*/
 function hideChat() {
     visible.value = !visible.value
 }

@@ -5,6 +5,13 @@
 </template>
 
 <script setup lang="ts">
+
+/**
+ * Define component props
+ * @typedef {object} Props
+ * @property {string} [display] - The text to be displayed on the button.
+ * @property {function} [btn_click] - Callback function to be executed when the button is clicked.
+*/
 const props = defineProps({
     display: {
         type: String,
