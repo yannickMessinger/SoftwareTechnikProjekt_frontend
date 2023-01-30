@@ -1,3 +1,18 @@
+<!--
+    Component that represents a table with all current maps.
+
+    Displays card name and creation date for all maps 
+    Displays no maps available, if list is empty
+    Displays lobby mode (drive mode or build mode)
+    Displayed if player has no active lobby, by clicking on button "Lobby Erstellen": Player creates new lobby with chosen card.
+    As host displayed if player has active lobby, by clicking on button "Lobby schließen": Host close current lobby and return to lobby overview.
+    As host displayed for all cards, except selected card, by clicking on button "zu Karte wechseln": 
+        -> Switches current card played in this lobby. Disabled if lobby is in playmode.
+    As host displayes a label to mark current card.
+    Displayed for all cards which are not chosen as active card, by clicking on button "X":
+        -> Deletes current map
+-->
+
 <template>
     <div id="ownCardsContainer">
         <div class="headline">
@@ -85,11 +100,9 @@ import router from "../../router/router"
 import useUser from "../../services/User/UserStore"
 import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
 import { useLobbyList } from "../../services/Lobby/useLobbyList"
-import { IMapDTO } from "../../models/Map/IMapDTO"
-import { IMyMapsState } from "../../models/Map/IMyMapsState"
 import { IGetMapsByPlayerResponseDTO } from "../../models/Map/IGetMapsByPlayerResponseDTO"
 
-const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage } = useLobbyList()
+const { receiveLobbyUpdates } = useLobbyList()
 onMounted(() => {
     //activate websockets connection to listen for incoming updates
     receiveLobbyUpdates()
@@ -104,7 +117,7 @@ const props = defineProps<{
 const { bus, emit } = useEventBus()
 
 /** Variablen: */
-const { user, userId, hostId, activeLobby, setActiveLobby } = useUser()
+const { userId, activeLobby } = useUser()
 const isEmpty = ref(true)
 const numberOfOwnedCards = ref(0)
 const cardList: ICardElement[] = reactive(Array(numberOfOwnedCards.value).fill(null))
@@ -115,9 +128,10 @@ const TogglePopup = () => {
     popupTrigger.value = !popupTrigger.value
 }
 
-/**Card List Data Import from Backend or load default list */
+/**Card List Data Import from Backend */
 getMapsFromBackend()
 
+/**  If user creates a new map, update map list*/
 watch(
     () => bus.value.get("new-map-event"),
     (id) => {
@@ -125,17 +139,19 @@ watch(
     }
 )
 
-/** button functions: */
+/** set map Id to activeLobby.map Id and switches user to lobby create view */
 function createLobbyAction(clickedCard: ICardElement) {
     activeLobby.value.mapId = clickedCard.id
     router.push("/create")
 }
+
+/** changes current map to clicked map*/
 function changeMapAction(clickedCard: ICardElement) {
     activeLobby.value.mapId = clickedCard.id
     changeMapInBackend(clickedCard.id)
 }
 
-/** delete button*/
+/** delete button for maps */
 function cardClickedDeleteAction(clickedCard: any) {
     var removedIndex = cardList.findIndex((cardElement) => cardElement.id == clickedCard.id)
     var removedCard = null
@@ -159,6 +175,7 @@ function cardClickedDeleteAction(clickedCard: any) {
     }
 }
 
+/** change map in backend */
 async function changeMapInBackend(mapId: number) {
     const url = "api/lobby/" + activeLobby.value.lobbyId + "/" + mapId
     try {
@@ -167,16 +184,17 @@ async function changeMapInBackend(mapId: number) {
         })
 
         if (!response.ok) {
-            console.log("error in changing map")
+            console.warn("error in changing map")
             throw new Error(response.statusText)
         }
     } catch (error) {
-        console.log("error in changing map")
+        console.warn("error in changing map")
     }
     emit("change-map-event", mapId)
     changeMapMessage()
 }
 
+/** get map list from backend */
 async function getMapsFromBackend() {
     const url = "api/map/player/" + userId.value
     try {
@@ -185,7 +203,7 @@ async function getMapsFromBackend() {
         })
 
         if (!response.ok) {
-            console.log("error in fetching maplist")
+            console.warn("error in fetching maplist")
             throw new Error(response.statusText)
         }
 
@@ -197,16 +215,15 @@ async function getMapsFromBackend() {
             var newCard: ICardElement = { id: value.mapId, name: value.mapName, date: new Date(value.creationDate) }
             cardList.push(newCard)
         })
-        //mapsState.mapslist = jsondata
-        // mapsState.errormsg = ""
     } catch (error) {
-        console.log("error in updateMapsList")
+        console.warn("error in updateMapsList")
     }
     if (cardList.length > 0) {
         isEmpty.value = false
     }
 }
 
+/** delete map in backend */
 async function deleteMapByGivenId(mapId: number) {
     const url = "/api/map/" + mapId
     try {
@@ -214,25 +231,16 @@ async function deleteMapByGivenId(mapId: number) {
             method: "DELETE",
         })
         if (!response.ok) {
-            console.log("error in remove map")
+            console.warn("error in remove map")
             throw new Error(response.statusText)
         }
     } catch (error) {
-        console.log(" error in remove map: " + error)
+        console.warn(" error in remove map: " + error)
     }
 }
 </script>
 
 <style scoped>
-/** 
-    * {
-        font-family: Circular, -apple-system, BlinkMacSystemFont, Roboto,
-            "Helvetica Neue", sans-serif;
-        font-size: 16px;
-        font-weight: 500;
-        line-height: 20px;
-        }
-    */
 table,
 tr {
     margin: auto;

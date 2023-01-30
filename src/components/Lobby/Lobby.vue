@@ -1,4 +1,7 @@
-<!--List Item that represents single lobby and is embedded in LobbyList, displays Lobby Data Name, the current gaming mode the lobby is set to and the number of active players-->
+<!--
+List Item that represents single lobby and is embedded in LobbyList, displays Lobby Data Name, the current gaming mode the lobby is set to and the number of active players
+    Displayed if lobby is in build mode, by clicking on button "Beitreten": Player joins clicked lobby.
+-->
 
 <template>
     <div class="cell">
@@ -28,7 +31,7 @@ const props = defineProps<{
     lobby: ILobby
 }>()
 
-const { setActiveLobby, name, activeLobby } = useUser()
+const { setActiveLobby } = useUser()
 const { receiveLobbyUpdates, joinMessage } = useLobbyList()
 //const { updateActiveChatLobbyId } = useChat(name.value, )
 
