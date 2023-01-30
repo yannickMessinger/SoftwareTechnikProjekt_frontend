@@ -262,7 +262,8 @@ async function onNpcMessageReceived(payload: INpcStompMessage) {
             payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 0 ||
             payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 12 ||
             payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 9 ||
-            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 11
+            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 11 ||
+            payload.npcInfoResponseDTO!.nextUpperMapObject.objectTypeId === 8
         ) {
             updateNpcCar!.viewRotation = updateNpcCar!.rotationMap.get(updateNpcCar!.positions.npcRotation)!
         } else if (

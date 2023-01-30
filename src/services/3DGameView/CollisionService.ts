@@ -25,7 +25,7 @@ export class CollisionService {
         playerObjectMap: Map<any, any>,
         collisionResetService: any
     ): boolean {
-        if (objects.length == 0) {
+        if (objects.length == 0 && playerObjectMap != null) {
             return false
         } else {
             for (let i = 0; i < objects.length; i++) {
