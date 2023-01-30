@@ -3,7 +3,7 @@ import * as THREE from "three"
 export class BoundingBoxService {
     public objects: any[]
     public boundingBoxes: { id: number; box: THREE.Box3 }[]
-    public relevantIds: any[]
+    public relevantIds: number[]
 
     constructor() {
         this.objects = []
@@ -15,12 +15,19 @@ export class BoundingBoxService {
         return this.boundingBoxes
     }
 
+    /**
+     * Saving the referenz of all children of the scene
+     * @param scene Scene from Trois.js/THREE.js in order to receive all loaded GLTF models
+     */
     setObjects(scene: any): void {
         this.objects.push(...scene.value.scene.children)
         this.init()
         this.createBoundingBox()
     }
 
+    /**
+     * Adds all object Ids to an array which will be used to determine which objects can be collisioned with
+     */
     init() {
         this.relevantIds.push(3)
         this.relevantIds.push(4)
@@ -33,6 +40,9 @@ export class BoundingBoxService {
         //this.relevantIds.push(22) - NPC car
     }
 
+    /**
+     * Creating and saving the relevant BoundingBoxes objects which are needed for collision detection
+     */
     createBoundingBox() {
         for (let i = 0; i < this.objects.length; i++) {
             if (this.relevantIds.includes(this.objects[i].name)) {

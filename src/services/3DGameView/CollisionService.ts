@@ -1,13 +1,14 @@
 import * as THREE from "three"
 import { useCrashSound } from "../useSound"
 import { useCarMultiplayer } from "./useCarMultiplayer"
+import { CollisionResetService } from "./CollisionResetService"
 
 const { positionState } = useCarMultiplayer()
 const { playCrashSound } = useCrashSound()
 
 export class CollisionService {
     public car: any
-    public carBB: any
+    public carBB: THREE.Box3
 
     constructor(car: any) {
         this.car = car
@@ -22,8 +23,8 @@ export class CollisionService {
 
     checkCollision(
         objects: { id: number; box: THREE.Box3 }[],
-        playerObjectMap: Map<any, any>,
-        collisionResetService: any
+        playerObjectMap: Map<number, any>,
+        collisionResetService: CollisionResetService
     ): boolean {
         if (objects.length == 0) {
             return false
