@@ -1,8 +1,8 @@
 import { reactive } from "vue"
-import { IMyMapsListItem } from "../typings/IMyMapsListItem"
-import { IMyMapsState } from "../typings/IMyMapsState"
-import { IAddMyMapsRequestDTO } from "../typings/IAddMyMapsRequestDTO"
-import useEventBus from "./eventBus"
+import { IAddMyMapsRequestDTO } from "../../models/Map/IAddMyMapsRequestDTO"
+import { IMyMapsListItem } from "../../models/Map/IMyMapsListItem"
+import { IMyMapsState } from "../../models/Map/IMyMapsState"
+import useEventBus from "../eventBus"
 
 const mapsState = reactive<IMyMapsState>({
     mapslist: Array<IMyMapsListItem>(),

@@ -16,9 +16,9 @@
 <script setup lang="ts">
 import Chat from "../components/UI/Chat.vue"
 
-import Header from "../components/Header.vue"
-import { useLobbyList } from "../services/useLobbyList"
-import { useMyMaps } from "../services/useMyMaps"
+import Header from "../components/UI/Header.vue"
+import { useLobbyList } from "../services/Lobby/useLobbyList"
+import { useMyMaps } from "../services/Lobby/useMyMaps"
 
 import LobbyList from "../components/Lobby/LobbyList.vue"
 import MyMaps from "../components/Lobby/MyMaps.vue"

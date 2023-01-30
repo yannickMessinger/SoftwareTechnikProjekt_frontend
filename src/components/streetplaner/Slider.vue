@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { useGridSize } from "../services/useGridSize"
+import { useGridSize } from "../../services/Editor/useGridSize"
 
 const { changeSize, gridSize } = useGridSize()
 

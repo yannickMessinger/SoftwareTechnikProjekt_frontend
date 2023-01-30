@@ -1,5 +1,5 @@
 import { reactive } from "vue"
-import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
+import type { IBlockElement } from "../../models/Editor/IBlockElement"
 
 export interface IBlockListState {
     list: Array<IBlockElement>

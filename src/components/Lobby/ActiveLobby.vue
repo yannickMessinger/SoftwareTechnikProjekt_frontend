@@ -56,15 +56,15 @@
 </template>
 
 <script setup lang="ts">
-import useUser from "../../services/UserStore"
+import useUser from "../../services/User/UserStore"
 import Chat from "../UI/Chat.vue"
-import { E_LobbyMode } from "../../typings/E_LobbyMode"
-import { useLobbyList } from "../../services/useLobbyList"
+import { useLobbyList } from "../../services/Lobby/useLobbyList"
 import { useChat } from "../../services/Chat/useChat"
 import { onMounted, ref, watch } from "vue"
 import router from "../../router/router"
-import { IGetMapByMapIdDTO } from "../../typings/IGetMapByMapIdDTO"
 import useEventBus from "../../services/eventBus"
+import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
+import { IGetMapByMapIdDTO } from "../../models/Map/IGetMapByMapIdDTO"
 
 const { name, userId, activeLobby, setActiveLobby } = useUser()
 const { connectLobbyChat, disconnectLobbyChat, activeLobbyID } = useChat(name.value, activeLobby.value)

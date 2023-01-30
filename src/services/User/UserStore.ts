@@ -1,11 +1,11 @@
 import { computed, reactive, readonly } from "vue"
-import IUser from "../typings/IUser"
-import { E_LobbyMode } from "../typings/E_LobbyMode"
-import { ILobby } from "../typings/ILobby"
-import { ILoginStateDTO } from "../typings/ILoginStateDTO"
-import { IGetPlayerWALResponseDTO } from "../typings/IGetPlayerWALResponseDTO"
-import router from "../router/router"
-import { ILobbyDTO } from "../typings/ILobbyDTO"
+import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
+import { ILobby } from "../../models/Lobby/ILobby"
+import { ILobbyDTO } from "../../models/Lobby/ILobbyDTO"
+import { ILoginStateDTO } from "../../models/Login/ILoginStateDTO"
+import { IGetPlayerWALResponseDTO } from "../../models/User/IGetPlayerWALResponseDTO"
+import IUser from "../../models/User/IUser"
+import router from "../../router/router"
 
 let reloginTried = false
 

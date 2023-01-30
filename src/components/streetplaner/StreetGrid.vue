@@ -1,22 +1,21 @@
 <script setup lang="ts">
 import { computed } from "@vue/reactivity"
 import { onMounted, onUnmounted, reactive, watch } from "vue"
-import type { IGridElement } from "../../services/streetplaner/IGridElement"
 import useEventBus from "../../services/eventBus"
-import ToolEnum from "../../services/streetplaner/ToolEnum"
-import { useGridSize } from "../../services/useGridSize"
-
-import { useBlockList } from "../../services/streetplaner/useBlockList"
-import { postStreetGrid } from "../../services/streetplaner/useStreetGridList"
-import { IBlockElement } from "../../services/streetplaner/IBlockElement"
-import { IMapObject } from "../../services/streetplaner/IMapObject"
-import { StreetGridDTO } from "../../services/streetplaner/StreetGridDTO"
-import useUser from "../../services/UserStore"
-import UserStore from "../../services/UserStore"
+import { useGridSize } from "../../services/Editor/useGridSize"
+import useUser from "../../services/User/UserStore"
+import UserStore from "../../services/User/UserStore"
 import { useEditor } from "../../services/Editor/useEditor"
 import { useGameView } from "../../services/3DGameView/useGameView"
-import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
-import { useValidation } from "../../services/streetplaner/useValidation"
+import { useBlockList } from "../../services/Editor/useBlockList"
+import { useValidation } from "../../services/Editor/useValidation"
+import { postStreetGrid } from "../../services/Editor/useStreetGridList"
+import ToolEnum from "../../models/Editor/ToolEnum"
+import { IGridElement } from "../../models/Editor/IGridElement"
+import { IMapObject } from "../../models/Editor/IMapObject"
+import { IBlockElement } from "../../models/Editor/IBlockElement"
+import { IGameAsset2D } from "../../models/Editor/IGameAsset2D"
+import { StreetGridDTO } from "../../models/Editor/StreetGridDTO"
 
 var gridSizeX = 20
 var gridSizeY = 30
@@ -160,7 +159,7 @@ onMounted(() => {
 onUnmounted(() => {
     let playerSpawnMapObject = editorState.mapObjects.filter((mapObject) => {
         return (
-            mapObject.game_assets.filter((asset) => {
+            mapObject.game_assets.filter((asset: any) => {
                 return asset.userId === userId.value
             }).length > 0
         )
@@ -515,7 +514,7 @@ function onClick(cell: any, e: any) {
                 if (toolState.block.objectTypeId === playerSpawnObjTypeId) {
                     // if asset is spawnpoint
                     let oldSpawnCell = editorState.mapObjects.filter(
-                        (ele) => ele.game_assets.filter((asset) => asset.userId === userId.value).length
+                        (ele) => ele.game_assets.filter((asset: any) => asset.userId === userId.value).length
                     )
                     for (let oldCell of oldSpawnCell) {
                         payload = {
@@ -523,7 +522,7 @@ function onClick(cell: any, e: any) {
                             x: oldCell.x,
                             y: oldCell.y,
                             rotation: oldCell.rotation,
-                            game_assets: oldCell.game_assets.filter((asset) => asset.userId !== userId.value),
+                            game_assets: oldCell.game_assets.filter((asset: any) => asset.userId !== userId.value),
                         }
 
                         updateMessage(payload)

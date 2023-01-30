@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Login from "../components/UI/Login.vue"
-import Header from "../components/Header.vue"
+import Header from "../components/UI/Header.vue"
 
 /** */
 </script>

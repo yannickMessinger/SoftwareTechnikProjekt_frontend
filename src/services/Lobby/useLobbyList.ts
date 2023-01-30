@@ -3,18 +3,18 @@
  */
 
 import { reactive } from "vue"
-import { IAddLobbyRequestDTO } from "../typings/IAddLobbyRequestDTO"
-import { E_LobbyMode } from "../typings/E_LobbyMode"
-import { ILobbyListState } from "../typings/ILobbyListState"
-import { ILobby } from "../typings/ILobby"
-import useUser from "./UserStore"
-import { ILobbyDTO } from "../typings/ILobbyDTO"
+import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
+import useUser from "../User/UserStore"
 import { Client } from "@stomp/stompjs"
-import { fetchPlayerList } from "./usePlayerList"
-import { useChat } from "./Chat/useChat"
-import IUser from "../typings/IUser"
-import router from "../router/router"
-import useEventBus from "./eventBus"
+import { fetchPlayerList } from "../User/usePlayerList"
+import { useChat } from "../Chat/useChat"
+import router from "../../router/router"
+import useEventBus from "../eventBus"
+import IUser from "../../models/User/IUser"
+import { ILobby } from "../../models/Lobby/ILobby"
+import { ILobbyListState } from "../../models/Lobby/ILobbyListState"
+import { ILobbyDTO } from "../../models/Lobby/ILobbyDTO"
+import { IAddLobbyRequestDTO } from "../../models/Lobby/IAddLobbyRequestDTO"
 
 const { emit } = useEventBus()
 const ws_url = `ws://${window.location.host}/stomp`
@@ -446,7 +446,7 @@ async function onMessageReceived(payload: IStompMessage) {
         if (payload.type === "LEAVE") {
             await fetchPlayerList()
             var index = activeLobby.value.playerList?.findIndex(
-                (element) => element.userId == payload.playerContent.userId
+                (element: any) => element.userId == payload.playerContent.userId
             )
             if (index != undefined) {
                 switch (index) {

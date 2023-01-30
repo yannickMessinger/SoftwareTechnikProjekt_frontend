@@ -11,8 +11,8 @@
 </template>
 
 <script setup lang="ts">
+import { ILobby } from "../../models/Lobby/ILobby"
 import Lobby from "./Lobby.vue"
-import { ILobby } from "../../typings/ILobby"
 
 //Lobbylist passed from backend
 const props = defineProps<{

@@ -35,10 +35,10 @@
 </template>
 
 <script setup lang="ts">
-import router from "../router/router"
-import BasicButton from "./Buttons/BasicButton.vue"
-import useUser from "../services/UserStore"
-import useEventBus from "../services/eventBus"
+import router from "../../router/router"
+import BasicButton from "../Buttons/BasicButton.vue"
+import useUser from "../../services/User/UserStore"
+import useEventBus from "../../services/eventBus"
 import { ref, watch } from "vue"
 
 const { logout, activeLobby, logindata } = useUser()
@@ -92,6 +92,6 @@ span {
     background-color: var(--woe-white-almost);
     background-size: cover;
     background-position: center;
-    background-image: url("../assets/Icons/Home.svg");
+    background-image: url("../../assets/Icons/Home.svg");
 }
 </style>

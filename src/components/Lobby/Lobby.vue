@@ -17,12 +17,12 @@
 </template>
 
 <script setup lang="ts">
-import { ILobby } from "../../typings/ILobby"
-import useUser from "../../services/UserStore"
+import useUser from "../../services/User/UserStore"
 import router from "../../router/router"
-import { useLobbyList } from "../../services/useLobbyList"
+import { useLobbyList } from "../../services/Lobby/useLobbyList"
 import { onMounted } from "vue"
-import { E_LobbyMode } from "../../typings/E_LobbyMode"
+import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
+import { ILobby } from "../../models/Lobby/ILobby"
 
 const props = defineProps<{
     lobby: ILobby

@@ -1,6 +1,6 @@
 import { computed, reactive, readonly } from "vue"
-import { IPlayerListState } from "../typings/IPlayerListState"
-import IUser from "../typings/IUser"
+import { IPlayerListState } from "../../models/User/IPlayerListState"
+import IUser from "../../models/User/IUser"
 import useUser from "./UserStore"
 
 const { activeLobby, setActiveLobby, updateActiveLobbyPlayerList } = useUser()

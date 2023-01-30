@@ -1,6 +1,6 @@
 import { reactive, ref } from "vue"
-import { IMapObject } from "../streetplaner/IMapObject"
-import useUser from "../UserStore"
+import { IMapObject } from "../../models/Editor/IMapObject"
+import useUser from "../User/UserStore"
 
 const { activeLobby } = useUser()
 

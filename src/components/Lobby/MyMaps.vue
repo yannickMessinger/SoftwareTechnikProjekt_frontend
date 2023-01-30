@@ -79,15 +79,15 @@
 <script setup lang="ts">
 import AddMapPopup from "./AddMapPopup.vue"
 import { onMounted, reactive, ref, watch } from "vue"
-import type { ICardElement } from "../../services/Lobby/ICardElement"
+import type { ICardElement } from "../../models/Lobby/ICardElement"
 import useEventBus from "../../services/eventBus"
 import router from "../../router/router"
-import useUser from "../../services/UserStore"
-import { IMapDTO } from "../../typings/IMapDTO"
-import { IMyMapsState } from "../../typings/IMyMapsState"
-import { IGetMapsByPlayerResponseDTO } from "../../typings/IGetMapsByPlayerResponseDTO"
-import { E_LobbyMode } from "../../typings/E_LobbyMode"
-import { useLobbyList } from "../../services/useLobbyList"
+import useUser from "../../services/User/UserStore"
+import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
+import { useLobbyList } from "../../services/Lobby/useLobbyList"
+import { IMapDTO } from "../../models/Map/IMapDTO"
+import { IMyMapsState } from "../../models/Map/IMyMapsState"
+import { IGetMapsByPlayerResponseDTO } from "../../models/Map/IGetMapsByPlayerResponseDTO"
 
 const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage } = useLobbyList()
 onMounted(() => {

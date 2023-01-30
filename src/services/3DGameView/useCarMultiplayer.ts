@@ -1,13 +1,13 @@
 import { Client } from "@stomp/stompjs"
 import { reactive } from "vue"
-import { IPosition } from "../../typings/IPosition"
-import { CreatePlayerCars } from "../../models/CreatePlayerCars"
+import { CreatePlayerCars } from "../../models/3D/CreatePlayerCars"
 import { useGameView } from "./useGameView"
-import useUser from "../UserStore"
-import { IMapObject } from "../streetplaner/IMapObject"
-import { NpcCar } from "../../components/3D/NpcCar"
-import { NpcPedestrian } from "../../components/3D/NpcPedestrian"
-import { INpcPosition } from "../../typings/INpcPosition"
+import useUser from "../User/UserStore"
+import { NpcCar } from "../../models/3D/NpcCar"
+import { NpcPedestrian } from "../../models/3D/NpcPedestrian"
+import { INpcPosition } from "../../models/3D/INpcPosition"
+import { IPosition } from "../../models/3D/IPosition"
+import { IMapObject } from "../../models/Editor/IMapObject"
 
 const { gameState } = useGameView()
 const { activeLobby } = useUser()
@@ -113,7 +113,7 @@ function fillNpcState() {
     //adds NpcCar instances to Map for each gameasset from backend
     gameState.mapObjsFromBackEnd.forEach((mapObj) => {
         if (mapObj.game_assets.length > 0) {
-            mapObj.game_assets.forEach((gameAsset) => {
+            mapObj.game_assets.forEach((gameAsset: any) => {
                 if (gameAsset.userId === 0) {
                     if (gameAsset.assetId === null) {
                         let tempId = -1
@@ -452,7 +452,7 @@ function fillPosition(payload: IStompMessage) {
 function fillPlayerCarState() {
     gameState.mapObjsFromBackEnd.forEach((mapObject) => {
         if (mapObject.game_assets.length > 0) {
-            mapObject.game_assets.forEach((game_asset) => {
+            mapObject.game_assets.forEach((game_asset: any) => {
                 if (game_asset.userId! > 0) {
                     playerCarState.playerCarMap.set(
                         game_asset.userId!,

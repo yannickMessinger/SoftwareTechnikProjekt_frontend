@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**Imports: */
 import { reactive, ref, watch } from "vue"
-import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
+import { IBlockElement } from "../../models/Editor/IBlockElement"
 import useEventBus from "../../services/eventBus"
 import BasicButton from "../Buttons/BasicButton.vue"
 

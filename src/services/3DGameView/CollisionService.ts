@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { useCrashSound } from "../useSound"
+import { useCrashSound } from "../Sound/useSound"
 import { useCarMultiplayer } from "./useCarMultiplayer"
 
 const { positionState } = useCarMultiplayer()

@@ -1,5 +1,5 @@
 import { reactive } from "vue"
-import { IPosition } from "../typings/IPosition"
+import { IPosition } from "./IPosition"
 
 export class CreatePlayerCars {
     public playerCarId: number

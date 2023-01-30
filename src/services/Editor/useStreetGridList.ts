@@ -1,6 +1,6 @@
 import { reactive } from "vue"
-import { IMapObject } from "./IMapObject"
-import { StreetGridDTO } from "./StreetGridDTO"
+import { IMapObject } from "../../models/Editor/IMapObject"
+import { StreetGridDTO } from "../../models/Editor/StreetGridDTO"
 
 const streetGridDTO = reactive({ mapObjects: Array<IMapObject>() })
 

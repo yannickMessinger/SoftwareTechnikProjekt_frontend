@@ -1,6 +1,6 @@
 import { reactive } from "vue"
-import { IMapObject } from "../../services/streetplaner/IMapObject"
-import { INpcPosition } from "../../typings/INpcPosition"
+import { IMapObject } from "../Editor/IMapObject"
+import { INpcPosition } from "./INpcPosition"
 
 /**
  * parentclass for npc objects. contains logic for driving straight, driving curves and drive intersections.

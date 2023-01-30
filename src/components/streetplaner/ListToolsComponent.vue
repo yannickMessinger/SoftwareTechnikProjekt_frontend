@@ -1,11 +1,11 @@
 <script setup lang="ts">
 /**Imports: */
 import { reactive } from "vue"
-import type { IToolElement } from "../../services/streetplaner/IToolElement"
 import useEventBus from "../../services/eventBus"
-import ToolEnum from "../../services/streetplaner/ToolEnum"
 import RandomVehicleDialog from "./RandomVehicleDialog.vue"
 import { createConfirmDialog } from "vuejs-confirm-dialog"
+import { IToolElement } from "../../models/Editor/IToolElement"
+import ToolEnum from "../../models/Editor/ToolEnum"
 
 /**Variables: */
 const pathToPictures = "/img/streetplaner/"

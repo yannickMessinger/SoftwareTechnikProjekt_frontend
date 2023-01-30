@@ -1,7 +1,6 @@
 import { CompatClient, Stomp, StompSubscription } from "@stomp/stompjs"
-import { IPosition } from "../typings/IPosition"
-import useUser from "./UserStore"
-
+import { IPosition } from "../../models/3D/IPosition"
+import useUser from "../User/UserStore"
 const { user } = useUser()
 const ws_url = "ws://localhost:8080/stomp"
 const DEST = "/topic/sound/"

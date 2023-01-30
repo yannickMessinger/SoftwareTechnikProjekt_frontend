@@ -1,5 +1,5 @@
+import IUser from "../User/IUser"
 import { E_LobbyMode } from "./E_LobbyMode"
-import IUser from "./IUser"
 
 export interface ILobbyDTO {
     lobbyId: number

@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import BasicButton from "../components/Buttons/BasicButton.vue"
-import Header from "../components/Header.vue"
+import Header from "../components/UI/Header.vue"
 import router from "../router/router"
 import Chat from "../components/UI/Chat.vue"
 

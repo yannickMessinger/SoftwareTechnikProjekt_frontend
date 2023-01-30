@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import SkelletonTrois from "../components/3D/GameView.vue"
 import HUD from "../components/3D/HUD.vue"
-import Header from "../components/Header.vue"
+import Header from "../components/UI/Header.vue"
 import Chat from "../components/UI/Chat.vue"
 </script>
 

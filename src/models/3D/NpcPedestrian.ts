@@ -1,4 +1,4 @@
-import { IMapObject } from "../../services/streetplaner/IMapObject"
+import { IMapObject } from "../Editor/IMapObject"
 import { NpcAsset } from "./NpcAsset"
 
 export class NpcPedestrian extends NpcAsset {

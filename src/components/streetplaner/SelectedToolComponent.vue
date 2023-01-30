@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**Imports: */
 import { reactive, watch } from "vue"
-import type { IToolElement } from "../../services/streetplaner/IToolElement"
+import { IToolElement } from "../../models/Editor/IToolElement"
+import ToolEnum from "../../models/Editor/ToolEnum"
 import useEventBus from "../../services/eventBus"
-import ToolEnum from "../../services/streetplaner/ToolEnum"
 
 /**Variables: */
 const pathToPictures = "/img/streetplaner/"

@@ -18,13 +18,13 @@
 
 <script setup lang="ts">
 import { onMounted, reactive } from "vue"
-import Header from "../components/Header.vue"
+import Header from "../components/UI/Header.vue"
 import PlayerList from "../components/Lobby/PlayerList.vue"
-import { usePlayerList } from "../services/usePlayerList"
+import { usePlayerList } from "../services/User/usePlayerList"
 import ActiveLobby from "../components/Lobby/ActiveLobby.vue"
 import MyMaps from "../components/Lobby/MyMaps.vue"
-import useUser from "../services/UserStore"
-import { useMyMaps } from "../services/useMyMaps"
+import useUser from "../services/User/UserStore"
+import { useMyMaps } from "../services/Lobby/useMyMaps"
 
 const { mapsList, updateMapsList } = useMyMaps()
 const { playerList, fetchPlayerList } = usePlayerList()

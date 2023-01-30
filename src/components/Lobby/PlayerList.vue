@@ -16,9 +16,9 @@
 
 <script setup lang="ts">
 import PlayerListItem from "./PlayerListItem.vue"
-import IUser from "../../typings/IUser"
-import { usePlayerList } from "../../services/usePlayerList"
+import { usePlayerList } from "../../services/User/usePlayerList"
 import { onMounted } from "vue"
+import IUser from "../../models/User/IUser"
 
 //PlayerList passed from backend
 const props = defineProps<{

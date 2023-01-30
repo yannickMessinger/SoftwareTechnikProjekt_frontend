@@ -1,6 +1,6 @@
 //interface for single lobby object, aleady with optional host and playerlist arguments
+import IUser from "../User/IUser"
 import { E_LobbyMode } from "./E_LobbyMode"
-import IUser from "./IUser"
 
 export interface ILobby {
     lobbyId: number

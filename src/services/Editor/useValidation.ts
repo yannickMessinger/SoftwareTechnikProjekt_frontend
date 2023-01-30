@@ -1,6 +1,5 @@
-import { reactive } from "vue"
-import { IGridElement } from "./IGridElement"
-import { IMapObject } from "./IMapObject"
+import { IGridElement } from "../../models/Editor/IGridElement"
+import { IMapObject } from "../../models/Editor/IMapObject"
 
 const straightObjTypeId = 0
 const curveObjTypeId = 1

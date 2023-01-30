@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue"
+import { IGameAsset2D } from "../../models/Editor/IGameAsset2D"
 import { useEditor } from "../../services/Editor/useEditor"
-import useUser from "../../services/UserStore"
-import { IGameAsset2D } from "../../services/streetplaner/IGameAsset2D"
+import useUser from "../../services/User/UserStore"
 
 const emit = defineEmits(["confirm", "cancel"])
 const { editorState } = useEditor(useUser().activeLobby.value.mapId)

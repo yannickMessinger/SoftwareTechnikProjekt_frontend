@@ -1,12 +1,10 @@
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
-import { IMapObject } from "../streetplaner/IMapObject"
 import { Scene } from "three"
 import { Client } from "@stomp/stompjs"
 import { off } from "process"
 import { reactive } from "vue"
 import { SphereGeometry } from "troisjs"
-
 
 /**
  * Interface to store the traffic light object.
@@ -112,7 +110,7 @@ stompClient.onStompError = (event) => {
 }
 
 /**
- * @description Callback function for when the stomp client connects. 
+ * @description Callback function for when the stomp client connects.
  * The function subscribes to the DEST topic and sets the color of the traffic light objects based on the message body.
  * @param frame - The frame returned from the stomp client connection.
  */
@@ -256,7 +254,7 @@ async function getCrossroad(crId: number, scene: Scene, x: number, y: number, ro
 
 /**
  * Asynchronously deletes a crossroad from the server.
- * 
+ *
  * @async
  * @function
  * @param {number} crId - The ID of the crossroad to be deleted.

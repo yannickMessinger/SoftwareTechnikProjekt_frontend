@@ -30,9 +30,9 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
-import { createNewLobby, updateLobbyList, useLobbyList } from "../../services/useLobbyList"
-import { useMyMaps } from "../../services/useMyMaps"
-import { E_LobbyMode } from "../../typings/E_LobbyMode"
+import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
+import { createNewLobby, updateLobbyList, useLobbyList } from "../../services/Lobby/useLobbyList"
+import { useMyMaps } from "../../services/Lobby/useMyMaps"
 import LobbyList from "./LobbyList.vue"
 import MyMaps from "./MyMaps.vue"
 

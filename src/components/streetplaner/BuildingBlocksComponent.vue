@@ -1,10 +1,10 @@
 <script setup lang="ts">
 /**Imports: */
 import { onMounted, reactive, ref, watch } from "vue"
-import type { IBlockElement } from "../../services/streetplaner/IBlockElement"
+import { IBlockElement } from "../../models/Editor/IBlockElement"
+import ToolEnum from "../../models/Editor/ToolEnum"
+import { IBlockListState, useBlockList } from "../../services/Editor/useBlockList"
 import useEventBus from "../../services/eventBus"
-import ToolEnum from "../../services/streetplaner/ToolEnum"
-import { IBlockListState, useBlockList } from "../../services/streetplaner/useBlockList"
 
 /**Variables: */
 const pathToPictures = "/img/streetplaner/"
