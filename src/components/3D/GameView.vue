@@ -403,7 +403,7 @@ export default defineComponent({
 
 <template>
     <Renderer resize="window" ref="renderer">
-        <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }" :far="80"> </Camera>
+        <Camera ref="camera" :position="{ x: 0, y: 0, z: 0 }" :look-at="{ x: 0, y: 0, z: -1 }" :far="200"> </Camera>
         <Box
             ref="box"
             :position="{ x: playerCarList.get(uid)?.playerCarX, y: 0.75, z: playerCarList.get(uid)?.playerCarZ }"

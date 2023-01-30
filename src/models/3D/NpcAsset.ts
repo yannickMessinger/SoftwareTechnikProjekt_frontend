@@ -106,7 +106,8 @@ export class NpcAsset {
             this.curMapObj.objectTypeId === 0 ||
             this.curMapObj.objectTypeId === 12 ||
             this.curMapObj.objectTypeId === 9 ||
-            this.curMapObj.objectTypeId === 11
+            this.curMapObj.objectTypeId === 11 ||
+            this.curMapObj.objectTypeId === 8
         ) {
             this.moveStraight()
         } else if (this.curMapObj.objectTypeId === 1 || this.curMapObj.objectTypeId === 10) {
