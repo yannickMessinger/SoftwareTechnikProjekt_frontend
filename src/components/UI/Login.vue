@@ -82,6 +82,15 @@ const usernameError = ref("")
 const passwordError = ref("")
 connectGlobalChat()
 
+/**
+ * Performs a login check.
+ * 
+ * Makes a call to the `login` function with the provided `username.value` and `password.value` as arguments.
+ * If the response body has properties `userId` and `userName`, the user is redirected to the `/lobby` route.
+ * Otherwise, an error message is set in the `usernameError.value` property.
+ * 
+ * @async
+ */
 async function loginCheck() {
     let responseBody = await login(username.value, password.value)
 
@@ -92,6 +101,20 @@ async function loginCheck() {
     }
 }
 
+/**
+ * Performs a registration check.
+ * 
+ * Clears any existing error messages in the `usernameError.value` and `passwordError.value` properties.
+ * If the `password.value` and `passwordRepeat.value` are equal, a call to the `register` function is made with the `username.value` and `password.value` as arguments.
+ * Depending on the response body, the following actions are performed:
+ *  - If response is -1, sets error messages in both `usernameError.value` and `passwordError.value` properties to "Ungültige Eingabe".
+ *  - If response is -2, sets error message in `usernameError.value` property to "Username bereits vergeben".
+ *  - If response is null, does nothing.
+ *  - Otherwise, calls the `toggleMode` function.
+ * If the `password.value` and `passwordRepeat.value` are not equal, sets error message in the `passwordError.value` property to "Passwort stimmt nicht überein".
+ * 
+ * @async
+ */
 async function registrationCheck() {
     usernameError.value = ""
     passwordError.value = ""
@@ -116,6 +139,15 @@ async function registrationCheck() {
     }
 }
 
+/**
+ * Toggles the registration mode.
+ * 
+ * Inverts the value of the `registrationMode.value` property.
+ * If `registrationMode.value` is `true`, sets the `headline.value` property to "Registrieren".
+ * Otherwise, sets the `headline.value` property to "Login".
+ * Clears the values of the `username.value`, `password.value`, and `passwordRepeat.value` properties.
+ * Clears the error message in the `usernameError.value` property.
+ */
 function toggleMode() {
     registrationMode.value = !registrationMode.value
     registrationMode.value == true ? (headline.value = "Registrieren") : (headline.value = "Login")
