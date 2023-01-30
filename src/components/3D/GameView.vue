@@ -240,20 +240,6 @@ export default defineComponent({
             })
         }
 
-        function checkPlayerCarDistance(posX: number, posZ: number, carId: number) {
-            const MAX_HEARING_DISTANCE = 30
-            let distanceX = movableObject.getPositionX() - posX
-            let distanceZ = movableObject.getPositionZ() - posZ
-
-            let distance = Math.abs(distanceX) + Math.abs(distanceZ)
-
-            if (distance < MAX_HEARING_DISTANCE) {
-                playEngineFromOtherCar(carId, distance)
-            } else {
-                pauseEngineFromOtherCar(carId)
-            }
-        }
-
         /**
          * method for testing to implement simple game logic where npc pedestrians could be picked up by player
          * and be driven to random generated target point on map.
@@ -274,7 +260,13 @@ export default defineComponent({
             }
         }
 
-        function checkPlayerNPCDistance(posX: number, posZ: number, carId: number, objectTypeId: number) {
+        /**
+         * Calculate distance and call service method which plays the volume louder or quieter depending on the distance
+         * @param posX x pos of player car
+         * @param posZ y pos of player car
+         * @param carId to differentiate the individual cars on the map
+         */
+        function checkPlayerCarDistance(posX: number, posZ: number, carId: number) {
             const MAX_HEARING_DISTANCE = 30
             let distanceX = movableObject.getPositionX() - posX
             let distanceZ = movableObject.getPositionZ() - posZ
@@ -282,9 +274,29 @@ export default defineComponent({
             let distance = Math.abs(distanceX) + Math.abs(distanceZ)
 
             if (distance < MAX_HEARING_DISTANCE) {
-                playEngineFromNPC(carId, distance, objectTypeId)
+                playEngineFromOtherCar(carId, distance)
             } else {
-                pauseEngineFromNPC(carId)
+                pauseEngineFromOtherCar(carId)
+            }
+        }
+
+        /**
+         * Calculate distance for npcs and call service method which plays the volume louder or quieter depending on the distance
+         * @param posX x pos of player car
+         * @param posZ y pos of player car
+         * @param carId to differentiate the individual cars on the map
+         */
+        function checkPlayerNPCDistance(posX: number, posZ: number, id: number, objectTypeId: number) {
+            const MAX_HEARING_DISTANCE = 30
+            let distanceX = movableObject.getPositionX() - posX
+            let distanceZ = movableObject.getPositionZ() - posZ
+
+            let distance = Math.abs(distanceX) + Math.abs(distanceZ)
+
+            if (distance < MAX_HEARING_DISTANCE) {
+                playEngineFromNPC(id, distance, objectTypeId)
+            } else {
+                pauseEngineFromNPC(id)
             }
         }
 
@@ -355,7 +367,6 @@ export default defineComponent({
                     })
                 }, 500)
             )
-
             initAmbientSound()
 
             /**
