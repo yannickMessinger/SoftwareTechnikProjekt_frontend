@@ -121,7 +121,7 @@ export class NpcAsset {
     }
 
     /**
-     * method to move the npc on straights, depending on the orientation of the npc, velocity value gehts added on the
+     * method to move the npc on straights, depending on the orientation of the npc, velocity value gets added on the
      * corresponding coordinate to simulate movement.
      */
     moveStraight(): void {
@@ -158,8 +158,8 @@ export class NpcAsset {
     }
 
     /**
-     * method to calculate coordinates for points that the npc has to be moved to to drive through curve.
-     * viewRotation is calculated accordingly and passed to GameView to show npc car turning through curve.
+     * method to calculate coordinates along the curve so that the npc is moved step by step, to make it move smoothly.
+     * viewRotation is increased or decreased accordingly by 90 degrees and passed to GameView to show npc car turning steadily through curve.
      */
     calculateCurvePoints(): void {
         this.positions.npcPosX = this.curveCenterX + Math.cos((this.currCurveAngle * Math.PI) / 180) * this.curveRadius
@@ -191,7 +191,7 @@ export class NpcAsset {
 
     /**
      *
-     * @returns if npc has reached mapObject limit and needs position updare from backend.
+     * @returns if npc has reached mapObject limit and needs position update from backend.
      * is called in a certain intervall of milliseconds to see if npc needs position update.
      */
     reachedMapEleLimit(): boolean | undefined {
@@ -309,7 +309,6 @@ export class NpcAsset {
     }
 
     /**
-     * Method to calculate coordinates of positions in curve that npc has to be moved to.
      * calculates curve center point that rotation is executed around and radius of the curve.
      * also sets necessary parameters like curve angle and if angle needs to be increased or decreased.
      */
