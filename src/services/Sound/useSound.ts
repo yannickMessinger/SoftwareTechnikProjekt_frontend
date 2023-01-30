@@ -86,7 +86,7 @@ function playHornFromFromOtherCar(distance: number) {
  * To avoid start sound while driving (because of audio loop): if track ends set currenTime (starttime) to 15
  */
 function playYourEngine() {
-    audioEngine.volume = 0.2
+    audioEngine.volume = 0.1
     let buffer = 3
     if (audioEngine.currentTime > audioEngine.duration - buffer) {
         audioEngine.currentTime = 15
