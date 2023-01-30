@@ -31,11 +31,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
 import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
+import { useChat } from "../../services/Chat/useChat"
 import { createNewLobby, updateLobbyList, useLobbyList } from "../../services/Lobby/useLobbyList"
 import { useMyMaps } from "../../services/Lobby/useMyMaps"
+import useUser from "../../services/User/UserStore"
 import LobbyList from "./LobbyList.vue"
 import MyMaps from "./MyMaps.vue"
+const { setActiveLobby, name, activeLobby } = useUser()
 
+const { connectLobbyChat, disconnectLobbyChat } = useChat(name.value, activeLobby.value)
 onMounted(async () => {
     await updateLobbyList()
 })

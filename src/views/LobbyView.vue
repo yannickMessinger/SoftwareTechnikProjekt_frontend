@@ -27,12 +27,16 @@ import { usePlayerList } from "../services/User/usePlayerList"
 import ActiveLobby from "../components/Lobby/ActiveLobby.vue"
 import MyMaps from "../components/Lobby/MyMaps.vue"
 import useUser from "../services/User/UserStore"
+import { useChat } from "../services/Chat/useChat"
 
 const { playerList, fetchPlayerList } = usePlayerList()
-const { userId, hostId } = useUser()
+const { userId, hostId, activeLobby, name } = useUser()
+const { connectLobbyChat, disconnectLobbyChat } = useChat(name.value, activeLobby.value)
 
 onMounted(async () => {
     await fetchPlayerList()
+    disconnectLobbyChat()
+    connectLobbyChat()
 })
 </script>
 

@@ -73,7 +73,7 @@ import { E_LobbyMode } from "../../models/Lobby/E_LobbyMode"
 import { IGetMapByMapIdDTO } from "../../models/Map/IGetMapByMapIdDTO"
 
 const { name, userId, activeLobby, setActiveLobby } = useUser()
-const { connectLobbyChat, disconnectLobbyChat, activeLobbyID } = useChat(name.value, activeLobby.value)
+const { activeLobbyID } = useChat(name.value, activeLobby.value)
 const { receiveLobbyUpdates, leaveLobbyMessage, closeLobbyMessage, driveMessage } = useLobbyList()
 const { bus } = useEventBus()
 
@@ -133,7 +133,6 @@ function goDrive() {
 function closeLobbyClicked() {
     deletePlayerFromLobby()
     closeLobbyMessage()
-    disconnectLobbyChat(activeLobbyID.value)
     setActiveLobby({
         lobbyId: -1,
         hostId: -1,

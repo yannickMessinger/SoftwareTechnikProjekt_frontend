@@ -14,12 +14,18 @@ let globalSubscription: StompSubscription
 let lobbySubscription: StompSubscription
 let activeLobbyID = ref(-1)
 
+/**
+ * Chat Message for parse to json
+ */
 interface IChatMessage {
     message: string
     author: string
     type: string
 }
 
+/**
+ * Chat state for inter communication, consists of a global and a lobby chatlist
+ */
 interface IChatState {
     chatList: IChatMessage[]
     chatList_lobby: IChatMessage[]
@@ -28,6 +34,9 @@ interface IChatState {
     activeLobbyId: number
 }
 
+/**
+ * Stomp message interface for stomp communication
+ */
 interface IStompMessage {
     author: string
     content: string
@@ -35,6 +44,9 @@ interface IStompMessage {
     lobbyId: number
 }
 
+/**
+ * Initialize chat state reactive
+ */
 const chatState = reactive<IChatState>({
     chatList: Array<IChatMessage>(),
     chatList_lobby: Array<IChatMessage>(),
@@ -43,27 +55,18 @@ const chatState = reactive<IChatState>({
     activeLobbyId: -1,
 })
 
-export function useChat(username: string, lobby: ILobby) {
-    chatState.userName = username
-    chatState.activeLobbyId = lobby.lobbyId
-
-    return {
-        chat: readonly(chatState),
-        sendMessage,
-        sendLobbyMessage,
-        connectGlobalChat,
-        connectLobbyChat,
-        disconnectLobbyChat,
-        activeLobbyID,
-    }
-}
-
+/**
+ * connect on gloabal chat channel per Websocket and Stomp
+ */
 function connectGlobalChat() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
     stompClient.connect({}, onConnectedGlobalWs, onError)
 }
 
+/**
+ * Subscribe on global channel and send a join message
+ */
 function onConnectedGlobalWs() {
     if (globalSubscription !== undefined) {
         globalSubscription.unsubscribe()
@@ -76,14 +79,18 @@ function onError(error: Error) {
     chatState.errormessage = error.message
 }
 
-//connect second ws for local lobbychat
+/**
+ * Connect lobby chat channel
+ */
 function connectLobbyChat() {
     let socket = new WebSocket(ws_url)
     stompClient = Stomp.over(socket)
     stompClient.connect({}, onConnectedLobbyWs, onError)
 }
 
-//subscribes ws to lobby specific path
+/**
+ * Subscribes the right lobby channel using the activeLobbyId,  and send join message
+ */
 function onConnectedLobbyWs() {
     lobbySubscription = lobbySubscription = stompClient.subscribe(
         `/topic/chat/lobby/${chatState.activeLobbyId}`,
@@ -96,14 +103,32 @@ function onConnectedLobbyWs() {
     )
 }
 
-function disconnectLobbyChat(oldValue: number) {
-    stompClient.send(LOBBY_MSG + oldValue, {}, JSON.stringify({ author: chatState.userName, type: "LEAVE" }))
-    chatState.chatList_lobby = []
+/**
+ * unsubscribe lobby chat for disconnect and clear chat.
+ */
+function disconnectLobbyChat() {
     if (lobbySubscription !== undefined) {
+        chatState.chatList_lobby = []
         lobbySubscription.unsubscribe()
     }
 }
 
+/**
+ * unsubscribe lobby chat for leave, send leave message and clear chat.
+ * @param oldLobbyId - to send leave message to old lobby
+ */
+function leaveLobbyChat(oldLobbyId: number) {
+    if (lobbySubscription !== undefined) {
+        stompClient.send(LOBBY_MSG + oldLobbyId, {}, JSON.stringify({ author: chatState.userName, type: "LEAVE" }))
+        chatState.chatList_lobby = []
+        lobbySubscription.unsubscribe()
+    }
+}
+
+/**
+ * sende Message to global chat
+ * @param message - chat message
+ */
 function sendMessage(message: string) {
     if (message && stompClient) {
         const chatMessage: IStompMessage = {
@@ -116,8 +141,11 @@ function sendMessage(message: string) {
         stompClient.send(SEND_MSG, {}, JSON.stringify(chatMessage))
     }
 }
+/**
+ * sends lobby inter message to specific lobby endpoint
+ * @param message - chat mesage
+ */
 
-//sends lobby inter message to specific endpoint
 function sendLobbyMessage(message: string) {
     if (message && stompClient) {
         const chatMessage: IStompMessage = {
@@ -131,6 +159,10 @@ function sendLobbyMessage(message: string) {
     }
 }
 
+/**
+ * if chat message received, add it du chatstate.chatlist. Additionally a notification message will be sent
+ * @param payload chat message
+ */
 function onMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
     if (message.type === "CHAT") {
@@ -143,7 +175,11 @@ function onMessageReceived(payload: { body: string }) {
         })
     }
 }
-
+/**
+ * if chat message received (could be join-message, leave-message or normal chat message), add it du chatstate.chatList_lobby.
+ *  Additionally a notification message will be sent
+ * @param payload
+ */
 function onLobbyMessageReceived(payload: { body: string }) {
     const message = JSON.parse(payload.body)
 
@@ -166,5 +202,21 @@ function onLobbyMessageReceived(payload: { body: string }) {
             author: message.author,
             type: "CHAT",
         })
+    }
+}
+
+export function useChat(username: string, lobby: ILobby) {
+    chatState.userName = username
+    chatState.activeLobbyId = lobby.lobbyId
+
+    return {
+        chat: readonly(chatState),
+        sendMessage,
+        sendLobbyMessage,
+        connectGlobalChat,
+        connectLobbyChat,
+        disconnectLobbyChat,
+        leaveLobbyChat,
+        activeLobbyID,
     }
 }

@@ -29,7 +29,7 @@ const SWITCHMAP_MSG = "/app/lobby.switchMap"
 
 let stompClient: Client
 const { user, userId, activeLobby, setActiveLobby, postActiveLobby } = useUser()
-const { disconnectLobbyChat, connectLobbyChat } = useChat(user.userName, activeLobby.value)
+const { leaveLobbyChat, connectLobbyChat } = useChat(user.userName, activeLobby.value)
 
 interface IStompMessage {
     playerContent: IUser
@@ -123,7 +123,6 @@ export async function createNewLobby(addLobbyName: string, addNumOfPlayers: numb
 purpose to update playerlist of active lobby for all players that joined that particullar lobby.
 */
 function joinMessage() {
-    connectLobbyChat()
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
         //if(activeLobby.value)
         const lobbyMessage: IStompMessage = {
@@ -182,7 +181,7 @@ function leaveLobbyMessage() {
         },
         type: "LEAVE",
     }
-    disconnectLobbyChat(activeLobby.value.lobbyId)
+    leaveLobbyChat(activeLobby.value.lobbyId)
     stompClient.publish({
         destination: LEAVE_MSG,
         headers: {},
@@ -193,7 +192,6 @@ function leaveLobbyMessage() {
 Purpose to inform all user about new available lobby */
 function createLobbyMessage() {
     console.log("CREATE")
-    connectLobbyChat()
     if (stompClient && userId.value !== undefined && activeLobby.value.lobbyId !== -1) {
         const lobbyMessage: IStompMessage = {
             playerContent: {
@@ -278,7 +276,7 @@ function closeLobbyMessage() {
         },
         type: "CLOSE",
     }
-    disconnectLobbyChat(activeLobby.value.lobbyId)
+    leaveLobbyChat(activeLobby.value.lobbyId)
     stompClient.publish({
         destination: CLOSE_MSG,
         headers: {},
