@@ -1,22 +1,11 @@
-<script>
+<script setup lang="ts">
 import ListBlocksComponent from "../streetplaner/ListBlocksComponent.vue"
 import BuildingBlocksComponent from "../streetplaner/BuildingBlocksComponent.vue"
 
-export default {
-    components: {
-        ListBlocksComponent: ListBlocksComponent,
-        BuildingBlocksComponent: BuildingBlocksComponent,
-    },
-    data() {
-        return {
-            viewType: "noDataPicked",
-        }
-    },
-    methods: {
-        handleClick(element) {
-            this.viewType = element
-        },
-    },
+let viewType = ""
+
+function handleClick(element: string) {
+    viewType = element
 }
 </script>
 

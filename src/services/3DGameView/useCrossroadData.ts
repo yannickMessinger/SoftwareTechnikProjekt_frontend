@@ -123,30 +123,38 @@ stompClient.onConnect = (frame) => {
                     switch (value) {
                         case "GREEN":
                             trafficLights.get(Number(key))!.currentState = "GREEN"
+                            // @ts-ignore
                             trafficLights
                                 .get(Number(key))!
                                 .object3d.getObjectByName("sphere")
+                                // @ts-ignore
                                 .material.color.setHex(0x77dd77)
                             break
                         case "YELLOW":
                             trafficLights.get(Number(key))!.currentState = "YELLOW"
+                            // @ts-ignore
                             trafficLights
                                 .get(Number(key))!
                                 .object3d.getObjectByName("sphere")
+                                // @ts-ignore
                                 .material.color.setHex(0xdddd77)
                             break
                         case "REDYELLOW":
                             trafficLights.get(Number(key))!.currentState = "REDYELLOW"
+                            // @ts-ignore
                             trafficLights
                                 .get(Number(key))!
                                 .object3d.getObjectByName("sphere")
+                                // @ts-ignore
                                 .material.color.setHex(0xdddd77)
                             break
                         case "RED":
                             trafficLights.get(Number(key))!.currentState = "RED"
+                            // @ts-ignore
                             trafficLights
                                 .get(Number(key))!
                                 .object3d.getObjectByName("sphere")
+                                // @ts-ignore
                                 .material.color.setHex(0xdd7777)
                             break
                         default:
