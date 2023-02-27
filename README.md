@@ -1,14 +1,25 @@
-# Frontend des Gruppenprojektes "Softwaretechnik Projekt" mit dem Titel "World of e mobility" in VueJs und Typescript
-* beeinhaltet einen Multiplayer Straßenplaner / Editor in 2D sowie einen 3D Multiplayer mit Fahrfunktionalität.
+# Frontend des Gruppenprojektes "Softwaretechnik Projekt" mit dem Titel "World of e mobility" mit VueJs, Typescript, TroisJS und ThreeJS.
+* beeinhaltet einen Multiplayer Straßenplaner / Editor in 2D sowie einen 3D Multiplayer mit gemeinsamer Fahrfunktionalität und NPC Charakteren. 
 
-# Installieren
+## Zunaechst vor erstem Start bitte:
+* npm install
 
-### npm install
+## vorher Backend starten, um Funktionalitaet zu ermoeglichen
+* siehe dazu bitte Repo SoftwareTechnikProjekt_backend
 
-# Lokal laufen lassen
+## dann lokal laufen lassen:
+* npm run dev
 
-### npm run dev
+## im Anschluss:
+* registrieren
+* einloggen
+* Lobby erstellen
+* Karte anlegen
+* Karte Lobby hinzufuegen
+* im Editor / Baumodus Karte bearbeiten
+* Npc Charactere hinzufuegen
+* eigenen Startpunkt setzen, sonst wird dieser zufaellig gesetzt
+* via Home Button Editor verlassen
+* in Spielmodus wechseln
+* fahren via wasd Eingabe
 
-# Dev-Branch
-
-### Dev branch nicht auf master pushen, wenn kein PO
