@@ -9,8 +9,10 @@
 
 ## dann lokal laufen lassen:
 * npm run dev
+* Port 5173
 
 ## im Anschluss:
+* Frontend laeuft auf http://localhost:5173
 * registrieren
 * einloggen
 * Lobby erstellen
